@@ -7,7 +7,7 @@ An example application to demonstrate uploading file to the Safe network
 
 ##Dependency
 
-Build the [Safe_ffi](https://github.com/maidsafe/safe_ffi/) rust code to generate a dynamic library.
+Build the [safe_ffi](https://github.com/maidsafe/safe_ffi/) rust code to generate a dynamic library.
 Place the library in the `src/scripts/safe_api` folder
 
 
