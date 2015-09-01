@@ -1,0 +1,43 @@
+{
+  "name": "safe_dns_example",
+  "productName": "safe_dns_example",
+  "version": "0.0.1",
+  "description": "Example Application to demonstrate Safe DNS API",  
+  "main": "index.js",
+  "repository": "maidsafe/safe_examples/dns_example",
+  "author": {
+    "name": "krishna",
+    "email": "krishna.kumar@maidsafe.net",
+    "url": "maidsafe.net"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build-win": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar_unpack=*.dll --platform=win32 --arch=x64 --version=0.30.0 --overwrite",
+    "build-linux": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar_unpack=*.so --platform=linux --arch=x64 --version=0.30.0 --overwrite",
+    "build-osx": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar_unpack=*.dylib --platform=darwin --arch=x64 --version=0.30.0 --overwrite"
+  },
+  "files": [
+    "index.js",
+    "src"
+  ],
+  "keywords": [
+    "Maidsafe",
+    "Safe DNS"
+  ],
+  "dependencies": {
+    "electron-debug": "^0.1.1",
+    "ffi": "^1.3.2",
+    "mime": "^1.3.4",
+    "ref": "^1.0.2",
+    "ref-array": "^1.1.1",
+    "temp": "^0.8.3"
+  },
+  "devDependencies": {
+    "electron-packager": "^5.0.0",
+    "electron-prebuilt": "^0.30.0",
+    "electron-rebuild": "^0.2.5"
+  }
+}
