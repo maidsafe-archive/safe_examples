@@ -1,0 +1,11 @@
+{
+  "name": "dns_manager",
+  "version": "0.0.1",
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "modernizr": "*",
+    "jquery.cookie": "*",
+    "bower-foundation5": "~5.0.3",
+    "open-sans-fontface": "~1.4.2"
+  }
+}

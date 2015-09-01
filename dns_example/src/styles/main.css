@@ -1,0 +1,240 @@
+body {
+    font-family: "Open Sans", sans-serif;
+    /*border: 2px solid #5081aa;*/
+    background-color: #F0F0F0;
+    -webkit-user-select: none;
+    overflow: hidden;
+}
+nav {
+    height: 32px;
+    background-color: #5081aa;
+    color: white;
+    position: fixed;
+    width: 100%;
+    z-index: 999;
+    display: none;
+}
+nav div.back {
+    padding: 5px 15px;
+    position: absolute;
+    left: 0px;
+    z-index: 999;
+}
+
+nav div.back img:hover {
+    cursor: pointer;
+}
+
+nav div.title {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-style: normal;
+    font-size: 18px;
+    padding: 5px 0;
+}
+button, button:hover, button:focus {
+    background-color: #5081aa;
+    color: white;
+    height: 32px;
+    font-size: 18px;
+    padding: 2px;
+    width: 138px;
+    font-weight: normal;
+}
+input {
+    height: 33px;
+    font-size: 19px;
+}
+a {
+    color: #21577c;
+}
+.no-pad {
+    padding: 0;
+}
+.row-full {
+    width: 100%;
+}
+section {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    bottom: 0;
+}
+nav div.publish {
+    margin: 6px 15px;
+    position: absolute;
+    right: 0px;
+    z-index: 999;
+}
+
+nav div.publish img {
+    margin: -3px 5px 0;
+}
+
+nav div.publish span {
+    font-size: 18px;
+}
+
+.centered-layout {
+    margin: 160px 0 15px 0;
+}
+.margin-25-vertical {
+    margin: 25px 0;
+}
+p.header {
+    font: normal normal 300 32px/37px 'Open Sans';
+    margin-bottom: 15px;
+}
+p.description {
+    font: normal normal normal 18px/22px 'Open Sans';
+    margin: 0 0 0 0;
+}
+#registration {
+    margin: 25px 0 55px;
+}
+#registration input {
+    height: 32px;
+    font: normal normal normal 19px 'Open Sans';
+    border-width: 2px;
+}
+#registration input:focus {
+    border: 1px solid #5081aa;
+}
+#registration span.scheme {
+    display: inherit;
+    margin: 10px auto;
+    font-weight: normal;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+}
+#registration input#service_name {
+    width: calc(100% - 20px);
+    margin: 0px 0px 0px 10px;
+}
+#registration input#public_name {
+    width: calc(100% - 10px);
+    margin: 0px 20px;
+}
+#registration span.dot {
+    display: inherit;
+    width: 5px;
+    float: left;
+    margin: 0;
+    font-weight: bold;
+    font-size: 30px;
+}
+.hide {
+    display: none !important;
+}
+button.btn_template {
+    margin-top: 47px;
+}
+
+.margin-top-50 {
+    margin-top: 50px;
+}
+
+.margin-top-110 {
+    margin-top: 110px;
+}
+div.holder {
+    width: 66px;
+    margin: 33px 0;
+}
+div.holder > img {
+    content: url("../imgs/upload_static.png");
+}
+div.holder:hover > img {
+    content: url("../imgs/upload_drag_hover.png");
+}
+#success img, #failure img {
+    margin-top: 17px;
+    margin-bottom: 32px;
+}
+#success a {
+    color: #21577c;
+}
+#success button, #failure button {
+    margin-top: 95px;
+}
+.no-margin {
+    margin: 0 !important;
+}
+.indicator {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    height: 8px;
+    background-color: #4166B1;
+    border-radius: 10px;
+    margin: 10% 0 0 0;
+    padding: 2px;
+}
+.meter {
+    width: 1px;
+    height: 4px;
+    background-color: white;
+    border-radius: 10px;
+}
+.error {
+    position: fixed;
+    display: none;
+}
+.error .arrow {
+    margin: 0 0 0 10px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #ff7676;
+}
+.error .error-msg {
+    padding: 8px;
+    height: 33px;
+    font-size: 14px;
+    background-color: #ff7676;
+    color: #fff;
+}
+.template_banner {
+    margin-top: 32px;
+    height: 65%;
+    background: url("../imgs/dns_bg.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding: 0;
+}
+.template_banner p {
+    font-size: 20px;
+    font-weight: bolder;
+    text-align: center;
+    color: white;
+    padding: 20px;
+}
+#template input {
+    text-align: center;
+}
+#template_title {
+    font-size: 39px;
+}
+#edit_template_title {
+    padding: 20px;
+}
+#template_title_input {
+    background: transparent;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+}
+.template_content {
+    height: calc(35% - 32px);
+    padding: 5%;
+}
+.template_content p {
+    font-size: 25px;
+    text-align: center;
+}
+nav div.back:hover, nav div.publish:hover, .template_banner:hover , .template_footer div:hover, .template_content p {
+    cursor: pointer;
+}
