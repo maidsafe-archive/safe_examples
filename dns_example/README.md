@@ -1,14 +1,14 @@
 # Safe DNS Example
 
-An example application to demonstrate uploading file to the Safe network
+An example application to demonstrate uploading files of a static website to the Safe network. This examples showcases features from the `safe_nfs` and `safe_dns` crates.
 
 ## Pre-Requisites
   NodeJs should be installed
 
 ##Dependency
 
-Build the [safe_ffi](https://github.com/maidsafe/safe_ffi/) rust code to generate a dynamic library.
-Place the library in the `src/scripts/safe_api` folder
+Build the [safe_ffi](https://github.com/maidsafe/safe_ffi/) rust code to generate the ffi library.
+Place this corresponding lib(`libsafe_ffi.{so, dylib, dll}`) library in the `src/scripts/safe_api` folder
 
 
 ## Development
