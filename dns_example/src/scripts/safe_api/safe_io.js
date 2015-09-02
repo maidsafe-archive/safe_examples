@@ -3,12 +3,29 @@ var ref = require('ref');
 var ArrayType = require('ref-array');
 var IntArray = ArrayType(ref.types.int);
 var fs = require('fs');
+var path = require('path');
 
 var safeIo = (function() {
   var api;
+  var RTLD_NOW = ffi.DynamicLibrary.FLAGS.RTLD_NOW;
+  var RTLD_GLOBAL = ffi.DynamicLibrary.FLAGS.RTLD_GLOBAL;
+  var mode = RTLD_NOW | RTLD_GLOBAL;
 
-  this.load = function(path) {
-    api = ffi.Library(path, {
+  var SODIUM_DEP_EXT = {
+    'linux':  '.so.13'
+    , 'linux2': '.so.13'
+    , 'sunos':  '.so.13'
+    , 'solaris':'.so.13'
+    , 'freebsd':'.so.13'
+    , 'openbsd':'.so.13'
+    , 'darwin': '.dylib'
+    , 'mac':    '.dylib'
+    , 'win32':  '.dll'
+  }[process.platform];
+
+  this.load = function(libPath) {
+    ffi.DynamicLibrary(path.resolve(libPath, 'libsodium' + SODIUM_DEP_EXT), mode);
+    api = ffi.Library(path.resolve(libPath, 'libsafe_ffi'), {
       'create_sub_directory': ['int', ['string', 'bool']],
       'create_file': ['int', ['string', IntArray, 'int']],
       'register_dns': ['int', ['string', 'string', 'string']]

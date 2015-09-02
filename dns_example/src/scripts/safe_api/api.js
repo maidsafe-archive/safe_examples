@@ -28,8 +28,7 @@ var SafeApi = function() {
    * @returns Library File path
    */
   var getLibraryFileName = function() {
-    var root = (__dirname.indexOf('asar') === -1) ? './src/scripts/safe_api/' : path.resolve(__dirname, '../../../../app.asar.unpacked/src/scripts/safe_api/');
-    return path.resolve(root, 'libsafe_ffi');
+    return (__dirname.indexOf('asar') === -1) ? './src/scripts/safe_api/' : path.resolve(__dirname, '../../../../app.asar.unpacked/src/scripts/safe_api/');
   };
 
   apiProcess.on('exit', function() {
