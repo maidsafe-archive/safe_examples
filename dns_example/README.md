@@ -9,7 +9,7 @@ An example application to demonstrate uploading files of a static website to the
 
 Build the [safe_ffi](https://github.com/maidsafe/safe_ffi/) rust code to generate the ffi library.
 Place this corresponding lib(`libsafe_ffi.{so, dylib, dll}`) library in the `src/scripts/safe_api` folder
-
+Also add the libsodium dependency in the `src/scripts/safe_api` folder. For linux, add `libsodium.so.<version>` instead of `libsodium.so` 
 
 ## Development
 
