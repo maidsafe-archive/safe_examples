@@ -7,25 +7,16 @@ var path = require('path');
 
 var safeIo = (function() {
   var api;
-  var RTLD_NOW = ffi.DynamicLibrary.FLAGS.RTLD_NOW;
-  var RTLD_GLOBAL = ffi.DynamicLibrary.FLAGS.RTLD_GLOBAL;
-  var mode = RTLD_NOW | RTLD_GLOBAL;
-
-  var SODIUM_DEP_EXT = {
-    'linux':  '.so.13'
-    , 'linux2': '.so.13'
-    , 'sunos':  '.so.13'
-    , 'solaris':'.so.13'
-    , 'freebsd':'.so.13'
-    , 'openbsd':'.so.13'
-    , 'darwin': '.dylib'
-    , 'mac':    '.dylib'
-    , 'win32':  '.dll'
-  }[process.platform];
 
   this.load = function(libPath) {
-    ffi.DynamicLibrary(path.resolve(libPath, 'libsodium' + SODIUM_DEP_EXT), mode);
-    api = ffi.Library(path.resolve(libPath, 'libsafe_ffi'), {
+    if (process.platform !== 'win32' && process.platform !== 'mac' && process.platform !== 'darwin') {
+      var RTLD_NOW = ffi.DynamicLibrary.FLAGS.RTLD_NOW;
+      var RTLD_GLOBAL = ffi.DynamicLibrary.FLAGS.RTLD_GLOBAL;
+      var mode = RTLD_NOW | RTLD_GLOBAL;
+      // TODO scan the dir for libsodium.so and pick the version rather than hardcoding 13(version)
+      ffi.DynamicLibrary(path.resolve(libPath, 'libsodium.so.13'), mode);
+    }
+    api = ffi.Library(path.resolve(libPath, process.platform === 'win32' ? 'safe_ffi' : 'libsafe_ffi'), {
       'create_sub_directory': ['int', ['string', 'bool']],
       'create_file': ['int', ['string', IntArray, 'int']],
       'register_dns': ['int', ['string', 'string', 'string']]
