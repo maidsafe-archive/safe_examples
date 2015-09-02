@@ -16,7 +16,7 @@
   "scripts": {
     "start": "electron .",
     "build-win": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar_unpack=*.dll --platform=win32 --arch=x64 --version=0.30.0 --overwrite",
-    "build-linux": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar_unpack=*.so --platform=linux --arch=x64 --version=0.30.0 --overwrite",
+    "build-linux": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar_unpack=*.so* --platform=linux --arch=x64 --version=0.30.0 --overwrite",
     "build-osx": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar_unpack=*.dylib --platform=darwin --arch=x64 --version=0.30.0 --overwrite"
   },
   "files": [
