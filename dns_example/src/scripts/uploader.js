@@ -17,7 +17,9 @@ module.exports = function(onStart, onProgress, onComplete) {
       }
       if (error) {
         alive = false;
-        callback ? callback(error) : function(){ /*no-op*/ };
+        callback ? callback(error) : function(){
+          onComplete(error)
+        };
         return;
       }
       completed += size;
@@ -74,6 +76,17 @@ module.exports = function(onStart, onProgress, onComplete) {
     return size;
   };
 
+  var uploadDirectory = function(folderPath, networkDirectoryPath, subDirectoryName, handler) {
+    var networkPath = networkDirectoryPath + '/' + subDirectoryName;
+    createDirectoryInNetwork(networkPath, function(error) {
+      if(error) {
+        handler.update('Failed to create directory : ' + networkDirectoryPath);
+        return;
+      }
+      uploadFiles(path.join(folderPath, subDirectoryName) , handler, networkPath);
+    })
+  };
+
   /**
    * Upload the files after reading through the directory.
    * For the root directory the networkDirectoryPath will be null and as it is called recursively the network path gets building
@@ -89,24 +102,19 @@ module.exports = function(onStart, onProgress, onComplete) {
     if(!networkDirectoryPath) {
       networkDirectoryPath = path.basename(folderPath);
       createDirectoryInNetwork(networkDirectoryPath, function(error) {
-        if(error || error > 0) {
-          throw 'Failed to create directory : ' + networkDirectoryPath;
+        if(error) {
+          handler.update('Failed to create directory : ' + networkDirectoryPath);
         }
         uploadFiles(folderPath, handler, networkDirectoryPath);
       });
       return;
     }
+
     var dirContents = fs.readdirSync(folderPath);
     for (var index in dirContents) {
       stats = fs.statSync(path.join(folderPath, dirContents[index]));
       if (stats.isDirectory()) {
-        var networkPath = networkDirectoryPath + '/' + dirContents[index];
-        createDirectoryInNetwork(networkPath, function(error) {
-          if(error || error > 0) {
-            throw 'Failed to create directory : ' + networkDirectoryPath;
-          }
-          uploadFiles(path.join(folderPath, dirContents[index]), handler, networkPath);
-        });
+        uploadDirectory(folderPath, networkDirectoryPath, dirContents[index], handler);
       } else {
         writeFileToNetwork(folderPath, networkDirectoryPath, dirContents[index], stats.size, handler);
       }
