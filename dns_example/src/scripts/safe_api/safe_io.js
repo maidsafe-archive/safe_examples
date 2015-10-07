@@ -7,37 +7,76 @@ var path = require('path');
 
 var safeIo = (function() {
   var api;
+  var safeClientPtrPtr = ref.refType(ref.refType(ref.types.void));
+  var clientPtrPtr;
 
   this.load = function(libPath) {
     api = ffi.Library(path.resolve(libPath, process.platform === 'win32' ? 'safe_ffi' : 'libsafe_ffi'), {
-      'create_sub_directory': ['int', ['string', 'bool']],
-      'create_file': ['int', ['string', IntArray, 'int']],
-      'register_dns': ['int', ['string', 'string', 'string']]
+      'create_account': ['int', ['string', 'string', 'string', safeClientPtrPtr]],
+      'log_in': ['int', ['string', 'string', 'string', safeClientPtrPtr]],
+      'create_sub_directory': ['int', [safeClientPtrPtr, 'string', 'bool', 'bool']],
+      'create_file': ['int', [safeClientPtrPtr, 'string', IntArray, 'int']],
+      'register_dns': ['int', [safeClientPtrPtr, 'string', 'string', 'string']]
     });
   };
 
+  this.createAccount = function(keyword, pin, password) {
+    clientPtrPtr = ref.alloc(safeClientPtrPtr);
+    return api.create_account(keyword, pin, password, clientPtrPtr);
+  };
+
+  this.login = function(keyword, pin, password) {
+    clientPtrPtr = ref.alloc(safeClientPtrPtr);
+    return api.log_in(keyword, pin, password, clientPtrPtr);
+  };
+
   this.createDirectory = function(directoryPath) {
-    return api.create_sub_directory(directoryPath, false);
+    return api.create_sub_directory(clientPtrPtr.deref(), directoryPath, false, false);
   };
 
   this.createFile = function(directoryPath, fileName, contents) {
-    return api.create_file(directoryPath + '/' + fileName, contents, contents.length);
+    return api.create_file(clientPtrPtr.deref(), directoryPath + '/' + fileName, contents, contents.length);
   };
 
   this.registerDns = function(publicName, serviceName, directoryPath) {
-    return api.register_dns(publicName, serviceName, directoryPath);
+    return api.register_dns(clientPtrPtr.deref(), publicName, serviceName, directoryPath);
   };
 
   return this;
 })();
 
 process.on('message', function(request) {
+
   var load = function(path) {
     try {
       safeIo.load(path);
     } catch(ex) {
       process.send('Load failed : ' + path );
       process.abort();
+    }
+  };
+
+  var createAccount = function(keyword, pin, password) {
+    try {
+      safeIo.createAccount(keyword, pin, password);
+      process.send('Account Created Successfully');
+    } catch(ex) {
+      process.send({
+        error: 999,
+        msg: ex.toString()
+      });
+    }
+  };
+
+  var login = function(keyword, ppin, password) {
+    try {
+      safeIo.login(keyword, pin, password);
+      process.send('Logged in Successfully');
+    } catch(ex) {
+      process.send({
+        error: 999,
+        msg: ex.toString()
+      });
     }
   };
 
@@ -93,7 +132,19 @@ process.on('message', function(request) {
 
   switch (request.method) {
     case 'init':
+      var keyword;
+      var pin;
+      var password;
       load(request.libPath);
+      keyword = Math.random().toString(16).substring(5);
+      pin = Math.random().toString().substring(4).substring(0, 4);
+      password = Math.random().toString().substring(4).substring(0, 4);
+      process.send('Creating Account :: ');
+      process.send('     Keyword   - ' + keyword);
+      process.send('     Pin       - ' + pin);
+      process.send('     Password  - ' + password);
+      createAccount(keyword, pin, password);
+      login(keyword, pin, password);
       break;
 
     case 'create_directory':

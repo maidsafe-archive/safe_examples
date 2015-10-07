@@ -4,6 +4,7 @@ An example application to demonstrate uploading files of a static website to the
 
 ## Pre-Requisites
   NodeJs should be installed
+  bower is installed globally. 
 
 ##Dependency
 
@@ -18,7 +19,7 @@ $ npm install
 $ bower install
 ```
 
-Rebuild the native dependencies with electron-rebuild by executing, `./node_modules/.bin/electron-rebuild`
+Rebuild the native dependencies with electron-rebuild by executing, `npm run electron-rebuild`
 
 ### Run the code
 
