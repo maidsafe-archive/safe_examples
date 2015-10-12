@@ -26,3 +26,5 @@ var API = function () {
   };
 
 };
+
+exports = module.exports = new API();
