@@ -1,30 +1,35 @@
-var requestManager = require('./request_manager');
-var connectionManager = require('./connection_manager');
+var RequestManager = require('./request_manager');
 
 var API = function () {
   var encryptionKey;
   var self = this;
 
+  var notInitialisedYet = function() {
+    console.log('Not yet initialised - init function should be invoked');
+  };
+
+  var onReady = function(callback) {
+    
+    this.updateAPI = function(err, requestManager) {
+      if (err) {
+        callback(err);
+        return;
+      }
+      self.nfs = require('./nfs')(requestManager);
+      self.dns = require('./dns')(requestManager);
+      callback(null);
+    };
+
+    return this.updateAPI;
+  };
+
   self.init = function(portNumber, launcherString, nonce, callback) {
-    // connectionManager.startListening();
-    // Handle Handlshake - MAID 1464
-    // initialise requestManager
-    // on success {
-    //    set Encryption key & set the NFS and DNS API
-    //    self.nfs = require('./nfs')(requestManager);
-    //    self.dns = require('./dns')(requestManager);
-    // }
-    // pass result to callback
+     new RequestManager(portNumber, launcherString, nonce, onReady(callback));
   };
 
-  self.nfs = function() {
-    console.log('Not yet initialised - init function should be invoked');
-  };
+  self.nfs = notInitialisedYet;
 
-  self.dns = function() {
-    console.log('Not yet initialised - init function should be invoked');
-  };
-
+  self.dns = notInitialisedYet;
 };
 
 exports = module.exports = new API();
