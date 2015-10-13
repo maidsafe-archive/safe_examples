@@ -1,22 +1,26 @@
 var RequestManager = require('./request_manager');
+var log = require('npmlog');
 
 var API = function () {
   var encryptionKey;
   var self = this;
 
   var notInitialisedYet = function() {
-    console.log('Not yet initialised - init function should be invoked');
+    log.warn('Not yet initialised - init function should be invoked');
   };
 
   var onReady = function(callback) {
-    
+
     this.updateAPI = function(err, requestManager) {
       if (err) {
+        log.error('Failed to connect with launcher ' + err);
         callback(err);
         return;
       }
+      log.info('Connected with Launcher');
       self.nfs = require('./nfs')(requestManager);
       self.dns = require('./dns')(requestManager);
+      log.verbose('safe_api has been initialised');
       callback(null);
     };
 
@@ -30,6 +34,8 @@ var API = function () {
   self.nfs = notInitialisedYet;
 
   self.dns = notInitialisedYet;
+
+  return self;
 };
 
 exports = module.exports = new API();

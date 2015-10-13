@@ -3,6 +3,9 @@ var remote = require('remote');
 var Menu = remote.require('menu');
 var shell = remote.require('shell');
 var dialog = remote.require('dialog');
+var log = require('npmlog');
+// TODO get loglevel from runtime arguments [info, verbose, warn, error]
+log.level = 'info';
 
 // Nodejs and Application Variable initialization
 var path = require('path');
