@@ -65,9 +65,7 @@ var Connection = function() {
     });
   };
 
-  this.send = function(data) {
-    socket.write(data);
-  };
+  this.send = socket.write;
 
   this.isAlive = function() {
     return alive;

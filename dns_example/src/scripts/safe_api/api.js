@@ -9,7 +9,7 @@ var API = function () {
   };
 
   var onReady = function(callback) {
-    
+
     this.updateAPI = function(err, requestManager) {
       if (err) {
         callback(err);
@@ -30,6 +30,8 @@ var API = function () {
   self.nfs = notInitialisedYet;
 
   self.dns = notInitialisedYet;
+
+  return self;
 };
 
 exports = module.exports = new API();
