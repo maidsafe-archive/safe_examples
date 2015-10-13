@@ -4,6 +4,7 @@
 
 var Connection = function() {
   var net = require('net');
+  var log = require('npmlog');
   var socket;
   var onDataRecievedListener;
   var onConnectionClosedListener;
@@ -33,6 +34,7 @@ var Connection = function() {
   };
 
   var onDataRecieved = function(data) {
+    log.verbose('Data recieved from launcher');
     if (!onDataRecievedListener) {
       return;
     }
@@ -40,11 +42,14 @@ var Connection = function() {
   };
 
   var onConnectionClosed = function() {
+    var connectionDroppedMsg = 'Connection with the launcher at port : ' + portNumber + ' disconnected';
+    var couldNotEstablishConMsg = 'Connection could not be established at port : ' + portNumber;
+    log.error(alive ? connectionDroppedMsg : couldNotEstablishConMsg);
     alive = false;
     if (!onConnectionClosedListener) {
       return;
     }
-    onConnectionClosedListener(data);
+    onConnectionClosedListener();
   };
 
   /**
@@ -56,11 +61,13 @@ var Connection = function() {
     if (options) {
       setFromOptions(options);
     }
+    log.verbose('Connecting with the launcher at port : ' + portNumber);
     socket =  new net.Socket();
     socket.on('data', onDataRecieved);
     socket.on('close', onConnectionClosed);
     socket.connect(portNumber, HOST, function() {
       alive = true;
+      log.verbose('Connected with the launcher at port : ' + portNumber);
       callback();
     });
   };

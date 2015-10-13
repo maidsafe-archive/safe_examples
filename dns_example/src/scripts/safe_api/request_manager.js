@@ -3,7 +3,9 @@
 */
 var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback) {
   var connectionManager = require('./connection_manager');
-  var sodium = require('libsodium-wrappers');  
+  var sodium = require('libsodium-wrappers');
+  var log = require('npmlog');
+
   var encryptionKey;
   var encryptionNonce;
   var KEY_SIZE = {
@@ -61,12 +63,15 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
 
 
   var onDataRecieved = function(data) {
+    log.verbose('Data revieved from launcher :' + data);
     var response;
     try {
       response = = decrypt(data);
+      log.verbose('Decrypted Response :' + response);
       if (!callbackPool.hasOwnProperty(response.id)) {
         return;
       }
+      log.verbose('Invoking Callbacks');
       for (var i in callbackPool[response.id]) {
         callbackPool[i](response.error_code, response.data);
       }
@@ -77,14 +82,16 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
   };
 
   var onConnectionClosed = function() {
-    console.log('Launcher socket connection closed');
+    log.error('Launcher socket connection closed');
   };
 
   self.send = function(request, callback) {
+    log.verbose('Sending Request :' + request);
     addToCallbackPool(request, callback);
     connectionManager.send(encrypt(request));
   };
 
+  log.verbose('Trying to connect with laucher');
   connectionManager.connect(port, handshake, {
     'onData': onDataRecieved,
     'onClosed': onConnectionClosed
