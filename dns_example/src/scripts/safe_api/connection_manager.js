@@ -34,7 +34,7 @@ var Connection = function() {
   };
 
   var onDataRecieved = function(data) {
-    log.verbose('Data recieved from launcher');
+    log.verbose('Data received from launcher');
     if (!onDataRecievedListener) {
       return;
     }
