@@ -66,7 +66,7 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
     log.verbose('Data received from launcher :' + data);
     var response;
     try {
-      response = = decrypt(data);
+      response = decrypt(data);
       log.verbose('Decrypted Response :' + response);
       if (!callbackPool.hasOwnProperty(response.id)) {
         return;
