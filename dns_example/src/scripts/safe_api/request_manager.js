@@ -63,7 +63,7 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
 
 
   var onDataRecieved = function(data) {
-    log.verbose('Data revieved from launcher :' + data);
+    log.verbose('Data recieved from launcher :' + data);
     var response;
     try {
       response = = decrypt(data);
