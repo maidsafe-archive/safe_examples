@@ -2,14 +2,14 @@
 
 An example application to demonstrate uploading files of a static website to the Safe network. This examples showcases features from the `safe_nfs` and `safe_dns` crates.
 
-## Pre-Requisites
+## Prerequisites
   NodeJs should be installed
   bower is installed globally. 
 
 ##Dependency
 
 Build the [safe_ffi](https://github.com/maidsafe/safe_ffi/) rust code to generate the ffi library.
-Place this corresponding lib(`libsafe_ffi.{so, dylib, dll}`) library in the `src/scripts/safe_api` folder
+Copy the `safe_ffi` dynamic library (Linux: `libsafe_ffi.so` or in OSX: `libsafe_ffi.dylib` or in Win: `safe_ffi.dll`) to the `src/scripts/safe_api` folder
 
 ## Development
 
