@@ -15,20 +15,20 @@ exports = module.exports = function(requestManager) {
    */
   this.registerDns = function(longName, serviceName, isSafeDrivePath, serviceHomeDirPath, callback) {
     if (!longName) {
-      callback("longName cannot be empty");
+      callback('longName cannot be empty');
       return;
     }
     if (!serviceHomeDirPath) {
-      callback("serviceHomeDirPath cannot be empty");
+      callback('serviceHomeDirPath cannot be empty');
       return;
     }
     var request = {
-      "endpoint": "safe-api/v1.0/dns/register-dns",
-      "data": {
-        "long_name": longName,
-        "service_name": serviceName || 'www',
-        "is_path_shared": isSafeDrivePath || false,
-        "service_home_dir_path": serviceHomeDirPath
+      endpoint: 'safe-api/v1.0/dns/register-dns',
+      data: {
+        long_name: longName,
+        service_name: serviceName || 'www',
+        is_path_shared: isSafeDrivePath || false,
+        service_home_dir_path: serviceHomeDirPath
       }
     };
     log.verbose('Registering DNS :: ' +  longName);

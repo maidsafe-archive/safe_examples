@@ -15,22 +15,22 @@ exports = module.exports = function(requestManager) {
   var UploadData = function(isSafeDrivePath, path, data, callback) {
     this.execute = function() {
       var request = {
-        "endpoint": "safe-api/v1.0/nfs/modify-file",
-        "data": {
-          "is_path_shared": isSafeDrivePath,
-          "file_path": path,
-          "new_values": {
-            "name": null,
-            "content": {
-              "offset": 0,
-              "overwrite": true,
-              "bytes": data
+        endpoint: 'safe-api/v1.0/nfs/modify-file',
+        data: {
+          is_path_shared: isSafeDrivePath,
+          file_path: path,
+          new_values: {
+            name: null,
+            content: {
+              offset: 0,
+              overwrite: true,
+              bytes: data
             },
-            "user_metadata": null
+            user_metadata: null
           }
         }
       };
-      log.verbose('Creating Directory :: ' +  path);
+      log.verbose('Uploading content for file - ' +  path);
       requestManager.send(request, callback);
     };
 
@@ -48,13 +48,13 @@ exports = module.exports = function(requestManager) {
    */
   this.createDir = function(isSafeDrivePath, path, isPrivate, isVersioned, metadata, callback) {
     var request = {
-      "endpoint": "safe-api/v1.0/nfs/create-dir",
-      "data": {
-        "is_path_shared": isSafeDrivePath || false,
-        "dir_path": path || '/',
-        "is_private": isPrivate || false,
-        "is_versioned": isVersioned || false,
-        "user_metadata": new Buffer(metadata || "").toString("base64")
+      endpoint: 'safe-api/v1.0/nfs/create-dir',
+      data: {
+        is_path_shared: isSafeDrivePath || false,
+        dir_path: path || '/',
+        is_private: isPrivate || false,
+        is_versioned: isVersioned || false,
+        user_metadata: new Buffer(metadata || '').toString('base64')
       }
     };
     log.verbose('Creating Directory :: ' +  path);
@@ -71,11 +71,11 @@ exports = module.exports = function(requestManager) {
    */
   this.createFile = function(isSafeDrivePath, path, metadata, data, callback) {
     var request = {
-      "endpoint": "safe-api/v1.0/nfs/create-dir",
-      "data": {
-        "is_path_shared": isSafeDrivePath || false,
-        "file_path": path || '/',
-        "user_metadata": new Buffer(metadata || "").toString("base64")
+      endpoint: 'safe-api/v1.0/nfs/create-file',
+      data: {
+        is_path_shared: isSafeDrivePath || false,
+        file_path: path || '/',
+        user_metadata: new Buffer(metadata || '').toString('base64')
       }
     };
     log.verbose('Creating File :: ' +  path);
