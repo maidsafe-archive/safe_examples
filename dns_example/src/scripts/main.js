@@ -3,6 +3,7 @@ var remote = require('remote');
 var Menu = remote.require('menu');
 var shell = remote.require('shell');
 var dialog = remote.require('dialog');
+var log = require('npmlog');
 
 // Nodejs and Application Variable initialization
 var path = require('path');
@@ -17,6 +18,16 @@ var tempBackgroundFilePath;
 window.$ = window.jQuery = require('../scripts/jquery.js');
 // Disable Menu bar
 Menu.setApplicationMenu(null);
+
+var initialiseLogger = function() {
+  var level = 'info';
+  process.argv.forEach(function (val) {
+    if(val.indexOf('--log') === 0) {
+      level = val.split('=')[1];
+    }
+  });
+  log.level = level;
+};
 
 // Navigation States
 var AppNavigator = {
@@ -366,6 +377,7 @@ var pickFile = function() {
 };
 
 /*****  Initialisation ***********/
+initialiseLogger();
 AppNavigator.init('step-1');
 registerDragRegion('drag_drop');
 $('#service_name').focus();
