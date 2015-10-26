@@ -2,7 +2,6 @@ var RequestManager = require('./request_manager');
 var log = require('npmlog');
 
 var API = function () {
-  var encryptionKey;
   var self = this;
 
   var notInitialisedYet = function() {
@@ -27,8 +26,8 @@ var API = function () {
     return this.updateAPI;
   };
 
-  self.init = function(portNumber, launcherString, nonce, callback) {
-     new RequestManager(portNumber, launcherString, nonce, onReady(callback));
+  self.init = function(portNumber, launcherString, callback) {
+     new RequestManager(portNumber, launcherString,onReady(callback));
   };
 
   self.nfs = notInitialisedYet;
