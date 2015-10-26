@@ -67,7 +67,7 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
     var response;
     try {
       response = decrypt(data);
-      log.verbose('Decrypted Response :' + response);
+      log.debug('Decrypted Response :' + response);
       if (!callbackPool.hasOwnProperty(response.id)) {
         return;
       }
@@ -86,12 +86,12 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
   };
 
   self.send = function(request, callback) {
-    log.verbose('Sending Request :' + request);
+    log.debug('Sending Request :' + request);
     addToCallbackPool(request, callback);
     connectionManager.send(encrypt(request));
   };
 
-  log.verbose('Trying to connect with laucher');
+  log.verbose('Trying to connect with launcher');
   connectionManager.connect(port, handshake, {
     'onData': onDataRecieved,
     'onClosed': onConnectionClosed
