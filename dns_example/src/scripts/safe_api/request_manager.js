@@ -67,7 +67,7 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
     var response;
     try {
       response = decrypt(data);
-      log.debug('Decrypted Response :' + response);
+      log.verbose('Decrypted Response :' + response);
       if (!callbackPool.hasOwnProperty(response.id)) {
         return;
       }
@@ -86,7 +86,7 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
   };
 
   self.send = function(request, callback) {
-    log.debug('Sending Request :' + request);
+    log.verbose('Sending Request :' + request);
     addToCallbackPool(request, callback);
     connectionManager.send(encrypt(request));
   };
