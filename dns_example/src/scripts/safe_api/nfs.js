@@ -30,7 +30,7 @@ exports = module.exports = function(requestManager) {
           }
         }
       };
-      log.verbose('Creating Directory :: ' +  path);
+      log.verbose('Uploading file content for file - ' +  path);
       requestManager.send(request, callback);
     };
 
@@ -71,7 +71,7 @@ exports = module.exports = function(requestManager) {
    */
   this.createFile = function(isSafeDrivePath, path, metadata, data, callback) {
     var request = {
-      "endpoint": "safe-api/v1.0/nfs/create-dir",
+      "endpoint": "safe-api/v1.0/nfs/create-file",
       "data": {
         "is_path_shared": isSafeDrivePath || false,
         "file_path": path || '/',
