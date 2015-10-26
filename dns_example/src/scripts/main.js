@@ -4,8 +4,6 @@ var Menu = remote.require('menu');
 var shell = remote.require('shell');
 var dialog = remote.require('dialog');
 var log = require('npmlog');
-// TODO get loglevel from runtime arguments [info, verbose, warn, error]
-log.level = 'info';
 
 // Nodejs and Application Variable initialization
 var path = require('path');
@@ -369,6 +367,7 @@ var pickFile = function() {
 };
 
 /*****  Initialisation ***********/
+log.level = process.env.LOG_LEVEL || 'info';
 AppNavigator.init('step-1');
 registerDragRegion('drag_drop');
 $('#service_name').focus();

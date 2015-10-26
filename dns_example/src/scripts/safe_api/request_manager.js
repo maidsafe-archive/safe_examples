@@ -91,7 +91,7 @@ var RequestManager = function(portNumber, launcherString, nonce, onReadyCallback
     connectionManager.send(encrypt(request));
   };
 
-  log.verbose('Trying to connect with laucher');
+  log.verbose('Trying to connect with launcher');
   connectionManager.connect(port, handshake, {
     'onData': onDataRecieved,
     'onClosed': onConnectionClosed
