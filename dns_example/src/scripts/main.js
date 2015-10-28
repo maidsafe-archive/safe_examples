@@ -11,6 +11,7 @@ var mime = require('mime');
 var fs = require('fs');
 var appSrcFolderPath = (__dirname.indexOf('asar') === -1) ? path.resolve('src') : path.resolve(__dirname, '../../src/');
 var Uploader = require('../scripts/uploader');
+var safeApi = require('../scripts/safe_api/api');
 var serviceName;
 var publicName;
 var tempBackgroundFilePath;
@@ -367,7 +368,28 @@ var pickFile = function() {
 };
 
 /*****  Initialisation ***********/
-log.level = process.env.LOG_LEVEL || 'info';
+var processArgs = require('remote').getGlobal('processArgs');
+log.level = processArgs.LOG_LEVEL || 'verbose';
 AppNavigator.init('step-1');
 registerDragRegion('drag_drop');
 $('#service_name').focus();
+
+if (!processArgs.launcher) {
+  log.error('Launcher parameters not available');
+  // TODO kill application (http://electron.atom.io/docs/v0.27.0/api/ipc-main-process/)
+}
+
+var connectionListener = function(err) {
+  if (err) {
+    log.error(err);
+    alert(err);
+    // TODO Kill Application
+    return;
+  }
+  $('#info_pane button').show();
+  $('#info_pane span').hide();
+  log.info('Connected with launcher');
+};
+log.info(processArgs.launcher);
+var tokens = processArgs.launcher.split(':');
+safeApi.init(tokens[1], tokens[2], tokens[3], connectionListener);

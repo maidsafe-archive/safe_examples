@@ -26,8 +26,8 @@ var API = function () {
     return this.updateAPI;
   };
 
-  self.init = function(portNumber, launcherString, callback) {
-     new RequestManager(portNumber, launcherString,onReady(callback));
+  self.init = function(host, portNumber, launcherString, callback) {
+     new RequestManager(host, portNumber, launcherString, onReady(callback));
   };
 
   self.nfs = notInitialisedYet;

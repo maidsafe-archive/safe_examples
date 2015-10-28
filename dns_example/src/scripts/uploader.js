@@ -1,10 +1,10 @@
-module.exports = function(onStart, onProgress, onComplete) {
+module.exports = function(safeApi, onStart, onProgress, onComplete) {
   var fs = require('fs');
   var path = require('path');
   var mime = require('mime');
 
-  var safeApi = require('../scripts/safe_api/api');
   var EXCEPTION_ERROR_CODE = 999;
+
 
   // TODO can replace ProgessHanlder with Async.js
   var ProgressHandler = function(totalSize, callback) {

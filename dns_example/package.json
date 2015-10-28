@@ -14,7 +14,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "start": "electron .",
+    "start": "electron . --launcher tcp:localhost:8080:demo --LOG_LEVEL verbose",
     "electron-rebuild": "grunt rebuild",
     "build-win": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar-unpack=*.dll --platform=win32 --arch=x64 --version=0.30.0 --overwrite",
     "build-linux": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar-unpack=*.so* --platform=linux --arch=x64 --version=0.30.0 --overwrite",
