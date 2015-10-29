@@ -1,7 +1,7 @@
 /**
 * Manage the Request
 */
-var RequestManager = function(portNumber, launcherString, onReadyCallback) {
+var RequestManager = function(host, portNumber, launcherString, notifierCallback) {
   var connectionManager = require('./connection_manager');
   var sodium = require('libsodium-wrappers');
   var log = require('npmlog');
@@ -19,12 +19,13 @@ var RequestManager = function(portNumber, launcherString, onReadyCallback) {
     return values;
   };
 
-  var convertArrayAsMap = function(array) {
-    var map = {};
-    for (var i in array) {
-      map[i.toString()] = array[i];
+  var convertStringAsUnit8Array = function(dataAsString) {
+    var buff = new Buffer(dataAsString, 'base64');
+    var key = new Uint8Array(buff.length);
+    for (var i=0; i < buff.length; i++) {
+      key[i] = buff.readUInt8(i);
     }
-    return map;
+    return key;
   };
 
   var HandshakeKeys = {
@@ -32,18 +33,23 @@ var RequestManager = function(portNumber, launcherString, onReadyCallback) {
     secretKey: null,
     publicKey: null,
     init: function() {
-      var keyPair = sodium.crypto_box_keypair();
-      this.publicKey = keyPair.publicKey;
-      this.secretKey = keyPair.privateKey;
-      this.nonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
+      try {
+        var keyPair = sodium.crypto_box_keypair();
+        this.publicKey = keyPair.publicKey;
+        this.secretKey = keyPair.privateKey;
+        this.nonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
+      } catch(e) {
+        notifierCallback(new Error('Failed to initialise HandshakeKeys - libsodium error'));
+      }
     }
   };
 
-  var addToCallbackPool = function(request, callback) {
-    var id = getValuesFromMap(sodium.crypto_hash(request));
-    var callbacksRegistered = callbackPool.hasOwnProperty(id) ? callbackPool[id] : [];
-    callbacksRegistered.push(callback);
-    callbackPool[id] = callbacksRegistered;
+  var addToCallbackPool = function(data, callback) {
+    var id = new Buffer(getValuesFromMap(sodium.crypto_hash(new Uint8Array(data)))).toString('base64');
+    if (!callbackPool[id]) {
+      callbackPool[id] = [];
+    }
+    callbackPool[id].push(callback);
   };
 
   var encrypt = function(data) {
@@ -51,75 +57,93 @@ var RequestManager = function(portNumber, launcherString, onReadyCallback) {
   };
 
   var decrypt = function(data) {
-    var cipher = convertArrayAsMap(data);
-    var decryptedData = sodium.crypto_secretbox_open_easy(cipher, encryptionNonce, encryptionKey);
+    var ct = new Uint8Array(data.length);
+    for (var i=0; i < data.length; i++) {
+      ct[i] = data.readUInt8(i);
+    }
+    var decryptedData = sodium.crypto_secretbox_open_easy(ct, encryptionNonce, encryptionKey);
     return new Buffer(getValuesFromMap(decryptedData)).toString();
   };
 
   var onDataReceived = function(data) {
-    log.verbose('Data received from launcher :' + data);
     var response;
     try {
-      response = decrypt(data);
-      log.verbose('Decrypted Response :' + response);
+      response = JSON.parse(decrypt(data));
+      log.info('Decrypted Response :' + JSON.stringify(response));
       if (!callbackPool.hasOwnProperty(response.id)) {
+        log.warn('Callback not found for response in RequestManager');
         return;
       }
       log.verbose('Invoking Callbacks');
-      for (var i in callbackPool[response.id]) {
-        callbackPool[i](response.error_code, response.data);
+      var callbacks = callbackPool[response.id];
+      for (var i in callbacks) {
+        var error = (response.error.code === 0) ? null : response.error;
+        callbacks[i](error, response.data);
       }
-      delete callbackPool[id];
+      delete callbackPool[response.id];
     } catch(ex) {
       log.error(ex);
     }
   };
 
-  var onConnectionClosed = function() {
+  var onConnectionError = function() {
     log.error('Launcher socket connection closed');
+    notifierCallback('Launcher Connection Error');
   };
 
   var onHandShakeComplete = function(handshakeResponse) {
-    log.verbose('Handshake response - ' + handshakeResponse);
-    handshakeResponse = sodium.crypto_box_open_easy(handshakeResponse, HandshakeKeys.nonce,
-                                                    HandshakeKeys.publicKey, HandshakeKeys.secretKey);
-    log.verbose('Handshake response (Decrypted) - ' + handshakeResponse);
+    log.info('Launcher responded for handshake request');
+    log.verbose('Handshake response - ' + handshakeResponse.toString());
+    handshakeResponse = JSON.parse(handshakeResponse.toString());
     if (handshakeResponse.error) {
       log.info('handshake failed - ' + handshakeResponse.error.description);
       log.warn(handshakeResponse.error);
-      onReadyCallback('Handshake failed - ' + handshakeResponse.error.description +
+      notifierCallback('Handshake failed - ' + handshakeResponse.error.description +
                       '(' + handshakeResponse.error.code + ')');
       return;
     }
-    encryptionNonce = handshakeResponse.data.splice(0, sodium.crypto_secretbox_NONCEBYTES);
-    encryptionKey = handshakeResponse.data;
+    var launcherPublicKey = convertStringAsUnit8Array(handshakeResponse.data.launcher_public_key);
+    var decryptedSymmKey;
+    try {
+      decryptedSymmKey = sodium.crypto_box_open_easy(convertStringAsUnit8Array(handshakeResponse.data.encrypted_symm_key), HandshakeKeys.nonce,
+                                                     launcherPublicKey, HandshakeKeys.secretKey);
+    } catch(e) {
+      log.error('SymmetricKey Decryption failed');
+      return notifierCallback('SymmetricKey Decryption failed');
+    }
+
+    encryptionNonce = decryptedSymmKey.subarray(0, sodium.crypto_secretbox_NONCEBYTES);
+    encryptionKey = decryptedSymmKey.subarray(sodium.crypto_secretbox_NONCEBYTES);
     connectionManager.setOnDataRecievedListener(onDataReceived);
-    onReadyCallback(null, self);
+    notifierCallback(null, self);
   };
 
   var handshake = function() {
+    log.info('Initiating Handshake with Launcher');
     var request = {
       "endpoint": "safe-api/v1.0/handshake/authenticate-app",
       "data": {
         "launcher_string": launcherString,
-        "nonce": new Buffer(getValuesFromMap(HandshakeKeys.nonce)).toString('base64'),
-        "public_encryption_key": new Buffer(getValuesFromMap(HandshakeKeys.publicKey)).toString('base64')
+        "asymm_nonce": new Buffer(getValuesFromMap(HandshakeKeys.nonce)).toString('base64'),
+        "asymm_pub_key": new Buffer(getValuesFromMap(HandshakeKeys.publicKey)).toString('base64')
       }
     };
+    log.verbose('Sending Request : ' + JSON.stringify(request));
     connectionManager.send(JSON.stringify(request));
   };
 
   self.send = function(request, callback) {
-    log.verbose('Sending Request :' + request);
-    addToCallbackPool(request, callback);
-    connectionManager.send(encrypt(request));
+    request = JSON.stringify(request);
+    var encryptedRequest = encrypt(request);
+    addToCallbackPool(getValuesFromMap(encryptedRequest), callback);
+    connectionManager.send(new Buffer(encryptedRequest));
   };
 
   HandshakeKeys.init();
   log.verbose('Trying to connect with launcher');
-  connectionManager.connect(portNumber, handshake, {
+  connectionManager.connect(host, portNumber, handshake, {
     'onData': onHandShakeComplete,
-    'onClosed': onConnectionClosed
+    'onError': onConnectionError
   });
 
   return;
