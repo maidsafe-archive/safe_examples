@@ -1,7 +1,6 @@
 // Electron UI Variable initialization
 var remote = require('remote');
 var Menu = remote.require('menu');
-var shell = remote.require('shell');
 var dialog = remote.require('dialog');
 var log = require('npmlog');
 
@@ -81,10 +80,6 @@ var AppNavigator = {
 
 var goBack = function() {
   AppNavigator.back();
-};
-
-var openExternal = function(url) {
-  shell.openExternal(url);
 };
 
 /**
@@ -191,23 +186,14 @@ var updateProgressBar = function(meter) {
   $('.indicator div.meter').css('width', meter + '%');
 };
 /** Uploader Callback - when the upload is completed **/
-var onUploadComplete = function(errorCode) {
-  showSection(errorCode ? 'failure': 'success');
-  if (!errorCode) {
-    var endPoint = 'safe:' +  serviceName + '.' + publicName;
-    $('#success_msg').html('Files Uploaded to <a onclick="openExternal(\'' + endPoint + '\')">' + endPoint + '</a>');
+var onUploadComplete = function(error) {
+  showSection(error ? 'failure': 'success');
+  if (error) {
+    $('#error_msg').html(error.description);
     return;
   }
-  var reason;
-  switch (errorCode) {
-    case -1001:
-      reason = 'Service Name and Public Name Already Registered';
-      break;
-
-    default:
-      reason = "Oops! Something went wrong";
-  }
-  $('#error_msg').html(reason);
+  var endPoint = 'safe:' +  serviceName + '.' + publicName;
+  $('#success_msg').html('Files Uploaded to <a onclick="openExternal(\'' + endPoint + '\')">' + endPoint + '</a>');
 };
 
 /**
@@ -218,14 +204,18 @@ var registerDragRegion = function(id) {
   var helper;
   var holder;
   holder = document.getElementById(id);
-  holder.ondragover = function () { this.className = 'hover'; return false; };
-  holder.ondragleave = function () { this.className = ''; return false; };
+  holder.ondragover = function () {
+    this.className = 'hover'; return false;
+  };
+  holder.ondragleave = function () {
+    this.className = ''; return false;
+  };
   holder.ondrop = function (e) {
     e.preventDefault();
     if (e.dataTransfer.files.length === 0) {
       return false;
     }
-    helper = new Uploader(onUploadStarted, updateProgressBar, onUploadComplete);
+    helper = new Uploader(safeApi, onUploadStarted, updateProgressBar, onUploadComplete);
     helper.uploadFolder(serviceName, publicName, e.dataTransfer.files[0].path);
     return false;
   };
@@ -279,7 +269,7 @@ var publishTemplate = function() {
     //// Values edited in the template are reset to defaults
     resetTemplate();
     //// Start upload
-    var helper = new Uploader(onUploadStarted, updateProgressBar, onUploadComplete);
+    var helper = new Uploader(safeApi, onUploadStarted, updateProgressBar, onUploadComplete);
     helper.uploadFolder(serviceName, publicName, tempDirPath);
   } catch(e) {
     console.log(e.message);
@@ -388,22 +378,7 @@ var connectionListener = function(err) {
   }
   $('#info_pane button').show();
   $('#info_pane span').hide();
-  log.info('API initialised successfully');
-
-  safeApi.nfs.createDir(false, '/test', true, false, null, function(err) {
-    if (err) {
-      log.error('test' + err.description);
-    } else {
-      log.info('Directory created');
-    }
-  });
-  safeApi.nfs.createDir(false, '/testDO', true, false, null, function(err) {
-    if (err) {
-      log.error('testDo' + err.description);
-    } else {
-      log.info('Directory created testDEMO');
-    }
-  })
+  log.info('Initialised successfully');
 };
 log.info('Launcher Arguments :: ' + processArgs.launcher);
 var tokens = processArgs.launcher.split(':');

@@ -46,7 +46,7 @@ exports = module.exports = function(requestManager) {
    * @param metadata - string that has to be associated as metadata with the directory
    * @param callback
    */
-  this.createDir = function(isSafeDrivePath, path, isPrivate, isVersioned, metadata, callback) {
+  this.createDirectory = function(isSafeDrivePath, path, isPrivate, isVersioned, metadata, callback) {
     var request = {
       endpoint: 'safe-api/v1.0/nfs/create-dir',
       data: {
@@ -66,7 +66,7 @@ exports = module.exports = function(requestManager) {
    * @param isSafeDrivePath - is the root of the path begins from SAFEDrive, if false it will search in application root directory
    * @param path - path where the directory has to be created the last fragment or token will be the directory name
    * @param metadata
-   * @param data
+   * @param data - base64 string
    * @param callback
    */
   this.createFile = function(isSafeDrivePath, path, metadata, data, callback) {

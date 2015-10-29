@@ -69,7 +69,7 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
     var response;
     try {
       response = JSON.parse(decrypt(data));
-      log.verbose('Decrypted Response :' + JSON.stringify(response));
+      log.info('Decrypted Response :' + JSON.stringify(response));
       if (!callbackPool.hasOwnProperty(response.id)) {
         log.warn('Callback not found for response in RequestManager');
         return;
@@ -77,7 +77,8 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
       log.verbose('Invoking Callbacks');
       var callbacks = callbackPool[response.id];
       for (var i in callbacks) {
-        callbacks[i](response.error, response.data);
+        var error = (response.error.code === 0) ? null : response.error;
+        callbacks[i](error, response.data);
       }
       delete callbackPool[response.id];
     } catch(ex) {
