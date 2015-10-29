@@ -20,13 +20,11 @@ exports = module.exports = function(requestManager) {
           is_path_shared: isSafeDrivePath,
           file_path: path,
           new_values: {
-            name: null,
             content: {
               offset: 0,
               overwrite: true,
               bytes: data
-            },
-            user_metadata: null
+            }
           }
         }
       };
