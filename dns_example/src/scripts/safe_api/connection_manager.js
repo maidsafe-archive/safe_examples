@@ -52,10 +52,10 @@ var Connection = function() {
         extraBuffer = data.slice(maxsize);
       }
       dataBuffer  = data.slice(0, maxsize);
-      response += dataBuffer.toString();
+      response = Buffer.concat([response, dataBuffer]);
       maxsize -= dataLength;
       if (maxsize === 0) {
-        onDataReceivedListener(JSON.parse(response));
+        onDataReceivedListener(response);
         state = self.STATE.READY;
       }
       return extraBuffer;
@@ -67,7 +67,7 @@ var Connection = function() {
         return;
       }
       state = self.STATE.READING;
-      response = '';
+      response = new Buffer(0);
       maxsize = size;
     };
 
@@ -93,11 +93,11 @@ var Connection = function() {
     };
     var readNewStream = function(buff) {
       var length = buff.slice(0, LENGTH_SIZE).readUInt32LE(0);
-      var dataBuff = buff.slice(LENGTH_SIZE).toString();
+      var dataBuff = buff.slice(LENGTH_SIZE);
       responseBuffer.reset(length);
       readStream(dataBuff);
     };
-    (responseBuffer.getState() === responseBuffer.STATE.READY ? readNewStream : readStream)(new Buffer(data));
+    (responseBuffer.getState() === responseBuffer.STATE.READY ? readNewStream : readStream)(data);
   };
 
   var onConnectionError = function() {
@@ -139,7 +139,6 @@ var Connection = function() {
    * @param data - Object
    */
   this.send = function(data) {
-    data = JSON.stringify(data);
     var lengthAsLE = new Buffer(LENGTH_SIZE);
     lengthAsLE.fill(0);
     lengthAsLE.writeUInt32LE(data.length);

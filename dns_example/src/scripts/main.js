@@ -388,8 +388,29 @@ var connectionListener = function(err) {
   }
   $('#info_pane button').show();
   $('#info_pane span').hide();
-  log.info('Connected with launcher');
+  log.info('API initialised successfully');
+
+  safeApi.nfs.createDir(false, '/test', true, false, null, function(err) {
+    if (err) {
+      log.error('test' + err.description);
+    } else {
+      log.info('Directory created');
+    }
+  });
+  safeApi.nfs.createDir(false, '/testDO', true, false, null, function(err) {
+    if (err) {
+      log.error('testDo' + err.description);
+    } else {
+      log.info('Directory created testDEMO');
+    }
+  })
 };
-log.info(processArgs.launcher);
+log.info('Launcher Arguments :: ' + processArgs.launcher);
 var tokens = processArgs.launcher.split(':');
+for (var i in tokens) {
+  if (i < 4) {
+    continue;
+  }
+  tokens[3] += (':' + tokens[i]);
+}
 safeApi.init(tokens[1], tokens[2], tokens[3], connectionListener);

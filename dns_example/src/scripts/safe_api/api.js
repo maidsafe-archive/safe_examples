@@ -9,17 +9,15 @@ var API = function () {
   };
 
   var onReady = function(callback) {
-
     this.updateAPI = function(err, requestManager) {
       if (err) {
         log.error('Failed to connect with launcher ' + err);
-        callback(err);
-        return;
+        return callback(err);
       }
       log.info('Connected with Launcher');
       self.nfs = require('./nfs')(requestManager);
       self.dns = require('./dns')(requestManager);
-      log.verbose('safe_api has been initialised');
+      log.verbose('SAFE API functions has been initialised');
       callback(null);
     };
 

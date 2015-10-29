@@ -19,12 +19,13 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
     return values;
   };
 
-  var convertArrayAsMap = function(array) {
-    var map = {};
-    for (var i in array) {
-      map[i.toString()] = array[i];
+  var convertStringAsUnit8Array = function(dataAsString) {
+    var buff = new Buffer(dataAsString, 'base64');
+    var key = new Uint8Array(buff.length);
+    for (var i=0; i < buff.length; i++) {
+      key[i] = buff.readUInt8(i);
     }
-    return map;
+    return key;
   };
 
   var HandshakeKeys = {
@@ -43,11 +44,12 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
     }
   };
 
-  var addToCallbackPool = function(request, callback) {
-    var id = getValuesFromMap(sodium.crypto_hash(request));
-    var callbacksRegistered = callbackPool.hasOwnProperty(id) ? callbackPool[id] : [];
-    callbacksRegistered.push(callback);
-    callbackPool[id] = callbacksRegistered;
+  var addToCallbackPool = function(data, callback) {
+    var id = new Buffer(getValuesFromMap(sodium.crypto_hash(new Uint8Array(data)))).toString('base64');
+    if (!callbackPool[id]) {
+      callbackPool[id] = [];
+    }
+    callbackPool[id].push(callback);
   };
 
   var encrypt = function(data) {
@@ -55,25 +57,29 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
   };
 
   var decrypt = function(data) {
-    var cipher = convertArrayAsMap(data);
-    var decryptedData = sodium.crypto_secretbox_open_easy(cipher, encryptionNonce, encryptionKey);
+    var ct = new Uint8Array(data.length);
+    for (var i=0; i < data.length; i++) {
+      ct[i] = data.readUInt8(i);
+    }
+    var decryptedData = sodium.crypto_secretbox_open_easy(ct, encryptionNonce, encryptionKey);
     return new Buffer(getValuesFromMap(decryptedData)).toString();
   };
 
   var onDataReceived = function(data) {
-    log.info('Data received from launcher (at RM) :' + data);
     var response;
     try {
-      response = decrypt(data);
-      log.verbose('Decrypted Response :' + response);
+      response = JSON.parse(decrypt(data));
+      log.verbose('Decrypted Response :' + JSON.stringify(response));
       if (!callbackPool.hasOwnProperty(response.id)) {
+        log.warn('Callback not found for response in RequestManager');
         return;
       }
       log.verbose('Invoking Callbacks');
-      for (var i in callbackPool[response.id]) {
-        callbackPool[i](response.error_code, response.data);
+      var callbacks = callbackPool[response.id];
+      for (var i in callbacks) {
+        callbacks[i](response.error, response.data);
       }
-      delete callbackPool[id];
+      delete callbackPool[response.id];
     } catch(ex) {
       log.error(ex);
     }
@@ -86,17 +92,8 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
 
   var onHandShakeComplete = function(handshakeResponse) {
     log.info('Launcher responded for handshake request');
-
-    var getAsKey = function(keyString) {
-      var buff = new Buffer(keyString, 'base64');
-      var key = new Uint8Array(buff.length);
-      for (var i=0; i < buff.length; i++) {
-        key[i] = buff.readUInt8(i);
-      }
-      return key;
-    };
-
-    log.verbose('Handshake response (Decrypted) - ' + handshakeResponse);
+    log.verbose('Handshake response - ' + handshakeResponse.toString());
+    handshakeResponse = JSON.parse(handshakeResponse.toString());
     if (handshakeResponse.error) {
       log.info('handshake failed - ' + handshakeResponse.error.description);
       log.warn(handshakeResponse.error);
@@ -104,26 +101,24 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
                       '(' + handshakeResponse.error.code + ')');
       return;
     }
-    var launcherPublicKey = getAsKey(handshakeResponse.data.launcher_public_key);
+    var launcherPublicKey = convertStringAsUnit8Array(handshakeResponse.data.launcher_public_key);
     var decryptedSymmKey;
     try {
-      decryptedSymmKey = sodium.crypto_box_open_easy(handshakeResponse.data.encrypted_symm_key, HandshakeKeys.nonce,
+      decryptedSymmKey = sodium.crypto_box_open_easy(convertStringAsUnit8Array(handshakeResponse.data.encrypted_symm_key), HandshakeKeys.nonce,
                                                      launcherPublicKey, HandshakeKeys.secretKey);
     } catch(e) {
-      log.error('Err : SymmetricKey Decryption failed');
+      log.error('SymmetricKey Decryption failed');
       return notifierCallback('SymmetricKey Decryption failed');
     }
 
-    log.info('Symm ::' + decryptedSymmKey);
-    //var symmKey = getAsKey(handshakeResponse.data.launcher_public_key);
-    //encryptionNonce = handshakeResponse.data.splice(0, sodium.crypto_secretbox_NONCEBYTES);
-    //encryptionKey = handshakeResponse.data;
+    encryptionNonce = decryptedSymmKey.subarray(0, sodium.crypto_secretbox_NONCEBYTES);
+    encryptionKey = decryptedSymmKey.subarray(sodium.crypto_secretbox_NONCEBYTES);
     connectionManager.setOnDataRecievedListener(onDataReceived);
     notifierCallback(null, self);
   };
 
   var handshake = function() {
-    log.info('Initiating Handshake');
+    log.info('Initiating Handshake with Launcher');
     var request = {
       "endpoint": "safe-api/v1.0/handshake/authenticate-app",
       "data": {
@@ -133,14 +128,14 @@ var RequestManager = function(host, portNumber, launcherString, notifierCallback
       }
     };
     log.verbose('Sending Request : ' + JSON.stringify(request));
-    connectionManager.send(request);
+    connectionManager.send(JSON.stringify(request));
   };
 
   self.send = function(request, callback) {
-    log.verbose('Sending Request :' + request);
-    request = encrypt(request);
-    addToCallbackPool(request, callback);
-    connectionManager.send(request);
+    request = JSON.stringify(request);
+    var encryptedRequest = encrypt(request);
+    addToCallbackPool(getValuesFromMap(encryptedRequest), callback);
+    connectionManager.send(new Buffer(encryptedRequest));
   };
 
   HandshakeKeys.init();
