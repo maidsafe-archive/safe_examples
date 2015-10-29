@@ -1,15 +1,11 @@
 # Safe DNS Example
 
-An example application to demonstrate uploading files of a static website to the Safe network. This examples showcases features from the `safe_nfs` and `safe_dns` crates.
+An example application to demonstrate uploading files of a static website to the Safe network. 
+This examples showcases features from the `safe_nfs` and `safe_dns` crates and also the IPC connection with Launcher. 
 
 ## Pre-Requisites
   NodeJs should be installed
   bower is installed globally. 
-
-##Dependency
-
-Build the [safe_ffi](https://github.com/maidsafe/safe_ffi/) rust code to generate the ffi library.
-Place this corresponding lib(`libsafe_ffi.{so, dylib, dll}`) library in the `src/scripts/safe_api` folder
 
 ## Development
 
@@ -18,8 +14,6 @@ After cloning the repository, install npm and bower dependencies.
 $ npm install
 $ bower install
 ```
-
-Rebuild the native dependencies with electron-rebuild by executing, `npm run electron-rebuild`
 
 ### Run the code
 

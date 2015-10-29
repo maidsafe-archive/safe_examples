@@ -54,7 +54,7 @@ var Connection = function() {
       dataBuffer  = data.slice(0, maxsize);
       response = Buffer.concat([response, dataBuffer]);
       maxsize -= dataLength;
-      if (maxsize === 0) {
+      if (maxsize <= 0) {
         onDataReceivedListener(response);
         state = self.STATE.READY;
       }
