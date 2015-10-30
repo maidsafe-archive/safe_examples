@@ -314,7 +314,7 @@ fn main() {
     println!("App: Response from Launcher: {:?}", response.error);
 
     // --------------------------------------------------------------------------------
-    //                         Create a Directory - NFS operation
+    //                  Fetch the created Directory - NFS operation
     // --------------------------------------------------------------------------------
     println!("App: Begin fetching directory...");
 
