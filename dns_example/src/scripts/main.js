@@ -1,8 +1,8 @@
 // Electron UI Variable initialization
 var remote = require('remote');
 var Menu = remote.require('menu');
-var shell = remote.require('shell');
 var dialog = remote.require('dialog');
+var log = require('npmlog');
 
 // Nodejs and Application Variable initialization
 var path = require('path');
@@ -10,6 +10,7 @@ var mime = require('mime');
 var fs = require('fs');
 var appSrcFolderPath = (__dirname.indexOf('asar') === -1) ? path.resolve('src') : path.resolve(__dirname, '../../src/');
 var Uploader = require('../scripts/uploader');
+var safeApi = require('../scripts/safe_api/api');
 var serviceName;
 var publicName;
 var tempBackgroundFilePath;
@@ -79,10 +80,6 @@ var AppNavigator = {
 
 var goBack = function() {
   AppNavigator.back();
-};
-
-var openExternal = function(url) {
-  shell.openExternal(url);
 };
 
 /**
@@ -189,23 +186,14 @@ var updateProgressBar = function(meter) {
   $('.indicator div.meter').css('width', meter + '%');
 };
 /** Uploader Callback - when the upload is completed **/
-var onUploadComplete = function(errorCode) {
-  showSection(errorCode ? 'failure': 'success');
-  if (!errorCode) {
-    var endPoint = 'safe:' +  serviceName + '.' + publicName;
-    $('#success_msg').html('Files Uploaded to <a onclick="openExternal(\'' + endPoint + '\')">' + endPoint + '</a>');
+var onUploadComplete = function(error) {
+  showSection(error ? 'failure': 'success');
+  if (error) {
+    $('#error_msg').html(error.description);
     return;
   }
-  var reason;
-  switch (errorCode) {
-    case -1001:
-      reason = 'Service Name and Public Name Already Registered';
-      break;
-
-    default:
-      reason = "Oops! Something went wrong";
-  }
-  $('#error_msg').html(reason);
+  var endPoint = 'safe:' +  serviceName + '.' + publicName;
+  $('#success_msg').html('Files Uploaded to <a onclick="openExternal(\'' + endPoint + '\')">' + endPoint + '</a>');
 };
 
 /**
@@ -216,14 +204,18 @@ var registerDragRegion = function(id) {
   var helper;
   var holder;
   holder = document.getElementById(id);
-  holder.ondragover = function () { this.className = 'hover'; return false; };
-  holder.ondragleave = function () { this.className = ''; return false; };
+  holder.ondragover = function () {
+    this.className = 'hover'; return false;
+  };
+  holder.ondragleave = function () {
+    this.className = ''; return false;
+  };
   holder.ondrop = function (e) {
     e.preventDefault();
     if (e.dataTransfer.files.length === 0) {
       return false;
     }
-    helper = new Uploader(onUploadStarted, updateProgressBar, onUploadComplete);
+    helper = new Uploader(safeApi, onUploadStarted, updateProgressBar, onUploadComplete);
     helper.uploadFolder(serviceName, publicName, e.dataTransfer.files[0].path);
     return false;
   };
@@ -277,7 +269,7 @@ var publishTemplate = function() {
     //// Values edited in the template are reset to defaults
     resetTemplate();
     //// Start upload
-    var helper = new Uploader(onUploadStarted, updateProgressBar, onUploadComplete);
+    var helper = new Uploader(safeApi, onUploadStarted, updateProgressBar, onUploadComplete);
     helper.uploadFolder(serviceName, publicName, tempDirPath);
   } catch(e) {
     console.log(e.message);
@@ -366,6 +358,34 @@ var pickFile = function() {
 };
 
 /*****  Initialisation ***********/
+var processArgs = require('remote').getGlobal('processArgs');
+log.level = processArgs.LOG_LEVEL || 'verbose';
 AppNavigator.init('step-1');
 registerDragRegion('drag_drop');
 $('#service_name').focus();
+
+if (!processArgs.launcher) {
+  log.error('Launcher parameters not available');
+  // TODO kill application (http://electron.atom.io/docs/v0.27.0/api/ipc-main-process/)
+}
+
+var connectionListener = function(err) {
+  if (err) {
+    log.error(err);
+    alert(err);
+    // TODO Kill Application
+    return;
+  }
+  $('#info_pane button').show();
+  $('#info_pane span').hide();
+  log.info('Initialised successfully');
+};
+log.info('Launcher Arguments :: ' + processArgs.launcher);
+var tokens = processArgs.launcher.split(':');
+for (var i in tokens) {
+  if (i < 4) {
+    continue;
+  }
+  tokens[3] += (':' + tokens[i]);
+}
+safeApi.init(tokens[1], tokens[2], tokens[3], connectionListener);
