@@ -3,7 +3,7 @@
 An example application to demonstrate uploading files of a static website to the Safe network. 
 This examples showcases features from the `safe_nfs` and `safe_dns` crates and also the IPC connection with Launcher. 
 
-## Pre-Requisites
+## Prerequisites
   NodeJs should be installed
   bower is installed globally. 
 
