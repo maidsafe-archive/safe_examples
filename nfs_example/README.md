@@ -1,6 +1,6 @@
-# Launcher-Test-Client
+# nfs_example
 
-This is a simple application written in rust that could serve as an example of how to interface with Safe-Launcher via IPC to do work on the SAFE Network. It does the handshake, establishes secure communication with Launcher and does a mutating and a fetching operation. Then it self terminates.
+This is a simple application written in rust that could serve as an example of how to interface with Safe-Launcher via IPC to do work on the SAFE Network. It does the handshake, establishes secure communication with Launcher and does a mutating and a fetching operation. Then it self terminates. The code in `fn main()` has extensive inline comments explaining the flow.
 
 ## Prerequisite
 

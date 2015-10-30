@@ -1,5 +1,5 @@
 [package]
-name = "launcher-test-client"
+name = "nfs_example"
 version = "0.1.0"
 authors = ["MaidSafe Developers <dev@maidsafe.net>"]
 
