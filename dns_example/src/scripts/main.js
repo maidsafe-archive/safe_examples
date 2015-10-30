@@ -3,6 +3,7 @@ var remote = require('remote');
 var Menu = remote.require('menu');
 var dialog = remote.require('dialog');
 var log = require('npmlog');
+var ipc = require('ipc');
 
 // Nodejs and Application Variable initialization
 var path = require('path');
@@ -366,14 +367,16 @@ $('#service_name').focus();
 
 if (!processArgs.launcher) {
   log.error('Launcher parameters not available');
-  // TODO kill application (http://electron.atom.io/docs/v0.27.0/api/ipc-main-process/)
+  log.info('Closing application');
+  ipc.send('close-app');
 }
 
 var connectionListener = function(err) {
   if (err) {
     log.error(err);
     alert(err);
-    // TODO Kill Application
+    log.info('Closing application');
+    ipc.send('close-app');
     return;
   }
   $('#info_pane button').show();
