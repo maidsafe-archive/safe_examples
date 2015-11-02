@@ -2,6 +2,7 @@
 const app = require('app');
 const BrowserWindow = require('browser-window');
 var path = require('path');
+var ipc = require('ipc');
 
 // report crashes to the Electron project
 require('crash-reporter').start();
@@ -54,3 +55,23 @@ app.on('ready', function () {
 	mainWindow = createMainWindow();
 	//mainWindow.openDevTools();
 });
+
+ipc.on('close-app', function(event, arg) {
+	app.quit();
+});
+
+// Expects the arguments to be passed as `--port 8080 --ip localhost`
+var initialiseArguments = function(args) {
+	global.processArgs = {};
+	var previousKey = '';
+	for (var i in args) {
+		if(args[i].indexOf('--') === 0) {
+			previousKey = args[i].replace(/--/, '');
+			global.processArgs[previousKey] = null;
+		} else {
+			global.processArgs[previousKey] = args[i];
+		}
+	}
+};
+
+initialiseArguments(process.argv);
