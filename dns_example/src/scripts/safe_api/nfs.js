@@ -21,8 +21,6 @@ exports = module.exports = function(requestManager) {
           file_path: path,
           new_values: {
             content: {
-              offset: 0,
-              overwrite: true,
               bytes: data
             }
           }

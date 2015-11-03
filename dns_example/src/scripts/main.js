@@ -118,7 +118,7 @@ var validate = function() {
 };
 
 /**
- * Clears the Publicname and service Name fields
+ * Clears the public name and service name fields
  */
 var clearServiceAndPublicName = function() {
   $('#service_name').val('');
@@ -267,9 +267,9 @@ var publishTemplate = function() {
       buff = fs.readFileSync(path.resolve(appSrcFolderPath, templateDependencies[key]));
       fs.writeFileSync(path.resolve(tempDirPath, key), buff);
     }
-    //// Values edited in the template are reset to defaults
+    // Values edited in the template are reset to defaults
     resetTemplate();
-    //// Start upload
+    // Start upload
     var helper = new Uploader(safeApi, onUploadStarted, updateProgressBar, onUploadComplete);
     helper.uploadFolder(serviceName, publicName, tempDirPath);
   } catch(e) {
@@ -353,7 +353,7 @@ var pickFile = function() {
   dialog.showOpenDialog({
     title: 'Select Image',
     filters: [
-      { name: 'Images', extensions: ['jpg', 'png'] },
+      { name: 'Images', extensions: ['jpg', 'png'] }
     ]
   }, onFileSelected)
 };
@@ -371,6 +371,8 @@ if (!processArgs.launcher) {
   ipc.send('close-app');
 }
 
+// Launcher connection listener.
+// Close the application on any connection error
 var connectionListener = function(err) {
   if (err) {
     log.error(err);
@@ -379,11 +381,13 @@ var connectionListener = function(err) {
     ipc.send('close-app');
     return;
   }
+  // Enable the button only if the connection is established and authorised
   $('#info_pane button').show();
   $('#info_pane span').hide();
   log.info('Initialised successfully');
 };
 log.info('Launcher Arguments :: ' + processArgs.launcher);
+// parse tokens from the launcher argument
 var tokens = processArgs.launcher.split(':');
 for (var i in tokens) {
   if (i < 4) {
@@ -391,4 +395,5 @@ for (var i in tokens) {
   }
   tokens[3] += (':' + tokens[i]);
 }
+// Initialise the SAFEApi
 safeApi.init(tokens[1], tokens[2], tokens[3], connectionListener);

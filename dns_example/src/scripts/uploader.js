@@ -6,7 +6,7 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
 
   var EXCEPTION_ERROR_CODE = 999;
 
-  // TODO can replace ProgessHanlder with Async.js
+  // TODO can replace ProgessHanlder with Async
   var ProgressHandler = function(totalSize, callback) {
     var completed = 0;
     var alive = true;

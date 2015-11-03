@@ -24,8 +24,15 @@ var API = function () {
     return this.updateAPI;
   };
 
-  self.init = function(host, portNumber, launcherString, callback) {
-     new RequestManager(host, portNumber, launcherString, onReady(callback));
+  /**
+   * The API gets initialised after successful handshake with the launcher.
+   * @param host - host ip from launcher
+   * @param portNumber - port number from launcher
+   * @param launcherString - string
+   * @param listener - Launcher connectivity (Ready/Error)is intimated through the listener
+   */
+  self.init = function(host, portNumber, launcherString, listener) {
+     new RequestManager(host, portNumber, launcherString, onReady(listener));
   };
 
   self.nfs = notInitialisedYet;
