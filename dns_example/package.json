@@ -16,9 +16,9 @@
   "scripts": {
     "start": "electron . --launcher tcp:localhost:8080:demo --LOG_LEVEL info",
     "electron-rebuild": "grunt rebuild",
-    "build-win": "electron-packager . safe_dns_example --out=dist --prune --asar  --platform=win32 --arch=x64 --version=0.30.0 --overwrite",
-    "build-linux": "electron-packager . safe_dns_example --out=dist --prune --asar  --platform=linux --arch=x64 --version=0.30.0 --overwrite",
-    "build-osx": "electron-packager . safe_dns_example --out=dist --prune --asar  --platform=darwin --arch=x64 --version=0.30.0 --overwrite"
+    "build-win": "electron-packager . safe_dns_example --out=app_dist --ignore=app_dist --prune --asar  --platform=win32 --arch=x64 --version=0.30.0 --overwrite",
+    "build-linux": "electron-packager . safe_dns_example --out=app_dist --ignore=app_dist --prune --asar  --platform=linux --arch=x64 --version=0.30.0 --overwrite",
+    "build-osx": "electron-packager . safe_dns_example --out=app_dist --ignore=app_dist --prune --asar  --platform=darwin --arch=x64 --version=0.30.0 --overwrite"
   },
   "files": [
     "index.js",
