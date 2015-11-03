@@ -10,7 +10,7 @@
  */
 var RequestManager = function(host, portNumber, launcherString, notifierCallback) {
   var connectionManager = require('./connection_manager');
-  var sodium = require('./libsodium-wrappers');
+  var sodium = require('libsodium-wrappers');
   var log = require('npmlog');
 
   var encryptionKey;
