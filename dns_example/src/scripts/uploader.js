@@ -1,12 +1,12 @@
-module.exports = function(onStart, onProgress, onComplete) {
+module.exports = function(safeApi, onStart, onProgress, onComplete) {
   var fs = require('fs');
   var path = require('path');
   var mime = require('mime');
+  var log = require('npmlog');
 
-  var safeApi = require('../scripts/safe_api/api');
   var EXCEPTION_ERROR_CODE = 999;
 
-  // TODO can replace ProgessHanlder with Async.js
+  // TODO can replace ProgessHanlder with Async
   var ProgressHandler = function(totalSize, callback) {
     var completed = 0;
     var alive = true;
@@ -38,7 +38,7 @@ module.exports = function(onStart, onProgress, onComplete) {
    */
   var createDirectoryInNetwork = function(directoryPath, callback) {
     console.log('Creating directory ' + directoryPath);
-    safeApi.createDirectory(directoryPath, callback);
+    safeApi.nfs.createDirectory(false, directoryPath, false, false, null, callback);
   };
 
   /**
@@ -51,7 +51,14 @@ module.exports = function(onStart, onProgress, onComplete) {
    */
   var writeFileToNetwork = function(localDirectory, networkDirectory, fileName, size, handler) {
     console.log("Creating file " + fileName + "  in " + networkDirectory);
-    safeApi.createFile(networkDirectory, fileName, path.join(localDirectory, fileName), handler.update);
+    var data = fs.readFileSync(path.join(localDirectory, fileName));
+    var Callback = function(size) {
+      this.execute = function(err) {
+        handler.update(err, size);
+      };
+      return this.execute;
+    };
+    safeApi.nfs.createFile(false, networkDirectory + '/' + fileName, null, data.toString('base64'), new Callback(size));
   };
 
   /**
@@ -125,10 +132,10 @@ module.exports = function(onStart, onProgress, onComplete) {
    * DNS registration is the last step after Uploading the files to the network
    * @param errorCode
    */
-  var registerDnsCallback = function(errorCode) {
-    if (errorCode !== 0) {
-      console.log('Registration FAILED :: ' + errorCode);
-      onComplete(errorCode);
+  var registerDnsCallback = function(error) {
+    if (error) {
+      log.error('Registration FAILED :: ' + error.description);
+      onComplete(error);
     } else {
       onComplete();
     }
@@ -154,7 +161,7 @@ module.exports = function(onStart, onProgress, onComplete) {
           return;
         }
         try {
-          safeApi.registerDns(publicName, serviceName, path.basename(folderPath), registerDnsCallback);
+          safeApi.dns.registerDns(publicName, serviceName, false, path.basename(folderPath), registerDnsCallback);
         } catch (e) {
           console.log(e);
           onComplete(EXCEPTION_ERROR_CODE);

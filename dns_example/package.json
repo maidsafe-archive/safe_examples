@@ -14,11 +14,11 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "start": "electron .",
+    "start": "electron . --launcher tcp:localhost:8080:demo --LOG_LEVEL info",
     "electron-rebuild": "grunt rebuild",
-    "build-win": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar-unpack=*.dll --platform=win32 --arch=x64 --version=0.30.0 --overwrite",
-    "build-linux": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar-unpack=*.so* --platform=linux --arch=x64 --version=0.30.0 --overwrite",
-    "build-osx": "electron-packager . safe_dns_example --out=dist --ignore=dist --prune --asar --asar-unpack=*.dylib --platform=darwin --arch=x64 --version=0.30.0 --overwrite"
+    "build-win": "electron-packager . safe_dns_example --out=app_dist --ignore=app_dist --prune --asar  --platform=win32 --arch=x64 --version=0.30.0 --overwrite",
+    "build-linux": "electron-packager . safe_dns_example --out=app_dist --ignore=app_dist --prune --asar  --platform=linux --arch=x64 --version=0.30.0 --overwrite",
+    "build-osx": "electron-packager . safe_dns_example --out=app_dist --ignore=app_dist --prune --asar  --platform=darwin --arch=x64 --version=0.30.0 --overwrite"
   },
   "files": [
     "index.js",
@@ -30,16 +30,14 @@
   ],
   "dependencies": {
     "electron-debug": "^0.1.1",
-    "ffi": "^1.3.2",
+    "libsodium-wrappers": "^0.2.10",
     "mime": "^1.3.4",
-    "ref": "^1.0.2",
-    "ref-array": "^1.1.1",
+    "npmlog": "^1.2.1",
     "temp": "^0.8.3"
   },
   "devDependencies": {
     "electron-packager": "^5.0.0",
     "electron-prebuilt": "^0.30.0",
-    "electron-rebuild": "^0.2.5",
     "grunt": "^0.4.5"
   }
 }
