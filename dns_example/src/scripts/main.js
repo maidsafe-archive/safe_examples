@@ -1,3 +1,5 @@
+/* global $: false, document: false, window: false */
+/* jshint unused:false */
 // Electron UI Variable initialization
 var remote = require('remote');
 var Menu = remote.require('menu');
@@ -15,10 +17,48 @@ var safeApi = require('../scripts/safe_api/api');
 var serviceName;
 var publicName;
 var tempBackgroundFilePath;
+var AppNavigator;
 // Registering Jquery - Electron Way
 window.$ = window.jQuery = require('../scripts/jquery.js');
 // Disable Menu bar
 Menu.setApplicationMenu(null);
+
+/**
+ * Shows the section corresponding to the id.
+ * @param id
+ */
+var showSection = function(id) {
+  var tmp;
+  var hideClass = 'hide';
+  var sections = [];
+  $('section').map(function(i, e) {
+    sections.push(e.getAttribute('id'));
+  });
+  for (var i in sections) {
+    if (sections[i]) {
+      if (sections[i] === id) {
+        $('#' + sections[i]).removeClass(hideClass);
+        continue;
+      }
+      tmp = $('#' + sections[i]);
+      if (!tmp.hasClass(hideClass)) {
+        tmp.addClass(hideClass);
+      }
+    }
+  }
+  AppNavigator.update(id);
+};
+
+var resetTemplate = function() {
+  $('#template_title').html('My Page');
+  $('#template_title_input').val('My Page');
+  $('#template_content').html('This page is created and published on the SAFE Network using the SAFE Uploader');
+  $('#template_content_input').val('This page is created and published on the SAFE Network using the SAFE Uploader');
+  var element = $('.template_banner');
+  element.css('background', 'url(../imgs/dns_bg.jpg)');
+  element.css('background-size', 'cover');
+  element.css('background-position', 'center');
+};
 
 // Navigation States
 var AppNavigator = {
@@ -29,7 +69,7 @@ var AppNavigator = {
   },
   onBack: {
     'template': function() {
-      resetTemplate()
+      resetTemplate();
     }
   },
   onLoad: {
@@ -37,11 +77,11 @@ var AppNavigator = {
       $('nav div.title').html('safe:' + serviceName + '.' + publicName);
     },
     'template': function() {
-      resetTemplate()
+      resetTemplate();
     }
   },
-  visibleOn: ['step-2', 'template'],
-  showPublish: ['template'],
+  visibleOn: [ 'step-2', 'template' ],
+  showPublish: [ 'template' ],
   ui: {
     nav: null,
     backElement: null,
@@ -105,11 +145,12 @@ var showError = function(id, msg) {
 var validate = function() {
   var serviceNameElement = document.getElementById('service_name');
   var publicNameElement = document.getElementById('public_name');
-  if (serviceNameElement.checkValidity() && publicNameElement.checkValidity() && publicNameElement.value.indexOf('.') === -1) {
+  if (serviceNameElement.checkValidity() && publicNameElement.checkValidity() &&
+      publicNameElement.value.indexOf('.') === -1) {
     return true;
-  } else if(!serviceNameElement.checkValidity()) {
+  } else if (!serviceNameElement.checkValidity()) {
     showError('service_name', 'Service Name cannot be empty');
-  } else if(!publicNameElement.checkValidity()) {
+  } else if (!publicNameElement.checkValidity()) {
     showError('public_name', 'Public Name cannot be empty');
   } else if (publicNameElement.value.indexOf('.') > -1) {
     showError('public_name', 'Public Name cannot contain "."');
@@ -130,7 +171,7 @@ var clearServiceAndPublicName = function() {
  * Validates the input and moves to the next section
  */
 var validateInput = function() {
-  if(!validate()) {
+  if (!validate()) {
     return;
   }
   serviceName = $('#service_name').val();
@@ -140,40 +181,15 @@ var validateInput = function() {
 };
 
 /**
- * Shows the section corresponding to the id.
- * @param id
- */
-var showSection = function(id) {
-  var tmp;
-  var hideClass = 'hide';
-  var sections = [];
-  $('section').map(function(i, e) {
-    sections.push(e.getAttribute('id'));
-  });
-  for (var i in sections) {
-    if (sections[i] === id) {
-      $('#' + sections[i]).removeClass(hideClass);
-      continue;
-    }
-    tmp = $('#' + sections[i]);
-    if (!tmp.hasClass(hideClass)) {
-      tmp.addClass(hideClass);
-    }
-  };
-  AppNavigator.update(id);
-};
-
-
-/**
  *  Dragover and drop is disabled on document.
  *  Read > https://github.com/nwjs/nw.js/issues/219
  */
-document.addEventListener('dragover', function(e){
+document.addEventListener('dragover', function(e) {
   e.preventDefault();
   e.stopPropagation();
 }, false);
 
-document.addEventListener('drop', function(e){
+document.addEventListener('drop', function(e) {
   e.preventDefault();
   e.stopPropagation();
 }, false);
@@ -188,7 +204,7 @@ var updateProgressBar = function(meter) {
 };
 /** Uploader Callback - when the upload is completed **/
 var onUploadComplete = function(error) {
-  showSection(error ? 'failure': 'success');
+  showSection(error ? 'failure' : 'success');
   if (error) {
     $('#error_msg').html(error.description);
     return;
@@ -205,13 +221,13 @@ var registerDragRegion = function(id) {
   var helper;
   var holder;
   holder = document.getElementById(id);
-  holder.ondragover = function () {
+  holder.ondragover = function() {
     this.className = 'hover'; return false;
   };
-  holder.ondragleave = function () {
+  holder.ondragleave = function() {
     this.className = ''; return false;
   };
-  holder.ondrop = function (e) {
+  holder.ondrop = function(e) {
     e.preventDefault();
     if (e.dataTransfer.files.length === 0) {
       return false;
@@ -225,9 +241,9 @@ var registerDragRegion = function(id) {
 var getTemplateBackgroundFile = function() {
   var backgroundFile;
   if (tempBackgroundFilePath) {
-    backgroundFile = { 'name' : path.basename(tempBackgroundFilePath), 'path': tempBackgroundFilePath };
+    backgroundFile = { 'name': path.basename(tempBackgroundFilePath), 'path': tempBackgroundFilePath };
   } else {
-    backgroundFile = { 'name': 'bg.jpg', 'path': 'imgs/dns_bg.jpg'};
+    backgroundFile = { 'name': 'bg.jpg', 'path': 'imgs/dns_bg.jpg' };
   }
   tempBackgroundFilePath = '';
   return backgroundFile;
@@ -235,7 +251,8 @@ var getTemplateBackgroundFile = function() {
 
 /**
  * The template is generated from the `/views/template` by replacing the the edited title and description.
- * The dependencies for the page such as normalize.css and bg.jpg are copied along with the genarted template to a temp Directory.
+ * The dependencies for the page such as normalize.css and bg.jpg are copied along with the genarted
+ * template to a temp Directory.
  * The temp directory is finally passed for Uploading to the network
  */
 var publishTemplate = function() {
@@ -248,7 +265,7 @@ var publishTemplate = function() {
   var content = $('#template_content_input').val();
   var templateDependencies = {
     'normalize.css': 'bower_components/bower-foundation5/css/normalize.css'
-    //'foundation.css': 'bower_components/bower-foundation5/css/foundation.css'
+    // 'foundation.css': 'bower_components/bower-foundation5/css/foundation.css'
   };
 
   try {
@@ -260,19 +277,22 @@ var publishTemplate = function() {
     templateDependencies[backgroundImage.name] = backgroundImage.path;
     templateString = templateString.replace(/BG_IMG/g, backgroundImage.name);
     fs.writeFileSync(path.resolve(tempDirPath, 'index.html'),
-        util.format(templateString.replace(/SAFE_SERVICE/g, serviceName).replace(/SAFE_PUBLIC/g, publicName), title, content));
+        util.format(templateString.replace(/SAFE_SERVICE/g, serviceName)
+            .replace(/SAFE_PUBLIC/g, publicName), title, content));
     // Save the template dependencies
     var buff;
     for (var key in templateDependencies) {
-      buff = fs.readFileSync(path.resolve(appSrcFolderPath, templateDependencies[key]));
-      fs.writeFileSync(path.resolve(tempDirPath, key), buff);
+      if (templateDependencies[key]) {
+        buff = fs.readFileSync(path.resolve(appSrcFolderPath, templateDependencies[key]));
+        fs.writeFileSync(path.resolve(tempDirPath, key), buff);
+      }
     }
     // Values edited in the template are reset to defaults
     resetTemplate();
     // Start upload
     var helper = new Uploader(safeApi, onUploadStarted, updateProgressBar, onUploadComplete);
     helper.uploadFolder(serviceName, publicName, tempDirPath);
-  } catch(e) {
+  } catch (e) {
     console.log(e.message);
     showSection('failure');
   }
@@ -321,17 +341,6 @@ var updateTemplateContent = function(value) {
   $('#template_content').html(value);
 };
 
-var resetTemplate = function() {
-  $('#template_title').html("My Page");
-  $('#template_title_input').val("My Page");
-  $('#template_content').html("This page is created and published on the SAFE Network using the SAFE Uploader");
-  $('#template_content_input').val("This page is created and published on the SAFE Network using the SAFE Uploader");
-  var element = $('.template_banner');
-  element.css('background', 'url(../imgs/dns_bg.jpg)');
-  element.css('background-size', 'cover');
-  element.css('background-position', 'center');
-};
-
 var onFileSelected = function(filePath) {
   if (!filePath) {
     return;
@@ -340,22 +349,22 @@ var onFileSelected = function(filePath) {
   var mimeType = mime.lookup(path.basename(filePath));
   tempBackgroundFilePath = filePath;
   var element = $('.template_banner');
-  element.css('background', 'url(data:' + mimeType +';base64,' + fs.readFileSync(filePath).toString('base64') + ')');
+  element.css('background', 'url(data:' + mimeType + ';base64,' + fs.readFileSync(filePath).toString('base64') + ')');
   element.css('background-size', 'cover');
   element.css('background-position', 'center');
 };
 
 var pickFile = function() {
-  if($('#template_title').hasClass('hide')) {
+  if ($('#template_title').hasClass('hide')) {
     toggleDisplay('edit_template_title', 'template_title');
     return;
   }
   dialog.showOpenDialog({
     title: 'Select Image',
     filters: [
-      { name: 'Images', extensions: ['jpg', 'png'] }
+      { name: 'Images', extensions: [ 'jpg', 'png' ] }
     ]
-  }, onFileSelected)
+  }, onFileSelected);
 };
 
 /*****  Initialisation ***********/
@@ -376,7 +385,6 @@ if (!processArgs.launcher) {
 var connectionListener = function(err) {
   if (err) {
     log.error(err);
-    alert(err);
     log.info('Closing application');
     ipc.send('close-app');
     return;
@@ -390,10 +398,12 @@ log.info('Launcher Arguments :: ' + processArgs.launcher);
 // parse tokens from the launcher argument
 var tokens = processArgs.launcher.split(':');
 for (var i in tokens) {
-  if (i < 4) {
-    continue;
+  if (tokens[i]) {
+    if (i < 4) {
+      continue;
+    }
+    tokens[3] += (':' + tokens[i]);
   }
-  tokens[3] += (':' + tokens[i]);
 }
 // Initialise the SAFEApi
 safeApi.init(tokens[1], tokens[2], tokens[3], connectionListener);
