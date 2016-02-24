@@ -1,0 +1,78 @@
+.ms-list-1 {
+  width: 80%;
+  margin: 0 auto;
+  padding-top: 40px;
+  .ms-list-1-i {
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.26);
+    .ms-list-1-i-ctx {
+      padding: 0 0 8px;
+      border-bottom: 2px solid @gray-400;
+    }
+    .ms-list-1-i-act {
+      padding-top: 8px;
+      text-align: right;
+      a {
+        display: inline-block;
+        padding-left: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 18px;
+        text-transform: uppercase;
+        color: @blue-400;
+      }
+    }
+  }
+}
+
+.ms-list-2 {
+  .ms-list-2-h {
+    &:hover {
+      background-color: white !important;
+    }
+     > .ms-list-2-i-ctx {
+       font-size: 14px;
+       font-weight: 600 !important;
+       cursor: pointer !important;
+       &:hover {
+         background-color: @gray-200;
+       }
+     }
+  }
+  .ms-list-2-i {
+    cursor: pointer;
+    &:hover {
+      background-color: @blue-100;
+    }
+    > .ms-list-2-i-ctx {
+      display: inline-block;
+      float: left;
+      line-height: 36px;
+      padding: 0 8px;
+      font-size: 14px;
+      font-weight: normal;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    > .icn {
+      width: 5%;
+    }
+    > .name {
+      width: 40%;
+    }
+    > .date {
+      width: 30%;
+    }
+    > .type {
+      width: 10%;
+    }
+    > .size {
+      width: 15%;
+    }
+    .clearfix();
+  }
+}

@@ -1,0 +1,37 @@
+<div class="ms-frame" ng-controller="ServiceCtrl">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="manageService" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Websites and Files</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Create a Service</h3>
+    <p class="content-1-p">
+      Here you can create a service to be used with public id. This domain will form the
+      URL used to view your site in the browser e.g. blog.maidsafe.safenet
+    </p>
+  </div><!-- /content 1 -->
+  <!-- create service form -->
+  <div class="ms-form">
+    <form id="create_service" name="create_service" ng-submit="createService()" ng-init="$state.params.serviceName ? serviceName = $state.params.serviceName : ''">
+      <div class="form-grp lgt">
+        <input type="text" name="service" required="required" placeholder="Service" ng-model="serviceName">
+      </div>
+    </form>
+  </div><!-- create public ID form -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <p class="content-1-p">
+      This is how your service will look in the browser.
+    </p>
+  </div><!-- /content 1 -->
+  <div class="service-preview">
+    <span class="service-preview-ctx">{{ (serviceName ? serviceName : 'demo') + '.' + longName + '.safenet' }}</span>
+  </div>
+  <div class="container-1 text-center">
+    <button type="submit" class="ms-btn ms-primary-btn" form="create_service" name="submitService">Next</button>
+  </div>
+</div>

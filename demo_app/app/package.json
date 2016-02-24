@@ -1,0 +1,16 @@
+{
+  "name": "maidsafe-demo-app",
+  "productName": "MaidSafe Demo App",
+  "identifier": "com.maidsafe.demo_app",
+  "description": "MaidSafe demo application",
+  "version": "0.1.0",
+  "author": "Maidsafe",
+  "copyright": "",
+  "main": "background.js",
+  "dependencies": {
+    "fs-jetpack": "^0.7.0",
+    "libsodium-wrappers": "^0.2.12",
+    "mime": "^1.3.4",
+    "temp": "^0.8.3"
+  }
+}

@@ -1,0 +1,25 @@
+<div class="ms-frame">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="manageService" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Websites and Files</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Time to add some files</h3>
+    <p class="content-1-p">
+      Here you can create a service to be used with your public id. This domain
+      will form the URL used to view your site in the browser. Select a directory
+      that will be associated to your service. Directory must contain index.html file
+      which will serve as the start page. Hit publish to Go Live!
+    </p>
+  </div><!-- /content 1 -->
+  <div class="" ng-controller="ServiceCtrl" ng-init="explorerInit()">
+    <!-- explorer -->
+    <explorer is-private="false" starting-path="$state.params.serviceName" on-directory-selected="setTargetFolder(name)" on-upload="onUpload(percentage)"/>
+    <!-- explorer -->
+    <progress-indicator register="registerProgress(scope)">
+  </div>
+</div>
