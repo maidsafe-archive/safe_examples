@@ -15,6 +15,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
     $scope.selectedPath = null;
     $scope.dir = null;
     $scope.isFileSelected;
+    $scope.listSelected = false;
 
     var getDirectory = function() {
       var onResponse = function(err, dir) {
@@ -143,7 +144,14 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
       getDirectory();
     };
 
-    $scope.select = function(name, isFile) {
+    $scope.select = function($event, name, isFile) {
+      var reset = function() {
+        $('.ms-list-2-i').removeClass('active');
+      };
+      reset();
+      var ele = angular.element($event.currentTarget);
+      $scope.listSelected = true;
+      ele.addClass('active');
       $scope.isFileSelected = isFile;
       $scope.selectedPath = name;
       window.sc = $scope;
