@@ -166,6 +166,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     };
 
     $scope.back = function() {
+      $scope.listSelected = false;
       var tokens = $scope.currentDirectory.split('/');
       tokens.pop();
       tokens.pop();

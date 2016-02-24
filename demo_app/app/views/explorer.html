@@ -34,7 +34,7 @@
         <div class="ms-list-2-i-ctx size">Size</div>
       </div>
       <div class="ms-list-2-i" ng-repeat="dir in dir.subDirectories" ng-click="select($event, dir.name, false)" ng-dblclick="openDirectory(dir.name)">
-        <div class="ms-list-2-i-ctx icn">&nbsp;</div>
+        <div class="ms-list-2-i-ctx icn ms-icn-folder">&nbsp;</div>
         <div class="ms-list-2-i-ctx name">{{ dir.name }}</div>
         <div class="ms-list-2-i-ctx date">{{ dir.createdOn | date : 'dd-MM-yy HH:mm:ss' }}</div>
         <div class="ms-list-2-i-ctx type">&nbsp;</div>
