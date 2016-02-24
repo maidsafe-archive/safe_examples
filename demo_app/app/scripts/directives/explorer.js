@@ -1,4 +1,4 @@
-window.maidsafeDemo.directive('explorer', ['safeApiFactory', function(safeApi) {
+window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', function($rootScope, safeApi) {
 
   var Explorer = function($scope, element, attrs) {
     var rootFolder = '/' + ($scope.isPrivate ? 'private' : 'public') + '/';
@@ -62,6 +62,7 @@ window.maidsafeDemo.directive('explorer', ['safeApiFactory', function(safeApi) {
         if (!selection || selection.length === 0) {
           return;
         }
+        $rootScope.$loader.show();
         // TODO instead of binding uploader to window use require
         var uploader = new window.uiUtils.Uploader(safeApi);
         var networkPath = $scope.currentDirectory;
@@ -72,6 +73,9 @@ window.maidsafeDemo.directive('explorer', ['safeApiFactory', function(safeApi) {
         }
         var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
         progress.onUpdate = function() {
+          if ($rootScope.$loader.isLoading) {
+            $rootScope.$loader.hide();
+          }
           var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
           if (progressCompletion === 100) {
             getDirectory();
@@ -101,7 +105,9 @@ window.maidsafeDemo.directive('explorer', ['safeApiFactory', function(safeApi) {
     $scope.download = function(fileName) {
       $scope.isFileSelected = true;
       $scope.selectedPath = fileName;
+      $rootScope.$loader.show();
       var onResponse = function(err, data) {
+        $rootScope.$loader.hide();
         if (err) {
           return console.error(err);
         }
@@ -116,7 +122,9 @@ window.maidsafeDemo.directive('explorer', ['safeApiFactory', function(safeApi) {
 
     $scope.delete = function() {
       var path = $scope.currentDirectory + '/' + $scope.selectedPath;
+      $rootScope.$loader.show();
       var onDelete = function(err) {
+        $rootScope.$loader.hide();
         if (err) {
           return console.error(err);
         }
