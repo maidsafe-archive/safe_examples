@@ -103,6 +103,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     };
 
     $scope.download = function(fileName) {
+      $scope.listSelected = false;
       $scope.isFileSelected = true;
       $scope.selectedPath = fileName;
       $rootScope.$loader.show();
@@ -139,6 +140,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     };
 
     $scope.openDirectory = function(directoryName) {
+      $scope.listSelected = false;
       $scope.selectedPath = directoryName;
       $scope.currentDirectory += ($scope.selectedPath + '/');
       getDirectory();
