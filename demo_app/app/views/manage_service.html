@@ -17,7 +17,7 @@
   <div ng-controller="ServiceCtrl">
     <h3 ng-if="!longName" class="heading-1"><a ui-sref="publicID">Create a Public ID to register a service</a></h3>
     <div ng-if="longName" ng-init="getServices()">
-      <div class="container-1 text-center">
+      <div class="container-2 text-center">
         <a ui-sref="createService" class="ms-btn ms-primary-btn">Create New</a>
       </div>
       <h3 class="heading-1" ng-show="serviceList.length === 0">No service registered</h3>
