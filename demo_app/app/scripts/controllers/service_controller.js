@@ -1,9 +1,10 @@
 /**
  * Service controller
  */
-window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', 'safeApiFactory',
-function($scope, $state, $rootScope, safe) {
+window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
+function($scope, $state, $rootScope, $timeout, safe) {
   'use strict';
+  var PROGRESS_DELAY = 1000;
   $scope.serviceList = [];
   $scope.newService = null;
   $scope.newServicePath = '/public';
@@ -141,10 +142,12 @@ function($scope, $state, $rootScope, safe) {
     if (percentage < 100 && !$scope.progressIndicator.show) {
       $scope.progressIndicator.show = true;
     }
-    if (percentage === 100) {
-      $scope.progressIndicator.show = false;
-    }
     $scope.progressIndicator.percentage = Math.floor(percentage);
+    if (percentage === 100) {
+      $timeout(function() {
+        $scope.progressIndicator.show = false;
+      }, PROGRESS_DELAY);
+    }
     console.log(percentage);
   };
 } ]);
