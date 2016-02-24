@@ -19,7 +19,7 @@
       <div class="text-center">
         Browse through your files to add to your site.
       </div>
-      <div class="content-1 text-center" ng-controller="ServiceCtrl">
+      <div class="container-4 text-center" ng-controller="ServiceCtrl">
         <button type="button" class="ms-btn ms-primary-btn" name="browseFile"
           ng-click="uploadDirectoryForService()">Browse</button>
           <progress-indicator register="registerProgress(scope)">
@@ -30,7 +30,7 @@
       <div class="text-center">
         Use our template to create a simple example site.
       </div>
-      <div class="content-1 text-center">
+      <div class="container-4 text-center">
         <button type="button" class="ms-btn ms-primary-btn" name="useTemaplate"
         ng-click="$state.go('sampleTemplate', {serviceName: $state.params.serviceName})">Use Template</button>
       </div>
