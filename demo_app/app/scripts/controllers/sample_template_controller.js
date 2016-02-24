@@ -31,7 +31,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', ['$scope', '$http', '$state
                 $state.go('manageService');
               });
             }
-            var msg = serviceName + 'service has been published successfully';
+            var msg = serviceName + ' service has been published successfully';
             $rootScope.$msPrompt.show('Service Published', msg, function(status) {
               $rootScope.$msPrompt.hide();
               $state.go('manageService');

@@ -24,7 +24,7 @@
       <div class="ms-list-1" ng-show="serviceList.length > 0">
         <div class="ms-list-1-i" ng-repeat="service in serviceList">
           <div class="ms-list-1-i-ctx">
-            <b>{{ service.name }}</b>{{ '.' + service.longName + '.safenet' }}
+            http://<b>{{ service.name }}</b>{{ '.' + service.longName + '.safenet' }}
           </div>
           <div class="ms-list-1-i-act">
             <a ui-sref="serviceExplorer({serviceName: service.name})">Edit Files</a>

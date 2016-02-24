@@ -79,7 +79,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
           $state.go('manageService');
         });
       }
-      var msg = $state.params.serviceName + 'service has been published successfully';
+      var msg = $state.params.serviceName + ' service has been published successfully';
       $rootScope.$msPrompt.show('Service Published', msg, function(status) {
         $rootScope.$msPrompt.hide();
         $state.go('manageService');
@@ -122,7 +122,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
                 return $state.go('manageService');
               });
             }
-            var msg = $state.params.serviceName + 'service has been published successfully';
+            var msg = $state.params.serviceName + ' service has been published successfully';
             $rootScope.$msPrompt.show('Service Published', msg, function(status) {
               $rootScope.$msPrompt.hide();
               $state.go('manageService');
