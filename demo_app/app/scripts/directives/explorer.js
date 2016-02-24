@@ -123,6 +123,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
 
     $scope.delete = function() {
       var path = $scope.currentDirectory + '/' + $scope.selectedPath;
+      $scope.listSelected = false;
       $rootScope.$loader.show();
       var onDelete = function(err) {
         $rootScope.$loader.hide();
