@@ -30,13 +30,13 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
 
     $scope.getFileIconClass = function(fileName) {
       fileName = fileName.split('.');
-      var ext = fileName[ fileName.length - 1 ];
+      var ext = fileName[fileName.length - 1];
       ext = ext.toLowerCase();
 
-      var imgExt = [ 'jpeg', 'jpg', 'png', 'gif', 'ttf' ];
-      var textExt = [ 'txt', 'doc', 'docx' ];
-      var audioExt = [ 'mp3', 'wav' ];
-      var videoExt = [ 'mpeg', 'mp4', 'avg' ];
+      var imgExt = ['jpeg', 'jpg', 'png', 'gif', 'ttf'];
+      var textExt = ['txt', 'doc', 'docx'];
+      var audioExt = ['mp3', 'wav'];
+      var videoExt = ['mpeg', 'mp4', 'avg'];
       var fileType = FILE_ICON_CLASSES.GENERIC;
       if (imgExt.indexOf(ext) !== -1) {
         fileType = FILE_ICON_CLASSES.IMAGE;
@@ -69,7 +69,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
         var networkPath = $scope.currentDirectory;
         if (!isFile) {
           var dirName = selection[0].split('\\');
-          dirName = dirName[ dirName.length - 1 ];
+          dirName = dirName[dirName.length - 1];
           networkPath += ('/' + dirName);
         }
         var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
