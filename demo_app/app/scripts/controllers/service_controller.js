@@ -50,7 +50,6 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
 
   // create service
   $scope.createService = function() {
-    console.log($scope);
     if (!$scope.longName) {
       return console.error('Create your Public ID to register a service');
     }
@@ -74,11 +73,17 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
   $scope.publishService = function() {
     safe.addService($scope.longName, $state.params.serviceName, false, $scope.newServicePath, function(err, res) {
       if (err) {
-        console.error(err);
-        return;
+        var msg = err;
+        return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
+          $rootScope.$msPrompt.hide();
+          $state.go('manageService');
+        });
       }
-      alert('Service published successfully');
-      $state.go('manageService');
+      var msg = $state.params.serviceName + 'service has been published successfully';
+      $rootScope.$msPrompt.show('Service Published', msg, function(status) {
+        $rootScope.$msPrompt.hide();
+        $state.go('manageService');
+      });
     });
   };
 
@@ -111,11 +116,17 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             $rootScope.$loader.hide();
             if (err) {
               console.error(err);
-              alert('Service could not b created');
-              return $state.go('manageService');
+              var msg = 'Service could not be created';
+              return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
+                $rootScope.$msPrompt.hide();
+                return $state.go('manageService');
+              });
             }
-            alert('Service has been published.');
-            $state.go('manageService');
+            var msg = $state.params.serviceName + 'service has been published successfully';
+            $rootScope.$msPrompt.show('Service Published', msg, function(status) {
+              $rootScope.$msPrompt.hide();
+              $state.go('manageService');
+            });
           });
         }
         $scope.onUpload(progressCompletion);

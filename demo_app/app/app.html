@@ -11,7 +11,8 @@
   <!-- root node -->
   <div class="ms-root" ui-view="">
   </div>
-  <ms-loader ng-show="$loader.isLoading" />
+  <ms-loader ng-show="$loader.isLoading"></ms-loader>
+  <ng-include src="'views/prompt.html'" ng-show="$msPrompt.isSet" />
   <!-- /root node -->
 
   <script>
@@ -40,6 +41,7 @@
 
   <!-- Directives -->
   <script src="scripts/directives/loader.js" charset="utf-8"></script>
+  <script src="scripts/directives/prompt.js" charset="utf-8"></script>
   <script src="scripts/directives/explorer.js" charset="utf-8"></script>
   <script src="scripts/directives/progress.js" charset="utf-8"></script>
 </body>

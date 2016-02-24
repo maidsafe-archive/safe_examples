@@ -26,4 +26,20 @@ window.maidsafeDemo = angular
       $rootScope.$applyAsync();
     }
   };
+  $rootScope.$msPrompt = {
+    isSet: false,
+    msg: 'Confirmation content',
+    title: 'Confirmation title',
+    callback: function(status) {},
+    show: function(title, msg, callback) {
+      this.isSet = true;
+      this.title = title;
+      this.msg = msg;
+      this.callback = callback;
+    },
+    hide: function() {
+      this.isSet = false;
+      this.msg = '';
+    }
+  };
 } ]);

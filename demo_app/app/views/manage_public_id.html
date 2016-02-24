@@ -18,7 +18,7 @@
 
   <!-- create public ID form -->
   <div class="ms-form" ng-controller="PublicIdCtrl" ng-init="init()">
-    <div class="heading-1 text-center" ng-show="longName">Your Pubilic ID is <b><i>{{ longName }}</i></b></div>
+    <div class="heading-1 text-center" ng-show="longName">Your Public ID is <b><i>{{ longName }}</i></b></div>
     <form name="createPublicID" ng-submit="createPublicId()" ng-show="!longName">
       <div class="form-grp drk">
         <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId">

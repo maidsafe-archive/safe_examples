@@ -25,14 +25,20 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', ['$scope', '$http', '$state
           safe.addService(safe.getUserLongName(), serviceName, false, '/public/' + serviceName, function(err) {
             $rootScope.$loader.hide();
             if (err) {
-              return console.error(err);
+              var msg = err;
+              return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
+                $rootScope.$msPrompt.hide();
+                $state.go('manageService');
+              });
             }
-            alert('Service has been published.');
-            $state.go('manageService');
+            var msg = serviceName + 'service has been published successfully';
+            $rootScope.$msPrompt.show('Service Published', msg, function(status) {
+              $rootScope.$msPrompt.hide();
+              $state.go('manageService');
+            });
           });
         }
       }
-      console.log(tempPath);
     });
   };
 
