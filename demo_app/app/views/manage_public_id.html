@@ -1,0 +1,32 @@
+<div class="ms-frame">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="home" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Public ID</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Create Your Public ID</h3>
+    <p class="content-1-p">
+      The ID you create will be your SAFE Network Public ID. This will be used on
+      all the apps and services on the network e.g. Drive, Messaging, Web, etc.
+      - Pick a good one ;)
+    </p>
+  </div><!-- /content 1 -->
+
+  <!-- create public ID form -->
+  <div class="ms-form" ng-controller="PublicIdCtrl" ng-init="init()">
+    <div class="heading-1 text-center" ng-show="longName">Your Pubilic ID is <b><i>{{ longName }}</i></b></div>
+    <form name="createPublicID" ng-submit="createPublicId()" ng-show="!longName">
+      <div class="form-grp drk">
+        <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId">
+      </div>
+      <div class="form-grp-btn">
+        <button type="submit" class="ms-btn ms-primary-btn" name="submitPublicID">Done</button>
+      </div>
+    </form>
+  </div><!-- create public ID form -->
+
+</div>

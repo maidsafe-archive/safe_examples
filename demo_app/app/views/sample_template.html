@@ -1,0 +1,31 @@
+<div class="ms-frame" ng-controller="SampleTemplateCtrl" ng-init="editTitle = false; editDesc = false;" ng-click="editTitle = false; editDesc = false;">
+  <div class="ms-sample-template">
+    <!-- header -->
+    <div class="frame-h">
+      <div class="frame-h-act">
+        <a ui-sref="createService({serviceName: $state.params.serviceName})" class="frame-h-act-btn ms-back-btn"></a>
+      </div>
+      <div class="frame-h-act-rt">
+        <button type="button" class="frame-h-act-btn" name="publish" ng-click="publish()">Publish</button>
+      </div>
+      <h3 class="frame-h-ctx">Sample template</h3>
+    </div><!-- /header -->
+    <div class="sample-template-bnr">
+      <span class="bnr-bg"></span>
+      <div class="site-title edit-ctx" ng-class="{ open: editTitle }">
+        <input type="text" name="name" class="editable"
+        placeholder="Site Title"
+        ng-model="siteTitle"
+        ng-click="handleInputClick($event);">
+        <h3 class="site-title-ctx non-editable" ng-click="$event.stopPropagation(); editTitle = true; editDesc = false;" ng-bind="siteTitle"></h3>
+      </div>
+    </div>
+    <div class="sample-template-ctx edit-ctx" ng-class="{ open: editDesc }">
+      <input type="text" name="name" class="editable"
+      placeholder="Site Description"
+      ng-model="siteDesc"
+      ng-click="handleInputClick($event);">
+      <p class="site-desc-ctx non-editable" ng-click="$event.stopPropagation(); editDesc = true; editTitle = false;" ng-bind="siteDesc"></p>
+    </div>
+  </div>
+</div>
