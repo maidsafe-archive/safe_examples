@@ -64,9 +64,13 @@ window.maidsafeDemo.directive('explorer', ['safeApiFactory', function(safeApi) {
         }
         // TODO instead of binding uploader to window use require
         var uploader = new window.uiUtils.Uploader(safeApi);
-        var dirName = selection[0].split('\\');
-        dirName = dirName[ dirName.length - 1 ];
-        var progress = uploader.upload(selection[0], $scope.isPrivate, $scope.currentDirectory + '/' + dirName);
+        var networkPath = $scope.currentDirectory;
+        if (!isFile) {
+          var dirName = selection[0].split('\\');
+          dirName = dirName[ dirName.length - 1 ];
+          networkPath += ('/' + dirName);
+        }
+        var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
         progress.onUpdate = function() {
           var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
           if (progressCompletion === 100) {
