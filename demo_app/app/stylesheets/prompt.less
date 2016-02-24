@@ -1,0 +1,47 @@
+// Prompt
+.ms-prompt {
+  width: 100%;
+  height: 100%;
+  display: table;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  .ms-prompt-b {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .ms-prompt-cntr {
+    width: 406px;
+    text-align: left;
+    display: inline-block;
+    background-color: white;
+    padding: 16px;
+    color: @gray-900;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); 
+    .ms-prompt-h {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 32px;
+      margin: 0;
+      padding: 0 0 16px;
+    }
+    .ms-prompt-ctx {
+      font-size: 16px;
+      font-weight: normal;
+      line-height: 24px;
+    }
+  }
+  .ms-prompt-f {
+    padding-top: 8px;
+    text-align: right;
+    button {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px;
+      background-color: transparent;
+    }
+  }
+}

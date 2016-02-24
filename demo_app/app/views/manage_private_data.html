@@ -1,0 +1,23 @@
+<div class="ms-frame">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="home" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">View and Manage Private Data</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Private Data</h3>
+    <p class="content-1-p">
+      This is your private data that only you can see. Here you can move, add and delete
+      your files as you want. These files are seperate from the public data used in websites, etc.
+    </p>
+  </div><!-- /content 1 -->
+  <div class="" ng-controller="PrivateDataCtrl">
+    <!-- explorer -->
+    <explorer is-private="true" on-directory-selected="setTargetFolder(name)" on-upload="onUpload(percentage)"/>
+    <!-- explorer -->
+    <progress-indicator register="registerProgress(scope)">
+  </div>
+</div>

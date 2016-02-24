@@ -1,7 +1,8 @@
+/* global alert: false, window: false */
 module.exports = function(safeApi, onStart, onProgress, onComplete) {
   var fs = require('fs');
   var path = require('path');
-  var mime = require('mime');
+  // var mime = require('mime');
   var log = require('npmlog');
 
   var EXCEPTION_ERROR_CODE = 999;
@@ -17,16 +18,15 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
       }
       if (error) {
         alive = false;
-        callback ? callback(error) : function(){
-          onComplete(error)
+        return callback ? callback(error) : function() {
+          onComplete(error);
         };
-        return;
       }
       completed += size;
       var meter = (completed * 100) / totalSize;
       onProgress(meter);
       if (completed === totalSize) {
-        callback ? callback() : function(){ /*no-op*/ };
+        return callback ? callback() : function() { /*no-op*/ };
       }
     };
   };
@@ -50,7 +50,7 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
    * @param handler - ProgressHandler
    */
   var writeFileToNetwork = function(localDirectory, networkDirectory, fileName, size, handler) {
-    console.log("Creating file " + fileName + "  in " + networkDirectory);
+    console.log('Creating file ' + fileName + '  in ' + networkDirectory);
     var data = fs.readFileSync(path.join(localDirectory, fileName));
     var Callback = function(size) {
       this.execute = function(err) {
@@ -72,12 +72,14 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
     var size = 0;
     var dirContents = fs.readdirSync(folderPath);
     for (var index in dirContents) {
-      tmpPath = path.join(folderPath, dirContents[index]);
-      stats = fs.statSync(tmpPath);
-      if (stats.isDirectory()) {
-        size += computeDirectorySize(tmpPath);
-      } else {
-        size += stats.size;
+      if (dirContents[index]) {
+        tmpPath = path.join(folderPath, dirContents[index]);
+        stats = fs.statSync(tmpPath);
+        if (stats.isDirectory()) {
+          size += computeDirectorySize(tmpPath);
+        } else {
+          size += stats.size;
+        }
       }
     }
     return size;
@@ -86,17 +88,18 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
   var uploadDirectory = function(folderPath, networkDirectoryPath, subDirectoryName, handler) {
     var networkPath = networkDirectoryPath + '/' + subDirectoryName;
     createDirectoryInNetwork(networkPath, function(error) {
-      if(error) {
+      if (error) {
         handler.update('Failed to create directory : ' + networkDirectoryPath);
         return;
       }
       uploadFiles(path.join(folderPath, subDirectoryName) , handler, networkPath);
-    })
+    });
   };
 
   /**
    * Upload the files after reading through the directory.
-   * For the root directory the networkDirectoryPath will be null and as it is called recursively the network path gets building
+   * For the root directory the networkDirectoryPath will be null and as it is called
+   * recursively the network path gets building
    * Files can be created only after the directory is ready on the network. Thus, files are uploaded on the callback of
    * createDirectoryInNetwork function
    * @param folderPath - Local folder path
@@ -106,10 +109,10 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
   // TODO simplify implementation - refactor
   var uploadFiles = function(folderPath, handler, networkDirectoryPath) {
     var stats;
-    if(!networkDirectoryPath) {
+    if (!networkDirectoryPath) {
       networkDirectoryPath = path.basename(folderPath);
       createDirectoryInNetwork(networkDirectoryPath, function(error) {
-        if(error) {
+        if (error) {
           handler.update('Failed to create directory : ' + networkDirectoryPath);
         }
         uploadFiles(folderPath, handler, networkDirectoryPath);
@@ -119,11 +122,13 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
 
     var dirContents = fs.readdirSync(folderPath);
     for (var index in dirContents) {
-      stats = fs.statSync(path.join(folderPath, dirContents[index]));
-      if (stats.isDirectory()) {
-        uploadDirectory(folderPath, networkDirectoryPath, dirContents[index], handler);
-      } else {
-        writeFileToNetwork(folderPath, networkDirectoryPath, dirContents[index], stats.size, handler);
+      if (dirContents[index]) {
+        stats = fs.statSync(path.join(folderPath, dirContents[index]));
+        if (stats.isDirectory()) {
+          uploadDirectory(folderPath, networkDirectoryPath, dirContents[index], handler);
+        } else {
+          writeFileToNetwork(folderPath, networkDirectoryPath, dirContents[index], stats.size, handler);
+        }
       }
     }
   };
@@ -169,7 +174,7 @@ module.exports = function(safeApi, onStart, onProgress, onComplete) {
       });
       handler.update(null, 0);
       uploadFiles(folderPath, handler);
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       window.showSection('failure');
     }

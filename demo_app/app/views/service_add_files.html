@@ -1,0 +1,39 @@
+<div class="ms-frame">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="createService({serviceName: $state.params.serviceName})" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Websites and Files</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Time to add some files</h3>
+    <p class="content-1-p">
+      Here you can create a service to be used with your public id. This domain
+      will form the URL used to view your site in the browser e.g. blog.maidsafe.safenet
+    </p>
+  </div><!-- /content 1 -->
+  <div class="or-comp">
+    <div class="or-comp-lt">
+      <div class="text-center">
+        Browse through your files to add to your site.
+      </div>
+      <div class="container-4 text-center" ng-controller="ServiceCtrl">
+        <button type="button" class="ms-btn ms-primary-btn" name="browseFile"
+          ng-click="uploadDirectoryForService()">Browse</button>
+          <progress-indicator register="registerProgress(scope)">
+      </div>
+    </div>
+    <div class="or-comp-or">OR</div>
+    <div class="or-comp-rt">
+      <div class="text-center">
+        Use our template to create a simple example site.
+      </div>
+      <div class="container-4 text-center">
+        <button type="button" class="ms-btn ms-primary-btn" name="useTemaplate"
+        ng-click="$state.go('sampleTemplate', {serviceName: $state.params.serviceName})">Use Template</button>
+      </div>
+    </div>
+  </div>
+</div>
