@@ -1,5 +1,4 @@
-window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', function($rootScope, safeApi) {
-
+window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', function($rootScope, safeApi) {
   var Explorer = function($scope, element, attrs) {
     var rootFolder = '/' + ($scope.isPrivate ? 'private' : 'public') + '/';
     var FILE_ICON_CLASSES = {
@@ -14,7 +13,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
     $scope.mime = require('mime');
     $scope.selectedPath = null;
     $scope.dir = null;
-    $scope.isFileSelected;
+    $scope.isFileSelected = null;
     $scope.listSelected = false;
 
     var getDirectory = function() {
@@ -58,7 +57,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
       var dialog = require('remote').dialog;
       dialog.showOpenDialog({
         title: 'Select Directory for upload',
-        properties: isFile ? [] : ['openDirectory']
+        properties: isFile ? [] : [ 'openDirectory' ]
       }, function(selection) {
         if (!selection || selection.length === 0) {
           return;
@@ -192,4 +191,4 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', 'safeApiFactory', funct
     templateUrl: './views/explorer.html',
     link: Explorer
   };
-}]);
+} ]);

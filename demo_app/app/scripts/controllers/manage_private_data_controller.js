@@ -4,7 +4,6 @@
 window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', 'safeApiFactory', function($scope, safe) {
   'use strict';
   $scope.progressIndicator = null;
-  
   $scope.registerProgress = function(progressScope) {
     $scope.progressIndicator = progressScope;
   };

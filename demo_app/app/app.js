@@ -15,5 +15,5 @@ class Utils {
   closeApp() {
     this.remote.getCurrentWindow().close();
   }
-};
+}
 window.uiUtils = new Utils(remote, Uploader, templateFile);

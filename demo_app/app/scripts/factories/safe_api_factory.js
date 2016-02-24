@@ -1,7 +1,8 @@
 /**
  * SAFE Api factory
  */
-window.maidsafeDemo.factory('safeApiFactory', ['$http', '$q', 'nfsFactory', 'dnsFactory', function(http, $q, nfs, dns) {
+window.maidsafeDemo.factory('safeApiFactory', [ '$http', '$q', 'nfsFactory', 'dnsFactory',
+function(http, $q, nfs, dns) {
   'use strict';
   var self = this;
   var sodium = require('libsodium-wrappers');
@@ -50,8 +51,10 @@ window.maidsafeDemo.factory('safeApiFactory', ['$http', '$q', 'nfsFactory', 'dns
         // TODO query params decryption
         var query = payload.url.split('?');
         if (query[1]) {
+          /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
           var encryptedQuery = new Buffer(sodium.crypto_secretbox_easy(query[1],
             symmetricKeys.nonce, symmetricKeys.key)).toString('base64');
+          /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
           payload.url = query[0] + '?' + encodeURIComponent(encryptedQuery);
         }
         if (payload.data) {
@@ -59,7 +62,10 @@ window.maidsafeDemo.factory('safeApiFactory', ['$http', '$q', 'nfsFactory', 'dns
           if (!(data instanceof Uint8Array)) {
             data = new Uint8Array(new Buffer(JSON.stringify(data)));
           }
-          payload.data = new Buffer(sodium.crypto_secretbox_easy(data, symmetricKeys.nonce, symmetricKeys.key)).toString('base64');
+          /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+          payload.data = new Buffer(sodium.crypto_secretbox_easy(data,
+            symmetricKeys.nonce, symmetricKeys.key)).toString('base64');
+          /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
         }
         return payload;
       } catch (e) {
@@ -74,7 +80,10 @@ window.maidsafeDemo.factory('safeApiFactory', ['$http', '$q', 'nfsFactory', 'dns
         var data = response.data;
         var symmetricKeys = self.getSymmetricKeys();
         try {
-          data = sodium.crypto_secretbox_open_easy(new Uint8Array(new Buffer(data, 'base64')), symmetricKeys.nonce, symmetricKeys.key);
+          /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
+          data = sodium.crypto_secretbox_open_easy(new Uint8Array(new Buffer(data, 'base64')),
+            symmetricKeys.nonce, symmetricKeys.key);
+          /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
           data = response.headers('file-name') ? new Buffer(data) : new Buffer(data).toString();
         } catch (e) {}
         return data;
@@ -99,8 +108,10 @@ window.maidsafeDemo.factory('safeApiFactory', ['$http', '$q', 'nfsFactory', 'dns
   };
 
   var sendAuthorisationRequest = function(callback) {
+    /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
     var assymKeys = sodium.crypto_box_keypair();
     var assymNonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
+    /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
     var publicKey = new Buffer(assymKeys.publicKey).toString('base64');
     var nonce = new Buffer(assymNonce).toString('base64');
 
@@ -116,9 +127,11 @@ window.maidsafeDemo.factory('safeApiFactory', ['$http', '$q', 'nfsFactory', 'dns
       setAuthToken(body.token);
       var cipher = new Uint8Array(new Buffer(body.encryptedKey, 'base64'));
       var publicKey = new Uint8Array(new Buffer(body.publicKey, 'base64'));
+      /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
       var data = sodium.crypto_box_open_easy(cipher, assymNonce, publicKey, assymKeys.privateKey);
       symmetricKeys.key = data.slice(0, sodium.crypto_secretbox_KEYBYTES);
       symmetricKeys.nonce = data.slice(sodium.crypto_secretbox_KEYBYTES);
+      /*jscs:enable requireCamelCaseOrUpperCaseIdentifiers*/
       symmetricKeys.key = new Buffer(symmetricKeys.key).toString('base64');
       symmetricKeys.nonce = new Buffer(symmetricKeys.nonce).toString('base64');
       setSymmetricKeys(symmetricKeys);
@@ -169,4 +182,4 @@ window.maidsafeDemo.factory('safeApiFactory', ['$http', '$q', 'nfsFactory', 'dns
     });
   };
   return $.extend(self, nfs, dns);
-}]);
+} ]);
