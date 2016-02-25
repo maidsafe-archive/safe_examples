@@ -82,8 +82,8 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
   };
 
   self.modifyFileContent = function(filePath, isPathShared, dataAsUint, offset, callback) {
-    var url = this.SERVER + 'nfs/file/' + encodeURIComponent(filePath) + '/' + isPathShared + '?offset=' + offset;
     offset = offset || 0;
+    var url = this.SERVER + 'nfs/file/' + encodeURIComponent(filePath) + '/' + isPathShared + '?offset=' + offset;
     var payload = {
       url: url,
       method: 'PUT',
