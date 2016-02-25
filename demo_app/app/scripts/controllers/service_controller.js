@@ -4,7 +4,7 @@
 window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
 function($scope, $state, $rootScope, $timeout, safe) {
   'use strict';
-  var PROGRESS_DELAY = 1000;
+  var PROGRESS_DELAY = 500;
   $scope.serviceList = [];
   $scope.newService = null;
   $scope.newServicePath = '/public';

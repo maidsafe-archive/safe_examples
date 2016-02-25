@@ -3,7 +3,7 @@
  */
 window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', '$timeout', 'safeApiFactory', function($scope, $timeout, safe) {
   'use strict';
-  var PROGRESS_DELAY = 1000;
+  var PROGRESS_DELAY = 500;
   $scope.progressIndicator = null;
   $scope.registerProgress = function(progressScope) {
     $scope.progressIndicator = progressScope;

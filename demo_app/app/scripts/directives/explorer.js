@@ -17,7 +17,9 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     $scope.listSelected = false;
 
     var getDirectory = function() {
+      $rootScope.$loader.show();
       var onResponse = function(err, dir) {
+        $rootScope.$loader.hide();
         if (err) {
           return console.error(err);
         }
