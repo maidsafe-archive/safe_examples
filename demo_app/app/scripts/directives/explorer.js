@@ -32,10 +32,10 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
       var ext = fileName[fileName.length - 1];
       ext = ext.toLowerCase();
 
-      var imgExt = ['jpeg', 'jpg', 'png', 'gif', 'ttf'];
-      var textExt = ['txt', 'doc', 'docx'];
-      var audioExt = ['mp3', 'wav'];
-      var videoExt = ['mpeg', 'mp4', 'avg'];
+      var imgExt = [ 'jpeg', 'jpg', 'png', 'gif', 'ttf' ];
+      var textExt = [ 'txt', 'doc', 'docx' ];
+      var audioExt = [ 'mp3', 'wav' ];
+      var videoExt = [ 'mpeg', 'mp4', 'avg' ];
       var fileType = FILE_ICON_CLASSES.GENERIC;
       if (imgExt.indexOf(ext) !== -1) {
         fileType = FILE_ICON_CLASSES.IMAGE;
