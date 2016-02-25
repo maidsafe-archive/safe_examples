@@ -1,8 +1,10 @@
 /**
  * Service controller
  */
-window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', 'safeApiFactory', function($scope, $state, $rootScope, safe) {
+window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
+function($scope, $state, $rootScope, $timeout, safe) {
   'use strict';
+  var PROGRESS_DELAY = 1000;
   $scope.serviceList = [];
   $scope.newService = null;
   $scope.newServicePath = '/public';
@@ -57,7 +59,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       return console.error('Provide valid service name');
     }
     $state.go('serviceAddFiles', { 'serviceName': $scope.serviceName });
-    $scope.serviceName = "";
+    $scope.serviceName = '';
   };
 
   // explorer init
@@ -72,14 +74,15 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
 
   $scope.publishService = function() {
     safe.addService($scope.longName, $state.params.serviceName, false, $scope.newServicePath, function(err, res) {
+      var msg = null;
       if (err) {
-        var msg = err;
+        msg = err;
         return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
           $rootScope.$msPrompt.hide();
           $state.go('manageService');
         });
       }
-      var msg = $state.params.serviceName + ' service has been published successfully';
+      msg = $state.params.serviceName + ' service has been published successfully';
       $rootScope.$msPrompt.show('Service Published', msg, function(status) {
         $rootScope.$msPrompt.hide();
         $state.go('manageService');
@@ -95,7 +98,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     var dialog = require('remote').dialog;
     dialog.showOpenDialog({
       title: 'Select Directory for upload',
-      properties: ['openDirectory']
+      properties: [ 'openDirectory' ]
     }, function(folders) {
       if (folders.length === 0) {
         return;
@@ -114,15 +117,16 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
           $rootScope.$loader.show();
           safe.addService($scope.longName, serviceName, false, '/public/' + serviceName, function(err) {
             $rootScope.$loader.hide();
+            var msg = null;
             if (err) {
               console.error(err);
-              var msg = 'Service could not be created';
+              msg = 'Service could not be created';
               return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
                 $rootScope.$msPrompt.hide();
                 return $state.go('manageService');
               });
             }
-            var msg = $state.params.serviceName + ' service has been published successfully';
+            msg = $state.params.serviceName + ' service has been published successfully';
             $rootScope.$msPrompt.show('Service Published', msg, function(status) {
               $rootScope.$msPrompt.hide();
               $state.go('manageService');
@@ -138,10 +142,12 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     if (percentage < 100 && !$scope.progressIndicator.show) {
       $scope.progressIndicator.show = true;
     }
-    if (percentage === 100) {
-      $scope.progressIndicator.show = false;
-    }
     $scope.progressIndicator.percentage = Math.floor(percentage);
+    if (percentage === 100) {
+      $timeout(function() {
+        $scope.progressIndicator.show = false;
+      }, PROGRESS_DELAY);
+    }
     console.log(percentage);
   };
 } ]);

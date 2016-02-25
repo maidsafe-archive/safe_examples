@@ -1,7 +1,8 @@
 /**
  * Public ID controller
  */
-window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeApiFactory', function($scope, $rootScope, safe) {
+window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeApiFactory',
+function($scope, $rootScope, safe) {
   'use strict';
   $scope.publicId = '';
   $scope.longName = null;
@@ -30,5 +31,4 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
     });
     console.log($scope.publicId);
   };
-
 } ]);

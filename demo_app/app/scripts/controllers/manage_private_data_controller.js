@@ -1,10 +1,10 @@
 /**
  * Manage private data controller
  */
-window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', 'safeApiFactory', function($scope, safe) {
+window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', '$timeout', 'safeApiFactory', function($scope, $timeout, safe) {
   'use strict';
+  var PROGRESS_DELAY = 1000;
   $scope.progressIndicator = null;
-  
   $scope.registerProgress = function(progressScope) {
     $scope.progressIndicator = progressScope;
   };
@@ -18,10 +18,12 @@ window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', 'safeApiFactory', 
     if (percentage < 100 && !$scope.progressIndicator.show) {
       $scope.progressIndicator.show = true;
     }
-    if (percentage === 100) {
-      $scope.progressIndicator.show = false;
-    }
     $scope.progressIndicator.percentage = Math.floor(percentage);
+    if (percentage === 100) {
+      $timeout(function() {
+        $scope.progressIndicator.show = false;
+      }, PROGRESS_DELAY);
+    }
     console.log(percentage);
   };
 } ]);

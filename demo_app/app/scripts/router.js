@@ -39,5 +39,5 @@ window.maidsafeDemo.config(function($stateProvider, $urlRouterProvider) {
   .state('managePrivateData', {
       url: '/manage_private_data',
       templateUrl: 'views/manage_private_data.html'
-    })
+    });
 });

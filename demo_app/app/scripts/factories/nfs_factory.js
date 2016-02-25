@@ -29,7 +29,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     dirPath = encodeURIComponent(dirPath);
     var URL = this.SERVER + 'nfs/directory/' + dirPath;
     if (typeof isPathShared === 'boolean') {
-      URL += '/' + isPathShared
+      URL += '/' + isPathShared;
     }
     var payload = {
       url: URL,
@@ -120,7 +120,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       }
     };
     (new this.Request(payload, callback)).send();
-  }
+  };
 
   self.renameDirectory = function(dirPath, isPathShared, newName, callback) {
     rename(dirPath, isPathShared, newName, false, callback);
