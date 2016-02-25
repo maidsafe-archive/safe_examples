@@ -18,6 +18,16 @@ function($rootScope, $timeout, safeApi) {
     $scope.isFileSelected = null;
     $scope.listSelected = false;
 
+    var releaseSelection = function() {
+      $(document).on('mouseup', function(e) {
+        var listItems = $('.ms-list-2-i');
+        if (!listItems.is(e.target) && listItems.has(e.target).length === 0) {
+          $scope.listSelected = false;
+          listItems.removeClass('active');
+        }
+      });
+    };
+
     var getDirectory = function() {
       $rootScope.$loader.show();
       var onResponse = function(err, dir) {
@@ -184,6 +194,7 @@ function($rootScope, $timeout, safeApi) {
     };
 
     $scope.rename = false;
+    releaseSelection();
     getDirectory();
   };
 
