@@ -31,7 +31,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
 
     $scope.getFileIconClass = function(fileName) {
       fileName = fileName.split('.');
-      var ext = fileName[ fileName.length - 1 ];
+      var ext = fileName[fileName.length - 1];
       ext = ext.toLowerCase();
 
       var imgExt = [ 'jpeg', 'jpg', 'png', 'gif', 'ttf' ];
@@ -70,7 +70,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
         var networkPath = $scope.currentDirectory;
         if (!isFile) {
           var dirName = selection[0].split('\\');
-          dirName = dirName[ dirName.length - 1 ];
+          dirName = dirName[dirName.length - 1];
           networkPath += ('/' + dirName);
         }
         var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
