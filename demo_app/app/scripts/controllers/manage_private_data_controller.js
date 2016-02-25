@@ -1,7 +1,7 @@
 /**
  * Manage private data controller
  */
-window.maidsafeDemo.controller('PrivateDataCtrl', ['$scope', '$timeout', 'safeApiFactory',
+window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', '$timeout', 'safeApiFactory',
   function($scope, $timeout, safe) {
     'use strict';
     var PROGRESS_DELAY = 500;
