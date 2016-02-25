@@ -7,7 +7,8 @@ export default class FileHelper {
     this.localPath = localPath;
     this.fileName = path.basename(localPath);
     this.size = fs.statSync(this.localPath).size;
-    this.networkParentDirPath = networkParentDirPath;
+    this.networkParentDirPath = networkParentDirPath[ networkParentDirPath.length - 1 ] === '/' ?
+    networkParentDirPath : networkParentDirPath + '/';    
   }
 
   _OnContentUploaded(err) {
@@ -25,7 +26,7 @@ export default class FileHelper {
       console.error(err);
       return this.uploader.updateProgressOnFailure(this.size, this.localPath);
     }
-    this.uploader.api.modifyFileContent(this.networkParentDirPath + '/' + this.fileName, false,
+    this.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false,
       new Uint8Array(fs.readFileSync(this.localPath)), 0, function(err) {
         self._OnContentUploaded(err);
       });
