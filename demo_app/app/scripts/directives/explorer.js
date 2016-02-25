@@ -1,4 +1,6 @@
-window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', function($rootScope, safeApi) {
+window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFactory',
+function($rootScope, $timeout, safeApi) {
+  var PROGRESS_DELAY = 500;
   var Explorer = function($scope, element, attrs) {
     var rootFolder = '/' + ($scope.isPrivate ? 'private' : 'public') + '/';
     var FILE_ICON_CLASSES = {
@@ -79,12 +81,12 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
             $rootScope.$loader.hide();
           }
           var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
-          if (progressCompletion === 100) {
-            getDirectory();
-          }
           $scope.onUpload({
             percentage: progressCompletion
           });
+          if (progressCompletion === 100) {
+            $timeout(getDirectory, PROGRESS_DELAY);
+          }
         };
       });
     };
