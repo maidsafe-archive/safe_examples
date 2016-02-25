@@ -1,4 +1,6 @@
-window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', function($rootScope, safeApi) {
+window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFactory',
+function($rootScope, $timeout, safeApi) {
+  var PROGRESS_DELAY = 500;
   var Explorer = function($scope, element, attrs) {
     var rootFolder = '/' + ($scope.isPrivate ? 'private' : 'public') + '/';
     var FILE_ICON_CLASSES = {
@@ -16,8 +18,20 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     $scope.isFileSelected = null;
     $scope.listSelected = false;
 
+    var releaseSelection = function() {
+      $(document).on('mouseup', function(e) {
+        var listItems = $('.ms-list-2-i');
+        if (!listItems.is(e.target) && listItems.has(e.target).length === 0) {
+          $scope.listSelected = false;
+          listItems.removeClass('active');
+        }
+      });
+    };
+
     var getDirectory = function() {
+      $rootScope.$loader.show();
       var onResponse = function(err, dir) {
+        $rootScope.$loader.hide();
         if (err) {
           return console.error(err);
         }
@@ -29,7 +43,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
 
     $scope.getFileIconClass = function(fileName) {
       fileName = fileName.split('.');
-      var ext = fileName[ fileName.length - 1 ];
+      var ext = fileName[fileName.length - 1];
       ext = ext.toLowerCase();
 
       var imgExt = [ 'jpeg', 'jpg', 'png', 'gif', 'ttf' ];
@@ -68,7 +82,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
         var networkPath = $scope.currentDirectory;
         if (!isFile) {
           var dirName = selection[0].split('\\');
-          dirName = dirName[ dirName.length - 1 ];
+          dirName = dirName[dirName.length - 1];
           networkPath += ('/' + dirName);
         }
         var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
@@ -77,12 +91,12 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
             $rootScope.$loader.hide();
           }
           var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
-          if (progressCompletion === 100) {
-            getDirectory();
-          }
           $scope.onUpload({
             percentage: progressCompletion
           });
+          if (progressCompletion === 100) {
+            $timeout(getDirectory, PROGRESS_DELAY);
+          }
         };
       });
     };
@@ -103,6 +117,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     };
 
     $scope.download = function(fileName) {
+      $scope.listSelected = false;
       $scope.isFileSelected = true;
       $scope.selectedPath = fileName;
       $rootScope.$loader.show();
@@ -139,6 +154,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     };
 
     $scope.openDirectory = function(directoryName) {
+      $scope.listSelected = false;
       $scope.selectedPath = directoryName;
       $scope.currentDirectory += ($scope.selectedPath + '/');
       getDirectory();
@@ -164,6 +180,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     };
 
     $scope.back = function() {
+      $scope.listSelected = false;
       var tokens = $scope.currentDirectory.split('/');
       tokens.pop();
       tokens.pop();
@@ -177,6 +194,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', 'safeApiFactory', func
     };
 
     $scope.rename = false;
+    releaseSelection();
     getDirectory();
   };
 

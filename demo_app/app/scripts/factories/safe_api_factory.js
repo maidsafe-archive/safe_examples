@@ -73,11 +73,14 @@ function(http, $q, nfs, dns) {
       }
     };
     var decrypt = function(response) {
+      var data = response.data;
+      if (!data) {
+        return callback('Invalid data');
+      }
       if (!(payload.headers && payload.headers.authorization)) {
-        return response.data;
+        return data;
       }
       try {
-        var data = response.data;
         var symmetricKeys = self.getSymmetricKeys();
         try {
           /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/

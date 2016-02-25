@@ -1,116 +1,43 @@
 import fs from 'fs';
 import path from 'path';
+import FileHelper from './file_helper';
+import { computeDirectorySize, DirectoryHelper } from './directory_helper';
 
 export default class Uploader {
   constructor(api) {
     this.api = api;
-  }
-
-  upload(localPath, isPrivate, networkPath) {
-    let api = this.api;
-    let progress = {
+    this.progress = {
       total: 0,
       completed: 0,
       failed: 0,
       failedFiles: [],
       onUpdate: function() {}
     };
+  }
 
-    let computeDirectorySize = function(localPath) {
-      let size = 0;
-      let stat;
-      let tempPath;
-      let contents = fs.readdirSync(localPath);
-      for (var i in contents) {
-        tempPath = localPath + '/' + contents[i];
-        stat = fs.statSync(tempPath);
-        if (stat.isDirectory()) {
-          size += computeDirectorySize(tempPath);
-        } else {
-          size += stat.size;
-        }
-      }
-      return size;
-    };
+  updateProgressOnFailure(size, path) {
+    this.progress.failed += size;
+    // this.progress.failedFiles.push(localPath);
+    this.progress.onUpdate();
+  }
 
-    let updateProgressOnFailure = function(size, path) {
-      progress.failed += size;
-      progress.failedFiles.push(localPath);
-      progress.onUpdate();
-    };
+  uploadDirectory(isPrivate, localPath, networkParentDirPath, isRoot) {
+    new DirectoryHelper(this, isPrivate, localPath, networkParentDirPath).upload();
+  }
 
-    let FileCreationHanlder = function(fileName, localPath, networkParentDirPath) {
-      let size = fs.statSync(localPath).size;
-      let ContentUpdated = function(size) {
-        this.onResponse = function(err) {
-          if (err) {
-            console.error(err);
-            return updateProgressOnFailure(size, localPath);
-          }
-          progress.completed += size;
-          progress.onUpdate();
-        };
-        return this.onResponse;
-      };
+  uploadFile(localPath, networkParentDirPath) {
+    new FileHelper(this, localPath, networkParentDirPath).upload();
+  }
 
-      this.onResponse = function(err) {
-        if (err) {
-          console.error(err);
-          return updateProgressOnFailure(size, localPath);
-        }
-        window.upData = new Uint8Array(fs.readFileSync(localPath));
-        api.modifyFileContent(networkParentDirPath + '/' + fileName, false,
-          new Uint8Array(fs.readFileSync(localPath)), 0, new ContentUpdated(size));
-        console.log('updating content', networkParentDirPath + '/' + fileName);
-      };
-
-      return this.onResponse;
-    };
-
-    let uploadFile = function(localPath, networkParentDirPath) {
-      let fileName = path.basename(localPath);
-      let hanlder = new FileCreationHanlder(fileName, localPath, networkParentDirPath);
-      console.log('Creating file', networkParentDirPath + '/' + fileName);
-      api.createFile(networkParentDirPath + '/' + fileName, '', false, hanlder);
-    };
-
-    let DirectoryCreationHanler = function(isPrivate, localPath, networkParentDirPath, isRoot) {
-      this.onResponse = function(err) {
-        if (err && !isRoot) {
-          console.log(err);
-          return updateProgressOnFailure(computeDirectorySize(localPath), localPath);
-        }
-        let stat;
-        let tempPath;
-        let contents = fs.readdirSync(localPath);
-        for (var i in contents) {
-          tempPath = localPath + '/' + contents[i];
-          stat = fs.statSync(tempPath);
-          if (stat.isDirectory()) {
-            uploadDirectory(isPrivate, tempPath, networkParentDirPath);
-          } else {
-            uploadFile(tempPath, networkParentDirPath);
-          }
-        }
-      };
-      return this.onResponse;
-    };
-
-    let uploadDirectory = function(isPrivate, localPath, networkParentDirPath, isRoot) {
-      networkParentDirPath += isRoot ? '' : ('/' + path.basename(localPath));
-      let hanlder = new DirectoryCreationHanler(isPrivate, localPath, networkParentDirPath, isRoot);
-      console.log('Dir ::', localPath, networkParentDirPath);
-      api.createDir(networkParentDirPath, isPrivate, null, false, false, hanlder);
-    };
-
+  upload(localPath, isPrivate, networkPath) {
     let stat = fs.statSync(localPath);
     if (stat.isDirectory()) {
-      progress.total = computeDirectorySize(localPath);
-      uploadDirectory(isPrivate, localPath, networkPath || '/', true);
+      this.progress.total = computeDirectorySize(localPath);
+      this.uploadDirectory(isPrivate, localPath, networkPath || '/', true);
     } else {
-      progress.total = stat.size;
-      uploadFile(localPath, networkPath || '/');
+      this.progress.total = stat.size;
+      this.uploadFile(localPath, networkPath || '/');
     }
-    return progress;
+    return this.progress;
   }
 }
