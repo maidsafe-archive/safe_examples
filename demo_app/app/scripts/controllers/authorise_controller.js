@@ -5,6 +5,8 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
   'use strict';
   var dirPath = '/shankar_home_new';
 
+  $scope.authorisationTasksMsg = '';
+
   // initialization
   $scope.init = function() {
     var createPvtDirCb = function(err, res) {
@@ -53,10 +55,12 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
         console.error(err);
         return;
       }
+      $scope.authorisationTasksMsg = 'Application authorised. Initialising it...';
       console.log('Application authorised');
       console.log(res);
       safe.getDns(getDnsCb);
     };
+    $scope.authorisationTasksMsg = 'Authorising application';
     safe.authorise(authoriseCb);
   };
 } ]);
