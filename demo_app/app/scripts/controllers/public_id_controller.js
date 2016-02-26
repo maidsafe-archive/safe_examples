@@ -22,7 +22,7 @@ function($scope, $rootScope, safe) {
       });
     }
     if (!safe.isAlphaNumeric($scope.publicId)) {
-      return $rootScope.$msPrompt.show('Invalid data', 'Public ID should not contain special characters or space', function(status) {
+      return $rootScope.$msPrompt.show('Invalid data', 'Public ID should not contain special characters, Uppercase or space', function(status) {
         $rootScope.$msPrompt.hide();
         $scope.publicId = '';
         $scope.$applyAsync();

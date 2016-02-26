@@ -197,7 +197,7 @@ function(http, $q, $rootScope, nfs, dns) {
   };
 
   self.isAlphaNumeric = function(str) {
-    return (new RegExp(/^[a-z0-9]+$/i)).test(str);
+    return (new RegExp(/^[a-z0-9]+$/g)).test(str);
   };
 
   return $.extend(self, nfs, dns);

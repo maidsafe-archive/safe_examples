@@ -60,7 +60,7 @@ function($scope, $state, $rootScope, $timeout, safe) {
       return console.error('Provide valid service name');
     }
     if (!safe.isAlphaNumeric($scope.serviceName)) {
-      return $rootScope.$msPrompt.show('Invalid data', 'Service name should not contain special characters or space', function(status) {
+      return $rootScope.$msPrompt.show('Invalid data', 'Service name should not contain special characters, Uppercase or space', function(status) {
         $rootScope.$msPrompt.hide();
         $scope.serviceName = '';
         $scope.$applyAsync();

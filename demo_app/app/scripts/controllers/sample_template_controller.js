@@ -33,7 +33,7 @@ function($scope, $http, $state, $rootScope, safe) {
                 $state.go('manageService');
               });
             }
-            msg = serviceName + ' service has been published successfully';
+            msg = 'Template has been published for the service: ' + serviceName;
             $rootScope.$msPrompt.show('Service Published', msg, function(status) {
               $rootScope.$msPrompt.hide();
               $state.go('manageService');
