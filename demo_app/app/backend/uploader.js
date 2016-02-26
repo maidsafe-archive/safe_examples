@@ -35,6 +35,9 @@ export default class Uploader {
       this.progress.total = computeDirectorySize(localPath);
       this.uploadDirectory(isPrivate, localPath, networkPath || '/', true);
     } else {
+      if (stat.size > 1000000) {
+        throw new Error('File greater than 1 Mb can not be uploaded');
+      }
       this.progress.total = stat.size;
       this.uploadFile(localPath, networkPath || '/');
     }
