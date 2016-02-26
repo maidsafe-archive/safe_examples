@@ -16,7 +16,17 @@ function($scope, $rootScope, safe) {
 
   $scope.createPublicId = function() {
     if (!$scope.publicId) {
-      return console.error('Please enter a valid Public ID');
+      // return console.error('Please enter a valid Public ID');
+      return $rootScope.$msPrompt.show('Invalid data', 'Please enter a valid Public ID', function(status) {
+        $rootScope.$msPrompt.hide();
+      });
+    }
+    if (!safe.isAlphaNumeric($scope.publicId)) {
+      return $rootScope.$msPrompt.show('Invalid data', 'Public ID should not contain special characters, Uppercase or space', function(status) {
+        $rootScope.$msPrompt.hide();
+        $scope.publicId = '';
+        $scope.$applyAsync();
+      });
     }
     $rootScope.$loader.show();
     safe.createPublicId($scope.publicId, function(err, res) {

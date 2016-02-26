@@ -195,5 +195,10 @@ function(http, $q, $rootScope, nfs, dns) {
       return callback();
     });
   };
+
+  self.isAlphaNumeric = function(str) {
+    return (new RegExp(/^[a-z0-9]+$/g)).test(str);
+  };
+
   return $.extend(self, nfs, dns);
 } ]);

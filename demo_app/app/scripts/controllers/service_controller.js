@@ -5,6 +5,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
 function($scope, $state, $rootScope, $timeout, safe) {
   'use strict';
   var PROGRESS_DELAY = 500;
+  $scope.serviceName = '';
   $scope.serviceList = [];
   $scope.newService = null;
   $scope.newServicePath = '/public';
@@ -57,6 +58,13 @@ function($scope, $state, $rootScope, $timeout, safe) {
     }
     if (!$scope.serviceName) {
       return console.error('Provide valid service name');
+    }
+    if (!safe.isAlphaNumeric($scope.serviceName)) {
+      return $rootScope.$msPrompt.show('Invalid data', 'Service name should not contain special characters, Uppercase or space', function(status) {
+        $rootScope.$msPrompt.hide();
+        $scope.serviceName = '';
+        $scope.$applyAsync();
+      });
     }
     $state.go('serviceAddFiles', { 'serviceName': $scope.serviceName });
     $scope.serviceName = '';

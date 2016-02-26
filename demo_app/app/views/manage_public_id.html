@@ -20,7 +20,7 @@
     <div class="heading-1 text-center" ng-show="longName">Your Public ID is: <b><i>{{ longName }}</i></b></div>
     <form name="createPublicID" ng-submit="createPublicId()" ng-show="!longName">
       <div class="form-grp drk">
-        <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId">
+        <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId" autofocus>
       </div>
       <div class="form-grp-btn">
         <button type="submit" class="ms-btn ms-primary-btn" name="submitPublicID">Done</button>

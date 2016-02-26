@@ -3,7 +3,7 @@
  */
 window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFactory', function($scope, $state, safe) {
   'use strict';
-  var dirPath = '/shankar_home_new';
+  $scope.authorisationTasksMsg = '';
 
   // initialization
   $scope.init = function() {
@@ -53,10 +53,12 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
         console.error(err);
         return;
       }
+      $scope.authorisationTasksMsg = 'Initialising...';
       console.log('Application authorised');
       console.log(res);
       safe.getDns(getDnsCb);
     };
+    $scope.authorisationTasksMsg = 'Authorising...';
     safe.authorise(authoriseCb);
   };
 } ]);

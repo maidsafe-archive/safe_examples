@@ -48,7 +48,7 @@
         </div> -->
         <div class="ms-list-2-i-ctx date">{{ file.createdOn | date : 'dd-MM-yy HH:mm:ss' }}</div>
         <div class="ms-list-2-i-ctx type">{{ mime.lookup(file.name) }}</div>
-        <div class="ms-list-2-i-ctx size">{{ file.size }}</div>
+        <div class="ms-list-2-i-ctx size">{{ bytesToSize(file.size) }}</div>
       </div>
       <!-- <div class="ms-list-2-i" ng-show='isDirectoryEmpty()'>
         <div class="ms-list-2-i-ctx icn">Empty</div>
