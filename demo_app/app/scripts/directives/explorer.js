@@ -137,7 +137,6 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
 
       $scope.delete = function() {
         var path = $scope.currentDirectory + '/' + $scope.selectedPath;
-        $scope.listSelected = false;
         $rootScope.$loader.show();
         var onDelete = function(err) {
           $rootScope.$loader.hide();
@@ -180,7 +179,6 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
       };
 
       $scope.back = function() {
-        $scope.listSelected = false;
         var tokens = $scope.currentDirectory.split('/');
         tokens.pop();
         tokens.pop();
