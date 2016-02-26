@@ -1,4 +1,4 @@
-<div class="ms-frame">
+<div class="ms-frame" ng-controller="ServiceCtrl">
   <!-- header -->
   <div class="frame-h">
     <div class="frame-h-act">
@@ -8,18 +8,18 @@
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
-    <h3 class="content-1-h">Time to add some files</h3>
+    <h3 class="content-1-h">Add Some Files</h3>
     <p class="content-1-p">
-      Here you can create a service to be used with your public id. This domain
-      will form the URL used to view your site in the browser e.g. blog.maidsafe.safenet
+      These files will be added to the SAFE Network and will be publicly viewable using the URL,
+      http://{{ $state.params.serviceName + '.' + longName + '.safenet' }}
     </p>
   </div><!-- /content 1 -->
   <div class="or-comp">
     <div class="or-comp-lt">
       <div class="text-center">
-        Browse through your files to add to your site.
+        Add web files. The root folder should contain index.html
       </div>
-      <div class="container-4 text-center" ng-controller="ServiceCtrl">
+      <div class="container-4 text-center">
         <button type="button" class="ms-btn ms-primary-btn" name="browseFile"
           ng-click="uploadDirectoryForService()">Browse</button>
           <progress-indicator register="registerProgress(scope)">
@@ -28,7 +28,7 @@
     <div class="or-comp-or">OR</div>
     <div class="or-comp-rt">
       <div class="text-center">
-        Use our template to create a simple example site.
+        Use our template to create a simple example site
       </div>
       <div class="container-4 text-center">
         <button type="button" class="ms-btn ms-primary-btn" name="useTemaplate"

@@ -5,7 +5,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
 function($scope, $http, $state, $rootScope, safe) {
   'use strict';
   $scope.siteTitle = 'My Page';
-  $scope.siteDesc = 'This page is created and published on the SAFE Network using the SAFE Uploader';
+  $scope.siteDesc = 'This page is created and published on the SAFE Network using the MaidSafe demo app';
   var filePath = '/views/sample_template_layout.html';
   var writeFile = function(title, content, filePath) {
     $rootScope.$loader.show();
@@ -33,7 +33,7 @@ function($scope, $http, $state, $rootScope, safe) {
                 $state.go('manageService');
               });
             }
-            msg = serviceName + ' service has been published successfully';
+            msg = 'Template has been published for the service: ' + serviceName;
             $rootScope.$msPrompt.show('Service Published', msg, function(status) {
               $rootScope.$msPrompt.hide();
               $state.go('manageService');
