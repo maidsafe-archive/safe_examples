@@ -33,7 +33,7 @@ var packageApp = function() {
   var config = packageForOs[utils.os()];
   childProcess.spawn(packagerPath, [
     'build',
-    'safe_demo_app',
+    'maidsafe_demo_app',
     '--icon=' + config.icon,
     '--platform=' + config.platform,
     '--asar',

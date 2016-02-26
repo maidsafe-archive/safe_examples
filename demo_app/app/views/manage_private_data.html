@@ -16,7 +16,7 @@
   </div><!-- /content 1 -->
   <div class="" ng-controller="PrivateDataCtrl">
     <!-- explorer -->
-    <explorer is-private="true" on-directory-selected="setTargetFolder(name)" on-upload="onUpload(percentage)"/>
+    <explorer is-private="true" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
     <!-- explorer -->
     <progress-indicator register="registerProgress(scope)">
   </div>

@@ -18,7 +18,7 @@
   </div><!-- /content 1 -->
   <div class="" ng-controller="ServiceCtrl" ng-init="explorerInit()">
     <!-- explorer -->
-    <explorer is-private="false" starting-path="$state.params.serviceName" on-directory-selected="setTargetFolder(name)" on-upload="onUpload(percentage)"/>
+    <explorer is-private="false" starting-path="$state.params.serviceName" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
     <!-- explorer -->
     <progress-indicator register="registerProgress(scope)">
   </div>

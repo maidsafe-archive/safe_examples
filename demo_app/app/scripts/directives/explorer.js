@@ -90,8 +90,9 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
               $rootScope.$loader.hide();
             }
             var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
-            $scope.onUpload({
-              percentage: progressCompletion
+            $scope.onProgress({
+              percentage: progressCompletion,
+              isUpload: true
             });
             if (progressCompletion === 100) {
               $timeout(getDirectory, PROGRESS_DELAY);
@@ -123,7 +124,6 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         var downloader = new window.uiUtils.Downloader(safeApi,
           $scope.currentDirectory + $scope.selectedPath, size, false);
         downloader.setOnCompleteCallback(function(err) {
-          $rootScope.$loader.hide();
           if (err) {
             console.log(err);
             $rootScope.$msPrompt.show('MaidSafe Demo', 'Download failed', function() {
@@ -131,6 +131,13 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
             });
           }
           downloader.open();
+        });
+        downloader.setStatusCallback(function(status) {
+          $rootScope.$loader.hide();
+          $scope.onProgress({
+            percentage: status,
+            isUpload: false
+          });
         });
         downloader.download();
       };
@@ -202,7 +209,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         isPrivate: '=',
         startingPath: '=',
         onDirectorySelected: '&',
-        onUpload: '&'
+        onProgress: '&'
       },
       templateUrl: './views/explorer.html',
       link: Explorer

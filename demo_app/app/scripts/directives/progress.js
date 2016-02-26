@@ -5,6 +5,7 @@ window.maidsafeDemo.directive('progressIndicator', [ function() {
   'use strict';
   var link = function(scope, element, attr) {
     scope.percentage = 0;
+    scope.text = "Uploading"
     scope.show = false;
     scope.register({
       scope: scope

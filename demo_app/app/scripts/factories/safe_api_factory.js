@@ -106,7 +106,7 @@ function(http, $q, $rootScope, nfs, dns) {
       }
       if (err.status === 401) {
         $rootScope.$loader.hide();
-        $rootScope.$msPrompt.show('Application unauthorised', 'No authorisation for this application present', function(status) {
+        $rootScope.$msPrompt.show('Access denied', 'Launcher has denied access. Restart application again to continue.', function(status) {
           $rootScope.$msPrompt.hide();
           window.uiUtils.closeApp();
         });
