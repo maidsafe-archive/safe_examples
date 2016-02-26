@@ -94,6 +94,14 @@ function(http, $q, $rootScope, nfs, dns) {
         return callback(e);
       }
     };
+    var closeApp = function(title, msg) {
+      $rootScope.$loader.hide();
+      $rootScope.$msPrompt.show(title, msg, function(status) {
+        $rootScope.$msPrompt.hide();
+        window.uiUtils.closeApp();
+      });
+      return;
+    };
     var onSuccess = function(response) {
       if (!response) {
         return callback();
@@ -101,16 +109,14 @@ function(http, $q, $rootScope, nfs, dns) {
       callback(null, decrypt(response), response.headers);
     };
     var onError = function(err) {
+      if (err.status === -1) {
+        return closeApp('Could not connect to launcher', 'Failed to connect with launcher. Launcher should be left running.');
+      }
       if (err.status === 401 && allowUnAuthErr) {
         return callback(err);
       }
       if (err.status === 401) {
-        $rootScope.$loader.hide();
-        $rootScope.$msPrompt.show('Access denied', 'Launcher has denied access. Restart application again to continue.', function(status) {
-          $rootScope.$msPrompt.hide();
-          window.uiUtils.closeApp();
-        });
-        return;
+        return closeApp('Access denied', 'Launcher has denied access. Restart application again to continue.');
       }
       err = decrypt(err);
       return callback(err);
@@ -199,6 +205,7 @@ function(http, $q, $rootScope, nfs, dns) {
     });
   };
 
+  // TODO Shankar - Move to utils
   self.isAlphaNumeric = function(str) {
     return (new RegExp(/^[a-z0-9]+$/g)).test(str);
   };
