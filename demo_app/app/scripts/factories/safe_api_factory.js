@@ -1,8 +1,8 @@
 /**
  * SAFE Api factory
  */
-window.maidsafeDemo.factory('safeApiFactory', [ '$http', '$q', 'nfsFactory', 'dnsFactory',
-function(http, $q, nfs, dns) {
+window.maidsafeDemo.factory('safeApiFactory', [ '$http', '$q', '$rootScope', 'nfsFactory', 'dnsFactory',
+function(http, $q, $rootScope, nfs, dns) {
   'use strict';
   var self = this;
   var sodium = require('libsodium-wrappers');
@@ -40,7 +40,7 @@ function(http, $q, nfs, dns) {
     return symmetricKeys;
   };
 
-  self.Request = function(payload, callback) {
+  self.Request = function(payload, callback, allowUnAuthErr) {
     var encrypt = function() {
       if (!(payload.headers && payload.headers.authorization)) {
         return payload;
@@ -101,6 +101,17 @@ function(http, $q, nfs, dns) {
       callback(null, decrypt(response), response.headers);
     };
     var onError = function(err) {
+      if (err.status === 401 && allowUnAuthErr) {
+        return callback(err);
+      }
+      if (err.status === 401) {
+        $rootScope.$loader.hide();
+        $rootScope.$msPrompt.show('Application unauthorised', 'No authorisation for this application present', function(status) {
+          $rootScope.$msPrompt.hide();
+          window.uiUtils.closeApp();
+        });
+        return;
+      }
       err = decrypt(err);
       return callback(err);
     };
@@ -171,7 +182,7 @@ function(http, $q, nfs, dns) {
         authorization: 'Bearer ' + token
       }
     };
-    (new self.Request(payload, callback)).send();
+    (new self.Request(payload, callback, true)).send();
   };
 
   // authorise application
