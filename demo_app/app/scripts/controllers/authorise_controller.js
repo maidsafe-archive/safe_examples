@@ -51,7 +51,6 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
     var authoriseCb = function(err, res) {
       if (err) {
         console.error(err);
-        window.uiUtils.closeApp();
         return;
       }
       console.log('Application authorised');

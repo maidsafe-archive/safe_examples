@@ -7,17 +7,34 @@ export default class FileHelper {
     this.localPath = localPath;
     this.fileName = path.basename(localPath);
     this.size = fs.statSync(this.localPath).size;
+    this.fd = fs.openSync(this.localPath, 0);
+    this.uploadedSize = 0;
     this.networkParentDirPath = networkParentDirPath[ networkParentDirPath.length - 1 ] === '/' ?
-    networkParentDirPath : networkParentDirPath + '/';    
+    networkParentDirPath : networkParentDirPath + '/';
   }
 
-  _OnContentUploaded(err) {
+  _OnContentUploaded(err, uploadedSize) {
     if (err) {
       console.error(err);
       return this.uploader.updateProgressOnFailure(this.size, this.localPath);
     }
-    this.uploader.progress.completed += this.size;
+    this.uploadedSize += uploadedSize;
+    this.uploader.progress.completed += uploadedSize;
     this.uploader.progress.onUpdate();
+    if (this.uploadedSize < this.size) {
+      this._uploadContent();
+    }
+  }
+
+  _uploadContent() {
+    var self = this;
+    var MAX_SIZE_FOR_UPLOAD = 512000; // 500kb (500 * 1024)
+    var buffer = new Buffer(Math.min(MAX_SIZE_FOR_UPLOAD, (this.size - this.uploadedSize)));
+    fs.readSync(this.fd, buffer, 0, buffer.length, this.uploadedSize);
+    self.uploader.api.modifyFileContent(this.networkParentDirPath + '/' + this.fileName, false,
+      new Uint8Array(buffer), this.uploadedSize, function(err) {
+        self._OnContentUploaded(err, buffer.length);
+      });
   }
 
   _onFileCreated(err) {
@@ -26,11 +43,8 @@ export default class FileHelper {
       console.error(err);
       return this.uploader.updateProgressOnFailure(this.size, this.localPath);
     }
-    this.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false,
-      new Uint8Array(fs.readFileSync(this.localPath)), 0, function(err) {
-        self._OnContentUploaded(err);
-      });
     console.log('updating content', this.networkParentDirPath + '/' + this.fileName);
+    this._uploadContent();
   }
 
   upload() {

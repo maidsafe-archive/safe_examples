@@ -28,7 +28,7 @@
           </div>
           <div class="ms-list-1-i-act">
             <a ui-sref="serviceExplorer({serviceName: service.name})">Edit Files</a>
-            <a target="_" href="http://{{ service.name + '.' + service.longName + '.safenet'}}">Visit Site</a>
+            <a href="" ng-click="openLink(service.name, service.longName)">Visit Site</a>
           </div>
         </div>
       </div>
