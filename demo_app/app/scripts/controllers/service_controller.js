@@ -141,7 +141,7 @@ function($scope, $state, $rootScope, $timeout, safe) {
             });
           });
         }
-        $scope.onUpload(progressCompletion);
+        $scope.onProgress(progressCompletion, true);
       };
     });
   };

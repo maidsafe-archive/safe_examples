@@ -1,4 +1,4 @@
-<div class="ms-frame">
+<div class="ms-frame" ng-controller="ServiceCtrl">
   <!-- header -->
   <div class="frame-h">
     <div class="frame-h-act">
@@ -10,7 +10,8 @@
   <div class="content-1">
     <h3 class="content-1-h">Add Some Files</h3>
     <p class="content-1-p">
-      These files will be added to the SAFE Network and will be publicly viewable using the URL, { TODO Krishna map url }
+      These files will be added to the SAFE Network and will be publicly viewable using the URL,
+      http://{{ $state.params.serviceName + '.' + longName + '.safenet' }}
     </p>
   </div><!-- /content 1 -->
   <div class="or-comp">
@@ -18,7 +19,7 @@
       <div class="text-center">
         Add web files. The root folder should contain index.html
       </div>
-      <div class="container-4 text-center" ng-controller="ServiceCtrl">
+      <div class="container-4 text-center">
         <button type="button" class="ms-btn ms-primary-btn" name="browseFile"
           ng-click="uploadDirectoryForService()">Browse</button>
           <progress-indicator register="registerProgress(scope)">
