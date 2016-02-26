@@ -138,6 +138,11 @@ function($scope, $state, $rootScope, $timeout, safe) {
     });
   };
 
+  $scope.openLink = function(serviceName, publicName) {
+    var shell = require('remote').shell;
+    shell.openExternal('http://' + serviceName + '.' + publicName + '.safenet');
+  };
+
   $scope.onProgress = function(percentage, isUpload) {
     if (percentage < 100 && !$scope.progressIndicator.show) {
       $scope.progressIndicator.show = true;
