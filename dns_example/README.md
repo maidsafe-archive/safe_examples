@@ -1,8 +1,8 @@
 # Safe DNS Example
 
-An example application to demonstrate uploading files of a static website to the Safe network. 
-This examples showcases features from the `safe_nfs` and `safe_dns` crates and also the IPC connection with Launcher. 
-The application can not be run as a Standalone example. 
+An example application to demonstrate uploading files of a static website to the Safe network.
+This examples showcases features from the `safe_nfs` and `safe_dns` crates and also the IPC connection with Launcher.
+The application can not be run as a Standalone example.
 Can work only with [safe_launcher](https://github.com/maidsafe/safe_launcher)
 
 ## Prerequisites
@@ -28,10 +28,10 @@ $ npm run build-osx
 
 Builds the app for OS X, Linux, and Windows, using [electron-packager](https://github.com/maxogden/electron-packager).
 
-### Logging
+### TODO
 
-Application by default Log level is 'info'
-
-Log level can be explicitly set by passing `--LOG_LEVEL` command line argument.
-
-Permitted values for LOG_LEVEL can be found [here](https://www.npmjs.com/package/npmlog#log-level-prefix-message)
+[ ] Refactor UI components
+[ ] Improve error handling while directory uploading
+[ ] Improve progress indicator
+[ ] Add Rename functionality
+[ ] Cut, Copy, Paste features
