@@ -130,6 +130,9 @@ function(http, $q, $rootScope, nfs, dns) {
     var nonce = new Buffer(assymNonce).toString('base64');
 
     var onResponse = function(err, body, headers) {
+      if (!err && !body && !headers) {
+        return callback('Unable to connect Launcher');
+      }
       if (err) {
         return callback(err);
       }
