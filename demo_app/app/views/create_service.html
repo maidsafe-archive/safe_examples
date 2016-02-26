@@ -18,7 +18,7 @@
   <div class="ms-form">
     <form id="create_service" name="create_service" ng-submit="createService()" ng-init="$state.params.serviceName ? serviceName = $state.params.serviceName : ''">
       <div class="form-grp lgt">
-        <input type="text" name="service" required="required" placeholder="Service" ng-model="serviceName">
+        <input type="text" name="service" required="required" placeholder="Service" ng-model="serviceName" autofocus>
       </div>
     </form>
   </div><!-- create public ID form -->
