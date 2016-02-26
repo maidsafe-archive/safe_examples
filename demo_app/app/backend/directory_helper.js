@@ -13,6 +13,9 @@ export let computeDirectorySize = function(localPath) {
     if (stat.isDirectory()) {
       size += computeDirectorySize(tempPath);
     } else {
+      if (stat.size > 1000000) {
+        throw new Error('File size is more than 1 Mb can not be uploaded');
+      }
       size += stat.size;
     }
   }

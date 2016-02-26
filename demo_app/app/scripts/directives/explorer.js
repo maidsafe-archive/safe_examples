@@ -96,20 +96,32 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
             dirName = dirName[dirName.length - 1];
             networkPath += ('/' + dirName);
           }
-          var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
-          progress.onUpdate = function() {
-            if ($rootScope.$loader.isLoading) {
-              $rootScope.$loader.hide();
-            }
-            var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
-            $scope.onProgress({
-              percentage: progressCompletion,
-              isUpload: true
+          try {
+            var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
+            progress.onUpdate = function() {
+              if ($rootScope.$loader.isLoading) {
+                $rootScope.$loader.hide();
+              }
+              var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
+              $scope.onProgress({
+                percentage: progressCompletion,
+                isUpload: true
+              });
+              if (progressCompletion === 100) {
+                $timeout(getDirectory, PROGRESS_DELAY);
+              } else if (progressCompletion > 100) { //patch fix
+                $rootScope.$loader.hide();
+                $rootScope.$msPrompt.show('MaidSafe Demo', 'Upload failed', function() {
+                  $rootScope.$msPrompt.hide();
+                });
+              }
+            };
+          } catch(err) {
+            $rootScope.$loader.hide();
+            $rootScope.$msPrompt.show('MaidSafe Demo', 'Cannot upload files above 1 Mb', function() {
+              $rootScope.$msPrompt.hide();
             });
-            if (progressCompletion === 100) {
-              $timeout(getDirectory, PROGRESS_DELAY);
-            }
-          };
+          }
         });
       };
 
