@@ -12,11 +12,23 @@ export default class Downloader {
     this.onComplete = onComplete;
     this.downloadedSize = 0;
     this.downloadPath = null;
+    this.statusCallback = null;
     this.MAX_SIZE_FOR_DOWNLOAD = 512000; // 500kb (500 * 1024)
+  }
+
+  setStatusCallback(callback) {    
+    this.statusCallback = callback;
   }
 
   setOnCompleteCallback(callback) {
     this.onComplete = callback;
+  }
+
+  _postStatus() {
+    if (!this.statusCallback) {
+      return;
+    }
+    this.statusCallback(Math.floor((this.downloadedSize * 100) / this.size));
   }
 
   _onResponse(err, data) {
@@ -24,11 +36,12 @@ export default class Downloader {
       return this.onComplete(err);
     }
     this.downloadedSize += data.length;
+    this._postStatus();
     fs.writeFileSync(this.downloadPath, new Buffer(data));
     if (this.downloadedSize === this.size) {
       this.onComplete();
     } else {
-      _downloadContent();
+      this._downloadContent();
     }
   }
 
@@ -45,6 +58,7 @@ export default class Downloader {
     var tempDir = temp.mkdirSync('safe-demo-');
     this.downloadPath = path.resolve(tempDir, path.basename(self.filePath));
     this._downloadContent();
+    this._postStatus();
   }
 
   open() {

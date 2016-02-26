@@ -138,9 +138,10 @@ function($scope, $state, $rootScope, $timeout, safe) {
     });
   };
 
-  $scope.onUpload = function(percentage) {
+  $scope.onProgress = function(percentage, isUpload) {
     if (percentage < 100 && !$scope.progressIndicator.show) {
       $scope.progressIndicator.show = true;
+      $scope.progressIndicator.text = isUpload ? "Uploading" : "Downloading";
     }
     $scope.progressIndicator.percentage = Math.floor(percentage);
     if (percentage === 100) {
