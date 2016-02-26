@@ -95,8 +95,10 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     (new this.Request(payload, callback)).send();
   };
 
-  self.getFile = function(filePath, isPathShared, callback) {
-    var url = this.SERVER + 'nfs/file/' + encodeURIComponent(filePath) + '/' + isPathShared;
+  self.getFile = function(filePath, isPathShared, offset, length, callback) {
+    var url = this.SERVER + 'nfs/file/' + encodeURIComponent(filePath) + '/' + isPathShared + '?';
+    url += ('offset=' + offset);
+    url += ('&length=' + length);
     var payload = {
       url: url,
       method: 'GET',
