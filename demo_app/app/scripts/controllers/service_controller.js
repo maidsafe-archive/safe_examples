@@ -1,167 +1,156 @@
 /**
  * Service controller
  */
-window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
-function($scope, $state, $rootScope, $timeout, safe) {
-  'use strict';
-  var PROGRESS_DELAY = 500;
-  $scope.serviceName = '';
-  $scope.serviceList = [];
-  $scope.newService = null;
-  $scope.newServicePath = '/public';
-  $scope.progressIndicator = null;
-
-  $scope.longName = safe.getUserLongName();
-
-  // get services
-  $scope.getServices = function() {
-    $rootScope.$loader.show();
-    safe.getDns(function(err, res) {
-      $rootScope.$loader.hide();
-      if (err) {
-        return console.error(err);
-      }
-      res = JSON.parse(res);
-      if (res.length === 0) {
-        return console.log('No Public ID registered');
-      }
-      var addServices = function(longName, services) {
-        services.forEach(function(ser) {
-          $scope.serviceList.push({
-            longName: longName,
-            name: ser
-          });
-        });
-      };
-      $rootScope.$loader.show();
-      res.forEach(function(longName) {
-        safe.getServices(longName, function(err, services) {
-          if (err) {
-            return console.error(err);
-          }
-          services = JSON.parse(services);
-          if (services.length === 0) {
-            return console.log('No service registered for ' + longName);
-          }
-          addServices(longName, services);
-        });
-      });
-      $rootScope.$loader.hide();
-      console.log(res);
-    });
-  };
-
-  // create service
-  $scope.createService = function() {
-    if (!$scope.longName) {
-      return console.error('Create your Public ID to register a service');
-    }
-    if (!$scope.serviceName) {
-      return console.error('Provide valid service name');
-    }
-    if (!safe.isAlphaNumeric($scope.serviceName)) {
-      return $rootScope.$msPrompt.show('Invalid data', 'Service name should not contain special characters, Uppercase or space', function(status) {
-        $rootScope.$msPrompt.hide();
-        $scope.serviceName = '';
-        $scope.$applyAsync();
-      });
-    }
-    $state.go('serviceAddFiles', { 'serviceName': $scope.serviceName });
+window.maidsafeDemo.controller('ServiceCtrl', ['$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
+  function($scope, $state, $rootScope, $timeout, safe) {
+    'use strict';
     $scope.serviceName = '';
-  };
+    $scope.serviceList = [];
+    $scope.newService = null;
+    $scope.newServicePath = '/public';
 
-  // explorer init
-  $scope.explorerInit = function() {
-    $scope.newService = $state.params.serviceName + '.' + $scope.longName + '.safenet';
-  };
+    $scope.longName = safe.getUserLongName();
 
-  // set target folder
-  $scope.setTargetFolder = function(name) {
-    $scope.newServicePath = name;
-  };
-
-  $scope.publishService = function() {
-    safe.addService($scope.longName, $state.params.serviceName, false, $scope.newServicePath, function(err, res) {
-      var msg = null;
-      if (err) {
-        msg = err;
-        return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
-          $rootScope.$msPrompt.hide();
-          $state.go('manageService');
-        });
-      }
-      msg = $state.params.serviceName + ' service has been published successfully';
-      $rootScope.$msPrompt.show('Service Published', msg, function(status) {
-        $rootScope.$msPrompt.hide();
-        $state.go('manageService');
-      });
-    });
-  };
-
-  $scope.registerProgress = function(progressScope) {
-    $scope.progressIndicator = progressScope;
-  };
-
-  $scope.uploadDirectoryForService = function() {
-    var dialog = require('remote').dialog;
-    dialog.showOpenDialog({
-      title: 'Select Directory for upload',
-      properties: [ 'openDirectory' ]
-    }, function(folders) {
-      if (folders.length === 0) {
-        return;
-      }
+    // get services
+    $scope.getServices = function() {
       $rootScope.$loader.show();
-      var serviceName = $state.params.serviceName;
-      // TODO instead of binding uploader to window use require
-      var uploader = new window.uiUtils.Uploader(safe);
-      var progress = uploader.upload(folders[0], false, '/public/' + serviceName);
-      progress.onUpdate = function() {
-        if ($rootScope.$loader.isLoading) {
-          $rootScope.$loader.hide();
+      safe.getDns(function(err, res) {
+        $rootScope.$loader.hide();
+        if (err) {
+          return console.error(err);
         }
-        var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
-        if (progressCompletion === 100) {
-          $rootScope.$loader.show();
-          safe.addService($scope.longName, serviceName, false, '/public/' + serviceName, function(err) {
-            $rootScope.$loader.hide();
-            var msg = null;
-            if (err) {
-              console.error(err);
-              msg = 'Service could not be created';
-              return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
-                $rootScope.$msPrompt.hide();
-                return $state.go('manageService');
-              });
-            }
-            msg = $state.params.serviceName + ' service has been published successfully';
-            $rootScope.$msPrompt.show('Service Published', msg, function(status) {
-              $rootScope.$msPrompt.hide();
-              $state.go('manageService');
+        res = JSON.parse(res);
+        if (res.length === 0) {
+          return console.log('No Public ID registered');
+        }
+        var addServices = function(longName, services) {
+          services.forEach(function(serviceName) {
+            $scope.serviceList.push({
+              longName: longName,
+              name: serviceName
             });
           });
+        };
+        $rootScope.$loader.show();
+        res.forEach(function(longName) {
+          safe.getServices(longName, function(err, services) {
+            if (err) {
+              return console.error(err);
+            }
+            services = JSON.parse(services);
+            if (services.length === 0) {
+              return console.log('No service registered for ' + longName);
+            }
+            addServices(longName, services);
+          });
+        });
+        $rootScope.$loader.hide();
+        console.log(res);
+      });
+    };
+
+    // create service
+    $scope.createService = function() {
+      if (!$scope.longName) {
+        return console.error('Create your Public ID to register a service');
+      }
+      if (!$scope.serviceName) {
+        return console.error('Provide valid service name');
+      }
+      if (!safe.isAlphaNumeric($scope.serviceName)) {
+        return $rootScope.prompt.show('Invalid data', 'Service name should not contain special characters, Uppercase or space', function() {
+          $scope.serviceName = '';
+          $scope.$applyAsync();
+        });
+      }
+      $state.go('serviceAddFiles', { 'serviceName': $scope.serviceName });
+      $scope.serviceName = '';
+    };
+
+    // explorer init
+    $scope.explorerInit = function() {
+      $scope.newService = $state.params.serviceName + '.' + $scope.longName + '.safenet';
+    };
+
+    $scope.publishService = function() {
+      safe.addService($scope.longName, $state.params.serviceName, false, $scope.newServicePath, function(err, res) {
+        var msg = null;
+        if (err) {
+          msg = err;
+          return $rootScope.prompt.show('Publish Service Error', msg, function() {
+            $state.go('manageService');
+          });
         }
-        $scope.onProgress(progressCompletion, true);
+        msg = $state.params.serviceName + ' service has been published successfully';
+        $rootScope.prompt.show('Service Published', msg, function() {
+          $state.go('manageService');
+        });
+      });
+    };
+
+    var registerService = function() {
+      $rootScope.$loader.show();
+      var serviceName = $state.params.serviceName;
+      var onResponse = function(err) {
+        $rootScope.$loader.hide();
+        var msg = null;
+        if (err) {
+          console.error(err);
+          msg = 'Service could not be created';
+          return $rootScope.prompt.show('Publish Service Error', msg, function() {
+            return $state.go('manageService');
+          });
+        }
+        msg = serviceName + ' service has been published successfully';
+        $rootScope.prompt.show('Service Published', msg, function() {
+          $state.go('manageService');
+        });
       };
-    });
-  };
+      safe.addService($scope.longName, serviceName, false, '/public/' + serviceName, onResponse);
+    };
 
-  $scope.openLink = function(serviceName, publicName) {
-    var shell = require('remote').shell;
-    shell.openExternal('http://' + serviceName + '.' + publicName + '.safenet');
-  };
+    $scope.uploadDirectoryForService = function() {
+      var dialog = require('remote').dialog;
+      dialog.showOpenDialog({
+        title: 'Select Directory for upload',
+        properties: ['openDirectory']
+      }, function(folders) {
+        if (folders.length === 0) {
+          return;
+        }
+        $rootScope.$loader.show();
+        var serviceName = $state.params.serviceName;
+        try {
+          var uploader = new window.uiUtils.Uploader(safe);
+          var progress = uploader.upload(folders[0], false, '/public/' + serviceName);
+          progress.onUpdate = function() {
+            if ($rootScope.$loader.isLoading) {
+              $rootScope.$loader.hide();
+            }
+            var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
+            if (progressCompletion === 100) {
+              registerService();
+            }
+            $scope.onProgress(progressCompletion, true);
+          };
+        } catch (e) {
+          $rootScope.$loader.hide();
+          $rootScope.prompt.show('MaidSafe Demo', 'Cannot upload file more than 1 Mb')
+        }
 
-  $scope.onProgress = function(percentage, isUpload) {
-    if (percentage < 100 && !$scope.progressIndicator.show) {
-      $scope.progressIndicator.show = true;
-      $scope.progressIndicator.text = isUpload ? "Uploading" : "Downloading";
-    }
-    $scope.progressIndicator.percentage = Math.floor(percentage);
-    if (percentage === 100) {
-      $timeout(function() {
-        $scope.progressIndicator.show = false;
-      }, PROGRESS_DELAY);
-    }
-    console.log(percentage);
-  };
-} ]);
+      });
+    };
+
+    $scope.openLink = function(serviceName, publicName) {
+      var shell = require('remote').shell;
+      shell.openExternal('http://' + serviceName + '.' + publicName + '.safenet');
+    };
+
+    $scope.onProgress = function(percentage, isUpload) {
+      if (!$rootScope.progressBar.isDisplayed()) {
+        $rootScope.progressBar.start(isUpload ? 'Uploading' : 'Downloading');
+      }
+      $rootScope.progressBar.update(Math.floor(percentage));
+    };
+  }
+]);

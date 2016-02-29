@@ -30,12 +30,15 @@ window.maidsafeDemo = angular
     isSet: false,
     msg: 'Confirmation content',
     title: 'Confirmation title',
+    eventCallback: function(){
+      this.hide();
+    },
     callback: function(status) {},
     show: function(title, msg, callback) {
       this.isSet = true;
       this.title = title;
       this.msg = msg;
-      this.callback = callback;
+      this.evntCallback = callback;
     },
     hide: function() {
       this.isSet = false;

@@ -96,8 +96,7 @@ function(http, $q, $rootScope, nfs, dns) {
     };
     var closeApp = function(title, msg) {
       $rootScope.$loader.hide();
-      $rootScope.$msPrompt.show(title, msg, function(status) {
-        $rootScope.$msPrompt.hide();
+      $rootScope.prompt.show(title, msg, function() {        
         window.uiUtils.closeApp();
       });
       return;

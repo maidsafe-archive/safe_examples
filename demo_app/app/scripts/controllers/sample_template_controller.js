@@ -28,14 +28,12 @@ function($scope, $http, $state, $rootScope, safe) {
             $rootScope.$loader.hide();
             if (err) {
               msg = err;
-              return $rootScope.$msPrompt.show('Publish Service Error', msg, function(status) {
-                $rootScope.$msPrompt.hide();
+              return $rootScope.prompt.show('Publish Service Error', msg, function() {                
                 $state.go('manageService');
               });
             }
             msg = 'Template has been published for the service: ' + serviceName;
-            $rootScope.$msPrompt.show('Service Published', msg, function(status) {
-              $rootScope.$msPrompt.hide();
+            $rootScope.prompt.show('Service Published', msg, function() {              
               $state.go('manageService');
             });
           });

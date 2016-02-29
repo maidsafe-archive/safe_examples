@@ -1,31 +1,14 @@
 /**
  * Manage private data controller
  */
-window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', '$timeout', 'safeApiFactory',
-  function($scope, $timeout, safe) {
+window.maidsafeDemo.controller('PrivateDataCtrl', [ '$scope', function($scope) {
     'use strict';
-    var PROGRESS_DELAY = 500;
-    $scope.progressIndicator = null;
-    $scope.registerProgress = function(progressScope) {
-      $scope.progressIndicator = progressScope;
-    };
-    // set target folder
-    $scope.setTargetFolder = function(path) {
-      // $scope.newServicePath = path;
-    };
 
     $scope.onProgress = function(percentage, isUpload) {
-      if (percentage < 100 && !$scope.progressIndicator.show) {
-        $scope.progressIndicator.show = true;
-        $scope.progressIndicator.text = isUpload ? "Uploading" : "Downloading";
+      if (!$rootScope.progressBar.isDisplayed()) {
+        $rootScope.progressBar.start(isUpload ? 'Uploading' : 'Downloading');
       }
-      $scope.progressIndicator.percentage = Math.floor(percentage);
-      if (percentage === 100) {
-        $timeout(function() {
-          $scope.progressIndicator.show = false;
-        }, PROGRESS_DELAY);
-      }
-      console.log(percentage);
+      $rootScope.progressBar.update(Math.floor(percentage));
     };
   }
 ]);
