@@ -57,7 +57,7 @@ window.maidsafeDemo.controller('ServiceCtrl', ['$scope', '$state', '$rootScope',
       if (!$scope.serviceName) {
         return console.error('Provide valid service name');
       }
-      if (!safe.isAlphaNumeric($scope.serviceName)) {
+      if (!$rootScope.isOnlyAlphaOrNumeric($scope.serviceName)) {
         return $rootScope.prompt.show('Invalid data', 'Service name should not contain special characters, Uppercase or space', function() {
           $scope.serviceName = '';
           $scope.$applyAsync();

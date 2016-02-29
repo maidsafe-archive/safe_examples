@@ -15,28 +15,25 @@ window.maidsafeDemo.controller('PublicIdCtrl', ['$scope', '$rootScope', 'safeApi
     };
 
     $scope.createPublicId = function() {
-      if (!$scope.publicId) {
-        // return console.error('Please enter a valid Public ID');
+      if (!$scope.publicId) {        
         return $rootScope.prompt.show('Invalid data', 'Please enter a valid Public ID');
       }
-      if (!safe.isAlphaNumeric($scope.publicId)) {
+      if (!$rootScope.isOnlyAlphaOrNumeric($scope.publicId)) {
         return $rootScope.prompt.show('Invalid data', 'Public ID should not contain special characters, Uppercase or space', function() {
           $scope.publicId = '';
           $scope.$applyAsync();
         });
       }
       $rootScope.$loader.show();
-      safe.createPublicId($scope.publicId, function(err, res) {
+      safe.createPublicId($scope.publicId, function(err) {
         $rootScope.$loader.hide();
         if (err) {
           return console.log(err);
         }
         safe.setUserLongName($scope.publicId);
         $scope.publicId = '';
-        $scope.init();
-        console.log(res);
-      });
-      console.log($scope.publicId);
+        $scope.init();        
+      });    
     };
   }
 ]);

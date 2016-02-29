@@ -26,6 +26,9 @@ window.maidsafeDemo = angular
       $rootScope.$applyAsync();
     }
   };
+  $rootScope.isOnlyAplhaOrNumeric = function(str) {
+    return (new RegExp(/^[a-z0-9]+$/g)).test(str);
+  };
   $rootScope.$msPrompt = {
     isSet: false,
     msg: 'Confirmation content',

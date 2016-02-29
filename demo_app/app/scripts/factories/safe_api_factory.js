@@ -204,10 +204,5 @@ function(http, $q, $rootScope, nfs, dns) {
     });
   };
 
-  // TODO Shankar - Move to utils
-  self.isAlphaNumeric = function(str) {
-    return (new RegExp(/^[a-z0-9]+$/g)).test(str);
-  };
-
   return $.extend(self, nfs, dns);
 } ]);
