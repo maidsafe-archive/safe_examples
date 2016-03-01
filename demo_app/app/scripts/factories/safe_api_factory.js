@@ -96,8 +96,7 @@ function(http, $q, $rootScope, nfs, dns) {
     };
     var closeApp = function(title, msg) {
       $rootScope.$loader.hide();
-      $rootScope.$msPrompt.show(title, msg, function(status) {
-        $rootScope.$msPrompt.hide();
+      $rootScope.prompt.show(title, msg, function() {        
         window.uiUtils.closeApp();
       });
       return;
@@ -203,11 +202,6 @@ function(http, $q, $rootScope, nfs, dns) {
       }
       return callback();
     });
-  };
-
-  // TODO Shankar - Move to utils
-  self.isAlphaNumeric = function(str) {
-    return (new RegExp(/^[a-z0-9]+$/g)).test(str);
   };
 
   return $.extend(self, nfs, dns);

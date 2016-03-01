@@ -26,16 +26,22 @@ window.maidsafeDemo = angular
       $rootScope.$applyAsync();
     }
   };
+  $rootScope.isOnlyAplhaOrNumeric = function(str) {
+    return (new RegExp(/^[a-z0-9]+$/g)).test(str);
+  };
   $rootScope.$msPrompt = {
     isSet: false,
     msg: 'Confirmation content',
     title: 'Confirmation title',
+    eventCallback: function(){
+      this.hide();
+    },
     callback: function(status) {},
     show: function(title, msg, callback) {
       this.isSet = true;
       this.title = title;
       this.msg = msg;
-      this.callback = callback;
+      this.evntCallback = callback;
     },
     hide: function() {
       this.isSet = false;

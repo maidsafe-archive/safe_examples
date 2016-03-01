@@ -111,16 +111,12 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
                 $timeout(getDirectory, PROGRESS_DELAY);
               } else if (progressCompletion > 100) { //patch fix
                 $rootScope.$loader.hide();
-                $rootScope.$msPrompt.show('MaidSafe Demo', 'Upload failed', function() {
-                  $rootScope.$msPrompt.hide();
-                });
+                $rootScope.prompt.show('MaidSafe Demo', 'Upload failed');
               }
             };
           } catch(err) {
             $rootScope.$loader.hide();
-            $rootScope.$msPrompt.show('MaidSafe Demo', 'Cannot upload files above 1 Mb', function() {
-              $rootScope.$msPrompt.hide();
-            });
+            $rootScope.prompt.show('MaidSafe Demo', 'Cannot upload files above 1 Mb');
           }
         });
       };
@@ -150,9 +146,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
             console.log(err);
-            $rootScope.$msPrompt.show('MaidSafe Demo', 'Download failed', function() {
-              $rootScope.$msPrompt.hide();
-            });
+            $rootScope.prompt.show('MaidSafe Demo', 'Download failed');
           }
           downloader.open();
         });
