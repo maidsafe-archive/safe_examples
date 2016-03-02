@@ -1,24 +1,41 @@
 import fs from 'fs';
 import path from 'path';
+import env from '../env';
 import FileHelper from './file_helper';
 import { computeDirectorySize, DirectoryHelper } from './directory_helper';
 
-export default class Uploader {
-  constructor(api) {
-    this.api = api;
-    this.progress = {
-      total: 0,
-      completed: 0,
-      failed: 0,
-      failedFiles: [],
-      onUpdate: function() {}
-    };
+class ProgressListener {
+  constructor(updateCallback) {
+    this.total = 0;
+    this._completed = 0;
+    this._success = 0;
+    this._failed = 0;
+    this._failedPaths = [];
+    this._updateCallback = updateCallback;
   }
 
-  updateProgressOnFailure(size, path) {
-    this.progress.failed += size;
-    // this.progress.failedFiles.push(localPath);
-    this.progress.onUpdate();
+  onError(size, path) {
+    this._failed += size;
+    this._completed += size;
+    this._failedPaths.push(path);
+    if (this._updateCallback) {
+      this._updateCallback(this._completed, this.total);
+    }
+  }
+
+  onSuccess(size, fileName) {
+    this._success += size;
+    this._completed += size;
+    if (this._updateCallback) {
+      this._updateCallback(this._completed, this.total, fileName);
+    }
+  }
+}
+
+export default class Uploader {
+  constructor(api, progressCallback) {
+    this.api = api;
+    this.progressListener = new ProgressListener(progressCallback);
   }
 
   uploadDirectory(isPrivate, localPath, networkParentDirPath, isRoot) {
@@ -32,13 +49,13 @@ export default class Uploader {
   upload(localPath, isPrivate, networkPath) {
     let stat = fs.statSync(localPath);
     if (stat.isDirectory()) {
-      this.progress.total = computeDirectorySize(localPath);
+      this.progressListener.total = computeDirectorySize(localPath);
       this.uploadDirectory(isPrivate, localPath, networkPath || '/', true);
     } else {
-      if (stat.size > 1000000) {
-        throw new Error('File greater than 1 Mb can not be uploaded');
+      if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
+        throw new Error('File greater than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
       }
-      this.progress.total = stat.size;
+      this.progressListener.total = stat.size;
       this.uploadFile(localPath, networkPath || '/');
     }
     return this.progress;

@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import env from '../env';
+import async from 'async';
 import FileHelper from './file_helper';
 
 export let computeDirectorySize = function(localPath) {
@@ -13,8 +15,8 @@ export let computeDirectorySize = function(localPath) {
     if (stat.isDirectory()) {
       size += computeDirectorySize(tempPath);
     } else {
-      if (stat.size > 1000000) {
-        throw new Error('File size is more than 1 Mb can not be uploaded');
+      if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
+        throw new Error('File more than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
       }
       size += stat.size;
     }
@@ -22,23 +24,71 @@ export let computeDirectorySize = function(localPath) {
   return size;
 };
 
+class TaskQueue {
+  constructor(onError) {
+    this.queue = [];
+    this.onError = onError;
+  }
+
+  run() {
+    if (this.queue.length === 0) {
+      return;
+    }
+    let self = this;
+    let tasks = [];
+    let UploadTask = function(helper) {
+      this.upload = function(callback) {
+        if (helper instanceof DirectoryCreationHelper) {
+          helper.create(callback);
+        } else {
+          helper.upload(callback);
+        }
+      };
+      return this.upload;
+    };
+    this.queue.every(function(helper) {
+      tasks.push(new UploadTask(helper));
+      return true
+    });
+    async.series(tasks, function(err) {
+      if (err && self.onError) {
+        return self.onError(err);
+      }
+    });
+  }
+
+  add(helper) {
+    this.queue.push(helper);
+  }
+}
+
+class DirectoryCreationHelper {
+  constructor(networkPath, isPrivate, uploader) {
+    this.networkPath = networkPath;
+    this.isPrivate = isPrivate;
+    this.uploader = uploader;
+  }
+
+  create(callback) {
+    console.log('DIR :', this.networkPath);
+    this.uploader.progressListener.onSuccess(0, this.networkPath);
+    this.uploader.api.createDir(this.networkPath, this.isPrivate, null, false, false, callback);
+  }
+}
+
 export class DirectoryHelper {
   constructor(uploader, isPrivate, localPath, networkParentDirPath) {
     this.uploader = uploader;
     this.isPrivate = isPrivate;
     this.localPath = localPath;
-    this.isRoot = true;
     this.networkParentDirPath = networkParentDirPath;
+    this.onError = function(err) {
+      console.log('Should Abort');
+    };
+    this.taskQueue = new TaskQueue(this.onError);
   }
 
-  _onDirectoryCreated(err, localPath, networkParentDirPath) {
-    if (err && !this.isRoot) {
-      console.log(err);
-      return this.uploader.updateProgressOnFailure(computeDirectorySize(this.localPath), this.localPath);
-    }
-    if (this.isRoot) {
-      this.isRoot = false;
-    }
+  _createTasks(localPath, networkPath) {
     let stat;
     let tempPath;
     let contents = fs.readdirSync(localPath);
@@ -46,22 +96,24 @@ export class DirectoryHelper {
       tempPath = localPath + '/' + contents[i];
       stat = fs.statSync(tempPath);
       if (stat.isDirectory()) {
-        this._uploadDirectory(tempPath, networkParentDirPath + '/' + contents[i]);
+        let dirPath = networkPath + '/' + contents[i];
+        this.taskQueue.add(new DirectoryCreationHelper(dirPath, this.isPrivate, this.uploader));
+        this._createTasks(tempPath, dirPath);
       } else {
-        new FileHelper(this.uploader, tempPath, networkParentDirPath).upload();
+        this.taskQueue.add(new FileHelper(this.uploader, tempPath, networkPath));
       }
     }
   }
 
-  _uploadDirectory(localPath, networkPath) {
-    let self = this;
-    console.log('Dir ::', localPath, networkPath);
-    this.uploader.api.createDir(networkPath, this.isPrivate, null, false, false, function(err) {
-      self._onDirectoryCreated(err, localPath, networkPath);
-    });
-  }
-
   upload() {
-    this._uploadDirectory(this.localPath, this.networkParentDirPath);
+    let stat = fs.statSync(this.localPath);
+    if (stat.isDirectory()) {
+      let networkPath = this.networkParentDirPath || '/';
+      this.taskQueue.add(new DirectoryCreationHelper(this.networkParentDirPath, this.isPrivate, this.uploader));
+      this._createTasks(this.localPath, this.networkParentDirPath);
+    } else {
+      this.taskQueue.add(new FileHelper(this.uploader, this.localPath, this.networkParentDirPath));
+    }
+    this.taskQueue.run();
   }
 }

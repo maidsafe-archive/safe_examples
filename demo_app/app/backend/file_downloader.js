@@ -16,7 +16,7 @@ export default class Downloader {
     this.MAX_SIZE_FOR_DOWNLOAD = 512000; // 500kb (500 * 1024)
   }
 
-  setStatusCallback(callback) {    
+  setStatusCallback(callback) {
     this.statusCallback = callback;
   }
 

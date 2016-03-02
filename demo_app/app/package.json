@@ -8,6 +8,7 @@
   "copyright": "",
   "main": "background.js",
   "dependencies": {
+    "async": "^1.5.2",
     "fs-jetpack": "^0.7.0",
     "libsodium-wrappers": "^0.2.12",
     "mime": "^1.3.4",

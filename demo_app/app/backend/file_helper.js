@@ -9,21 +9,26 @@ export default class FileHelper {
     this.size = fs.statSync(this.localPath).size;
     this.fd = fs.openSync(this.localPath, 0);
     this.uploadedSize = 0;
-    this.networkParentDirPath = networkParentDirPath[ networkParentDirPath.length - 1 ] === '/' ?
-    networkParentDirPath : networkParentDirPath + '/';
+    this.onCompleteCallback = function() {};
+    this.networkParentDirPath = networkParentDirPath[networkParentDirPath.length - 1] === '/' ?
+      networkParentDirPath : networkParentDirPath + '/';
   }
 
   _OnContentUploaded(err, uploadedSize) {
     if (err) {
       console.error(err);
-      return this.uploader.updateProgressOnFailure(this.size, this.localPath);
+      this.onCompleteCallback(err);
+      return this.uploader.progressListener.onError(this.size, this.localPath);
     }
     this.uploadedSize += uploadedSize;
-    this.uploader.progress.completed += uploadedSize;
-    this.uploader.progress.onUpdate();
     if (this.uploadedSize < this.size) {
       this._uploadContent();
+    } else {
+      if (this.onCompleteCallback) {
+        this.onCompleteCallback();
+      }
     }
+    this.uploader.progressListener.onSuccess(uploadedSize, this.networkParentDirPath + this.fileName);
   }
 
   _uploadContent() {
@@ -31,8 +36,9 @@ export default class FileHelper {
     var MAX_SIZE_FOR_UPLOAD = 512000; // 500kb (500 * 1024)
     var buffer = new Buffer(Math.min(MAX_SIZE_FOR_UPLOAD, (this.size - this.uploadedSize)));
     fs.readSync(this.fd, buffer, 0, buffer.length, this.uploadedSize);
-    self.uploader.api.modifyFileContent(this.networkParentDirPath + '/' + this.fileName, false,
-      new Uint8Array(buffer), this.uploadedSize, function(err) {
+    self.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false,
+      new Uint8Array(buffer), this.uploadedSize,
+      function(err) {
         self._OnContentUploaded(err, buffer.length);
       });
   }
@@ -41,16 +47,18 @@ export default class FileHelper {
     let self = this;
     if (err) {
       console.error(err);
-      return this.uploader.updateProgressOnFailure(this.size, this.localPath);
+      return this.uploader.progressListener.onError(this.size, this.localPath);
     }
-    console.log('updating content', this.networkParentDirPath + '/' + this.fileName);
+    console.log('updating content', this.networkParentDirPath + this.fileName);
     this._uploadContent();
   }
 
-  upload() {
+  upload(callback) {
     let self = this;
-    console.log('Creating file', this.networkParentDirPath + '/' + this.fileName);
-    self.uploader.api.createFile(this.networkParentDirPath + '/' + this.fileName, '', false, function(err) {
+    this.onCompleteCallback = callback;
+    console.log('Creating file', this.networkParentDirPath + this.fileName);
+    self.uploader.progressListener.onSuccess(0, this.networkParentDirPath + this.fileName);
+    self.uploader.api.createFile(this.networkParentDirPath + this.fileName, '', false, function(err) {
       self._onFileCreated(err);
     });
   }
