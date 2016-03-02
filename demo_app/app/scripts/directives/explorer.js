@@ -115,7 +115,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
           } catch (err) {
             console.error(err);
             $rootScope.$loader.hide();
-            $rootScope.prompt.show('File size restriction', err.message);
+            $rootScope.prompt.show('File Size Restriction', err.message);
           }
         });
       };

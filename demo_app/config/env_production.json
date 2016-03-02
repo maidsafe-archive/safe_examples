@@ -1,5 +1,5 @@
 {
   "name": "production",
-  "isFileUploadSizeRestricted": false,
+  "isFileUploadSizeRestricted": true,
   "maxFileUploadSize": 1000000
 }

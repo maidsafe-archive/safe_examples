@@ -53,7 +53,7 @@ export default class Uploader {
       this.uploadDirectory(isPrivate, localPath, networkPath || '/', true);
     } else {
       if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
-        throw new Error('File greater than ' + env.isFileUploadSizeRestricted + ' bytes can not be uploaded');
+        throw new Error('File greater than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
       }
       this.progressListener.total = stat.size;
       this.uploadFile(localPath, networkPath || '/');

@@ -16,7 +16,7 @@ export let computeDirectorySize = function(localPath) {
       size += computeDirectorySize(tempPath);
     } else {
       if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
-        throw new Error('File more than ' + env.maxFileUploadSize + ' bytes can not be uploaded');
+        throw new Error('File more than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
       }
       size += stat.size;
     }
