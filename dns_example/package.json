@@ -38,6 +38,10 @@
   "devDependencies": {
     "electron-packager": "^5.0.0",
     "electron-prebuilt": "^0.30.0",
-    "grunt": "^0.4.5"
+    "grunt": "^0.4.5",
+    "jshint-stylish": "~0.4.0",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-jscs": "^1.5.0",
+    "load-grunt-tasks": "~0.6.0"
   }
 }

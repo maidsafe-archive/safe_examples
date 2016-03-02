@@ -1,3 +1,5 @@
 /.idea
 /dns_example/src/scripts/safe_api/*.dll
 /dns_example/app_dist
+/demo_app/app_dist
+/demo_app/.idea

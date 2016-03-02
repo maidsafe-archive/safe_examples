@@ -1,0 +1,5 @@
+{
+  "name": "development",
+  "isFileUploadSizeRestricted": true,
+  "maxFileUploadSize": 1000000
+}

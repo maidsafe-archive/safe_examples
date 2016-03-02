@@ -1,0 +1,5 @@
+{
+  "name": "test",
+  "isFileUploadSizeRestricted": true,
+  "maxFileUploadSize": 1000000
+}

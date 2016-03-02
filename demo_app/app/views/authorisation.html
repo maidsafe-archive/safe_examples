@@ -1,0 +1,12 @@
+<div class="ms-frame" ng-controller="AuthoriseCtrl" ng-init="init()">
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Waiting for authorisation with SAFE Launcher</h3>
+    <p class="content-1-p">
+      Please check Launcher and grant access for the application to connect to the SAFE Network.
+    </p>
+  </div><!-- /content 1 -->
+  <div class="ms-authTasklist" ng-show="authorisationTasksMsg.length > 0">
+    <div class="ms-authTasklist-i" ng-bind="authorisationTasksMsg"></div>
+  </div>
+</div>

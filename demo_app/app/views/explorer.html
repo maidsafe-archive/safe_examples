@@ -1,0 +1,58 @@
+<div class="ms-explr">
+  <div class="ms-explr-h">
+    <div class="ms-explr-h-lt">
+      <button type="button" class="ms-btn ms-up-btn" name="goBack" ng-click="back()"></button>
+      <!-- <button type="button" class="ms-btn" name="goForward">F</button> -->
+      <!-- <button type="button" class="ms-btn" name="goStepBack">SB</button> -->
+    </div>
+    <div class="ms-explr-h-addrbar">
+      <input type="text" name="addrBar" readonly value="" ng-model="currentDirectory">
+    </div>
+    <div class="ms-explr-h-rt ms-dropdown">
+      <button type="button" class="ms-btn ms-add-btn" name="upload" ng-click="uploadDialog = !uploadDialog"></button>
+      <div ng-show="uploadDialog" class="ms-dropdown-b">
+        <ul style="list-style-type:none">
+          <li ng-click="upload(false)">
+            Upload Directory
+          </li>
+          <li ng-click="upload(true)">
+            Upload File
+          </li>
+        </ul>
+      </div>
+      <!-- <button type="button" class="ms-btn ms-rename-btn" name="goBack" ng-click="rename = !rename"></button> -->
+      <button type="button" class="ms-btn ms-delete-btn" name="goBack" ng-click="delete()" ng-disabled="!listSelected"></button>
+    </div>
+  </div>
+  <div class="ms-explr-cont">
+    <div class="ms-list-2">
+      <div class="ms-list-2-i ms-list-2-h">
+        <div class="ms-list-2-i-ctx icn">&nbsp;</div>
+        <div class="ms-list-2-i-ctx name">Name</div>
+        <div class="ms-list-2-i-ctx type">Type</div>
+        <div class="ms-list-2-i-ctx size">Size</div>
+        <div class="ms-list-2-i-ctx date">Date</div>
+      </div>
+      <div class="ms-list-2-i" ng-repeat="dir in dir.subDirectories" ng-click="select($event, dir.name, false)" ng-dblclick="openDirectory(dir.name)">
+        <div class="ms-list-2-i-ctx icn ms-icn-folder">&nbsp;</div>
+        <div class="ms-list-2-i-ctx name">{{ dir.name }}</div>
+        <div class="ms-list-2-i-ctx type">&nbsp;</div>
+        <div class="ms-list-2-i-ctx size">&nbsp;</div>
+        <div class="ms-list-2-i-ctx date">{{ dir.createdOn | date : 'dd-MM-yy HH:mm' }}</div>
+      </div>
+      <div class="ms-list-2-i" ng-repeat='file in dir.files' ng-click="select($event, file.name, true)" ng-dblclick="download(file.name, file.size)">
+        <div class="ms-list-2-i-ctx icn" ng-class="getFileIconClass(file.name)">&nbsp;</div>
+        <div class="ms-list-2-i-ctx name" ng-show="{{ !rename }}">{{ file.name }}</div>
+        <!-- <div class="ms-list-2-i-ctx name" ng-show="{{ selectedPath === file.name && rename }}">
+          <input type="text" value={{ file.name}}/>
+        </div> -->
+        <div class="ms-list-2-i-ctx type">{{ mime.lookup(file.name) }}</div>
+        <div class="ms-list-2-i-ctx size">{{ bytesToSize(file.size) }}</div>
+        <div class="ms-list-2-i-ctx date">{{ file.createdOn | date : 'dd-MM-yy HH:mm' }}</div>
+      </div>
+      <!-- <div class="ms-list-2-i" ng-show='isDirectoryEmpty()'>
+        <div class="ms-list-2-i-ctx icn">Empty</div>
+      </div> -->
+    </div>
+  </div>
+</div>

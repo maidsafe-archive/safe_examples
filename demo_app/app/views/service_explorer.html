@@ -1,0 +1,21 @@
+<div class="ms-frame">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="manageService" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Websites and Files</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Manage Public Files</h3>
+    <p class="content-1-p">
+      Manage your public files for each published service.
+    </p>
+  </div><!-- /content 1 -->
+  <div class="" ng-controller="ServiceCtrl" ng-init="explorerInit()">
+    <!-- explorer -->
+    <explorer is-private="false" starting-path="$state.params.serviceName" on-progress="onProgress(percentage, isUpload)"/>
+    <!-- explorer -->    
+  </div>
+</div>
