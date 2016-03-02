@@ -83,7 +83,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         var dialog = require('remote').dialog;
         dialog.showOpenDialog({
           title: 'Select Directory for upload',
-          properties: isFile ? [] : ['openDirectory']
+          properties: isFile ? ['openFile'] : ['openDirectory']
         }, function(selection) {
           if (!selection || selection.length === 0) {
             return;
