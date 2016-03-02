@@ -46,10 +46,10 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         if (isNaN(bytes)) {
           return '0 Bytes';
         }
-         var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-         if (bytes == 0) return '0 Byte';
-         var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-         return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
       };
 
       // get file icon
@@ -89,7 +89,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
             return;
           }
           $rootScope.$loader.show();
-          var uploader = new window.uiUtils.Uploader(safeApi);
+
           var networkPath = $scope.currentDirectory;
           if (!isFile) {
             var dirName = selection[0].split('\\');
@@ -97,26 +97,25 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
             networkPath += ('/' + dirName);
           }
           try {
-            var progress = uploader.upload(selection[0], $scope.isPrivate, networkPath);
-            progress.onUpdate = function() {
+            var progressCallback = function(completed, total, filePath) {
               if ($rootScope.$loader.isLoading) {
                 $rootScope.$loader.hide();
               }
-              var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
+              var progressCompletion = ((completed / total) * 100);
               $scope.onProgress({
                 percentage: progressCompletion,
                 isUpload: true
               });
               if (progressCompletion === 100) {
-                $timeout(getDirectory, PROGRESS_DELAY);
-              } else if (progressCompletion > 100) { //patch fix
-                $rootScope.$loader.hide();
-                $rootScope.prompt.show('MaidSafe Demo', 'Upload failed');
+                getDirectory();
               }
             };
-          } catch(err) {
+            var uploader = new window.uiUtils.Uploader(safeApi, progressCallback);
+            uploader.upload(selection[0], $scope.isPrivate, networkPath);
+          } catch (err) {
+            console.error(err);
             $rootScope.$loader.hide();
-            $rootScope.prompt.show('MaidSafe Demo', 'Cannot upload files above 1 Mb');
+            $rootScope.prompt.show('File size restriction', err.message);
           }
         });
       };

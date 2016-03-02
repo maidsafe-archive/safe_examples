@@ -14,7 +14,7 @@ export let createTemplateFile = function(title, content, filePath, callback) {
     var templateString = fs.readFileSync(filePath).toString();
     var tempFilePath = path.resolve(tempDirPath, fileName);
     fs.writeFileSync(tempFilePath,
-        util.format(templateString, title, title, content));
+      util.format(templateString, title, title, content));
     return callback(null, tempDirPath);
   } catch (e) {
     return callback(e);

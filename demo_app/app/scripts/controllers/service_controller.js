@@ -58,7 +58,7 @@ window.maidsafeDemo.controller('ServiceCtrl', ['$scope', '$state', '$rootScope',
         return console.error('Provide valid service name');
       }
       if (!$rootScope.isOnlyAlphaOrNumeric($scope.serviceName)) {
-        return $rootScope.prompt.show('Invalid data', 'Service name should not contain special characters, Uppercase or space', function() {
+        return $rootScope.prompt.show('Invalid input', 'Service name should not contain special characters, Uppercase or space', function() {
           $scope.serviceName = '';
           $scope.$applyAsync();
         });
@@ -121,23 +121,23 @@ window.maidsafeDemo.controller('ServiceCtrl', ['$scope', '$state', '$rootScope',
         $rootScope.$loader.show();
         var serviceName = $state.params.serviceName;
         try {
-          var uploader = new window.uiUtils.Uploader(safe);
-          var progress = uploader.upload(folders[0], false, '/public/' + serviceName);
-          progress.onUpdate = function() {
+          var progressCallback = function(completed, total, filePath) {
             if ($rootScope.$loader.isLoading) {
               $rootScope.$loader.hide();
             }
-            var progressCompletion = (((progress.completed + progress.failed) / progress.total) * 100);
-            if (progressCompletion === 100) {
+            var progressCompletion = ((completed / total) * 100);
+            $scope.onProgress(progressCompletion, true);
+            if (progressCompletion >= 100) {
               registerService();
             }
-            $scope.onProgress(progressCompletion, true);
           };
+          var uploader = new window.uiUtils.Uploader(safe, progressCallback);
+          uploader.upload(folders[0], false, '/public/' + serviceName);
         } catch (e) {
+          console.log(e);
           $rootScope.$loader.hide();
-          $rootScope.prompt.show('MaidSafe Demo', 'Cannot upload file more than 1 Mb')
+          $rootScope.prompt.show('File Size Restriction', e.message);
         }
-
       });
     };
 

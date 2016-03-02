@@ -25,17 +25,17 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', ['$scope', '$http', '$state
         return console.error(err);
       }
       var serviceName = $state.params.serviceName;
-      var uploader = new window.uiUtils.Uploader(safe);
-      var progress = uploader.upload(tempPath, false, '/public/' + serviceName);
-      progress.onUpdate = function() {
+      var progressCallback = function(completed, total) {
         if (!$rootScope.$loader.isLoading) {
           $rootScope.$loader.hide();
         }
-        if (progress.total === (progress.completed + progress.failed)) {
+        if (total === completed) {
           $rootScope.$loader.show();
           safe.addService(safe.getUserLongName(), serviceName, false, '/public/' + serviceName, onServiceCreated);
         }
       };
+      var uploader = new window.uiUtils.Uploader(safe, progressCallback);
+      uploader.upload(tempPath, false, '/public/' + serviceName);      
     };
 
     var writeFile = function(title, content, filePath) {
