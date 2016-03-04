@@ -1,4 +1,4 @@
-window.maidsafeDemo.directive('prompt', ['$rootScope', function($rootScope) {
+window.maidsafeDemo.directive('prompt', [ '$rootScope', function($rootScope) {
   'use strict';
 
   var Prompt = function() {
@@ -19,7 +19,7 @@ window.maidsafeDemo.directive('prompt', ['$rootScope', function($rootScope) {
         return false;
       }
       self.title = title;
-      self.msg = msg;      
+      self.msg = msg;
       self.visible = true;
       self.callback = callback;
       $rootScope.$applyAsync();
@@ -34,4 +34,4 @@ window.maidsafeDemo.directive('prompt', ['$rootScope', function($rootScope) {
       $rootScope.prompt = new Prompt();
     }
   };
-}]);
+} ]);

@@ -1,7 +1,7 @@
 /**
  * Progress indicator directive
  */
-window.maidsafeDemo.directive('progressIndicator', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', function($rootScope, $timeout) {
   'use strict';
 
   var ProgressBar = function() {
@@ -14,12 +14,12 @@ window.maidsafeDemo.directive('progressIndicator', ['$rootScope', '$timeout', fu
     self.start = function(text) {
       self.text = text || 'Status';
       self.percentageCompleted = 0;
-      self.show = true;      
+      self.show = true;
     };
 
     self.isDisplayed = function() {
       return self.show;
-    }
+    };
 
     self.update = function(newValue) {
       self.percentageCompleted = newValue;
@@ -43,4 +43,4 @@ window.maidsafeDemo.directive('progressIndicator', ['$rootScope', '$timeout', fu
       $rootScope.progressBar = new ProgressBar();
     }
   };
-}]);
+} ]);

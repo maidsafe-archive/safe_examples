@@ -96,7 +96,7 @@ function(http, $q, $rootScope, nfs, dns) {
     };
     var closeApp = function(title, msg) {
       $rootScope.$loader.hide();
-      $rootScope.prompt.show(title, msg, function() {        
+      $rootScope.prompt.show(title, msg, function() {
         window.uiUtils.closeApp();
       });
       return;
@@ -109,7 +109,8 @@ function(http, $q, $rootScope, nfs, dns) {
     };
     var onError = function(err) {
       if (err.status === -1) {
-        return closeApp('Could not connect to launcher', 'Failed to connect with launcher. Launcher should be left running.');
+        return closeApp('Could not connect to launcher',
+          'Failed to connect with launcher. Launcher should be left running.');
       }
       if (err.status === 401 && allowUnAuthErr) {
         return callback(err);

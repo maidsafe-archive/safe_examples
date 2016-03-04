@@ -7,7 +7,7 @@ export default class FileHelper {
     this.localPath = localPath;
     this.fileName = path.basename(localPath);
     this.size = fs.statSync(this.localPath).size;
-    this.fd = fs.openSync(this.localPath, 0);
+    this.fd = fs.openSync(this.localPath, 'r');
     this.uploadedSize = 0;
     this.onCompleteCallback = function() {};
     this.networkParentDirPath = networkParentDirPath[networkParentDirPath.length - 1] === '/' ?
@@ -33,9 +33,9 @@ export default class FileHelper {
 
   _uploadContent() {
     var self = this;
-    var MAX_SIZE_FOR_UPLOAD = 512000; // 500kb (500 * 1024)
+    var MAX_SIZE_FOR_UPLOAD = 512000; // 500kb (500 * 1024)    
     var buffer = new Buffer(Math.min(MAX_SIZE_FOR_UPLOAD, (this.size - this.uploadedSize)));
-    fs.readSync(this.fd, buffer, 0, buffer.length, this.uploadedSize);
+    fs.readSync(this.fd, buffer, 0, buffer.length, this.uploadedSize);    
     self.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false,
       new Uint8Array(buffer), this.uploadedSize,
       function(err) {

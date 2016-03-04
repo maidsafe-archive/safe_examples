@@ -1,7 +1,7 @@
 /**
  * Sample site controller
  */
-window.maidsafeDemo.controller('SampleTemplateCtrl', ['$scope', '$http', '$state', '$rootScope', 'safeApiFactory',
+window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$state', '$rootScope', 'safeApiFactory',
   function($scope, $http, $state, $rootScope, safe) {
     'use strict';
     $scope.siteTitle = 'My Page';
@@ -18,7 +18,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', ['$scope', '$http', '$state
       }
       var msg = 'Template has been published for the service: ' + $state.params.serviceName;
       $rootScope.prompt.show('Service Published', msg, goToManageService);
-    }
+    };
 
     var onTemplateReady = function(err, tempPath) {
       if (err) {
@@ -35,14 +35,13 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', ['$scope', '$http', '$state
         }
       };
       var uploader = new window.uiUtils.Uploader(safe, progressCallback);
-      uploader.upload(tempPath, false, '/public/' + serviceName);      
+      uploader.upload(tempPath, false, '/public/' + serviceName);
     };
 
     var writeFile = function(title, content, filePath) {
       $rootScope.$loader.show();
       window.uiUtils.createTemplateFile(title, content, filePath, onTemplateReady);
     };
-
 
     $scope.registerProgress = function(progressScope) {
       $scope.progressIndicator = progressScope;

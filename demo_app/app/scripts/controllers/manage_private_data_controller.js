@@ -1,7 +1,7 @@
 /**
  * Manage private data controller
  */
-window.maidsafeDemo.controller('PrivateDataCtrl', ['$rootScope', '$scope', function($rootScope, $scope) {
+window.maidsafeDemo.controller('PrivateDataCtrl', [ '$rootScope', '$scope', function($rootScope, $scope) {
     'use strict';
 
     $scope.onProgress = function(percentage, isUpload) {

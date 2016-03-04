@@ -12,6 +12,7 @@ export default class Downloader {
     this.onComplete = onComplete;
     this.downloadedSize = 0;
     this.downloadPath = null;
+    this.fd = null;
     this.statusCallback = null;
     this.MAX_SIZE_FOR_DOWNLOAD = 512000; // 500kb (500 * 1024)
   }
@@ -35,10 +36,11 @@ export default class Downloader {
     if (err) {
       return this.onComplete(err);
     }
+    fs.writeSync(this.fd, new Buffer(data), 0, data.length, this.downloadedSize);
     this.downloadedSize += data.length;
     this._postStatus();
-    fs.writeFileSync(this.downloadPath, new Buffer(data));
     if (this.downloadedSize === this.size) {
+      fs.closeSync(this.fd);
       this.onComplete();
     } else {
       this._downloadContent();
@@ -57,6 +59,7 @@ export default class Downloader {
     var self = this;
     var tempDir = temp.mkdirSync('safe-demo-');
     this.downloadPath = path.resolve(tempDir, path.basename(self.filePath));
+    this.fd = fs.openSync(this.downloadPath, 'w', 0o666);
     this._downloadContent();
     this._postStatus();
   }
