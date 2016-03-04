@@ -1,7 +1,7 @@
 /**
  * Service controller
  */
-window.maidsafeDemo.controller('ServiceCtrl', ['$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
+window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
   function($scope, $state, $rootScope, $timeout, safe) {
     'use strict';
     $scope.serviceName = '';
@@ -58,7 +58,8 @@ window.maidsafeDemo.controller('ServiceCtrl', ['$scope', '$state', '$rootScope',
         return console.error('Provide valid service name');
       }
       if (!$rootScope.isOnlyAlphaOrNumeric($scope.serviceName)) {
-        return $rootScope.prompt.show('Invalid input', 'Service name should not contain special characters, Uppercase or space', function() {
+        return $rootScope.prompt.show('Invalid input',
+          'Service name should not contain special characters, Uppercase or space', function() {
           $scope.serviceName = '';
           $scope.$applyAsync();
         });
@@ -113,7 +114,7 @@ window.maidsafeDemo.controller('ServiceCtrl', ['$scope', '$state', '$rootScope',
       var dialog = require('remote').dialog;
       dialog.showOpenDialog({
         title: 'Select Directory for upload',
-        properties: ['openDirectory']
+        properties: [ 'openDirectory' ]
       }, function(folders) {
         if (folders.length === 0) {
           return;

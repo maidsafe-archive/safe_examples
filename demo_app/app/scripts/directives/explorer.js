@@ -1,4 +1,4 @@
-window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFactory',
+window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFactory',
   function($rootScope, $timeout, safeApi) {
     var PROGRESS_DELAY = 500;
     var Explorer = function($scope, element, attrs) {
@@ -46,8 +46,10 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         if (isNaN(bytes)) {
           return '0 Bytes';
         }
-        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        if (bytes == 0) return '0 Byte';
+        var sizes = [ 'Bytes', 'KB', 'MB', 'GB', 'TB' ];
+        if (bytes === 0) {
+          return '0 Byte';
+        }
         var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
         return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
       };
@@ -58,10 +60,10 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         var ext = fileName[fileName.length - 1];
         ext = ext.toLowerCase();
 
-        var imgExt = ['jpeg', 'jpg', 'png', 'gif', 'ttf'];
-        var textExt = ['txt', 'doc', 'docx'];
-        var audioExt = ['mp3', 'wav'];
-        var videoExt = ['mpeg', 'mp4', 'avg'];
+        var imgExt = [ 'jpeg', 'jpg', 'png', 'gif', 'ttf' ];
+        var textExt = [ 'txt', 'doc', 'docx' ];
+        var audioExt = [ 'mp3', 'wav' ];
+        var videoExt = [ 'mpeg', 'mp4', 'avg' ];
         var fileType = FILE_ICON_CLASSES.GENERIC;
         if (imgExt.indexOf(ext) !== -1) {
           fileType = FILE_ICON_CLASSES.IMAGE;
@@ -83,7 +85,7 @@ window.maidsafeDemo.directive('explorer', ['$rootScope', '$timeout', 'safeApiFac
         var dialog = require('remote').dialog;
         dialog.showOpenDialog({
           title: 'Select Directory for upload',
-          properties: isFile ? ['openFile'] : ['openDirectory']
+          properties: isFile ? [ 'openFile' ] : [ 'openDirectory' ]
         }, function(selection) {
           if (!selection || selection.length === 0) {
             return;

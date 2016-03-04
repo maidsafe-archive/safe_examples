@@ -33,7 +33,7 @@ window.maidsafeDemo = angular
     isSet: false,
     msg: 'Confirmation content',
     title: 'Confirmation title',
-    eventCallback: function(){
+    eventCallback: function() {
       this.hide();
     },
     callback: function(status) {},
