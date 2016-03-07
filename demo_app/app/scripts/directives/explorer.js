@@ -57,7 +57,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
       // get file icon
       $scope.getFileIconClass = function(fileName) {
         fileName = fileName.split('.');
-        var ext = fileName[fileName.length - 1];
+        var ext = fileName[ fileName.length - 1 ];
         ext = ext.toLowerCase();
 
         var imgExt = [ 'jpeg', 'jpg', 'png', 'gif', 'ttf' ];
@@ -103,7 +103,10 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
               if ($rootScope.$loader.isLoading) {
                 $rootScope.$loader.hide();
               }
-              var progressCompletion = ((completed / total) * 100);
+              var progressCompletion = 100;
+              if (!(total === 0 && completed === 0)) {
+                progressCompletion = ((completed / total) * 100);
+              }
               $scope.onProgress({
                 percentage: progressCompletion,
                 isUpload: true
@@ -235,3 +238,4 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
     };
   }
 ]);
+
