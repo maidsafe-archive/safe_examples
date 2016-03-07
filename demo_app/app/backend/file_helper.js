@@ -35,7 +35,7 @@ export default class FileHelper {
     var self = this;
     var MAX_SIZE_FOR_UPLOAD = 512000; // 500kb (500 * 1024)    
     var buffer = new Buffer(Math.min(MAX_SIZE_FOR_UPLOAD, (this.size - this.uploadedSize)));
-    fs.readSync(this.fd, buffer, 0, buffer.length, this.uploadedSize);    
+    fs.readSync(this.fd, buffer, 0, buffer.length, this.uploadedSize);
     self.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false,
       new Uint8Array(buffer), this.uploadedSize,
       function(err) {
@@ -50,7 +50,11 @@ export default class FileHelper {
       return this.uploader.progressListener.onError(this.size, this.localPath);
     }
     console.log('updating content', this.networkParentDirPath + this.fileName);
-    this._uploadContent();
+    if (self.size === 0) {
+      this._OnContentUploaded(null, 0);
+    } else {
+      this._uploadContent();
+    }
   }
 
   upload(callback) {

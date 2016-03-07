@@ -59,12 +59,15 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       }
       if (!$rootScope.isOnlyAlphaOrNumeric($scope.serviceName)) {
         return $rootScope.prompt.show('Invalid input',
-          'Service name should not contain special characters, Uppercase or space', function() {
-          $scope.serviceName = '';
-          $scope.$applyAsync();
-        });
+          'Service name should not contain special characters, Uppercase or space',
+          function() {
+            $scope.serviceName = '';
+            $scope.$applyAsync();
+          });
       }
-      $state.go('serviceAddFiles', { 'serviceName': $scope.serviceName });
+      $state.go('serviceAddFiles', {
+        'serviceName': $scope.serviceName
+      });
       $scope.serviceName = '';
     };
 
@@ -126,7 +129,10 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             if ($rootScope.$loader.isLoading) {
               $rootScope.$loader.hide();
             }
-            var progressCompletion = ((completed / total) * 100);
+            var progressCompletion = 100;
+            if (!(total === 0 && completed === 0)) {
+              progressCompletion = ((completed / total) * 100);
+            }
             $scope.onProgress(progressCompletion, true);
             if (progressCompletion >= 100) {
               registerService();
@@ -155,3 +161,4 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     };
   }
 ]);
+
