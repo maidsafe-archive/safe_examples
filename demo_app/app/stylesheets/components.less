@@ -198,14 +198,42 @@
 }
 
 // auth task list
-.ms-authTasklist {
+.ms-authLoading {
   width: 100%;
   margin-top: 40px;
   text-align: center;
-  .ms-authTasklist-i {
+  .ms-authLoading-desc {
     font-size: 18px;
     font-weight: 600;
     line-height: 32px;
     padding-bottom: 16px;
+  }
+  .ms-authLoading-i {
+    width: 300px;
+    height: 5px;
+    display: block;
+    background-color: @blue-100;
+    position: relative;
+    margin: 0 auto;
+    overflow: hidden;
+    &:after {
+      content: '';
+      width: 40%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: -40%;
+      background-color: @blue-400;
+      animation: authLoad 1.5s linear infinite;
+    }
+  }
+}
+
+@keyframes authLoad {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
   }
 }
