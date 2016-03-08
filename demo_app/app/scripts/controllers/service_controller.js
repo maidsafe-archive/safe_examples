@@ -32,20 +32,23 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
           });
         };
         $rootScope.$loader.show();
-        res.forEach(function(longName) {
+        res.forEach(function(longName, index) {
           safe.getServices(longName, function(err, services) {
             if (err) {
+              $rootScope.$loader.hide();
               return console.error(err);
             }
             services = JSON.parse(services);
             if (services.length === 0) {
+              $rootScope.$loader.hide();
               return console.log('No service registered for ' + longName);
             }
             addServices(longName, services);
+            if (index === (res.length - 1)) {
+              $rootScope.$loader.hide();
+            }
           });
         });
-        $rootScope.$loader.hide();
-        console.log(res);
       });
     };
 
@@ -161,4 +164,3 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     };
   }
 ]);
-
