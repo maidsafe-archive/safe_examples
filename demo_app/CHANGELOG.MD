@@ -8,4 +8,5 @@
   - Empty file upload issue fixed
   - Duplicate public Id creation resolved
   - Minor UI fixes
+  - File size restriction updated to 5 Mb
   - SAFE Launcher 0.4.0
