@@ -1,12 +1,33 @@
 <div class="ms-frame" ng-controller="AuthoriseCtrl" ng-init="init()">
-  <!-- content 1 -->
-  <div class="content-1">
-    <h3 class="content-1-h">Waiting for authorisation with SAFE Launcher</h3>
-    <p class="content-1-p">
-      Please check Launcher and grant access for the application to connect to the SAFE Network.
-    </p>
-  </div><!-- /content 1 -->
-  <div class="ms-authTasklist" ng-show="authorisationTasksMsg.length > 0">
-    <div class="ms-authTasklist-i" ng-bind="authorisationTasksMsg"></div>
+  <!-- Authorising -->
+  <div ng-show="authorisationTasks.currentState === authorisationTasks.state.AUTHORISING">
+    <!-- content 1 -->
+    <div class="content-1">
+      <h3 class="content-1-h">Waiting on Authorisation Request</h3>
+      <p class="content-1-p">
+        Please check the SAFE Launcher and grant access to the MaidSafe Demo application to connect to the SAFE Network.
+      </p>
+    </div><!-- /content 1 -->
+    <div class="ms-authLoading" >
+      <div class="ms-authLoading-desc">{{ authorisationTasks.messages.AUTHORISING }}</div>
+      <span class="ms-authLoading-i"></span>
+    </div>
   </div>
+  <!-- /Authorising -->
+  <!-- Initialising -->
+  <div ng-show="authorisationTasks.currentState === authorisationTasks.state.INITIALISING">
+    <!-- content 1 -->
+    <div class="content-1">
+      <h3 class="content-1-h">Getting everything ready</h3>
+      <p class="content-1-p">
+        Please Please wait while we initialise the Demo app for you. We're busy setting up the
+        demo app with everything it needs to give you a small taster of things to come.
+      </p>
+    </div><!-- /content 1 -->
+    <div class="ms-authLoading">
+      <div class="ms-authLoading-desc">{{ authorisationTasks.messages.INITIALISING }}</div>
+      <span class="ms-authLoading-i"></span>
+    </div>
+  </div>
+  <!-- /Initialising -->
 </div>

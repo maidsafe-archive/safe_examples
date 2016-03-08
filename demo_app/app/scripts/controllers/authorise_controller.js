@@ -3,7 +3,17 @@
  */
 window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFactory', function($scope, $state, safe) {
   'use strict';
-  $scope.authorisationTasksMsg = '';
+  $scope.authorisationTasks = {
+    state: {
+      'AUTHORISING': 'authorising',
+      'INITIALISING': 'initialising'
+    },
+    messages: {
+      'AUTHORISING': 'Waiting for response...',
+      'INITIALISING': 'Initialising...'
+    },
+    currentState: null
+  };
 
   // initialization
   $scope.init = function() {
@@ -53,12 +63,12 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
         console.error(err);
         return;
       }
-      $scope.authorisationTasksMsg = 'Initialising...';
+      $scope.authorisationTasks.currentState = $scope.authorisationTasks.state.INITIALISING;
       console.log('Application authorised');
       console.log(res);
       safe.getDns(getDnsCb);
     };
-    $scope.authorisationTasksMsg = 'Authorising...';
+    $scope.authorisationTasks.currentState = $scope.authorisationTasks.state.AUTHORISING;
     safe.authorise(authoriseCb);
   };
 } ]);
