@@ -94,7 +94,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
 
           var networkPath = $scope.currentDirectory;
           if (!isFile) {
-            var dirName = selection[0].split('\\');
+            var dirName = selection[0].split(require('path').sep);
             dirName = dirName[dirName.length - 1];
             networkPath += dirName;
           }

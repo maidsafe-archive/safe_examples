@@ -4,20 +4,20 @@
     <div class="frame-h-act">
       <a ui-sref="createService({serviceName: $state.params.serviceName})" class="frame-h-act-btn ms-back-btn"></a>
     </div>
-    <h3 class="frame-h-ctx">Manage Websites and Files</h3>
+    <h3 class="frame-h-ctx">Manage Websites</h3>
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
-    <h3 class="content-1-h">Add Some Files</h3>
+    <h3 class="content-1-h">Add Some Web Content</h3>
     <p class="content-1-p">
-      These files will be added to the SAFE Network and will be publicly viewable using the URL,
+      This folder content will be added to the SAFE Network and will be publicly viewable using the URL,
       http://{{ $state.params.serviceName + '.' + longName + '.safenet' }}
     </p>
   </div><!-- /content 1 -->
   <div class="or-comp">
     <div class="or-comp-lt">
       <div class="text-center">
-        Add web files. The root folder should contain index.html
+        Add an existing website folder which contains index.html
       </div>
       <div class="container-4 text-center">
         <button type="button" class="ms-btn ms-primary-btn" name="browseFile"
