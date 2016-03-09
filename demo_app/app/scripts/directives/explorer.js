@@ -96,7 +96,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
           if (!isFile) {
             var dirName = selection[0].split('\\');
             dirName = dirName[dirName.length - 1];
-            networkPath += ('/' + dirName);
+            networkPath += dirName;
           }
           try {
             var progressCallback = function(completed, total, filePath) {
@@ -116,6 +116,16 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
               }
             };
             var uploader = new window.uiUtils.Uploader(safeApi, progressCallback);
+            uploader.setOnErrorCallback(function(msg) {
+              // TODO Krishna - progressbar has too many inderictions - try to make it simpler
+              $scope.onProgress({
+                percentage: 100,
+                isUpload: true
+              });
+              $rootScope.prompt.show('Upload failed', msg, function() {
+                getDirectory();
+              });
+            });
             uploader.upload(selection[0], $scope.isPrivate, networkPath);
           } catch (err) {
             console.error(err);

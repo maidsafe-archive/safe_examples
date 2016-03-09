@@ -18,7 +18,7 @@ export default class FileHelper {
     if (err) {
       console.error(err);
       this.onCompleteCallback(err);
-      return this.uploader.progressListener.onError(this.size, this.localPath);
+      return this.uploader.onError('Failed to update file ' + this.networkParentDirPath + this.fileName);
     }
     this.uploadedSize += uploadedSize;
     if (this.uploadedSize < this.size) {
@@ -47,7 +47,7 @@ export default class FileHelper {
     let self = this;
     if (err) {
       console.error(err);
-      return this.uploader.progressListener.onError(this.size, this.localPath);
+      return this.uploader.onError('Failed to create file ' + this.networkParentDirPath + this.fileName);
     }
     console.log('updating content', this.networkParentDirPath + this.fileName);
     if (self.size === 0) {

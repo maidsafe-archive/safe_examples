@@ -142,9 +142,13 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             }
           };
           var uploader = new window.uiUtils.Uploader(safe, progressCallback);
+          uploader.setOnErrorCallback(function(msg) {
+              $scope.onProgress(100, false);
+              $rootScope.prompt.show('Upload failed', msg);
+            });
           uploader.upload(folders[0], false, '/public/' + serviceName);
         } catch (e) {
-          console.log(e);
+          console.error(e);
           $rootScope.$loader.hide();
           $rootScope.prompt.show('File Size Restriction', e.message);
         }

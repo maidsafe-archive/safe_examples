@@ -168,7 +168,7 @@ function(http, $q, $rootScope, nfs, dns) {
         app: {
           name: 'Maidsafe Demo',
           id: 'demo.maidsafe.net',
-          version: '0.2.0',
+          version: '0.2.1',
           vendor: 'MaidSafe'
         },
         permissions: [],

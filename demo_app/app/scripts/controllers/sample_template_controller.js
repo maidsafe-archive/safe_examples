@@ -35,6 +35,10 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         }
       };
       var uploader = new window.uiUtils.Uploader(safe, progressCallback);
+      uploader.setOnErrorCallback(function(msg) {
+        $rootScope.$loader.hide();
+        $rootScope.prompt.show('Filed to upload Template', msg);
+      });
       uploader.upload(tempPath, false, '/public/' + serviceName);
     };
 
