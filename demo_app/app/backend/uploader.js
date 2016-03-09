@@ -36,6 +36,7 @@ export default class Uploader {
   constructor(api, progressCallback) {
     this.api = api;
     this.progressListener = new ProgressListener(progressCallback);
+    this.onError = null;
   }
 
   uploadDirectory(isPrivate, localPath, networkParentDirPath, isRoot) {
@@ -59,5 +60,9 @@ export default class Uploader {
       this.uploadFile(localPath, networkPath || '/');
     }
     return this.progress;
+  }
+
+  setOnErrorCallback(callback) {
+    this.onError = callback;
   }
 }

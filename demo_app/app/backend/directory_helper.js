@@ -78,12 +78,13 @@ class DirectoryCreationHelper {
 
 export class DirectoryHelper {
   constructor(uploader, isPrivate, localPath, networkParentDirPath) {
+    var self = this;
     this.uploader = uploader;
     this.isPrivate = isPrivate;
     this.localPath = localPath;
     this.networkParentDirPath = networkParentDirPath;
     this.onError = function(err) {
-      console.log('Should Abort');
+      self.uploader.onError('Failed to create directory ' + networkParentDirPath);
     };
     this.taskQueue = new TaskQueue(this.onError);
   }
