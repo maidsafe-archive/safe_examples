@@ -82,7 +82,7 @@ export class DirectoryHelper {
     this.uploader = uploader;
     this.isPrivate = isPrivate;
     this.localPath = localPath;
-    this.networkParentDirPath = networkParentDirPath;    
+    this.networkParentDirPath = networkParentDirPath;
     this.onError = function(err) {
       self.uploader.onError('Failed to create directory ' + networkParentDirPath);
     };
