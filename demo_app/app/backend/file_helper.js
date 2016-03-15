@@ -17,6 +17,7 @@ export default class FileHelper {
   _OnContentUploaded(err, uploadedSize) {
     if (err) {
       console.error(err);
+      fs.closeSync(this.fd);
       this.onCompleteCallback(err);
       return this.uploader.onError('Failed to update file ' + this.networkParentDirPath + this.fileName);
     }
@@ -25,6 +26,7 @@ export default class FileHelper {
       this._uploadContent();
     } else {
       if (this.onCompleteCallback) {
+        fs.closeSync(this.fd);
         this.onCompleteCallback();
       }
     }
@@ -33,7 +35,7 @@ export default class FileHelper {
 
   _uploadContent() {
     var self = this;
-    var MAX_SIZE_FOR_UPLOAD = 512000; // 500kb (500 * 1024)    
+    var MAX_SIZE_FOR_UPLOAD = 512000; // 500kb (500 * 1024)
     var buffer = new Buffer(Math.min(MAX_SIZE_FOR_UPLOAD, (this.size - this.uploadedSize)));
     fs.readSync(this.fd, buffer, 0, buffer.length, this.uploadedSize);
     self.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false,

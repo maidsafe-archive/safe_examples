@@ -34,6 +34,7 @@ export default class Downloader {
 
   _onResponse(err, data) {
     if (err) {
+      fs.closeSync(this.fd);
       return this.onComplete(err);
     }
     fs.writeSync(this.fd, new Buffer(data), 0, data.length, this.downloadedSize);
