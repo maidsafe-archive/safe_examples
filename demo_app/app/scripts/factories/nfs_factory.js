@@ -64,7 +64,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     (new this.Request(payload, callback)).send();
   };
 
-  self.createFile = function(filePath, metadata, isPathShared, callback) {
+  self.createFile = function(filePath, metadata, isPathShared, localPath, callback) {
     var url = this.SERVER + 'nfs/file';
     var payload = {
       url: url,
@@ -75,7 +75,8 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       data: {
         filePath: filePath,
         metadata: metadata,
-        isPathShared: isPathShared
+        isPathShared: isPathShared,
+        localFilePath: localPath
       }
     };
     (new this.Request(payload, callback)).send();
