@@ -1,5 +1,8 @@
 # MaidSafe Demo App Change Log
 
+##[0.2.2]
+  - Fixed the alert dialog (PR #58).
+
 ##[0.2.1]
   - Folder upload bug fix for OSX and Linux  
   - Overwrite of directory error is handled and presented to the user
