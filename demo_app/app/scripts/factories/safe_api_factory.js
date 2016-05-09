@@ -161,21 +161,23 @@ function(http, $q, $rootScope, nfs, dns) {
       callback(null, symmetricKeys);
     };
 
+    var packageData = require('./package.json');
     var payload = {
       url: self.SERVER + 'auth',
       method: 'POST',
       data: {
         app: {
-          name: 'Maidsafe Demo',
-          id: 'demo.maidsafe.net',
-          version: '0.2.2',
-          vendor: 'MaidSafe'
+          name: packageData.productName,
+          id: packageData.identifier,
+          version: packageData.version,
+          vendor: packageData.author
         },
         permissions: [],
         publicKey: publicKey,
         nonce: nonce
       }
     };
+    debugger
     (new self.Request(payload, onResponse)).send();
   };
 
