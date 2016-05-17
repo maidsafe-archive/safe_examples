@@ -3,7 +3,7 @@
   "productName": "MaidSafe Demo App",
   "identifier": "com.maidsafe.demo_app",
   "description": "MaidSafe demo application",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": "Maidsafe",
   "copyright": "",
   "main": "background.js",
