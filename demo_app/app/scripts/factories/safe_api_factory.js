@@ -177,7 +177,6 @@ function(http, $q, $rootScope, nfs, dns) {
         nonce: nonce
       }
     };
-    debugger
     (new self.Request(payload, onResponse)).send();
   };
 
