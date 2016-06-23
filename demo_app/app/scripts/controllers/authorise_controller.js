@@ -38,7 +38,6 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
       }
       console.log('Get Dir');
       console.log(res);
-      res = JSON.parse(res);
       if (res.subDirectories.length === 0) {
         safe.createDir('/public', false, '', false, false, createPubDirCb);
       } else {
@@ -50,7 +49,6 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
       if (err) {
         return console.error(err);
       }
-      res = JSON.parse(res);
       console.log(res);
       if (res.length !== 0) {
         safe.setUserLongName(res[0]);

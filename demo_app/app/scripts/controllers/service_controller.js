@@ -19,7 +19,6 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         if (err) {
           return console.error(err);
         }
-        res = JSON.parse(res);
         if (res.length === 0) {
           return console.log('No Public ID registered');
         }
@@ -38,7 +37,6 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
               $rootScope.$loader.hide();
               return console.error(err);
             }
-            services = JSON.parse(services);
             if (services.length === 0) {
               $rootScope.$loader.hide();
               return console.log('No service registered for ' + longName);

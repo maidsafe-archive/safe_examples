@@ -35,7 +35,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
           if (err) {
             return console.error(err);
           }
-          $scope.dir = JSON.parse(dir);
+          $scope.dir = dir;
           $scope.$applyAsync();
         };
         safeApi.getDir(onResponse, $scope.currentDirectory, false);
@@ -248,4 +248,3 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
     };
   }
 ]);
-
