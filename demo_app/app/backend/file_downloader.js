@@ -32,34 +32,30 @@ export default class Downloader {
     this.statusCallback(Math.floor((this.downloadedSize * 100) / this.size));
   }
 
-  _onResponse(err, data) {
+  _onResponse(err, sizeDownloaded) {
     if (err) {
       return this.onComplete(err);
-    }
-    fs.writeSync(this.fd, new Buffer(data), 0, data.length, this.downloadedSize);
-    this.downloadedSize += data.length;
+    }    
+    this.downloadedSize += sizeDownloaded;
     this._postStatus();
     if (this.downloadedSize === this.size) {
-      fs.closeSync(this.fd);
       this.onComplete();
-    } else {
-      this._downloadContent();
     }
   }
 
   _downloadContent() {
     var self = this;
     var length = Math.min(this.MAX_SIZE_FOR_DOWNLOAD, this.size - this.downloadedSize);
-    self.api.getFile(this.filePath, this.isShared, this.downloadedSize, length, function(err, data) {
-      self._onResponse(err, data);
+    self.api.getFile(this.filePath, this.isShared, this.downloadPath, function(err, sizeDownloaded) {
+      self._onResponse(err, sizeDownloaded);
     });
   }
 
   download() {
     var self = this;
     var tempDir = temp.mkdirSync('safe-demo-');
+    console.log('TO download', this.size);
     this.downloadPath = path.resolve(tempDir, path.basename(self.filePath));
-    this.fd = fs.openSync(this.downloadPath, 'w', 0o666);
     this._downloadContent();
     this._postStatus();
   }

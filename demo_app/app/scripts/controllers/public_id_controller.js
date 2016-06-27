@@ -18,9 +18,10 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
       if (!$scope.publicId) {
         return $rootScope.prompt.show('Invalid data', 'Please enter a valid Public ID');
       }
-      if (!$rootScope.isOnlyAlphaOrNumeric($scope.publicId)) {
+
+      if (!(new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$')).test($scope.publicId)) {
         return $rootScope.prompt.show('Invalid data',
-          'Public ID should not contain special characters, Uppercase or space', function() {
+          'Public ID entered is invalid', function() {
           $scope.publicId = '';
           $scope.$applyAsync();
         });
