@@ -72,7 +72,7 @@ class DirectoryCreationHelper {
   create(callback) {
     console.log('DIR :', this.networkPath);
     this.uploader.progressListener.onSuccess(0, this.networkPath);
-    this.uploader.api.createDir(this.networkPath, this.isPrivate, null, false, false, callback);
+    this.uploader.api.createDir(this.networkPath, this.isPrivate, null, false, callback);
   }
 }
 

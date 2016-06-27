@@ -6,7 +6,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
     'use strict';
     $scope.siteTitle = 'My Page';
     $scope.siteDesc = 'This page is created and published on the SAFE Network using the MaidSafe demo app';
-    var filePath = '/views/sample_template_layout.html';
+    var dirPath = 'views/sample_template';
 
     var onServiceCreated = function(err) {
       var goToManageService = function() {
@@ -42,9 +42,9 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       uploader.upload(tempPath, false, '/public/' + serviceName);
     };
 
-    var writeFile = function(title, content, filePath) {
+    var writeFile = function(title, content, dirPath) {
       $rootScope.$loader.show();
-      window.uiUtils.createTemplateFile(title, content, filePath, onTemplateReady);
+      window.uiUtils.createTemplateFile(title, content, dirPath, onTemplateReady);
     };
 
     $scope.registerProgress = function(progressScope) {
@@ -53,7 +53,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
 
     $scope.publish = function() {
       console.log($scope.siteTitle + ' ' + $scope.siteDesc);
-      writeFile($scope.siteTitle, $scope.siteDesc, filePath);
+      writeFile($scope.siteTitle, $scope.siteDesc, dirPath);
     };
 
     $scope.handleInputClick = function(e) {
