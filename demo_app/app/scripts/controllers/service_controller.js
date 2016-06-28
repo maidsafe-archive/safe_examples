@@ -10,6 +10,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     $scope.newServicePath = '/public';
 
     $scope.longName = safe.getUserLongName();
+    var serviceCheck = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$/;
 
     // get services
     $scope.getServices = function() {
@@ -58,16 +59,16 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       if (!$scope.serviceName) {
         return console.error('Provide valid service name');
       }
-      if (!$rootScope.isOnlyAlphaOrNumeric($scope.serviceName)) {
+      if (!serviceCheck.test($scope.serviceName)) {
         return $rootScope.prompt.show('Invalid input',
-          'Service name should not contain special characters, Uppercase or space',
+          'Service name should not contain special characters and space. In addition the hyphen is permitted if it is surrounded by characters, digits or hyphens, although it is not to start or end a label',
           function() {
             $scope.serviceName = '';
             $scope.$applyAsync();
           });
       }
       $state.go('serviceAddFiles', {
-        'serviceName': $scope.serviceName
+        'serviceName': $scope.serviceName.toLowerCase()
       });
       $scope.serviceName = '';
     };
