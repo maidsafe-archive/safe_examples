@@ -29,13 +29,14 @@ export default class Downloader {
     if (!this.statusCallback) {
       return;
     }
-    this.statusCallback(Math.floor((this.downloadedSize * 100) / this.size));
+    let status = (this.downloadedSize === 0 && this.size === 0) ? 100 : Math.floor((this.downloadedSize * 100) / this.size);
+    this.statusCallback(status);
   }
 
   _onResponse(err, sizeDownloaded) {
     if (err) {
       return this.onComplete(err);
-    }    
+    }
     this.downloadedSize += sizeDownloaded;
     this._postStatus();
     if (this.downloadedSize === this.size) {

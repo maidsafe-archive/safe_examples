@@ -44,6 +44,7 @@ export default class Uploader {
   }
 
   uploadFile(localPath, networkParentDirPath) {
+    var self = this;
     new FileHelper(this, localPath, networkParentDirPath).upload();
   }
 

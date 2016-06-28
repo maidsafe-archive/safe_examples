@@ -115,11 +115,13 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       }
     };
     request.get(url, headers)
+    .on('response', function(response) {
+      if (response.statusCode !== 200 && response.statusCode !== 206) {
+        callback('Failed with status ' + response.statusMessage);
+      }
+    })
     .on('data', function(d) {
       callback(null, d.length);
-    })
-    .on('error', function(err){
-      console.error(err);
     })
     .pipe(fs.createWriteStream(downloadPath));
   };
