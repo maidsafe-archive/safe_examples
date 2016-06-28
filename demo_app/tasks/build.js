@@ -24,6 +24,7 @@ var paths = {
         './scripts/**',
         './images/**',
         './vendor/**',
+        './views/sample_template/**',
         './**/*.html',
         './**/*.+(jpg|png|svg)'
     ],

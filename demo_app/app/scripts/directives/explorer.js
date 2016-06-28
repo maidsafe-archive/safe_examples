@@ -160,7 +160,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
             console.log(err);
-            $rootScope.prompt.show('MaidSafe Demo', 'Download failed');
+            $rootScope.progressBar.close();
+            return $rootScope.prompt.show('MaidSafe Demo', 'Download failed');
           }
           downloader.open();
         });
