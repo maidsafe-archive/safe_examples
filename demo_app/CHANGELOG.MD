@@ -1,5 +1,8 @@
 # MaidSafe Demo App Change Log
 
+##[0.3.0]
+  - Safe launcher v0.5 compatibility 
+
 ##[0.2.2]
   - Fixed the alert dialog (PR #58).
 
