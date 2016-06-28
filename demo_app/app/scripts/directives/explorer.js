@@ -35,7 +35,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
           if (err) {
             return console.error(err);
           }
-          $scope.dir = JSON.parse(dir);
+          $scope.dir = dir;
           $scope.$applyAsync();
         };
         safeApi.getDir(onResponse, $scope.currentDirectory, false);
@@ -160,7 +160,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
             console.log(err);
-            $rootScope.prompt.show('MaidSafe Demo', 'Download failed');
+            $rootScope.progressBar.close();
+            return $rootScope.prompt.show('MaidSafe Demo', 'Download failed');
           }
           downloader.open();
         });
@@ -248,4 +249,3 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
     };
   }
 ]);
-

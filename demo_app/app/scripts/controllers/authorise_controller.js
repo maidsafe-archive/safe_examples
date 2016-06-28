@@ -29,7 +29,7 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
       if (err) {
         return console.error(err);
       }
-      safe.createDir('/private', true, '', false, false, createPvtDirCb);
+      safe.createDir('/private', true, '', false, createPvtDirCb);
     };
 
     var getDirCb = function(err, res) {
@@ -38,9 +38,8 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
       }
       console.log('Get Dir');
       console.log(res);
-      res = JSON.parse(res);
       if (res.subDirectories.length === 0) {
-        safe.createDir('/public', false, '', false, false, createPubDirCb);
+        safe.createDir('/public', false, '', false, createPubDirCb);
       } else {
         $state.go('home');
       }
@@ -50,7 +49,6 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$state', 'safeApiFa
       if (err) {
         return console.error(err);
       }
-      res = JSON.parse(res);
       console.log(res);
       if (res.length !== 0) {
         safe.setUserLongName(res[0]);
