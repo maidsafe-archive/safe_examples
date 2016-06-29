@@ -3,6 +3,12 @@
     <div class="ms-prompt-cntr">
       <h3 class="ms-prompt-h">{{ prompt.title }}</h3>
       <p class="ms-prompt-ctx">{{ prompt.msg }}</p>
+      <div class="ms-prompt-sub">
+        <h3 class="ms-prompt-sub-title">{{ prompt.sub.title }}</h3>
+        <p class="ms-prompt-sub-ctx">
+          {{ prompt.sub.ctx }}
+        </p>
+      </div>
       <div class="ms-prompt-f">
         <!-- <button type="button" name="Cancel" class="ms-btn" ng-click="$msPrompt.callback(false)">Cancel</button> -->
         <button type="button" name="Confirm" class="ms-btn" ng-click="prompt.close()">Ok</button>

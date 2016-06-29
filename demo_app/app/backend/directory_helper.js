@@ -84,7 +84,7 @@ export class DirectoryHelper {
     this.localPath = localPath;
     this.networkParentDirPath = networkParentDirPath;
     this.onError = function(err) {
-      self.uploader.onError('Failed to create directory ' + networkParentDirPath);
+      self.uploader.onError('Failed to create directory ' + networkParentDirPath + '\n' + err.data.description);
     };
     this.taskQueue = new TaskQueue(this.onError);
   }

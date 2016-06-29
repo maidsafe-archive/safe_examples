@@ -1,6 +1,7 @@
 import fs from 'fs';
 import temp from 'temp';
 import path from 'path';
+import fse from 'fs-extra';
 import remote from 'remote';
 
 export default class Downloader {
@@ -57,11 +58,21 @@ export default class Downloader {
     var tempDir = temp.mkdirSync('safe-demo-');
     console.log('TO download', this.size);
     this.downloadPath = path.resolve(tempDir, path.basename(self.filePath));
-    this._downloadContent();
+    if (this.size === 0) {
+      this.onComplete();
+    } else {
+      this._downloadContent();
+    }
     this._postStatus();
   }
 
   open() {
-    remote.shell.openItem(this.downloadPath);
+    var self = this;
+    fse.ensureFile(this.downloadPath, function (err) {
+      if (err) {
+        return self._onResponse('Not able to write file on local machine', self.size);
+      }
+      remote.shell.openItem(self.downloadPath);
+    });
   }
 }

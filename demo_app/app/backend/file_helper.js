@@ -20,7 +20,8 @@ export default class FileHelper {
       if (this.onCompleteCallback) {
         this.onCompleteCallback('Failed to update file ' + err.data.description);
       }
-      return this.uploader.onError('Failed to update file ' + this.networkParentDirPath + this.fileName);
+      return this.uploader.onError('Failed to update file ' + this.networkParentDirPath + this.fileName +
+        '\n' + err.data.description);
     }
     this.uploadedSize += uploadedSize;
     if (this.uploadedSize === this.size && this.onCompleteCallback) {

@@ -33,6 +33,9 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
           return $rootScope.prompt.show('Public ID Error', 'Public ID is already taken.', function() {
             $scope.publicId = '';
             $scope.$applyAsync();
+          }, {
+            title: 'Reason',
+            ctx: err.data.description
           });
         }
         safe.setUserLongName($scope.publicId);

@@ -14,7 +14,10 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       };
       $rootScope.$loader.hide();
       if (err) {
-        return $rootScope.prompt.show('Publish Service Error', err, goToManageService);
+        return $rootScope.prompt.show('Publish Service Error', 'Failed to add new service\n', goToManageService, {
+          title: 'Reason',
+          ctx: err.data.description
+        });
       }
       var msg = 'Template has been published for the service: ' + $state.params.serviceName;
       $rootScope.prompt.show('Service Published', msg, goToManageService);
@@ -22,7 +25,8 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
 
     var onTemplateReady = function(err, tempPath) {
       if (err) {
-        return console.error(err);
+        console.error(err)
+        return $rootScope.prompt.show('Upload Template', err);
       }
       var serviceName = $state.params.serviceName;
       var progressCallback = function(completed, total) {
@@ -37,7 +41,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       var uploader = new window.uiUtils.Uploader(safe, progressCallback);
       uploader.setOnErrorCallback(function(msg) {
         $rootScope.$loader.hide();
-        $rootScope.prompt.show('Filed to upload Template', msg);
+        $rootScope.prompt.show('Failed to upload Template', msg);
       });
       uploader.upload(tempPath, false, '/public/' + serviceName);
     };
