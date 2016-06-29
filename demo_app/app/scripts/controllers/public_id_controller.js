@@ -27,6 +27,7 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
         });
       }
       $rootScope.$loader.show();
+      $scope.publicId = $scope.publicId.toLowerCase();
       safe.createPublicId($scope.publicId, function(err) {
         $rootScope.$loader.hide();
         if (err) {
