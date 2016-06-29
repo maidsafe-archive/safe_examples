@@ -67,12 +67,12 @@ export default class Downloader {
   }
 
   open() {
-    if (!fse.ensureFileSync(this.downloadPath)) {
-      var fileName = path.basename(this.downloadPath);
-      var tempDir = temp.mkdirSync('safe-demo-');
-      this.downloadPath = path.resolve(tempDir, fileName);
-      fs.writeFileSync(this.downloadPath, '');
-    }
-    remote.shell.openItem(this.downloadPath);
+    var self = this;
+    fse.ensureFile(this.downloadPath, function (err) {
+      if (err) {
+        return self._onResponse('Not able to write file on local machine', self.size);
+      }
+      remote.shell.openItem(self.downloadPath);
+    });
   }
 }
