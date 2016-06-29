@@ -14,7 +14,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       };
       $rootScope.$loader.hide();
       if (err) {
-        return $rootScope.prompt.show('Publish Service Error', err, goToManageService);
+        return $rootScope.prompt.show('Publish Service Error', 'Failed to add new service\n' + err.data.description, goToManageService);
       }
       var msg = 'Template has been published for the service: ' + $state.params.serviceName;
       $rootScope.prompt.show('Service Published', msg, goToManageService);
