@@ -122,9 +122,9 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
                 percentage: 100,
                 isUpload: true
               });
-              $rootScope.prompt.show('Upload failed', msg, function() {
+              $rootScope.prompt.show('Upload failed', msg.split('\n')[0], function() {
                 getDirectory();
-              });
+              }, { title: 'Reason', ctx: msg.split('\n')[1] });
             });
             uploader.upload(selection[0], $scope.isPrivate, networkPath);
           } catch (err) {
@@ -160,8 +160,13 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
             console.log(err);
-            $rootScope.progressBar.close();
-            return $rootScope.prompt.show('MaidSafe Demo', 'Download failed');
+            return $rootScope.prompt.show('MaidSafe Demo', 'Download failed', function() {
+              $rootScope.progressBar.close();
+            },
+            {
+              title: 'Reason',
+              ctx: err
+            });
           }
           downloader.open();
         });
@@ -181,7 +186,11 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
         var onDelete = function(err) {
           $rootScope.$loader.hide();
           if (err) {
-            return console.error(err);
+            console.error(err)
+            return $rootScope.prompt.show('MaidSafe Demo', 'Delete failed', function() {}, {
+              title: 'Reason',
+              ctx: err.data.description
+            });;
           }
           getDirectory();
         };

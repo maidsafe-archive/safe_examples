@@ -35,8 +35,12 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         res.forEach(function(longName, index) {
           safe.getServices(longName, function(err, services) {
             if (err) {
+              console.error(err)
               $rootScope.$loader.hide();
-              return console.error(err);
+              return $rootScope.prompt.show('Get Services', 'Failed to get service list', function() {}, {
+                title: 'Reason',
+                ctx: err.data.description
+              });
             }
             if (services.length === 0) {
               $rootScope.$loader.hide();
@@ -82,9 +86,11 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       safe.addService($scope.longName, $state.params.serviceName, false, $scope.newServicePath, function(err, res) {
         var msg = null;
         if (err) {
-          msg = err;
-          return $rootScope.prompt.show('Publish Service Error', msg, function() {
+          return $rootScope.prompt.show('Publish Service Error', 'Failed to add service', function() {
             $state.go('manageService');
+          }, {
+            title: 'Reason',
+            ctx: err.data.description  
           });
         }
         msg = $state.params.serviceName + ' service has been published successfully';

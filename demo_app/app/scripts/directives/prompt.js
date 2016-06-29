@@ -14,12 +14,16 @@ window.maidsafeDemo.directive('prompt', [ '$rootScope', function($rootScope) {
       self.callback = null;
     };
 
-    self.show = function(title, msg, callback) {
+    self.show = function(title, msg, callback, sub) {
       if (self.visible) {
         return false;
       }
       self.title = title;
       self.msg = msg;
+      self.sub = sub || {
+        title: '',
+        ctx: ''
+      };
       self.visible = true;
       self.callback = callback;
       $rootScope.$applyAsync();
