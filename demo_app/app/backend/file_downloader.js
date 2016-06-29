@@ -1,6 +1,7 @@
 import fs from 'fs';
 import temp from 'temp';
 import path from 'path';
+import fse from 'fs-extra';
 import remote from 'remote';
 
 export default class Downloader {
@@ -57,11 +58,21 @@ export default class Downloader {
     var tempDir = temp.mkdirSync('safe-demo-');
     console.log('TO download', this.size);
     this.downloadPath = path.resolve(tempDir, path.basename(self.filePath));
-    this._downloadContent();
+    if (this.size === 0) {
+      this.onComplete();
+    } else {
+      this._downloadContent();
+    }
     this._postStatus();
   }
 
   open() {
+    if (!fse.ensureFileSync(this.downloadPath)) {
+      var fileName = path.basename(this.downloadPath);
+      var tempDir = temp.mkdirSync('safe-demo-');
+      this.downloadPath = path.resolve(tempDir, fileName);
+      fs.writeFileSync(this.downloadPath, '');
+    }
     remote.shell.openItem(this.downloadPath);
   }
 }
