@@ -1,7 +1,11 @@
 # MaidSafe Demo App Change Log
 
+##[0.3.1]
+  - Error handling for file upload streaming
+  - validation for service and public names
+
 ##[0.3.0]
-  - Safe launcher v0.5 compatibility 
+  - Safe launcher v0.5 compatibility
 
 ##[0.2.2]
   - Fixed the alert dialog (PR #58).
