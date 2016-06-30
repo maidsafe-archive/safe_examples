@@ -21,7 +21,7 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
 
       if (!(new RegExp('^[a-z0-9][a-z0-9-]{1,61}[a-z0-9](?:)+$')).test($scope.publicId)) {
         return $rootScope.prompt.show('Invalid data',
-          'Public ID should be lower case and should not contain special characters \
+          'Public ID should be minimum of 3 characters, lower case and should not contain special characters \
           or space. In addition \'-\' is permitted if it is not at the \
           start or end', function() {
           $scope.publicId = '';
