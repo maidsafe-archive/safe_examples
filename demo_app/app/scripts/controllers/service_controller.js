@@ -65,7 +65,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       }
       if (!serviceCheck.test($scope.serviceName)) {
         return $rootScope.prompt.show('Invalid input',
-          'Service name should be lower case and should not contain special characters\
+          'Service name should be minimum of 3 characters, lower case and should not contain special characters\
            or space. In addition \'-\' is permitted if it is not at the start or end',
           function() {
             $scope.serviceName = '';
