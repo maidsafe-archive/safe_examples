@@ -10,7 +10,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     $scope.newServicePath = '/public';
 
     $scope.longName = safe.getUserLongName();
-    var serviceCheck = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$/;
+    var serviceCheck = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
 
     // get services
     $scope.getServices = function() {
@@ -65,7 +65,9 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       }
       if (!serviceCheck.test($scope.serviceName)) {
         return $rootScope.prompt.show('Invalid input',
-          'Service name should not contain special characters and space. In addition the hyphen is permitted if it is surrounded by characters, digits or hyphens, although it is not to start or end a label',
+          'Service name should be lower case and should not contain special characters\
+           and space. In addition the hyphen is permitted if it is surrounded by characters,\
+           digits or hyphens, although it is not to start or end a label',
           function() {
             $scope.serviceName = '';
             $scope.$applyAsync();
@@ -90,7 +92,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             $state.go('manageService');
           }, {
             title: 'Reason',
-            ctx: err.data.description  
+            ctx: err.data.description
           });
         }
         msg = $state.params.serviceName + ' service has been published successfully';

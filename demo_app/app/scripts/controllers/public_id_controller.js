@@ -19,15 +19,16 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
         return $rootScope.prompt.show('Invalid data', 'Please enter a valid Public ID');
       }
 
-      if (!(new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$')).test($scope.publicId)) {
+      if (!(new RegExp('^[a-z0-9][a-z0-9-]{1,61}[a-z0-9](?:)+$')).test($scope.publicId)) {
         return $rootScope.prompt.show('Invalid data',
-          'Public ID entered is invalid', function() {
+          'Public ID should be lower case and should not contain special characters\
+          and space. In addition the hyphen is permitted if it is surrounded by characters,\
+          digits or hyphens, although it is not to start or end a label', function() {
           $scope.publicId = '';
           $scope.$applyAsync();
         });
       }
       $rootScope.$loader.show();
-      $scope.publicId = $scope.publicId.toLowerCase();
       safe.createPublicId($scope.publicId, function(err) {
         $rootScope.$loader.hide();
         if (err) {
