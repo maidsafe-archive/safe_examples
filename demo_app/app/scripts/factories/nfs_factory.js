@@ -101,8 +101,26 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       auth: {
         'bearer': self.getAuthToken()
       }
-    }, function(err) {
-      callback(err);
+    }, function(e, response) {
+      if (response.statusCode !== 200) {
+        var errMsg = response.body;
+        if (!response.statusCode) {
+          errMsg = {
+            errorCode: 400,
+            description: 'Request connection closed abruptly'
+          }
+        } else {
+          try {
+            errMsg = JSON.parse(errMsg);
+          } catch(e) {
+            errMsg = {
+              errorCode: 400,
+              description: errMsg
+            }
+          }
+        }
+        callback({data: !response.statusCode ? 'Request connection closed' : JSON.parse(response.body)});
+      }
     }));
   };
 
