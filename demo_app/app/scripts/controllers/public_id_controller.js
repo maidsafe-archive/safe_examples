@@ -31,7 +31,7 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
       safe.createPublicId($scope.publicId, function(err) {
         $rootScope.$loader.hide();
         if (err) {
-          return $rootScope.prompt.show('Public ID Error', 'Public ID is already taken.', function() {
+          return $rootScope.prompt.show('Public ID Error', 'Failed to create Public ID.', function() {
             $scope.publicId = '';
             $scope.$applyAsync();
           }, {

@@ -27,6 +27,20 @@ function(http, $q, $rootScope, nfs, dns) {
   };
 
   self.Request = function(payload, callback, allowUnAuthErr) {
+    var checkLauncherStatus = function(cb) {
+      var getTokenPayload = {
+        url: self.SERVER + '/auth',
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer ' + self.getAuthToken()
+        }
+      };
+      http(getTokenPayload).then(function(res) {
+        cb(null, res);
+      }, function(err) {
+        cb(err);
+      });
+    };
     var closeApp = function(title, msg) {
       $rootScope.$loader.hide();
       $rootScope.prompt.show(title, msg, function() {
@@ -42,8 +56,14 @@ function(http, $q, $rootScope, nfs, dns) {
     };
     var onError = function(err) {
       if (err.status === -1) {
-        return closeApp('Could not connect to launcher',
-          'Failed to connect with launcher. Launcher should be left running.');
+        checkLauncherStatus(function(error, response) {
+          if (error && error.status === -1) {
+            return closeApp('Could not connect to launcher',
+              'Failed to connect with launcher. Launcher should be left running.');
+          }
+          // TODO check other error throwing status -1
+          return callback(err);
+        });
       }
       if (err.status === 401 && allowUnAuthErr) {
         return callback(err);
