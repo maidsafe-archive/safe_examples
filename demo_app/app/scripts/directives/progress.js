@@ -26,6 +26,7 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
       if (self.percentageCompleted === 100) {
         $timeout(self.close, 200);
       }
+      $rootScope.$applyAsync();
     };
 
     self.close = function() {

@@ -35,10 +35,13 @@ export default class FileHelper {
     if (err) {
       return self._OnContentUploaded(err);
     }
+    if (self.size === 0) {
+      return self._OnContentUploaded(err, 0);
+    }
     console.log('Updating file content', this.networkParentDirPath + this.fileName);
     self.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false, this.localPath, 0,
       function(err, uploadedSize) {
-       self._OnContentUploaded(err, uploadedSize)
+       self._OnContentUploaded(err, uploadedSize);
       }
     );
   }

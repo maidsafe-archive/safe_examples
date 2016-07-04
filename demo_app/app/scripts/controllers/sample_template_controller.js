@@ -33,7 +33,15 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         if (!$rootScope.$loader.isLoading) {
           $rootScope.$loader.hide();
         }
-        if (total === completed) {
+        var progressCompletion = 100;
+        if (!(total === 0 && completed === 0)) {
+          progressCompletion = ((completed / total) * 100);
+        }
+        if (!$rootScope.progressBar.isDisplayed()) {
+          $rootScope.progressBar.start('Uploading');
+        }
+        $rootScope.progressBar.update(Math.floor(progressCompletion));
+        if (progressCompletion === 100) {
           $rootScope.$loader.show();
           safe.addService(safe.getUserLongName(), serviceName, false, '/public/' + serviceName, onServiceCreated);
         }

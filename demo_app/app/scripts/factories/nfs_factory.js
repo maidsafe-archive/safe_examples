@@ -90,8 +90,12 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     var self = this;
     var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
     var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
-    var fileStream = fs.createReadStream(localPath).on('data', function(chunk) {
-      callback(null, chunk.length);
+    // TODO this factor usage is just a patch - must use a better implementation for progress bar handling
+    var factor = 0;
+    var fileStream = fs.createReadStream(localPath);
+    fileStream.on('data', function(chunk) {
+      factor++;
+      callback(null, chunk.length - 1);
     });
     fileStream.pipe(request.put(url, {
       headers: {
@@ -102,8 +106,8 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
         'bearer': self.getAuthToken()
       }
     }, function(e, response) {
-      if (response.statusCode === 200) {
-        return callback();
+      if (response && response.statusCode === 200) {
+        return callback(null, factor);
       }
       var errMsg = response.body;
       try {
