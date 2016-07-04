@@ -18,6 +18,12 @@ window.maidsafeDemo.directive('prompt', [ '$rootScope', function($rootScope) {
       if (self.visible) {
         return false;
       }
+      if (sub && sub.ctx) {
+        var split = sub.ctx.split('::');
+        if (split.length > 2) {
+          sub.ctx = split.slice(split.length - 2).join('::');
+        }
+      }
       self.title = title;
       self.msg = msg;
       self.sub = sub || {

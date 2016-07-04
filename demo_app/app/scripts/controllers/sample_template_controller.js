@@ -25,7 +25,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
 
     var onTemplateReady = function(err, tempPath) {
       if (err) {
-        console.error(err)
+        console.error(err);
         return $rootScope.prompt.show('Upload Template', err);
       }
       var serviceName = $state.params.serviceName;

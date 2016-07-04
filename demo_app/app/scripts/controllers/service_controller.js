@@ -10,7 +10,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     $scope.newServicePath = '/public';
 
     $scope.longName = safe.getUserLongName();
-    var serviceCheck = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
+    var serviceCheck = /^[a-z0-9][a-z0-9-]{1,60}[a-z0-9](?:)+$/;
 
     // get services
     $scope.getServices = function() {
@@ -35,7 +35,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         res.forEach(function(longName, index) {
           safe.getServices(longName, function(err, services) {
             if (err) {
-              console.error(err)
+              console.error(err);
               $rootScope.$loader.hide();
               return $rootScope.prompt.show('Get Services', 'Failed to get service list', function() {}, {
                 title: 'Reason',
@@ -65,8 +65,9 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       }
       if (!serviceCheck.test($scope.serviceName)) {
         return $rootScope.prompt.show('Invalid input',
-          'Service name should be minimum of 3 characters, lower case and should not contain special characters\
-           or space. In addition \'-\' is permitted if it is not at the start or end',
+          'Service name should be minimum of 3 characters and maximum of 63 characters. Should be lower case and ' +
+          'should not contain special characters or space. In addition \'-\' is permitted if it is not at the ' +
+          'start or end',
           function() {
             $scope.serviceName = '';
             $scope.$applyAsync();
