@@ -109,16 +109,18 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       if (response && response.statusCode === 200) {
         return callback(null, factor);
       }
-      var errMsg = response.body;
-      try {
-        errMsg = JSON.parse(errMsg);
-      } catch(e) {
-        errMsg = {
-          errorCode: 400,
-          description: 'Request connection closed abruptly - ' + errMsg
+      self.deleteFile(filePath, isPathShared, function() {
+        var errMsg = response.body;
+        try {
+          errMsg = JSON.parse(errMsg);
+        } catch(e) {
+          errMsg = {
+            errorCode: 400,
+            description: 'Request connection closed abruptly - ' + errMsg
+          }
         }
-      }
-      callback({data: !response.statusCode ? 'Request connection closed' : JSON.parse(response.body)});
+        callback({data: !response.statusCode ? 'Request connection closed' : JSON.parse(response.body)});
+      });
     }));
   };
 
