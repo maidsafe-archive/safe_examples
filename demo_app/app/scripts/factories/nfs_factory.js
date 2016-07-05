@@ -90,8 +90,12 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     var self = this;
     var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
     var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
-    var fileStream = fs.createReadStream(localPath).on('data', function(chunk) {
-      callback(null, chunk.length);
+    // TODO this factor usage is just a patch - must use a better implementation for progress bar handling
+    var factor = 0;
+    var fileStream = fs.createReadStream(localPath);
+    fileStream.on('data', function(chunk) {
+      factor++;
+      callback(null, chunk.length - 1);
     });
     fileStream.pipe(request.put(url, {
       headers: {
@@ -102,25 +106,19 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
         'bearer': self.getAuthToken()
       }
     }, function(e, response) {
-      if (response.statusCode !== 200) {
-        var errMsg = response.body;
-        if (!response.statusCode) {
-          errMsg = {
-            errorCode: 400,
-            description: 'Request connection closed abruptly'
-          }
-        } else {
-          try {
-            errMsg = JSON.parse(errMsg);
-          } catch(e) {
-            errMsg = {
-              errorCode: 400,
-              description: errMsg
-            }
-          }
-        }
-        callback({data: !response.statusCode ? 'Request connection closed' : JSON.parse(response.body)});
+      if (response && response.statusCode === 200) {
+        return callback(null, factor);
       }
+      var errMsg = response.body;
+      try {
+        errMsg = JSON.parse(errMsg);
+      } catch(e) {
+        errMsg = {
+          errorCode: 400,
+          description: 'Request connection closed abruptly - ' + errMsg
+        }
+      }
+      callback({data: !response.statusCode ? 'Request connection closed' : JSON.parse(response.body)});
     }));
   };
 

@@ -19,14 +19,15 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
         return $rootScope.prompt.show('Invalid data', 'Please enter a valid Public ID');
       }
 
-      if (!(new RegExp('^[a-z0-9][a-z0-9-]{1,61}[a-z0-9](?:)+$')).test($scope.publicId)) {
+      if (!(new RegExp('^[a-z0-9][a-z0-9-]{1,60}[a-z0-9](?:)+$')).test($scope.publicId)) {
         return $rootScope.prompt.show('Invalid data',
-          'Public ID should be minimum of 3 characters, lower case and should not contain special characters \
-          or space. In addition \'-\' is permitted if it is not at the \
-          start or end', function() {
-          $scope.publicId = '';
-          $scope.$applyAsync();
-        });
+          'Public ID should be minimum of 3 characters and maximum of 63 characters. Should be lower case and should ' +
+          'not contain special characters or space. In addition \'-\' is permitted if it is not at the start or end',
+            function() {
+              $scope.publicId = '';
+              $scope.$applyAsync();
+            }
+        );
       }
       $rootScope.$loader.show();
       safe.createPublicId($scope.publicId, function(err) {
