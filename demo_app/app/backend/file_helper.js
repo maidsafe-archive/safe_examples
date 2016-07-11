@@ -29,30 +29,30 @@ export default class FileHelper {
     }
     this.uploader.progressListener.onSuccess(uploadedSize, this.networkParentDirPath + this.fileName);
   }
-
-  _uploadFileContent(err) {
-    let self = this;
-    if (err) {
-      return self._OnContentUploaded(err);
-    }
-    if (self.size === 0) {
-      return self._OnContentUploaded(err, 0);
-    }
-    console.log('Updating file content', this.networkParentDirPath + this.fileName);
-    self.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false, this.localPath, 0,
-      function(err, uploadedSize) {
-       self._OnContentUploaded(err, uploadedSize);
-      }
-    );
-  }
+  //
+  // _uploadFileContent(err) {
+  //   let self = this;
+  //   if (err) {
+  //     return self._OnContentUploaded(err);
+  //   }
+  //   if (self.size === 0) {
+  //     return self._OnContentUploaded(err, 0);
+  //   }
+  //   console.log('Updating file content', this.networkParentDirPath + this.fileName);
+  //   self.uploader.api.modifyFileContent(this.networkParentDirPath + this.fileName, false, this.localPath, 0,
+  //     function(err, uploadedSize) {
+  //      self._OnContentUploaded(err, uploadedSize);
+  //     }
+  //   );
+  // }
 
   upload(callback) {
     let self = this;
     this.onCompleteCallback = callback;
     console.log('Creating file', this.networkParentDirPath + this.fileName);
     self.uploader.api.createFile(this.networkParentDirPath + this.fileName, '',
-                                 false, function(err) {
-                                  self._uploadFileContent(err)
+                                 false, this.localPath, function(err, uploadedSize) {
+                                  self._OnContentUploaded(err, uploadedSize);
                                  });
   }
 }
