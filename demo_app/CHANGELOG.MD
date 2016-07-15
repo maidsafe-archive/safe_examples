@@ -1,5 +1,9 @@
 # MaidSafe Demo App Change Log
 
+##[0.4.0]
+  - File size limit increased to 50 MB
+  - Compatibility with safe launcher v0.6.0
+
 ##[0.3.1]
   - Error handling for file upload streaming
   - validation for service and public names
