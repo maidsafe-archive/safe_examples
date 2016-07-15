@@ -69,20 +69,31 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     (new this.Request(payload, callback)).send();
   };
 
-  self.createFile = function(filePath, metadata, isPathShared, callback) {
+  self.createFile = function(filePath, metadata, isPathShared, localPath, callback) {
     var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
     var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
-    var payload = {
-      url: url,
-      method: 'POST',
+
+    var factor = 0;
+    var fileStream = fs.createReadStream(localPath);
+    fileStream.on('data', function(chunk) {
+      factor++;
+      callback(null, chunk.length - 1);
+    });
+    fileStream.pipe(request.post(url, {
       headers: {
-        authorization: 'Bearer ' + this.getAuthToken()
+        'Content-Type': mime.lookup(filePath),
+        'metadata': metadata
       },
-      data: {
-        metadata: metadata
+      auth: {
+        'bearer': this.getAuthToken()
       }
-    };
-    (new this.Request(payload, callback)).send();
+    }, function(e, response) {
+      if (response && response.statusCode === 200) {
+        return callback(null, factor);
+      }
+      var errMsg = response.headers['Content-Type'] === 'application/json' ? JSON.parse(response.body) : 'Request connection closed';
+      callback({data: errMsg});
+    }));
   };
 
   self.modifyFileContent = function(filePath, isPathShared, localPath, offset, callback) {
@@ -105,22 +116,12 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       auth: {
         'bearer': self.getAuthToken()
       }
-    }, function(e, response) {
+    }, function(e, response) {      
       if (response && response.statusCode === 200) {
         return callback(null, factor);
       }
-      self.deleteFile(filePath, isPathShared, function() {
-        var errMsg = response.body;
-        try {
-          errMsg = JSON.parse(errMsg);
-        } catch(e) {
-          errMsg = {
-            errorCode: 400,
-            description: 'Request connection closed abruptly - ' + errMsg
-          }
-        }
-        callback({data: !response.statusCode ? 'Request connection closed' : JSON.parse(response.body)});
-      });
+      var errMsg = response.headers['Content-Type'] === 'application/json' ? JSON.parse(response.body) : 'Request connection closed';
+      callback({data: errMsg});
     }));
   };
 
