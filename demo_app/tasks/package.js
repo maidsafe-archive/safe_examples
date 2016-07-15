@@ -36,7 +36,7 @@ var packageForOs = {
     icon: 'resources/windows/icon.ico',
     unpack: '*.so',
     platform: 'linux',
-    packageName: packageConfig.productName.toLowerCase().replace(' ', '_'),
+    packageName: packageConfig.productName.toLowerCase().replace(/ /g, '_'),
     packagePreference: ''
   },
   windows: {
