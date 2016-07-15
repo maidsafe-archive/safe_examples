@@ -4,7 +4,7 @@
   "identifier": "com.maidsafe.demo_app",
   "description": "MaidSafe Demo Application",
   "version": "0.3.1",
-  "author": "Maidsafe",
+  "author": "MaidSafe",
   "copyright": "",
   "main": "background.js",
   "dependencies": {
