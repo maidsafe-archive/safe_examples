@@ -4,19 +4,18 @@
     <div class="frame-h-act">
       <a ui-sref="home" class="frame-h-act-btn ms-back-btn"></a>
     </div>
-    <h3 class="frame-h-ctx">View and Manage Private Data</h3>
+    <h3 class="frame-h-ctx">Manage Network Data</h3>
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
-    <h3 class="content-1-h">Private Data</h3>
+    <h3 class="content-1-h">Time to add some files!</h3>
     <p class="content-1-p">
-      This is your private data that only you can see. Here you can add and delete
-      your files. <br/> These files are separate from the public data used in websites, etc.
+      Here you can create and manage files for your public and private data.
     </p>
   </div><!-- /content 1 -->
   <div class="" ng-controller="PrivateDataCtrl">
     <!-- explorer -->
-    <explorer is-private="true" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
+    <explorer is-private="false" is-default="true" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
     <!-- explorer -->
   </div>
 </div>

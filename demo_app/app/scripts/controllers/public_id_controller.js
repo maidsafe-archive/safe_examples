@@ -1,8 +1,8 @@
 /**
  * Public ID controller
  */
-window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeApiFactory',
-  function($scope, $rootScope, safe) {
+window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$state', '$rootScope', 'safeApiFactory',
+  function($scope, $state, $rootScope, safe) {
     'use strict';
     $scope.publicId = '';
     $scope.longName = null;
@@ -10,7 +10,7 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$rootScope', 'safeAp
     $scope.init = function() {
       var longName = safe.getUserLongName();
       if (longName) {
-        $scope.longName = longName;
+        return $state.go('manageService', {longName: longName});
       }
     };
 

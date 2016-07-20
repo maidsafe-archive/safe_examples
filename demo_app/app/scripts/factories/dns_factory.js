@@ -58,5 +58,16 @@ window.maidsafeDemo.factory('dnsFactory', [ function(Shared) {
     (new this.Request(payload, callback)).send();
   };
 
+  self.deleteService = function(longName, serviceName, callback) {
+    var payload = {
+      url: this.SERVER + 'dns/' + serviceName + '/' + longName,
+      method: 'DELETE',
+      headers: {
+        authorization: 'Bearer ' + this.getAuthToken()
+      }
+    };
+    (new this.Request(payload, callback)).send();
+  };
+
   return self;
 } ]);

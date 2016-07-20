@@ -3,7 +3,7 @@
     <div class="ms-prompt-cntr">
       <h3 class="ms-prompt-h">{{ prompt.title }}</h3>
       <p class="ms-prompt-ctx">{{ prompt.msg }}</p>
-      <div class="ms-prompt-sub">
+      <div class="ms-prompt-sub" ng-if="prompt.sub.ctx">
         <h3 class="ms-prompt-sub-title">{{ prompt.sub.title }}</h3>
         <p class="ms-prompt-sub-ctx">
           {{ prompt.sub.ctx }}

@@ -12,12 +12,20 @@ window.maidsafeDemo.config(function($stateProvider, $urlRouterProvider) {
       url: '/home',
       templateUrl: 'views/home.html'
     })
+  .state('manageNetworkData', {
+      url: '/manage_network_data',
+      templateUrl: 'views/manage_network_data.html'
+    })
+  .state('managePublicData', {
+      url: '/manage_public_data?:serviceName&:servicePath?',
+      templateUrl: 'views/manage_public_data.html'
+    })
   .state('publicID', {
       url: '/manage_public_id',
       templateUrl: 'views/manage_public_id.html'
     })
   .state('manageService', {
-      url: '/manage_service',
+      url: '/manage_service?:longName?',
       templateUrl: 'views/manage_service.html'
     })
   .state('createService', {

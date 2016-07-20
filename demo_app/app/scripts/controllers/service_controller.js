@@ -25,6 +25,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         }
         var addServices = function(longName, services) {
           services.forEach(function(serviceName) {
+            console.log(serviceName);
             $scope.serviceList.push({
               longName: longName,
               name: serviceName
@@ -73,7 +74,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             $scope.$applyAsync();
           });
       }
-      $state.go('serviceAddFiles', {
+      $state.go('managePublicData', {
         'serviceName': $scope.serviceName.toLowerCase()
       });
       $scope.serviceName = '';
@@ -98,6 +99,25 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         msg = $state.params.serviceName + ' service has been published successfully';
         $rootScope.prompt.show('Service Published', msg, function() {
           $state.go('manageService');
+        });
+      });
+    };
+
+    $scope.deleteService = function(serviceName) {
+      if (!serviceName) {
+        return;
+      }
+      safe.deleteService($scope.longName, serviceName, function(err, res) {
+        if (err) {
+          return $rootScope.prompt.show('Delete Service Error', 'Failed to delete service', function() {
+            $state.go('manageService');
+          }, {
+            title: 'Reason',
+            ctx: err.data.description
+          });
+        }
+        $rootScope.prompt.show('Service Deleted', 'Service deleted successfully!', function() {
+          $state.go('manageService', {}, {reload: true});
         });
       });
     };

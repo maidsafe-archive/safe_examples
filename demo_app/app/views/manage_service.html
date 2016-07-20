@@ -8,6 +8,14 @@
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
+    <h3 class="content-1-h">Public ID</h3>
+    <p class="content-1-p text-center">
+      Your Public ID is: <b>{{ $state.params.longName }}</b>
+    </p>
+    <!-- <div class="heading-1 text-center">Your Public ID is: <b><i>{{ $state.params.longName }}</i></b></div> -->
+  </div><!-- /content 1 -->
+  <!-- content 1 -->
+  <div class="content-1">
     <h3 class="content-1-h">Manage Services</h3>
     <p class="content-1-p">
       Here you can view and edit which services you have tied to your public ID.<br/>
@@ -26,9 +34,13 @@
           <div class="ms-list-1-i-ctx">
             http://<b>{{ service.name }}</b>{{ '.' + service.longName + '.safenet' }}
           </div>
+          <div class="ms-list-1-i-act-lt">
+            <a href="" class="danger" ng-click="deleteService(service.name)">DELETE</a>
+          </div>
           <div class="ms-list-1-i-act">
-            <a ui-sref="serviceExplorer({serviceName: service.name})">Edit Files</a>
-            <a href="" ng-click="openLink(service.name, service.longName)">Visit Site</a>
+            <a ui-sref="managePublicData({serviceName: service.name})">Edit Files</a>
+            <a ui-sref="serviceExplorer({serviceName: service.name})">Remap DNS</a>
+            <!-- <a href="" ng-click="openLink(service.name, service.longName)">Visit Site</a> -->
           </div>
         </div>
       </div>
