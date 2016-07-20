@@ -8,10 +8,10 @@
     <div class="ms-explr-h-addrbar">
       <input type="text" name="addrBar" readonly value="" ng-model="currentDirectory">
     </div>
-    <div class="ms-explr-h-rt ms-dropdown" ng-if="!isPrivate">
+    <div class="ms-explr-h-rt ms-dropdown" ng-if="!isPrivate && !isDefault">
       <button type="button" class="ms-btn ms-txt-btn" name="upload" ng-click="createFromTemplate()">Create from Template</button>
     </div>
-    <div class="ms-explr-h-rt ms-dropdown" ng-if="isPrivate">
+    <div class="ms-explr-h-rt ms-dropdown" ng-if="isPrivate || isDefault">
       <button type="button" class="ms-btn ms-add-btn" name="upload" ng-click="uploadDialog = !uploadDialog"></button>
       <div ng-show="uploadDialog" class="ms-dropdown-b">
         <ul style="list-style-type:none">

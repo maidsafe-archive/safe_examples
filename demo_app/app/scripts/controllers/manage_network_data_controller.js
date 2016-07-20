@@ -1,7 +1,7 @@
 /**
- * Manage private data controller
+ * Manage network data controller
  */
-window.maidsafeDemo.controller('PrivateDataCtrl', [ '$rootScope', '$scope', '$state', 'safeApiFactory',
+window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$state', 'safeApiFactory',
   function($rootScope, $scope, $state, safe) {
     'use strict';
     $scope.selectedFolder = null;
@@ -19,6 +19,7 @@ window.maidsafeDemo.controller('PrivateDataCtrl', [ '$rootScope', '$scope', '$st
       var msg = 'Service ' + $state.params.serviceName + ' published';
       $rootScope.prompt.show('Service Published', msg, goToManageService);
     };
+    
     $scope.setTargetFolder = function(name) {
       if (name) {
         return $scope.selectedFolder = name;

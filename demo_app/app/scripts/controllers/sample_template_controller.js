@@ -50,7 +50,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       $scope.progressIndicator = progressScope;
     };
 
-    $scope.publish = function() {
+    $scope.createTeamplate = function() {
       console.log($scope.siteTitle + ' ' + $scope.siteDesc);
       writeFile($scope.siteTitle, $scope.siteDesc, dirPath);
     };
