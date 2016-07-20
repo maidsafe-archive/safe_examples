@@ -29,13 +29,17 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         if (progressCompletion === 100) {
           $rootScope.$loader.show();
           $rootScope.prompt.show('Template Created', 'Sample temaplete created successfully!', function() {
-            $state.go('managePublicData', {serviceName: $state.params.serviceName});
+            $state.go('managePublicData', {
+              serviceName: $state.params.serviceName,
+              remap: $state.params.remap
+            });
           });
         }
       };
       var uploader = new window.uiUtils.Uploader(safe, progressCallback);
       uploader.setOnErrorCallback(function(msg) {
         $rootScope.$loader.hide();
+        $rootScope.progressBar.close();
         $rootScope.prompt.show('Failed to upload Template', msg);
       });
       uploader.upload(tempPath, false, '/public/' + serviceName);

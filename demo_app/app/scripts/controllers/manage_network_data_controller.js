@@ -19,7 +19,7 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
       var msg = 'Service ' + $state.params.serviceName + ' published';
       $rootScope.prompt.show('Service Published', msg, goToManageService);
     };
-    
+
     $scope.setTargetFolder = function(name) {
       if (name) {
         return $scope.selectedFolder = name;
@@ -35,12 +35,29 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
     };
 
     $scope.mapService = function() {
-      if (!$state.params.serviceName) {
+      var serviceName = $state.params.serviceName;
+      if (!serviceName) {
         return;
       }
-      var serviceName = $state.params.serviceName;
-      $rootScope.$loader.hide();
-      safe.addService(safe.getUserLongName(), serviceName, false, $scope.selectedFolder, onServiceCreated);
+      var addService = function() {
+        $rootScope.$loader.show();
+        safe.addService(safe.getUserLongName(), serviceName, false, $scope.selectedFolder, onServiceCreated);
+      };
+
+      if ($state.params.remap) {
+        $rootScope.$loader.show();
+        return safe.deleteService(safe.getUserLongName(), serviceName, function(err, res) {
+          $rootScope.$loader.hide();
+          if (err) {
+            return $rootScope.prompt.show('Remap Service Error', 'Failed to remap service\n', function() {}, {
+              title: 'Reason',
+              ctx: err.data.description
+            });
+          }
+          addService();
+        });
+      }
+      addService();
     };
   }
 ]);

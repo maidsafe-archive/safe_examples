@@ -17,7 +17,7 @@ window.maidsafeDemo.config(function($stateProvider, $urlRouterProvider) {
       templateUrl: 'views/manage_network_data.html'
     })
   .state('managePublicData', {
-      url: '/manage_public_data?:serviceName&:servicePath?',
+      url: '/manage_public_data?:serviceName&:servicePath?&:remap?',
       templateUrl: 'views/manage_public_data.html'
     })
   .state('publicID', {
@@ -29,11 +29,15 @@ window.maidsafeDemo.config(function($stateProvider, $urlRouterProvider) {
       templateUrl: 'views/manage_service.html'
     })
   .state('createService', {
-      url: '/create_service/:serviceName?',
+      url: '/create_service?:serviceName?',
       templateUrl: 'views/create_service.html'
     })
   .state('sampleTemplate', {
-      url: '/sample_template/:serviceName',
+      url: '/sample_template?:serviceName?:remap?',
       templateUrl: 'views/sample_template.html'
+    })
+  .state('serviceExplorer', {
+      url: '/service_explorer?:serviceName&:servicePath?',
+      templateUrl: 'views/service_explorer.html'
     });
 });

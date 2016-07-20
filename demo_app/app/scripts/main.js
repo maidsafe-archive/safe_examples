@@ -26,6 +26,7 @@ window.maidsafeDemo = angular
       $rootScope.$applyAsync();
     }
   };
+  $rootScope.serviceList = [];
   $rootScope.isOnlyAlphaOrNumeric = function(str) {
     return (new RegExp(/^[a-z0-9]+$/g)).test(str);
   };

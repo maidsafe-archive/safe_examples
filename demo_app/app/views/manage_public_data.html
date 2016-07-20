@@ -16,7 +16,13 @@
   </div><!-- /content 1 -->
   <div>
     <!-- explorer -->
-    <explorer is-private="false" is-default="false" starting-path="$state.params.servicePath" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
+    <explorer
+      is-private="false"
+      is-default="false"
+      show-edit-opt="false"
+      starting-path="$state.params.servicePath"
+      on-directory-selected="setTargetFolder(name)"
+      on-progress="onProgress(percentage, isUpload)"/>
     <!-- explorer -->
   </div>
   <div class="container-2 text-center">

@@ -49,7 +49,10 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       };
 
       $scope.createFromTemplate = function() {
-        $state.go('sampleTemplate', {serviceName: $state.params.serviceName});
+        $state.go('sampleTemplate', {
+          serviceName: $state.params.serviceName,
+          remap: $state.params.remap
+        });
       };
 
       // bytes to size
@@ -260,6 +263,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       restrict: 'E',
       scope: {
         isPrivate: '=',
+        showEditOpt: '=',
         isDefault: '=',
         startingPath: '=',
         onDirectorySelected: '&',
