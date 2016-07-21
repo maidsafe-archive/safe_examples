@@ -8,24 +8,24 @@
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
-    <h3 class="content-1-h">Choose a folder to map '{{$state.params.serviceName}}' to.</h3>
+    <h3 class="content-1-h">Select the content folder for '{{$state.params.serviceName}}' service.</h3>
     <p class="content-1-p">
-      Here you can map your service '{{$state.params.serviceName}}' to your public folder. To create and manage your files
-      and folders, please use the <a ui-sref="manageNetworkData">Manage Network Data</a> section.
+      Here you can select an existing public folder from the list below. You can create a new public folder
+      from a <a href="" ng-click="createFromTemplate()">Template</a> or upload an existing content folder to your public NFS folder from the
+      <a href="" ng-click="goToPublicFolder()">Manage Network Data</a> section.
     </p>
   </div><!-- /content 1 -->
   <div>
     <!-- explorer -->
     <explorer
-      is-private="false"
-      is-default="false"
-      show-edit-opt="false"
-      starting-path="$state.params.servicePath"
+      list-mode="true"
+      starting-path="explorerRootPath"
       on-directory-selected="setTargetFolder(name)"
       on-progress="onProgress(percentage, isUpload)"/>
     <!-- explorer -->
   </div>
   <div class="container-2 text-center">
-    <button type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder" ng-disabled="!selectedFolder">Use This Folder</button>
+    <button ng-if="!selectedFolder" type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder">Please select a folder</button>
+    <button ng-if="selectedFolder" type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder" ng-disabled="!selectedFolder">Use This Folder</button>
   </div>
 </div>

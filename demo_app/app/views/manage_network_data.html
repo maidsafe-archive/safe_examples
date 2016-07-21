@@ -15,7 +15,7 @@
   </div><!-- /content 1 -->
   <div class="" ng-controller="NetworkDataCtrl">
     <!-- explorer -->
-    <explorer is-private="false" is-default="true" show-edit-opt="true" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
+    <explorer list-mode="false" starting-path="$state.params.explorerRootPath" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
     <!-- explorer -->
   </div>
 </div>

@@ -38,7 +38,7 @@
             <a href="" class="danger" ng-click="deleteService(service.name)">DELETE</a>
           </div>
           <div class="ms-list-1-i-act">
-            <a ui-sref="serviceExplorer({serviceName: service.name, servicePath: service.homeDir})">Edit Files</a>
+            <a ui-sref="serviceExplorer({serviceName: service.name, servicePath: 'public/' + service.homeDir})">Edit Files</a>
             <a ui-sref="managePublicData({serviceName: service.name, remap: true})">Remap DNS</a>
             <!-- <a href="" ng-click="openLink(service.name, service.longName)">Visit Site</a> -->
           </div>

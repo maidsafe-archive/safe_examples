@@ -2,8 +2,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
   function($rootScope, $state, $timeout, safeApi) {
     var PROGRESS_DELAY = 500;
     var Explorer = function($scope, element, attrs) {
-      var rootFolder = '/' + ($scope.isPrivate ? 'private' : 'public') + '/';
-      rootFolder = $scope.isDefault ? '/' : rootFolder;
       var FILE_ICON_CLASSES = {
         GENERIC: 'ms-icn-file-generic',
         IMAGE: 'ms-icn-file-img',
@@ -12,7 +10,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         VIDEO: 'ms-icn-file-video'
       };
 
-      $scope.currentDirectory = rootFolder + ($scope.startingPath ? ($scope.startingPath + '/') : '');
+      $scope.currentDirectory = '/' + ($scope.startingPath ? ($scope.startingPath + '/') : '');
       $scope.mime = require('mime');
       $scope.selectedPath = null;
       $scope.dir = null;
@@ -46,13 +44,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $scope.$applyAsync();
         };
         safeApi.getDir(onResponse, $scope.currentDirectory, false);
-      };
-
-      $scope.createFromTemplate = function() {
-        $state.go('sampleTemplate', {
-          serviceName: $state.params.serviceName,
-          remap: $state.params.remap
-        });
       };
 
       // bytes to size
@@ -204,7 +195,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
             return $rootScope.prompt.show('MaidSafe Demo', 'Delete failed', function() {}, {
               title: 'Reason',
               ctx: err.data.description
-            });;
+            });
           }
           getDirectory();
         };
@@ -216,6 +207,9 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       };
 
       $scope.openDirectory = function(directoryName) {
+        if ($scope.listMode) {
+          return;
+        }
         $scope.listSelected = false;
         $scope.selectedPath = directoryName;
         $scope.currentDirectory += ($scope.selectedPath + '/');
@@ -245,9 +239,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         tokens.pop();
         var targetFolder = tokens.pop();
         var path = tokens.join('/');
-        if(!path && !$scope.isDefault) {
-          return;
-        }
         $scope.isPrivate = (targetFolder.toLowerCase() === 'private');
         $scope.currentDirectory = path + '/';
         $scope.selectedPath = null;
@@ -262,9 +253,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
     return {
       restrict: 'E',
       scope: {
-        isPrivate: '=',
-        showEditOpt: '=',
-        isDefault: '=',
+        listMode: '=',
         startingPath: '=',
         onDirectorySelected: '&',
         onProgress: '&'
