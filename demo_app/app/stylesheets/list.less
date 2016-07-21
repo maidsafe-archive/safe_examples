@@ -12,7 +12,28 @@
       line-height: 36px;
       border-bottom: 2px solid @gray-400;
     }
+    .ms-list-1-i-act-lt {
+      display: inline-block;
+      float: left;
+      text-align: left;
+      a {
+        height: 36px;
+        display: inline-block;
+        padding-left: 8px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 36px;
+        text-transform: uppercase;
+        color: @blue-400;
+        &.danger {
+          color: @red-100;
+        }
+      }
+    }
     .ms-list-1-i-act {
+      display: inline-block;
+      float: right;
       text-align: right;
       a {
         height: 36px;
@@ -26,6 +47,7 @@
         color: @blue-400;
       }
     }
+    .clearfix();
   }
 }
 

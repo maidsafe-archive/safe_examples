@@ -5,7 +5,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
   function($scope, $state, $rootScope, $timeout, safe) {
     'use strict';
     $scope.serviceName = '';
-    $scope.serviceList = [];
+    // $scope.serviceList = [];
     $scope.newService = null;
     $scope.newServicePath = '/public';
 
@@ -15,6 +15,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     // get services
     $scope.getServices = function() {
       $rootScope.$loader.show();
+      $rootScope.serviceList = [];
       safe.getDns(function(err, res) {
         $rootScope.$loader.hide();
         if (err) {
@@ -23,17 +24,33 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         if (res.length === 0) {
           return console.log('No Public ID registered');
         }
-        var addServices = function(longName, services) {
-          services.forEach(function(serviceName) {
-            $scope.serviceList.push({
-              longName: longName,
-              name: serviceName
+        var addServices = function(longName, serviceName, homeDir) {
+          $rootScope.serviceList.push({
+            longName: longName,
+            name: serviceName,
+            homeDir: homeDir
+          });
+        };
+
+        var getHomeDir = function(longName, serviceList) {
+          $rootScope.$loader.show();
+          serviceList.forEach(function(service, index) {
+            safe.getHomeDir(longName, service, function(err, homeDir) {
+              if (err) {
+                console.error(err);
+                $rootScope.$loader.hide();
+                return $rootScope.prompt.show('Get Services', 'Failed to get service list', function() {}, {
+                  title: 'Reason',
+                  ctx: err.data.description
+                });
+              }
+              addServices(longName, service, homeDir.info.name)
             });
           });
         };
-        $rootScope.$loader.show();
-        res.forEach(function(longName, index) {
-          safe.getServices(longName, function(err, services) {
+
+        var getServicesForLongname = function(longName, index) {
+          var getServicesCallback = function(err, services) {
             if (err) {
               console.error(err);
               $rootScope.$loader.hide();
@@ -46,11 +63,17 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
               $rootScope.$loader.hide();
               return console.log('No service registered for ' + longName);
             }
-            addServices(longName, services);
+            getHomeDir(longName, services);
             if (index === (res.length - 1)) {
               $rootScope.$loader.hide();
             }
-          });
+          };
+          safe.getServices(longName, getServicesCallback);
+        };
+
+        $rootScope.$loader.show();
+        res.forEach(function(longName, index) {
+          getServicesForLongname(longName, index);
         });
       });
     };
@@ -73,7 +96,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             $scope.$applyAsync();
           });
       }
-      $state.go('serviceAddFiles', {
+      $state.go('managePublicData', {
         'serviceName': $scope.serviceName.toLowerCase()
       });
       $scope.serviceName = '';
@@ -98,6 +121,25 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         msg = $state.params.serviceName + ' service has been published successfully';
         $rootScope.prompt.show('Service Published', msg, function() {
           $state.go('manageService');
+        });
+      });
+    };
+
+    $scope.deleteService = function(serviceName) {
+      if (!serviceName) {
+        return;
+      }
+      safe.deleteService($scope.longName, serviceName, function(err, res) {
+        if (err) {
+          return $rootScope.prompt.show('Delete Service Error', 'Failed to delete service', function() {
+            $state.go('manageService');
+          }, {
+            title: 'Reason',
+            ctx: err.data.description
+          });
+        }
+        $rootScope.prompt.show('Service Deleted', 'Service deleted successfully!', function() {
+          $state.go('manageService', {}, {reload: true});
         });
       });
     };

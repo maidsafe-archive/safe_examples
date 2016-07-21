@@ -8,21 +8,6 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
     $scope.siteDesc = 'This page is created and published on the SAFE Network using the MaidSafe demo app';
     var dirPath = 'views/sample_template';
 
-    var onServiceCreated = function(err) {
-      var goToManageService = function() {
-        $state.go('manageService');
-      };
-      $rootScope.$loader.hide();
-      if (err) {
-        return $rootScope.prompt.show('Publish Service Error', 'Failed to add new service\n', goToManageService, {
-          title: 'Reason',
-          ctx: err.data.description
-        });
-      }
-      var msg = 'Template has been published for the service: ' + $state.params.serviceName;
-      $rootScope.prompt.show('Service Published', msg, goToManageService);
-    };
-
     var onTemplateReady = function(err, tempPath) {
       if (err) {
         console.error(err);
@@ -43,12 +28,18 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         $rootScope.progressBar.update(Math.floor(progressCompletion));
         if (progressCompletion === 100) {
           $rootScope.$loader.show();
-          safe.addService(safe.getUserLongName(), serviceName, false, '/public/' + serviceName, onServiceCreated);
+          $rootScope.prompt.show('Template Created', 'Sample temaplete created successfully!', function() {
+            $state.go('managePublicData', {
+              serviceName: $state.params.serviceName,
+              remap: $state.params.remap
+            });
+          });
         }
       };
       var uploader = new window.uiUtils.Uploader(safe, progressCallback);
       uploader.setOnErrorCallback(function(msg) {
         $rootScope.$loader.hide();
+        $rootScope.progressBar.close();
         $rootScope.prompt.show('Failed to upload Template', msg);
       });
       uploader.upload(tempPath, false, '/public/' + serviceName);
@@ -63,7 +54,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       $scope.progressIndicator = progressScope;
     };
 
-    $scope.publish = function() {
+    $scope.createTeamplate = function() {
       console.log($scope.siteTitle + ' ' + $scope.siteDesc);
       writeFile($scope.siteTitle, $scope.siteDesc, dirPath);
     };

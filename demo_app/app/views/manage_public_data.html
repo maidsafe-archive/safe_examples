@@ -1,0 +1,31 @@
+<div class="ms-frame" ng-controller="NetworkDataCtrl">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="manageService" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Websites</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Choose a folder to map '{{$state.params.serviceName}}' to.</h3>
+    <p class="content-1-p">
+      Here you can map your service '{{$state.params.serviceName}}' to your public folder. To create and manage your files
+      and folders, please use the <a ui-sref="manageNetworkData">Manage Network Data</a> section.
+    </p>
+  </div><!-- /content 1 -->
+  <div>
+    <!-- explorer -->
+    <explorer
+      is-private="false"
+      is-default="false"
+      show-edit-opt="false"
+      starting-path="$state.params.servicePath"
+      on-directory-selected="setTargetFolder(name)"
+      on-progress="onProgress(percentage, isUpload)"/>
+    <!-- explorer -->
+  </div>
+  <div class="container-2 text-center">
+    <button type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder" ng-disabled="!selectedFolder">Use This Folder</button>
+  </div>
+</div>

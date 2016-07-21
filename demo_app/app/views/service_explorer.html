@@ -15,7 +15,11 @@
   </div><!-- /content 1 -->
   <div class="" ng-controller="ServiceCtrl" ng-init="explorerInit()">
     <!-- explorer -->
-    <explorer is-private="false" starting-path="$state.params.serviceName" on-progress="onProgress(percentage, isUpload)"/>
-    <!-- explorer -->    
+    <explorer
+      is-private="false"
+      starting-path="$state.params.servicePath"
+      show-edit-opt="true"
+      on-progress="onProgress(percentage, isUpload)"/>
+    <!-- explorer -->
   </div>
 </div>

@@ -1,8 +1,9 @@
-window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFactory',
-  function($rootScope, $timeout, safeApi) {
+window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 'safeApiFactory',
+  function($rootScope, $state, $timeout, safeApi) {
     var PROGRESS_DELAY = 500;
     var Explorer = function($scope, element, attrs) {
       var rootFolder = '/' + ($scope.isPrivate ? 'private' : 'public') + '/';
+      rootFolder = $scope.isDefault ? '/' : rootFolder;
       var FILE_ICON_CLASSES = {
         GENERIC: 'ms-icn-file-generic',
         IMAGE: 'ms-icn-file-img',
@@ -21,8 +22,14 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
       var releaseSelection = function() {
         $(document).on('mouseup', function(e) {
           var listItems = $('.ms-list-2-i');
-          if (!listItems.is(e.target) && listItems.has(e.target).length === 0) {
-            $scope.listSelected = false;
+          var explorer = $('.ms-explr');
+          if (!listItems.is(e.target) && (listItems.has(e.target).length === 0) && (explorer.has(e.target).length !== 0)) {
+            if ($scope.listSelected) {
+              $scope.onDirectorySelected({
+                name: null
+              });
+              $scope.listSelected = false;
+            }
             listItems.removeClass('active');
           }
         });
@@ -39,6 +46,13 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
           $scope.$applyAsync();
         };
         safeApi.getDir(onResponse, $scope.currentDirectory, false);
+      };
+
+      $scope.createFromTemplate = function() {
+        $state.go('sampleTemplate', {
+          serviceName: $state.params.serviceName,
+          remap: $state.params.remap
+        });
       };
 
       // bytes to size
@@ -218,7 +232,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
         ele.addClass('active');
         $scope.isFileSelected = isFile;
         $scope.selectedPath = name;
-        window.sc = $scope;
         if (isFile || !$scope.onDirectorySelected) {
           return;
         }
@@ -230,11 +243,12 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
       $scope.back = function() {
         var tokens = $scope.currentDirectory.split('/');
         tokens.pop();
-        tokens.pop();
+        var targetFolder = tokens.pop();
         var path = tokens.join('/');
-        if (!path) {
+        if(!path && !$scope.isDefault) {
           return;
         }
+        $scope.isPrivate = (targetFolder.toLowerCase() === 'private');
         $scope.currentDirectory = path + '/';
         $scope.selectedPath = null;
         getDirectory();
@@ -249,6 +263,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$timeout', 'safeApiFa
       restrict: 'E',
       scope: {
         isPrivate: '=',
+        showEditOpt: '=',
+        isDefault: '=',
         startingPath: '=',
         onDirectorySelected: '&',
         onProgress: '&'
