@@ -27,6 +27,7 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
         return $scope.selectedFolder = name;
       }
       $scope.selectedFolder = null;
+      $scope.$applyAsync();
     };
 
     $scope.createFromTemplate = function() {

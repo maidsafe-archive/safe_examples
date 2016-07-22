@@ -25,7 +25,12 @@
     <!-- explorer -->
   </div>
   <div class="container-2 text-center">
-    <button ng-if="!selectedFolder" type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder">Please select a folder</button>
-    <button ng-if="selectedFolder" type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder" ng-disabled="!selectedFolder">Publish</button>
+    <button
+      type="button"
+      class="ms-btn ms-primary-btn"
+      form="useThisFolder"
+      ng-click="mapService()"
+      name="useThisFolder"
+      ng-disabled="!selectedFolder">Publish</button>
   </div>
 </div>

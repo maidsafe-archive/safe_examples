@@ -15,66 +15,51 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
     // get services
     $scope.getServices = function() {
       $rootScope.serviceList = [];
-      safe.getDns(function(err, res) {
-        $rootScope.$loader.hide();
-        if (err) {
-          return console.error(err);
-        }
-        if (res.length === 0) {
-          return console.log('No Public ID registered');
-        }
-        var addServices = function(longName, serviceName, homeDir) {
-          $rootScope.serviceList.push({
-            longName: longName,
-            name: serviceName,
-            homeDir: homeDir
-          });
-        };
+      var addServices = function(longName, serviceName, homeDir) {
+        $rootScope.serviceList.push({
+          longName: longName,
+          name: serviceName,
+          homeDir: homeDir
+        });
+      };
 
-        var getHomeDir = function(longName, serviceList) {
-          $rootScope.$loader.show($msg.MAP_SERVICE_WITH_HOME_DIR);
-          serviceList.forEach(function(service, index) {
-            safe.getHomeDir(longName, service, function(err, homeDir) {
-              if (err) {
-                console.error(err);
-                $rootScope.$loader.hide();
-                return $rootScope.prompt.show('Get Services', 'Failed to map service to \'HOME DIRECTORY\'', function() {}, {
-                  title: 'Reason',
-                  ctx: err.data.description
-                });
-              }
-              addServices(longName, service, homeDir.info.name)
-            });
-          });
-        };
-
-        var getServicesForLongname = function(longName, index) {
-          var getServicesCallback = function(err, services) {
+      var getHomeDir = function(longName, serviceList) {
+        $rootScope.$loader.show($msg.MAP_SERVICE_WITH_HOME_DIR);
+        serviceList.forEach(function(service, index) {
+          safe.getHomeDir(longName, service, function(err, homeDir) {
             if (err) {
               console.error(err);
               $rootScope.$loader.hide();
-              return $rootScope.prompt.show('Get Services', 'Failed to get service list', function() {}, {
+              return $rootScope.prompt.show('Get Services', 'Failed to map service to \'HOME DIRECTORY\'', function() {}, {
                 title: 'Reason',
                 ctx: err.data.description
               });
             }
-            if (services.length === 0) {
-              $rootScope.$loader.hide();
-              return console.log('No service registered for ' + longName);
-            }
-            getHomeDir(longName, services);
-            if (index === (res.length - 1)) {
-              $rootScope.$loader.hide();
-            }
-          };
-          safe.getServices(longName, getServicesCallback);
-        };
-
-        $rootScope.$loader.show($msg.GET_SERVICE_LIST);
-        res.forEach(function(longName, index) {
-          getServicesForLongname(longName, index);
+            addServices(longName, service, homeDir.info.name)
+          });
         });
-      });
+      };
+
+      var getServicesForLongname = function(longName) {
+        var getServicesCallback = function(err, services) {
+          $rootScope.$loader.hide();
+          if (err) {
+            console.error(err);
+            return $rootScope.prompt.show('Get Services', 'Failed to get service list', function() {}, {
+              title: 'Reason',
+              ctx: err.data.description
+            });
+          }
+          if (services.length === 0) {
+            return console.log('No service registered for ' + longName);
+          }
+          getHomeDir(longName, services);
+        };
+        safe.getServices(longName, getServicesCallback);
+      };
+
+      $rootScope.$loader.show($msg.GET_SERVICE_LIST);
+      getServicesForLongname($scope.longName);
     };
 
     // create service
