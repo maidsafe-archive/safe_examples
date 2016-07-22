@@ -51,6 +51,10 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       };
 
       var getDirectory = function() {
+        if ($scope.currentDirectory === '/') {
+          $scope.dir = [];
+          return;
+        }
         $rootScope.$loader.show();
         var onResponse = function(err, dir) {
           $rootScope.$loader.hide();
