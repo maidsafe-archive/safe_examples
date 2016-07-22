@@ -27,22 +27,17 @@
     </div>
   </div>
   <div class="ms-explr-cont">
-    <div class="ms-list-2" ng-switch on="currentDirectory">
-      <div ng-switch-when="/">
-        <div class="ms-list-2-i" style="padding: 20px" ng-repeat="dir in rootDirectories"
+    <div class="ms-list-2 static-dir-holder" ng-switch on="currentDirectory">
+      <div ng-switch-when="/" class="static-dir-holder-b">
+        <div class="ms-list-2-i static-dir-holder-i" ng-repeat="dir in rootDirectories"
           ng-click="select($event, dir.name, false)" ng-dblclick="openDirectory(dir.name)">
-          <div style="static-dir-holder" style="margin-left:10px">
-            <div class="icn" ng-class="{'ms-icn-public-folder': dir.name === 'public', 'ms-icn-private-folder': dir.name !== 'public'}">
-              &nbsp;
-            </div>
-            <div style="float:left;margin:8px 15px;width:80%">
-              <div>
-                <h3>{{ dir.displayName }}</h3>
-              </div>
-              <div class="description" style="margin-top: 5px">
-                {{ dir.description }}
-              </div>
-            </div>
+          <div class="static-dir-holder-icn" ng-class="{'ms-icn-public-folder': dir.name === 'public', 'ms-icn-private-folder': dir.name !== 'public'}">
+          </div>
+          <div class="static-dir-holder-desc">
+            <h3 class="head">{{ dir.displayName }}</h3>
+            <p class="ctx">
+              {{ dir.description }}
+            </p>
           </div>
         </div>
       </div>

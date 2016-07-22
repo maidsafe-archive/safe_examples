@@ -1,8 +1,8 @@
 /**
  * Sample site controller
  */
-window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$state', '$rootScope', 'safeApiFactory',
-  function($scope, $http, $state, $rootScope, safe) {
+window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$state', '$rootScope', 'MESSAGES', 'safeApiFactory',
+  function($scope, $http, $state, $rootScope, $msg, safe) {
     'use strict';
     $scope.siteTitle = 'My Page';
     $scope.siteDesc = 'This page is created and published on the SAFE Network using the MaidSafe demo app';
@@ -27,11 +27,11 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         }
         $rootScope.progressBar.update(Math.floor(progressCompletion));
         if (progressCompletion === 100) {
-          $rootScope.$loader.show();
           $rootScope.prompt.show('Template Created', 'Sample temaplete created successfully!', function() {
             $state.go('managePublicData', {
               serviceName: $state.params.serviceName,
-              remap: $state.params.remap
+              remap: $state.params.remap,
+              folderPath: 'public'
             });
           });
         }
@@ -46,7 +46,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
     };
 
     var writeFile = function(title, content, dirPath) {
-      $rootScope.$loader.show();
+      $rootScope.$loader.show($msg.PREPARING_TEMPLATE);
       window.uiUtils.createTemplateFile(title, content, dirPath, onTemplateReady);
     };
 

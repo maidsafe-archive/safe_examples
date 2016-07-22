@@ -1,8 +1,8 @@
 /**
  * Service controller
  */
-window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'safeApiFactory',
-  function($scope, $state, $rootScope, $timeout, safe) {
+window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'MESSAGES', 'safeApiFactory',
+  function($scope, $state, $rootScope, $timeout, $msg, safe) {
     'use strict';
     $scope.serviceName = '';
     // $scope.serviceList = [];
@@ -14,7 +14,6 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
 
     // get services
     $scope.getServices = function() {
-      $rootScope.$loader.show();
       $rootScope.serviceList = [];
       safe.getDns(function(err, res) {
         $rootScope.$loader.hide();
@@ -33,13 +32,13 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         };
 
         var getHomeDir = function(longName, serviceList) {
-          $rootScope.$loader.show();
+          $rootScope.$loader.show($msg.MAP_SERVICE_WITH_HOME_DIR);
           serviceList.forEach(function(service, index) {
             safe.getHomeDir(longName, service, function(err, homeDir) {
               if (err) {
                 console.error(err);
                 $rootScope.$loader.hide();
-                return $rootScope.prompt.show('Get Services', 'Failed to get service list', function() {}, {
+                return $rootScope.prompt.show('Get Services', 'Failed to map service to \'HOME DIRECTORY\'', function() {}, {
                   title: 'Reason',
                   ctx: err.data.description
                 });
@@ -71,7 +70,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
           safe.getServices(longName, getServicesCallback);
         };
 
-        $rootScope.$loader.show();
+        $rootScope.$loader.show($msg.GET_SERVICE_LIST);
         res.forEach(function(longName, index) {
           getServicesForLongname(longName, index);
         });
@@ -95,7 +94,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             $scope.serviceName = '';
             $scope.$applyAsync();
           });
-      }      
+      }
       $state.go('managePublicData', {
         'serviceName': $scope.serviceName.toLowerCase(),
         'folderPath': 'public'
@@ -145,65 +144,65 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       });
     };
 
-    var registerService = function() {
-      $rootScope.$loader.show();
-      var serviceName = $state.params.serviceName;
-      var onResponse = function(err) {
-        $rootScope.$loader.hide();
-        var msg = null;
-        if (err) {
-          console.error(err);
-          msg = 'Service could not be created';
-          return $rootScope.prompt.show('Publish Service Error', msg, function() {
-            return $state.go('manageService');
-          });
-        }
-        msg = serviceName + ' service has been published successfully';
-        $rootScope.prompt.show('Service Published', msg, function() {
-          $state.go('manageService');
-        });
-      };
-      safe.addService($scope.longName, serviceName, false, '/public/' + serviceName, onResponse);
-    };
-
-    $scope.uploadDirectoryForService = function() {
-      var dialog = require('remote').dialog;
-      dialog.showOpenDialog({
-        title: 'Select Directory for upload',
-        properties: [ 'openDirectory' ]
-      }, function(folders) {
-        if (folders.length === 0) {
-          return;
-        }
-        $rootScope.$loader.show();
-        var serviceName = $state.params.serviceName;
-        try {
-          var progressCallback = function(completed, total, filePath) {
-            if ($rootScope.$loader.isLoading) {
-              $rootScope.$loader.hide();
-            }
-            var progressCompletion = 100;
-            if (!(total === 0 && completed === 0)) {
-              progressCompletion = ((completed / total) * 100);
-            }
-            $scope.onProgress(progressCompletion, true);
-            if (progressCompletion >= 100) {
-              registerService();
-            }
-          };
-          var uploader = new window.uiUtils.Uploader(safe, progressCallback);
-          uploader.setOnErrorCallback(function(msg) {
-              $scope.onProgress(100, false);
-              $rootScope.prompt.show('Upload failed', msg);
-            });
-          uploader.upload(folders[0], false, '/public/' + serviceName);
-        } catch (e) {
-          console.error(e);
-          $rootScope.$loader.hide();
-          $rootScope.prompt.show('File Size Restriction', e.message);
-        }
-      });
-    };
+    // var registerService = function() {
+    //   $rootScope.$loader.show();
+    //   var serviceName = $state.params.serviceName;
+    //   var onResponse = function(err) {
+    //     $rootScope.$loader.hide();
+    //     var msg = null;
+    //     if (err) {
+    //       console.error(err);
+    //       msg = 'Service could not be created';
+    //       return $rootScope.prompt.show('Publish Service Error', msg, function() {
+    //         return $state.go('manageService');
+    //       });
+    //     }
+    //     msg = serviceName + ' service has been published successfully';
+    //     $rootScope.prompt.show('Service Published', msg, function() {
+    //       $state.go('manageService');
+    //     });
+    //   };
+    //   safe.addService($scope.longName, serviceName, false, '/public/' + serviceName, onResponse);
+    // };
+    //
+    // $scope.uploadDirectoryForService = function() {
+    //   var dialog = require('remote').dialog;
+    //   dialog.showOpenDialog({
+    //     title: 'Select Directory for upload',
+    //     properties: [ 'openDirectory' ]
+    //   }, function(folders) {
+    //     if (folders.length === 0) {
+    //       return;
+    //     }
+    //     $rootScope.$loader.show();
+    //     var serviceName = $state.params.serviceName;
+    //     try {
+    //       var progressCallback = function(completed, total, filePath) {
+    //         if ($rootScope.$loader.isLoading) {
+    //           $rootScope.$loader.hide();
+    //         }
+    //         var progressCompletion = 100;
+    //         if (!(total === 0 && completed === 0)) {
+    //           progressCompletion = ((completed / total) * 100);
+    //         }
+    //         $scope.onProgress(progressCompletion, true);
+    //         if (progressCompletion >= 100) {
+    //           registerService();
+    //         }
+    //       };
+    //       var uploader = new window.uiUtils.Uploader(safe, progressCallback);
+    //       uploader.setOnErrorCallback(function(msg) {
+    //           $scope.onProgress(100, false);
+    //           $rootScope.prompt.show('Upload failed', msg);
+    //         });
+    //       uploader.upload(folders[0], false, '/public/' + serviceName);
+    //     } catch (e) {
+    //       console.error(e);
+    //       $rootScope.$loader.hide();
+    //       $rootScope.prompt.show('File Size Restriction', e.message);
+    //     }
+    //   });
+    // };
 
     $scope.openLink = function(serviceName, publicName) {
       var shell = require('remote').shell;

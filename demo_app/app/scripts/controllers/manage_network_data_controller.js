@@ -1,8 +1,8 @@
 /**
  * Manage network data controller
  */
-window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$state', 'safeApiFactory',
-  function($rootScope, $scope, $state, safe) {
+window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$state', 'MESSAGES', 'safeApiFactory',
+  function($rootScope, $scope, $state, $msg, safe) {
     'use strict';
     $scope.selectedFolder = null;
     $scope.explorerRootPath = $state.params.folderPath || '';
@@ -56,12 +56,12 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
         return;
       }
       var addService = function() {
-        $rootScope.$loader.show();
+        $rootScope.$loader.show($msg.REMAP_SERVICE);
         safe.addService(safe.getUserLongName(), serviceName, false, $scope.selectedFolder, onServiceCreated);
       };
 
       if ($state.params.remap) {
-        $rootScope.$loader.show();
+        $rootScope.$loader.show($msg.REMAP_SERVICE);
         return safe.deleteService(safe.getUserLongName(), serviceName, function(err, res) {
           $rootScope.$loader.hide();
           if (err) {

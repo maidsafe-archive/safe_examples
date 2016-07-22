@@ -17,12 +17,15 @@ window.maidsafeDemo = angular
   $rootScope.$stateParams = $stateParams;
   $rootScope.$loader = {
     isLoading: false,
-    show: function() {
+    description: null,
+    show: function(description) {
       this.isLoading = true;
+      this.description = description || '';
       $rootScope.$applyAsync();
     },
     hide: function() {
       this.isLoading = false;
+      this.description = null;
       $rootScope.$applyAsync();
     }
   };

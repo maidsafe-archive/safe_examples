@@ -11,7 +11,7 @@
   <!-- root node -->
   <div class="ms-root" ui-view="">
   </div>
-  <ms-loader ng-show="$loader.isLoading"></ms-loader>
+  <ms-loader ng-show="$loader.isLoading" description="{{$loader.description}}"></ms-loader>
   <prompt></prompt>
   <progress-indicator></progress-indicator>
   <!-- /root node -->
@@ -25,10 +25,12 @@
   <script src="./app.js"></script>
   <script src="./scripts/main.js"></script>
   <script src="./scripts/router.js"></script>
+  <script src="./scripts/constants.js"></script>
 
   <!-- directives -->
 
   <!-- factories -->
+  <script src="scripts//safe_api_factory.js" charset="utf-8"></script>
   <script src="scripts/factories/safe_api_factory.js" charset="utf-8"></script>
   <script src="scripts/factories/nfs_factory.js" charset="utf-8"></script>
   <script src="scripts/factories/dns_factory.js" charset="utf-8"></script>

@@ -1,7 +1,10 @@
 .ms-list-1 {
   width: 80%;
+  height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin: 0 auto;
-  padding-top: 40px;
+  // padding-top: 40px;
   .ms-list-1-i {
     padding: 5.5px 16px;
     margin-bottom: 16px;
@@ -11,6 +14,14 @@
       font-size: 16px;
       line-height: 36px;
       border-bottom: 2px solid @gray-400;
+      .url {
+        float: left;
+      }
+      .path {
+        float: right;
+        font-size: 14px;
+      }
+      .clearfix();
     }
     .ms-list-1-i-act-lt {
       display: inline-block;
