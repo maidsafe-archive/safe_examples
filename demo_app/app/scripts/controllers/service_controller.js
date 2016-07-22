@@ -35,6 +35,9 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
                 ctx: err.data.description
               });
             }
+            if (index === (serviceList.length - 1)) {
+              $rootScope.$loader.hide();
+            }
             addServices(longName, service, homeDir.info.name)
           });
         });
@@ -114,7 +117,9 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       if (!serviceName) {
         return;
       }
+      $rootScope.$loader.show($msg.DELETING_SERVICE);
       safe.deleteService($scope.longName, serviceName, function(err, res) {
+        $rootScope.$loader.hide();
         if (err) {
           return $rootScope.prompt.show('Delete Service Error', 'Failed to delete service', function() {
             $state.go('manageService');

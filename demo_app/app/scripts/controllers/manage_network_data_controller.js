@@ -13,12 +13,13 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
       };
       $rootScope.$loader.hide();
       if (err) {
-        return $rootScope.prompt.show('Publish Service Error', 'Failed to add new service\n', function() {}, {
-          title: 'Reason',
-          ctx: err.data.description
-        });
+        return $rootScope.prompt.show('Publish Service Failed',
+          'Failed to add \'' + $state.params.serviceName + '\' service\n', function() {}, {
+            title: 'Reason',
+            ctx: err.data.description
+          });
       }
-      var msg = 'Service ' + $state.params.serviceName + ' published';
+      var msg = '\'' + $state.params.serviceName + '\' service has been published successfully.';
       $rootScope.prompt.show('Service Published', msg, goToManageService);
     };
 
@@ -56,8 +57,8 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
       if (!serviceName) {
         return;
       }
-      var addService = function() {
-        $rootScope.$loader.show($msg.REMAP_SERVICE);
+      var addService = function(isExisting) {
+        $rootScope.$loader.show(isExisting ? $msg.REMAP_SERVICE : $msg.CREATE_SERVICE);
         safe.addService(safe.getUserLongName(), serviceName, false, $scope.selectedFolder, onServiceCreated);
       };
 
@@ -71,10 +72,10 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
               ctx: err.data.description
             });
           }
-          addService();
+          addService(true);
         });
       }
-      addService();
+      addService(false);
     };
   }
 ]);

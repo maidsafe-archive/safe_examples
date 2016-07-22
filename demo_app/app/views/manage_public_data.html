@@ -10,8 +10,8 @@
   <div class="content-1">
     <h3 class="content-1-h">Select the content folder for '{{$state.params.serviceName}}' service.</h3>
     <p class="content-1-p">
-      Here you can select an existing public folder from the list below. You can create a new public folder
-      from a <a href="" ng-click="createFromTemplate()">Template</a> or upload an existing content folder from the
+      Here you can select an existing public folder from the list below. You can also create a new public folder
+      from a <a href="" ng-click="createFromTemplate()">Template</a> or upload an existing folder from the
       <a href="" ng-click="goToPublicFolder()">Manage Network Data</a> section.
     </p>
   </div><!-- /content 1 -->
@@ -21,6 +21,7 @@
       list-mode="true"
       starting-path="explorerRootPath"
       on-directory-selected="setTargetFolder(name)"
+      select-target="{{$state.params.servicePath}}"
       on-progress="onProgress(percentage, isUpload)"/>
     <!-- explorer -->
   </div>
@@ -31,6 +32,6 @@
       form="useThisFolder"
       ng-click="mapService()"
       name="useThisFolder"
-      ng-disabled="!selectedFolder">Publish</button>
+      ng-disabled="!selectedFolder">Publish Website</button>
   </div>
 </div>

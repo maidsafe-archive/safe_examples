@@ -8,20 +8,24 @@ export let computeDirectorySize = function(localPath) {
   let size = 0;
   let stat;
   let tempPath;
-  let contents = fs.readdirSync(localPath);
-  for (var i in contents) {
-    tempPath = localPath + '/' + contents[i];
-    stat = fs.statSync(tempPath);
-    if (stat.isDirectory()) {
-      size += computeDirectorySize(tempPath);
-    } else {
-      if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
-        throw new Error('File more than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
+  try {
+    let contents = fs.readdirSync(localPath);
+    for (var i in contents) {
+      tempPath = localPath + '/' + contents[i];
+      stat = fs.statSync(tempPath);
+      if (stat.isDirectory()) {
+        size += computeDirectorySize(tempPath);
+      } else {
+        if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
+          throw new Error('File more than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
+        }
+        size += stat.size;
       }
-      size += stat.size;
     }
+    return size;
+  } catch (e) {
+    throw new Error(e.message);
   }
-  return size;
 };
 
 class TaskQueue {
@@ -84,7 +88,7 @@ export class DirectoryHelper {
     this.localPath = localPath;
     this.networkParentDirPath = networkParentDirPath;
     this.onError = function(err) {
-      self.uploader.onError('Failed to create directory ' + networkParentDirPath + '\n' + err.data.description);
+      self.uploader.onError(networkParentDirPath + '\n' + err.data.description);
     };
     this.taskQueue = new TaskQueue(this.onError);
   }

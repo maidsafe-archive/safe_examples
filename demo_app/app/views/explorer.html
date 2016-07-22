@@ -49,7 +49,7 @@
           <div class="ms-list-2-i-ctx size" ng-if="!listMode">Size</div>
           <div class="ms-list-2-i-ctx date">Date</div>
         </div>
-        <div class="ms-list-2-i" ng-repeat="dir in dir.subDirectories" ng-click="select($event, dir.name, false)" ng-dblclick="openDirectory(dir.name)">
+        <div class="ms-list-2-i" ng-repeat="dir in dir.subDirectories | orderBy: 'name'" ng-click="select($event, dir.name, false)" ng-dblclick="openDirectory(dir.name)">
           <div class="ms-list-2-i-ctx icn ms-icn-folder">&nbsp;</div>
           <div class="ms-list-2-i-ctx name">{{ dir.name }}</div>
           <div class="ms-list-2-i-ctx type" ng-if="!listMode">&nbsp;</div>

@@ -1,5 +1,5 @@
-window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 'safeApiFactory',
-  function($rootScope, $state, $timeout, safeApi) {
+window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', '$filter', 'safeApiFactory',
+  function($rootScope, $state, $timeout, $filter, safeApi) {
     var PROGRESS_DELAY = 500;
     var Explorer = function($scope, element, attrs) {
       var FILE_ICON_CLASSES = {
@@ -14,16 +14,15 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         {
           displayName: 'Public folder',
           name: 'public',
-          description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\
-            Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque \
-            penatibus et magnis dis parturient montes, ssss'
+          description: 'Public data is content that you wish to share with other \
+          users, such as websites. Public data is not encrypted and therefore not \
+          suitable for information which you wish to remain private.'
         },
         {
           displayName: 'Private folder',
           name: 'private',
-          description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\
-            Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque \
-            penatibus et magnis dis parturient montes, ssss'
+          description: 'Private data is always encrypted and only accessible \
+          to you, it is therefore well suited for data which you wish to remain confidential.'
         },
       ];
 
@@ -63,6 +62,22 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           }
           $scope.dir = dir;
           $scope.$applyAsync();
+          if ($scope.listMode && attrs.selectTarget) {
+            $timeout(function() {
+              var dirNameList = $scope.dir.subDirectories.map(function(d) {
+                return d.name;
+              });
+              dirNameList.sort(function(a, b) {
+                return (a.toLowerCase() < b.toLowerCase()) ? -1 : 1;
+              });
+              var targetFolder = element.find('.ms-list-2 .ms-list-2-i')[dirNameList.indexOf(attrs.selectTarget) + 1];
+              if (targetFolder) {
+                var targetFolderEle = angular.element(targetFolder);
+                targetFolderEle.click();
+                element.find('.ms-explr-cont').scrollTop(targetFolderEle.position().top);
+              }
+            }, 200);
+          }
         };
         safeApi.getDir(onResponse, $scope.currentDirectory, false);
       };
@@ -156,7 +171,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           } catch (err) {
             console.error(err);
             $rootScope.$loader.hide();
-            $rootScope.prompt.show('File Size Restriction', err.message);
+            $rootScope.prompt.show('Upload failed', err.message);
           }
         });
       };

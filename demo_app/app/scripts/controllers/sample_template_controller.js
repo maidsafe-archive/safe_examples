@@ -6,9 +6,12 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
     'use strict';
     $scope.siteTitle = 'My Page';
     $scope.siteDesc = 'This page is created and published on the SAFE Network using the MaidSafe demo app';
+    $scope.longName = safe.getUserLongName();
+    $scope.targetFolderName = $state.params.serviceName + '-service';
     var dirPath = 'views/sample_template';
 
     var onTemplateReady = function(err, tempPath) {
+      $rootScope.$loader.hide();
       if (err) {
         console.error(err);
         return $rootScope.prompt.show('Upload Template', err);
@@ -27,12 +30,11 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         }
         $rootScope.progressBar.update(Math.floor(progressCompletion));
         if (progressCompletion === 100) {
-          $rootScope.prompt.show('Template Created', 'Sample temaplete created successfully!', function() {
-            $state.go('managePublicData', {
-              serviceName: $state.params.serviceName,
-              remap: $state.params.remap,
-              folderPath: 'public'
-            });
+          return $state.go('managePublicData', {
+            serviceName: $state.params.serviceName,
+            remap: $state.params.remap,
+            folderPath: 'public',
+            servicePath: $scope.targetFolderName
           });
         }
       };
@@ -40,9 +42,12 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       uploader.setOnErrorCallback(function(msg) {
         $rootScope.$loader.hide();
         $rootScope.progressBar.close();
-        $rootScope.prompt.show('Failed to upload Template', msg);
+        $rootScope.prompt.show('Failed to Create Folder', msg);
       });
-      uploader.upload(tempPath, false, '/public/' + serviceName);
+      if (!$scope.targetFolderName) {
+        return $rootScope.prompt.show('Failed to Create Folder ', 'Folder name cannot be empty.', function() {});
+      }
+      uploader.upload(tempPath, false, '/public/' + $scope.targetFolderName);
     };
 
     var writeFile = function(title, content, dirPath) {
