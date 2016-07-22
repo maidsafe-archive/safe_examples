@@ -24,6 +24,24 @@
         demo app with everything it needs to give you a small taste of things to come.
       </p>
     </div><!-- /content 1 -->
+    <div class="ms-auth-init-list">
+      <ul>
+        <li ng-class="{success: (authorisationTasks.appSetupStatus.checkingPublicName === authorisationTasks.state.SUCCESS),
+        error: (authorisationTasks.appSetupStatus.checkingPublicName === authorisationTasks.state.FAILURE),
+        'in-progress': (authorisationTasks.appSetupStatus.checkingPublicName === authorisationTasks.state.IN_PROGRESS)}">Get public name</li>
+        <li ng-class="{success: (authorisationTasks.appSetupStatus.checkingDirectories === authorisationTasks.state.SUCCESS),
+        error: (authorisationTasks.appSetupStatus.checkingDirectories === authorisationTasks.state.FAILURE),
+        'in-progress': (authorisationTasks.appSetupStatus.checkingDirectories === authorisationTasks.state.IN_PROGRESS)}">Get directory</li>
+        <li ng-class="{success: (authorisationTasks.appSetupStatus.creatingPublicDirectory === authorisationTasks.state.SUCCESS),
+        error: (authorisationTasks.appSetupStatus.creatingPublicDirectory === authorisationTasks.state.FAILURE),
+        'in-progress': (authorisationTasks.appSetupStatus.creatingPublicDirectory === authorisationTasks.state.IN_PROGRESS),
+        disabled: !authorisationTasks.appSetupStatus.creatingPublicDirectory}">Create public folder</li>
+        <li ng-class="{success: (authorisationTasks.appSetupStatus.creatingPrivateDirectory === authorisationTasks.state.SUCCESS),
+        error: (authorisationTasks.appSetupStatus.creatingPrivateDirectory === authorisationTasks.state.FAILURE),
+        'in-progress': (authorisationTasks.appSetupStatus.creatingPrivateDirectory === authorisationTasks.state.IN_PROGRESS),
+        disabled: !authorisationTasks.appSetupStatus.creatingPrivateDirectory}">Create private folder</li>
+      </ul>
+    </div>
     <div class="ms-authLoading">
       <div class="ms-authLoading-desc">{{ authorisationTasks.messages.INITIALISING }}</div>
       <span class="ms-authLoading-i"></span>

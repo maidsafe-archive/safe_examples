@@ -1,3 +1,44 @@
+.ms-auth-init-list {
+  width: 200px;
+  margin: 40px auto 0;
+  ul {
+    margin: 0;
+    padding: 0;
+    li {
+      font-size: 14px;
+      line-height: 20px;
+      padding-left: 25px;
+      margin-bottom: 8px;
+      color: @gray-800;
+      position: relative;
+      list-style: none;
+      &:before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 15px;
+      }
+      &.success:before {
+        background-image: url(../images/success.svg);
+      }
+      &.in-progress:before {
+        background-image: url(../images/in_progress.svg);
+      }
+      &.error:before {
+        background-image: url(../images/cross.svg);
+      }
+      &.disabled:before {
+        background-image: url(../images/disabled.svg);
+      }
+    }
+  }
+}
 .ms-list-1 {
   width: 80%;
   height: 360px;

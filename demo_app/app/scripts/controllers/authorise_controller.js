@@ -89,6 +89,7 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$stat
       if (res.length !== 0) {
         safe.setUserLongName(res[0]);
       }
+      safe.getDir(getDirCb, '/');
     };
 
     var authoriseCb = function(err, res) {
@@ -99,7 +100,6 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$stat
       $scope.authorisationTasks.currentState = $scope.authorisationTasks.state.INITIALISING;
       console.log('Application authorised');
       safe.getDns(getDnsCb);
-      safe.getDir(getDirCb, '/');
     };
 
     $scope.authorisationTasks.currentState = $scope.authorisationTasks.state.AUTHORISING;
