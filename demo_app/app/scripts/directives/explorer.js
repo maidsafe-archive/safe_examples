@@ -10,6 +10,23 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         VIDEO: 'ms-icn-file-video'
       };
 
+      $scope.rootDirectories = [
+        {
+          displayName: 'Public folder',
+          name: 'public',
+          description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\
+            Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque \
+            penatibus et magnis dis parturient montes, ssss'
+        },
+        {
+          displayName: 'Private folder',
+          name: 'private',
+          description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\
+            Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque \
+            penatibus et magnis dis parturient montes, ssss'
+        },
+      ];
+
       $scope.currentDirectory = '/' + ($scope.startingPath ? ($scope.startingPath + '/') : '');
       $scope.mime = require('mime');
       $scope.selectedPath = null;

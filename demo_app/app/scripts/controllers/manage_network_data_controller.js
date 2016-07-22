@@ -4,8 +4,8 @@
 window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$state', 'safeApiFactory',
   function($rootScope, $scope, $state, safe) {
     'use strict';
-    $scope.selectedFolder = null;    
-    $scope.explorerRootPath = $state.params.folderPath || 'public';
+    $scope.selectedFolder = null;
+    $scope.explorerRootPath = $state.params.folderPath || '';
 
     var onServiceCreated = function(err) {
       var goToManageService = function() {
@@ -37,8 +37,9 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
     };
 
     $scope.goToPublicFolder = function() {
+      debugger;
       $state.go('manageNetworkData', {
-        folderPath: '/public'
+        folderPath: 'public'
       });
     };
 

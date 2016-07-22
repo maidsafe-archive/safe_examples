@@ -95,9 +95,10 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             $scope.serviceName = '';
             $scope.$applyAsync();
           });
-      }
+      }      
       $state.go('managePublicData', {
-        'serviceName': $scope.serviceName.toLowerCase()
+        'serviceName': $scope.serviceName.toLowerCase(),
+        'folderPath': 'public'
       });
       $scope.serviceName = '';
     };

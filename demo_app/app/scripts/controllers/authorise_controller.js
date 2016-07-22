@@ -21,8 +21,8 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$stat
   $scope.authorisationTasks.appSetupStatus = {
     checkingPublicName: $scope.authorisationTasks.state.IN_PROGRESS,
     checkingDirectories: $scope.authorisationTasks.state.IN_PROGRESS,
-    creatingPublicDirectory: $scope.authorisationTasks.state.IN_PROGRESS,
-    creatingPrivateDirectory: $scope.authorisationTasks.state.IN_PROGRESS
+    creatingPublicDirectory: null,
+    creatingPrivateDirectory: null
   };
 
   // initialization
@@ -52,6 +52,7 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$stat
         });
       }
       $scope.authorisationTasks.appSetupStatus.creatingPublicDirectory = $scope.authorisationTasks.state.SUCCESS;
+      safe.createDir('/private', true, '', false, createPvtDirCb);
     };
 
     var getDirCb = function(err, res) {
@@ -66,8 +67,9 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$stat
       }
       $scope.authorisationTasks.appSetupStatus.checkingDirectories = $scope.authorisationTasks.state.SUCCESS;
       if (res.subDirectories.length === 0) {
+        $scope.authorisationTasks.appSetupStatus.creatingPrivateDirectory = $scope.authorisationTasks.state.IN_PROGRESS;
+        $scope.authorisationTasks.appSetupStatus.creatingPublicDirectory = $scope.authorisationTasks.state.IN_PROGRESS;
         safe.createDir('/public', false, '', false, createPubDirCb);
-        safe.createDir('/private', true, '', false, createPvtDirCb);
       } else {
         $state.go('home');
       }

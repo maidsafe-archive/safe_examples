@@ -11,7 +11,7 @@
     <h3 class="content-1-h">Select the content folder for '{{$state.params.serviceName}}' service.</h3>
     <p class="content-1-p">
       Here you can select an existing public folder from the list below. You can create a new public folder
-      from a <a href="" ng-click="createFromTemplate()">Template</a> or upload an existing content folder to your public NFS folder from the
+      from a <a href="" ng-click="createFromTemplate()">Template</a> or upload an existing content folder from the
       <a href="" ng-click="goToPublicFolder()">Manage Network Data</a> section.
     </p>
   </div><!-- /content 1 -->
@@ -26,6 +26,6 @@
   </div>
   <div class="container-2 text-center">
     <button ng-if="!selectedFolder" type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder">Please select a folder</button>
-    <button ng-if="selectedFolder" type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder" ng-disabled="!selectedFolder">Use This Folder</button>
+    <button ng-if="selectedFolder" type="button" class="ms-btn ms-primary-btn" form="useThisFolder" ng-click="mapService()" name="useThisFolder" ng-disabled="!selectedFolder">Publish</button>
   </div>
 </div>

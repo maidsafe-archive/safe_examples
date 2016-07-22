@@ -13,11 +13,11 @@ window.maidsafeDemo.config(function($stateProvider, $urlRouterProvider) {
       templateUrl: 'views/home.html'
     })
   .state('manageNetworkData', {
-      url: '/manage_network_data',
+      url: '/manage_network_data?:folderPath',
       templateUrl: 'views/manage_network_data.html'
     })
   .state('managePublicData', {
-      url: '/manage_public_data?:serviceName&:servicePath?&:remap?',
+      url: '/manage_public_data?:serviceName&:servicePath?&:remap?&:folderPath',
       templateUrl: 'views/manage_public_data.html'
     })
   .state('publicID', {
