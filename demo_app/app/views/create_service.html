@@ -10,15 +10,15 @@
   <div class="content-1">
     <h3 class="content-1-h">Create a Service</h3>
     <p class="content-1-p">
-      Here you can create a service to be used with public id. This service name along with your public ID will form the
-       URL used to view your site in the browser e.g. blog.maidsafe.safenet
+      The service name along with your public ID will form the URL used to view
+      your site in a browser. <br> e.g. blog.maidsafe.safenet
     </p>
   </div><!-- /content 1 -->
   <!-- create service form -->
   <div class="ms-form">
     <form id="create_service" name="create_service" ng-submit="createService()" ng-init="$state.params.serviceName ? serviceName = $state.params.serviceName : ''">
       <div class="form-grp lgt">
-        <input type="text" name="service" required="required" placeholder="Your service" ng-model="serviceName">
+        <input type="text" name="service" required="required" placeholder="Service Name" ng-model="serviceName" autofocus>
       </div>
     </form>
   </div><!-- create public ID form -->
@@ -29,7 +29,7 @@
     </p>
   </div><!-- /content 1 -->
   <div class="service-preview">
-    <span class="service-preview-ctx">http://{{ (serviceName ? serviceName : '&lt;your service&gt;') + '.' + longName + '.safenet' }}</span>
+    <span class="service-preview-ctx">http://{{ (serviceName ? serviceName : '&lt;service name&gt;') + '.' + longName + '.safenet' }}</span>
   </div>
   <div class="container-2 text-center">
     <button type="submit" class="ms-btn ms-primary-btn" form="create_service" name="submitService">Next</button>

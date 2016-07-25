@@ -1,7 +1,52 @@
+.ms-auth-init-list {
+  display: inline-block;
+  margin: 40px auto 0;
+  text-align: left;
+  ul {
+    margin: 0;
+    padding: 0;
+    li {
+      font-size: 14px;
+      line-height: 20px;
+      padding-left: 8px;
+      margin-bottom: 8px;
+      color: @gray-800;
+      position: relative;
+      list-style: none;
+      &:before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: -22px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 15px;
+      }
+      &.success:before {
+        background-image: url(../images/success.svg);
+      }
+      &.in-progress:before {
+        background-image: url(../images/in_progress.svg);
+      }
+      &.error:before {
+        background-image: url(../images/cross.svg);
+      }
+      &.disabled {
+        display: none;
+      }
+    }
+  }
+}
 .ms-list-1 {
   width: 80%;
+  height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin: 0 auto;
-  padding-top: 40px;
+  // padding-top: 40px;
   .ms-list-1-i {
     padding: 5.5px 16px;
     margin-bottom: 16px;
@@ -11,8 +56,37 @@
       font-size: 16px;
       line-height: 36px;
       border-bottom: 2px solid @gray-400;
+      .url {
+        float: left;
+      }
+      .path {
+        float: right;
+        font-size: 14px;
+      }
+      .clearfix();
+    }
+    .ms-list-1-i-act-lt {
+      display: inline-block;
+      float: left;
+      text-align: left;
+      a {
+        height: 36px;
+        display: inline-block;
+        padding-left: 8px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 36px;
+        text-transform: uppercase;
+        color: @blue-400;
+        &.danger {
+          color: @red-100;
+        }
+      }
     }
     .ms-list-1-i-act {
+      display: inline-block;
+      float: right;
       text-align: right;
       a {
         height: 36px;
@@ -26,6 +100,7 @@
         color: @blue-400;
       }
     }
+    .clearfix();
   }
 }
 

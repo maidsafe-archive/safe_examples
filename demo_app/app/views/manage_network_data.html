@@ -1,0 +1,21 @@
+<div class="ms-frame">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="home" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Network Data</h3>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Time to add some files!</h3>
+    <p class="content-1-p">
+      Here you can create and manage files for your public and private data.
+    </p>
+  </div><!-- /content 1 -->
+  <div class="" ng-controller="NetworkDataCtrl">
+    <!-- explorer -->
+    <explorer list-mode="false" starting-path="explorerRootPath" on-directory-selected="setTargetFolder(name)" on-progress="onProgress(percentage, isUpload)"/>
+    <!-- explorer -->
+  </div>
+</div>
