@@ -29,8 +29,8 @@
   <div class="ms-explr-cont">
     <div class="ms-list-2 static-dir-holder" ng-switch on="currentDirectory">
       <div ng-switch-when="/" class="static-dir-holder-b">
-        <div class="ms-list-2-i static-dir-holder-i" ng-repeat="dir in rootDirectories"
-          ng-click="select($event, dir.name, false)" ng-dblclick="openDirectory(dir.name)">
+        <div class="ms-list-2-i static-dir-holder-i" ng-repeat="dir in rootDirectories | orderBy: 'name'"
+          ng-click="select($event, dir.name, false);openDirectory(dir.name)">
           <div class="static-dir-holder-icn" ng-class="{'ms-icn-public-folder': dir.name === 'public', 'ms-icn-private-folder': dir.name !== 'public'}">
           </div>
           <div class="static-dir-holder-desc">
@@ -56,7 +56,7 @@
           <div class="ms-list-2-i-ctx size" ng-if="!listMode">&nbsp;</div>
           <div class="ms-list-2-i-ctx date">{{ dir.createdOn | date : 'dd-MM-yy HH:mm' }}</div>
         </div>
-        <div class="ms-list-2-i" ng-repeat='file in dir.files' ng-click="select($event, file.name, true)" ng-dblclick="download(file.name, file.size)">
+        <div ng-if="!listMode" class="ms-list-2-i" ng-repeat='file in dir.files' ng-click="select($event, file.name, true)" ng-dblclick="download(file.name, file.size)">
           <div class="ms-list-2-i-ctx icn" ng-class="getFileIconClass(file.name)">&nbsp;</div>
           <div class="ms-list-2-i-ctx name" ng-show="{{ !rename }}">{{ file.name }}</div>
           <!-- <div class="ms-list-2-i-ctx name" ng-show="{{ selectedPath === file.name && rename }}">

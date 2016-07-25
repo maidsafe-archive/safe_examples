@@ -163,7 +163,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
                 percentage: 100,
                 isUpload: true
               });
-              $rootScope.prompt.show('Upload failed', msg.split('\n')[0], function() {
+              $rootScope.prompt.show('Failed to create file', msg.split('\n')[0], function() {
                 getDirectory();
               }, { title: 'Reason', ctx: msg.split('\n')[1] });
             });
@@ -171,7 +171,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           } catch (err) {
             console.error(err);
             $rootScope.$loader.hide();
-            $rootScope.prompt.show('Upload failed', err.message);
+            $rootScope.prompt.show('Failed to create file', err.message);
           }
         });
       };
@@ -197,7 +197,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         $scope.selectedPath = fileName;
         $rootScope.$loader.show();
         var downloader = new window.uiUtils.Downloader(safeApi,
-          $scope.currentDirectory + $scope.selectedPath, size, false);
+          $scope.currentDirectory + $scope.selectedPath, size, false, $rootScope.tempDirPath);
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
             console.log(err);

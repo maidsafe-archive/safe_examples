@@ -52,4 +52,5 @@ window.maidsafeDemo = angular
       this.msg = '';
     }
   };
+  $rootScope.tempDirPath = require('temp').mkdirSync('safe-demo-');
 } ]);
