@@ -1,11 +1,10 @@
 import fs from 'fs';
-import temp from 'temp';
 import path from 'path';
 import fse from 'fs-extra';
 import remote from 'remote';
 
 export default class Downloader {
-  constructor(api, filePath, size, isShared, onComplete) {
+  constructor(api, filePath, size, isShared, tempDirPath, onComplete) {
     this.api = api;
     this.filePath = filePath;
     this.size = size;
@@ -16,6 +15,7 @@ export default class Downloader {
     this.fd = null;
     this.statusCallback = null;
     this.MAX_SIZE_FOR_DOWNLOAD = 512000; // 500kb (500 * 1024)
+    this.tempDirPath = tempDirPath;
   }
 
   setStatusCallback(callback) {
@@ -55,9 +55,8 @@ export default class Downloader {
 
   download() {
     var self = this;
-    var tempDir = temp.mkdirSync('safe-demo-');
     console.log('TO download', this.size);
-    this.downloadPath = path.resolve(tempDir, path.basename(self.filePath));
+    this.downloadPath = path.resolve(self.tempDirPath, path.basename(self.filePath));
     if (this.size === 0) {
       this.onComplete();
     } else {
@@ -72,7 +71,7 @@ export default class Downloader {
       if (err) {
         return self._onResponse('Not able to write file on local machine', self.size);
       }
-      remote.shell.openItem(self.downloadPath);
+      remote.shell.showItemInFolder(self.downloadPath);
     });
   }
 }

@@ -91,7 +91,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       if (response && response.statusCode === 200) {
         return callback(null, factor);
       }
-      var errMsg = response.headers['Content-Type'] === 'application/json' ? JSON.parse(response.body) : 'Request connection closed';
+      var errMsg = e ? {description: 'Request connection closed - ' + e.code } : JSON.parse(response.body);
       callback({data: errMsg});
     }));
   };
@@ -116,11 +116,11 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       auth: {
         'bearer': self.getAuthToken()
       }
-    }, function(e, response) {      
+    }, function(e, response) {
       if (response && response.statusCode === 200) {
         return callback(null, factor);
       }
-      var errMsg = response.headers['Content-Type'] === 'application/json' ? JSON.parse(response.body) : 'Request connection closed';
+      var errMsg = e ? {description: 'Request connection closed - ' + e.code } : JSON.parse(response.body);
       callback({data: errMsg});
     }));
   };

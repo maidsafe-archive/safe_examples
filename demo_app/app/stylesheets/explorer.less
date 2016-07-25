@@ -43,7 +43,56 @@
     height: 250px;
     overflow: auto;
     background-color: white;
-    border: 1px solid @gray-500;
+    box-shadow: 0 0 1px @gray-500;  
+  }
+}
+
+.static-dir-holder {
+  position: relative;
+  height: inherit;
+  .static-dir-holder-b {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  .static-dir-holder-i {
+    height: 50%;
+    padding: 24px;
+    display: flex;
+    position: relative;
+    &:before {
+      content: '';
+      width: 94%;
+      height: 1px;
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 3%;
+      background-color: @blue-200;
+      visibility: visible;
+    }
+    &:last-child:before {
+      display: none;
+    }
+    .static-dir-holder-icn {
+      width: 110px;
+    }
+    .static-dir-holder-desc {
+      flex: 1;
+      padding-left: 20px;
+      .head {
+        margin: 8px 0;
+        padding: 0;
+        font-size: 20px;
+        font-weight: 600;
+      }
+      .ctx {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        font-weight: normal;
+      }
+    }
   }
 }
 
@@ -87,4 +136,24 @@
   background-size: 24px;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+.ms-icn-private-folder {
+  background-image: url('../images/private_folder.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  float:left;
+  width:15%;
+  height:75px;
+}
+
+.ms-icn-public-folder {
+  background-image: url('../images/public_folder.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  float:left;
+  width:15%;
+  height:75px;
 }

@@ -11,6 +11,10 @@
   font-weight: normal;
   background-color: @gray-600;
   cursor: pointer;
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 }
 
 .ms-primary-btn {
@@ -52,4 +56,7 @@
   background-size: 42px;
   background-position: center;
   background-repeat: no-repeat;
+}
+.ms-txt-btn {
+  width: auto !important;
 }
