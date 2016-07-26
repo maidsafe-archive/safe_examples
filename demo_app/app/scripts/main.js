@@ -29,6 +29,9 @@ window.maidsafeDemo = angular
       $rootScope.$applyAsync();
     }
   };
+  $rootScope.openExternal = function(url) {
+    require("shell").openExternal(url);
+  };
   $rootScope.serviceList = [];
   $rootScope.isOnlyAlphaOrNumeric = function(str) {
     return (new RegExp(/^[a-z0-9]+$/g)).test(str);

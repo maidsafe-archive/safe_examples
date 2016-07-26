@@ -83,6 +83,16 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             $scope.$applyAsync();
           });
       }
+      var serviceNames = $rootScope.serviceList.map(function(service) {
+        return service.name;
+      });
+      if (serviceNames.indexOf($scope.serviceName) !== -1) {
+        return $rootScope.prompt.show('Service Name Exist', ($scope.serviceName + ' service already exist.'),
+          function() {
+            $scope.serviceName = '';
+            $scope.$applyAsync();
+          });
+      }
       $state.go('managePublicData', {
         'serviceName': $scope.serviceName.toLowerCase(),
         'folderPath': 'public'

@@ -209,6 +209,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
               ctx: err
             });
           }
+          $('.ms-list-2-i').removeClass('active');
           downloader.open();
         });
         downloader.setStatusCallback(function(status) {
@@ -228,7 +229,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            return $rootScope.prompt.show('MaidSafe Demo', 'Delete failed', function() {}, {
+            $rootScope.prompt.show('MaidSafe Demo', 'Delete failed', function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });

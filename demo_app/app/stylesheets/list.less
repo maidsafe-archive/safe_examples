@@ -42,7 +42,7 @@
 }
 .ms-list-1 {
   width: 80%;
-  height: 360px;
+  height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
   margin: 0 auto;
@@ -58,6 +58,13 @@
       border-bottom: 2px solid @gray-400;
       .url {
         float: left;
+        a {
+          text-decoration: none;
+          color: @blue-400;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
       .path {
         float: right;
