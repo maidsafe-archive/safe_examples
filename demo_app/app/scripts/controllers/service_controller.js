@@ -87,7 +87,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         return service.name;
       });
       if (serviceNames.indexOf($scope.serviceName) !== -1) {
-        return $rootScope.prompt.show('Service Name Exist', ($scope.serviceName + ' service already exist.'),
+        return $rootScope.prompt.show('Service Name Exists', ($scope.serviceName + ' service already exists.'),
           function() {
             $scope.serviceName = '';
             $scope.$applyAsync();
