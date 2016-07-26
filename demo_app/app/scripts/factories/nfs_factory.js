@@ -81,6 +81,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     });
     fileStream.pipe(request.post(url, {
       headers: {
+        'Content-Length': fs.statSync(localPath).size,
         'Content-Type': mime.lookup(filePath),
         'metadata': metadata
       },
@@ -96,34 +97,34 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     }));
   };
 
-  self.modifyFileContent = function(filePath, isPathShared, localPath, offset, callback) {
-    offset = offset || 0;
-    var self = this;
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
-    var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
-    // TODO this factor usage is just a patch - must use a better implementation for progress bar handling
-    var factor = 0;
-    var fileStream = fs.createReadStream(localPath);
-    fileStream.on('data', function(chunk) {
-      factor++;
-      callback(null, chunk.length - 1);
-    });
-    fileStream.pipe(request.put(url, {
-      headers: {
-        'Content-Type': mime.lookup(filePath),
-        'Range': 'Bytes=' + offset + '-'
-      },
-      auth: {
-        'bearer': self.getAuthToken()
-      }
-    }, function(e, response) {
-      if (response && response.statusCode === 200) {
-        return callback(null, factor);
-      }
-      var errMsg = e ? {description: 'Request connection closed - ' + e.code } : JSON.parse(response.body);
-      callback({data: errMsg});
-    }));
-  };
+  // self.modifyFileContent = function(filePath, isPathShared, localPath, offset, callback) {
+  //   offset = offset || 0;
+  //   var self = this;
+  //   var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+  //   var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
+  //   // TODO this factor usage is just a patch - must use a better implementation for progress bar handling
+  //   var factor = 0;
+  //   var fileStream = fs.createReadStream(localPath);
+  //   fileStream.on('data', function(chunk) {
+  //     factor++;
+  //     callback(null, chunk.length - 1);
+  //   });
+  //   fileStream.pipe(request.put(url, {
+  //     headers: {
+  //       'Content-Type': mime.lookup(filePath),
+  //       'Range': 'Bytes=' + offset + '-'
+  //     },
+  //     auth: {
+  //       'bearer': self.getAuthToken()
+  //     }
+  //   }, function(e, response) {
+  //     if (response && response.statusCode === 200) {
+  //       return callback(null, factor);
+  //     }
+  //     var errMsg = e ? {description: 'Request connection closed - ' + e.code } : JSON.parse(response.body);
+  //     callback({data: errMsg});
+  //   }));
+  // };
 
   self.getFile = function(filePath, isPathShared, downloadPath, callback) {
     var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
