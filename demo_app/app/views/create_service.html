@@ -18,7 +18,7 @@
   <div class="ms-form">
     <form id="create_service" name="create_service" ng-submit="createService()" ng-init="$state.params.serviceName ? serviceName = $state.params.serviceName : ''">
       <div class="form-grp lgt">
-        <input type="text" name="service" required="required" placeholder="Service Name" ng-model="serviceName" autofocus>
+        <input type="text" name="service" required="required" placeholder="Service Name" ng-model="serviceName" focus="true">
       </div>
     </form>
   </div><!-- create public ID form -->
@@ -32,6 +32,6 @@
     <span class="service-preview-ctx">http://{{ (serviceName ? serviceName : '&lt;service name&gt;') + '.' + longName + '.safenet' }}</span>
   </div>
   <div class="container-2 text-center">
-    <button type="submit" class="ms-btn ms-primary-btn" form="create_service" name="submitService">Next</button>
+    <button type="submit" class="ms-btn ms-primary-btn" form="create_service" ng-disabled="!serviceName" name="submitService">Next</button>
   </div>
 </div>

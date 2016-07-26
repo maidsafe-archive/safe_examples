@@ -43,12 +43,12 @@
           <div class="form-grp lgt">
             <label for="">Name the folder for this site:</label>
             <input type="text" name="service" required="required"
-              placeholder="Folder name" ng-model="targetFolderName" required="required" onfocus="this.select()" autofocus>
+              placeholder="Folder name" ng-model="targetFolderName" required="required" onfocus="this.select()" focus="true">
           </div>
         </form>
       </div>
       <div class="container-2 text-center">
-        <button type="submit" class="ms-btn ms-primary-btn" form="create_website_folder" name="submitCreateFolder">Create folder</button>
+        <button type="submit" class="ms-btn ms-primary-btn" form="create_website_folder" ng-disabled="!targetFolderName" name="submitCreateFolder">Create folder</button>
       </div>
     </div>
   </div>
