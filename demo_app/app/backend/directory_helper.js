@@ -88,7 +88,7 @@ export class DirectoryHelper {
     this.localPath = localPath;
     this.networkParentDirPath = networkParentDirPath;
     this.onError = function(err) {
-      self.uploader.onError(networkParentDirPath + '\n' + err.data.description);
+      self.uploader.onError(networkParentDirPath + '\n' + (err.data ? err.data.description : err));
     };
     this.taskQueue = new TaskQueue(this.onError);
   }

@@ -163,6 +163,9 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
                 percentage: 100,
                 isUpload: true
               });
+              if (msg.data) {
+                msg = msg.data.description;
+              }
               $rootScope.prompt.show('Failed to create file', msg.split('\n')[0], function() {
                 getDirectory();
               }, { title: 'Reason', ctx: msg.split('\n')[1] });
