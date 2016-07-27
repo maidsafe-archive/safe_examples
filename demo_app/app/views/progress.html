@@ -2,5 +2,7 @@
     <div class="progress-b">
         <div ng-if="progressBar.statusText">{{progressBar.statusText}}</div>
         {{ progressBar.text }}<span class="progress-slider-b"><span class="progress-slider" style="width: {{ progressBar.percentageCompleted }}%"></span></span>{{ progressBar.percentageCompleted }}%
+        <div ng-if="progressBar.showCancel && !progressBar.canceling"><button ng-click="progressBar.cancel()">CANCEL</button></div>
+        <div ng-if="progressBar.showCancel && progressBar.canceling"><button disabled>CANCELING..</button></div>
     </div>
 </div>

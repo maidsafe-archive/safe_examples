@@ -44,15 +44,18 @@ export default class Uploader {
     this.api = api;
     this.progressListener = new ProgressListener(progressCallback);
     this.onError = null;
+    this.helper;
   }
 
   uploadDirectory(isPrivate, localPath, networkParentDirPath, isRoot) {
-    new DirectoryHelper(this, isPrivate, localPath, networkParentDirPath).upload();
+    this.helper = new DirectoryHelper(this, isPrivate, localPath, networkParentDirPath);
+    this.helper.upload();
   }
 
   uploadFile(localPath, networkParentDirPath) {
     var self = this;
-    new FileHelper(this, localPath, networkParentDirPath).upload();
+    this.helper = new FileHelper(this, localPath, networkParentDirPath);
+    this.helper.upload();
   }
 
   upload(localPath, isPrivate, networkPath) {
@@ -74,5 +77,10 @@ export default class Uploader {
 
   setOnErrorCallback(callback) {
     this.onError = callback;
+  }
+
+  cancel() {
+    this.isAborted = true;
+    this.helper.cancel();
   }
 }

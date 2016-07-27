@@ -79,7 +79,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       factor++;
       callback(null, chunk.length - 1);
     });
-    fileStream.pipe(request.post(url, {
+    var writeStream = request.post(url, {
       headers: {
         'Content-Length': fs.statSync(localPath).size,
         'Content-Type': mime.lookup(filePath),
@@ -94,14 +94,16 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       }
       var errMsg;
       if (e) {
-        errMsg = {description: 'Request connection closed - ' + e.code };
+        errMsg = {description: 'Request connection closed' + (e.code ? (' - ' + e.code) : '') };
       } else if (response.statusCode === 401) {
         errMsg = {description: 'Could not authorise with launcher' };
       } else {
         errMsg = JSON.parse(response.body);
       }
       callback({data: errMsg});
-    }));
+    });
+    fileStream.pipe(writeStream);
+    return writeStream;    
   };
 
   // self.modifyFileContent = function(filePath, isPathShared, localPath, offset, callback) {

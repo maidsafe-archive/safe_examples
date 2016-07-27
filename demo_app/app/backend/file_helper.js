@@ -52,9 +52,17 @@ export default class FileHelper {
     let self = this;
     this.onCompleteCallback = callback;
     console.log('Creating file', this.networkParentDirPath + this.fileName);
-    self.uploader.api.createFile(this.networkParentDirPath + this.fileName, '',
-                                 false, this.localPath, function(err, uploadedSize) {
+    this.stream = self.uploader.api.createFile(this.networkParentDirPath + this.fileName, '',
+                                  false, this.localPath, function(err, uploadedSize) {
                                   self._OnContentUploaded(err, uploadedSize);
                                  });
+  }
+
+  cancel() {
+    if (!this.stream) {
+      return;
+    }
+    this.stream.abort();
+    this.uploader.onError('File upload was aborted');
   }
 }

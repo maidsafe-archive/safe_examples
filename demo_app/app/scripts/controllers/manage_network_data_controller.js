@@ -39,7 +39,6 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
     };
 
     $scope.goToPublicFolder = function() {
-      debugger;
       $state.go('manageNetworkData', {
         folderPath: 'public'
       });
@@ -47,7 +46,7 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
 
     $scope.onProgress = function(percentage, isUpload, status) {
       if (!$rootScope.progressBar.isDisplayed()) {
-        $rootScope.progressBar.start(isUpload ? 'Uploading' : 'Downloading');
+        $rootScope.progressBar.start(isUpload ? 'Uploading' : 'Downloading', true);
       }
       $rootScope.progressBar.update(Math.floor(percentage), status);
     };
