@@ -48,6 +48,11 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
             }
             listItems.removeClass('active');
           }
+          var dropdown = $('.ms-dropdown .ms-dropdown-b');
+          if (!dropdown.is(e.target) && (dropdown.has(e.target).length === 0)) {
+            $scope.uploadDialog = false;
+          }
+          $scope.$applyAsync();
         });
       };
 
