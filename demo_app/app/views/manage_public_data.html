@@ -5,6 +5,9 @@
       <a ui-sref="manageService" class="frame-h-act-btn ms-back-btn"></a>
     </div>
     <h3 class="frame-h-ctx">Manage Websites</h3>
+    <div class="frame-h-act-rt">
+      <a ui-sref="home" class="frame-h-act-btn ms-home-btn"></a>
+    </div>
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
@@ -22,7 +25,7 @@
       starting-path="explorerRootPath"
       on-directory-selected="setTargetFolder(name)"
       select-target="{{$state.params.servicePath}}"
-      on-progress="onProgress(percentage, isUpload)"/>
+      on-progress="onProgress(percentage, isUpload, status)"/>
     <!-- explorer -->
   </div>
   <div class="container-2 text-center no-bottom-pad">

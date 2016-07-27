@@ -24,10 +24,29 @@
 }
 
 .ms-back-btn {
-  background-image: url('../images/back.svg');
-  background-size: 42px;
+  background-image: url('../images/back_arrow.svg');
+  background-size: 24px;
   background-position: center;
   background-repeat: no-repeat;
+  &:hover {
+    background-color: @btn-hover !important;
+  }
+  &:active {
+    background-color: @btn-active !important;
+  }
+}
+
+.ms-home-btn {
+  background-image: url('../images/home_icon.svg');
+  background-size: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  &:hover {
+    background-color: @btn-hover !important;
+  }
+  &:active {
+    background-color: @btn-active !important;
+  }
 }
 
 .ms-up-btn {

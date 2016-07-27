@@ -18,14 +18,16 @@ export default class FileHelper {
     if (err) {
       console.error(err);
       if (this.onCompleteCallback) {
-        this.onCompleteCallback('Failed to update file ' + err.data.description);
+        this.onCompleteCallback(err);
       }
-      return this.uploader.onError('Failed to update file ' + this.networkParentDirPath + this.fileName +
-        '\n' + err.data.description);
+      return this.uploader.onError(err);
     }
     this.uploadedSize += uploadedSize;
-    if (this.uploadedSize === this.size && this.onCompleteCallback) {
-      this.onCompleteCallback();
+    if (this.uploadedSize === this.size) {
+      this.uploader.progressListener.filesCompletedCount++;
+      if (this.onCompleteCallback) {
+        this.onCompleteCallback();
+      }
     }
     this.uploader.progressListener.onSuccess(uploadedSize, this.networkParentDirPath + this.fileName);
   }
@@ -50,9 +52,17 @@ export default class FileHelper {
     let self = this;
     this.onCompleteCallback = callback;
     console.log('Creating file', this.networkParentDirPath + this.fileName);
-    self.uploader.api.createFile(this.networkParentDirPath + this.fileName, '',
-                                 false, this.localPath, function(err, uploadedSize) {
+    this.stream = self.uploader.api.createFile(this.networkParentDirPath + this.fileName, '',
+                                  false, this.localPath, function(err, uploadedSize) {
                                   self._OnContentUploaded(err, uploadedSize);
                                  });
+  }
+
+  cancel() {
+    if (!this.stream) {
+      return;
+    }
+    this.stream.abort();
+    this.uploader.onError('Upload cancelled.');
   }
 }

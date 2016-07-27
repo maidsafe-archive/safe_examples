@@ -17,7 +17,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         return $rootScope.prompt.show('Upload Template', err);
       }
       var serviceName = $state.params.serviceName;
-      var progressCallback = function(completed, total) {
+      var progressCallback = function(completed, total, status) {
         if (!$rootScope.$loader.isLoading) {
           $rootScope.$loader.hide();
         }
@@ -28,7 +28,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         if (!$rootScope.progressBar.isDisplayed()) {
           $rootScope.progressBar.start('Uploading');
         }
-        $rootScope.progressBar.update(Math.floor(progressCompletion));
+        $rootScope.progressBar.update(Math.floor(progressCompletion), status);
         if (progressCompletion === 100) {
           return $state.go('managePublicData', {
             serviceName: $state.params.serviceName,

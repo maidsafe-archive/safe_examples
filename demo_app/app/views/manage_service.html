@@ -4,7 +4,10 @@
     <div class="frame-h-act">
       <a ui-sref="home" class="frame-h-act-btn ms-back-btn"></a>
     </div>
-    <h3 class="frame-h-ctx">Manage Websites</h3>
+    <h3 class="frame-h-ctx">Manage Services</h3>
+    <div class="frame-h-act-rt">
+      <a ui-sref="home" class="frame-h-act-btn ms-home-btn"></a>
+    </div>
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
@@ -13,7 +16,7 @@
     </p>
   </div><!-- /content 1 -->
   <div class="content-1">
-    <h3 class="content-1-h">Manage Services</h3>
+    <!-- <h3 class="content-1-h">Manage Services</h3> -->
     <p class="content-1-p">
       Here you can view and edit the services you currently have.<br/>
       There is no limit to how many you can create but they must all be unique within your public id.
@@ -29,7 +32,9 @@
       <div class="ms-list-1" ng-show="serviceList.length > 0">
         <div class="ms-list-1-i" ng-repeat="service in serviceList">
           <div class="ms-list-1-i-ctx">
-            <span class="url">http://<b>{{ service.name }}</b>{{ '.' + service.longName + '.safenet' }}</span>
+            <span class="url"><a href=""
+                ng-click="openExternal('http://' + service.name + '.' + service.longName + '.safenet')">
+                http://<b>{{ service.name }}</b>{{ '.' + service.longName + '.safenet' }}</a></span>
             <span class="path">/public/{{service.homeDir}}</span>
           </div>
           <div class="ms-list-1-i-act-lt">

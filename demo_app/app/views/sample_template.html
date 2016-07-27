@@ -5,10 +5,10 @@
       <div class="frame-h-act">
         <a ui-sref="managePublicData({serviceName: $state.params.serviceName, remap: $state.params.remap, folderPath:'public'})" class="frame-h-act-btn ms-back-btn"></a>
       </div>
-      <div class="frame-h-act-rt">
-        <!-- <button type="button" class="frame-h-act-btn" name="publish" ng-click="createTeamplate()">Create</button> -->
-      </div>
       <h3 class="frame-h-ctx">Create from Template</h3>
+      <div class="frame-h-act-rt">
+        <a ui-sref="home" class="frame-h-act-btn ms-home-btn"></a>
+      </div>
     </div><!-- /header -->
     <div class="sample-template-b">
       <div class="service-preview">
@@ -43,12 +43,12 @@
           <div class="form-grp lgt">
             <label for="">Name the folder for this site:</label>
             <input type="text" name="service" required="required"
-              placeholder="Folder name" ng-model="targetFolderName" required="required" onfocus="this.select()" autofocus>
+              placeholder="Folder name" ng-model="targetFolderName" required="required" onfocus="this.select()" focus="true">
           </div>
         </form>
       </div>
       <div class="container-2 text-center">
-        <button type="submit" class="ms-btn ms-primary-btn" form="create_website_folder" name="submitCreateFolder">Create folder</button>
+        <button type="submit" class="ms-btn ms-primary-btn" form="create_website_folder" ng-disabled="!targetFolderName" name="submitCreateFolder">Create folder</button>
       </div>
     </div>
   </div>

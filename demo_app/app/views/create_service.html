@@ -5,6 +5,9 @@
       <a ui-sref="manageService" class="frame-h-act-btn ms-back-btn"></a>
     </div>
     <h3 class="frame-h-ctx">Manage Websites</h3>
+    <div class="frame-h-act-rt">
+      <a ui-sref="home" class="frame-h-act-btn ms-home-btn"></a>
+    </div>
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
@@ -18,7 +21,7 @@
   <div class="ms-form">
     <form id="create_service" name="create_service" ng-submit="createService()" ng-init="$state.params.serviceName ? serviceName = $state.params.serviceName : ''">
       <div class="form-grp lgt">
-        <input type="text" name="service" required="required" placeholder="Service Name" ng-model="serviceName" autofocus>
+        <input type="text" name="service" required="required" placeholder="Service Name" ng-model="serviceName" focus="true">
       </div>
     </form>
   </div><!-- create public ID form -->
@@ -29,9 +32,9 @@
     </p>
   </div><!-- /content 1 -->
   <div class="service-preview">
-    <span class="service-preview-ctx">http://{{ (serviceName ? serviceName : '&lt;service name&gt;') + '.' + longName + '.safenet' }}</span>
+    <span class="service-preview-ctx">http://<b>{{ (serviceName ? serviceName : '&lt;service name&gt;')}}</b>.{{longName}}.safenet</span>
   </div>
   <div class="container-2 text-center">
-    <button type="submit" class="ms-btn ms-primary-btn" form="create_service" name="submitService">Next</button>
+    <button type="submit" class="ms-btn ms-primary-btn" form="create_service" ng-disabled="!serviceName" name="submitService">Next</button>
   </div>
 </div>

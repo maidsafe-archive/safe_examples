@@ -10,6 +10,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         VIDEO: 'ms-icn-file-video'
       };
 
+      var uploader;
+
       $scope.rootDirectories = [
         {
           displayName: 'Public folder',
@@ -140,7 +142,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
             networkPath += dirName;
           }
           try {
-            var progressCallback = function(completed, total, filePath) {
+            var progressCallback = function(completed, total, countStatus) {
               if ($rootScope.$loader.isLoading) {
                 $rootScope.$loader.hide();
               }
@@ -150,20 +152,26 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
               }
               $scope.onProgress({
                 percentage: progressCompletion,
-                isUpload: true
+                isUpload: true,
+                status: countStatus
               });
               if (progressCompletion === 100) {
                 getDirectory();
               }
             };
-            var uploader = new window.uiUtils.Uploader(safeApi, progressCallback);
+            uploader = new window.uiUtils.Uploader(safeApi, progressCallback);
             uploader.setOnErrorCallback(function(msg) {
+              uploader = null;
               // TODO Krishna - progressbar has too many inderictions - try to make it simpler
               $scope.onProgress({
                 percentage: 100,
-                isUpload: true
+                isUpload: true,
+                status: ''
               });
-              $rootScope.prompt.show('Failed to create file', msg.split('\n')[0], function() {
+              if (msg.data) {
+                msg = msg.data.description;
+              }
+              $rootScope.prompt.show('Operation Failed', msg.split('\n')[0], function() {
                 getDirectory();
               }, { title: 'Reason', ctx: msg.split('\n')[1] });
             });
@@ -171,7 +179,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           } catch (err) {
             console.error(err);
             $rootScope.$loader.hide();
-            $rootScope.prompt.show('Failed to create file', err.message);
+            $rootScope.prompt.show('Operation Failed', err.message);
           }
         });
       };
@@ -209,6 +217,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
               ctx: err
             });
           }
+          $('.ms-list-2-i').removeClass('active');
           downloader.open();
         });
         downloader.setStatusCallback(function(status) {
@@ -228,7 +237,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            return $rootScope.prompt.show('MaidSafe Demo', 'Delete failed', function() {}, {
+            $rootScope.prompt.show('MaidSafe Demo', 'Delete failed', function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });
@@ -280,6 +289,13 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         $scope.selectedPath = null;
         getDirectory();
       };
+
+      $scope.$on('cancel-upload', function() {
+        if (!uploader) {
+          return;
+        }
+        uploader.cancel();
+      });
 
       $scope.rename = false;
       releaseSelection();

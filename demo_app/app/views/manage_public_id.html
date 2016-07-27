@@ -5,6 +5,9 @@
       <a ui-sref="home" class="frame-h-act-btn ms-back-btn"></a>
     </div>
     <h3 class="frame-h-ctx">Create Public ID</h3>
+    <div class="frame-h-act-rt">
+      <a ui-sref="home" class="frame-h-act-btn ms-home-btn"></a>
+    </div>
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
@@ -19,7 +22,7 @@
   <div class="ms-form" ng-init="init()">
     <form id="createPublicID" name="createPublicID" ng-submit="createPublicId()">
       <div class="form-grp drk">
-        <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId" autofocus>
+        <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId" focus="true">
       </div>
     </form>
   </div><!-- create public ID form -->
@@ -29,9 +32,9 @@
     </p>
   </div><!-- /content 1 -->
   <div class="service-preview">
-    <span class="service-preview-ctx">http://&lt;service name&gt;.{{ (publicId ? publicId : '&lt;public id&gt;') + '.safenet' }}</span>
+    <span class="service-preview-ctx">http://&lt;service name&gt;.<b>{{(publicId ? publicId : '&lt;public id&gt;')}}</b>.safenet</span>
   </div>
   <div class="container-2 text-center">
-    <button type="submit" class="ms-btn ms-primary-btn" form="createPublicID" name="submitPublicID">Done</button>
+    <button type="submit" class="ms-btn ms-primary-btn" form="createPublicID" ng-disabled="!publicId" name="submitPublicID">Done</button>
   </div>
 </div>
