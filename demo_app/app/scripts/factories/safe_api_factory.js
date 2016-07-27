@@ -28,14 +28,14 @@ function(http, $q, $rootScope, nfs, dns) {
 
   self.Request = function(payload, callback, allowUnAuthErr) {
     var checkLauncherStatus = function(cb) {
-      var getTokenPayload = {
+      var validateTokenPayload = {
         url: self.SERVER + '/auth',
         method: 'GET',
         headers: {
           authorization: 'Bearer ' + self.getAuthToken()
         }
       };
-      http(getTokenPayload).then(function(res) {
+      http(validateTokenPayload).then(function(res) {
         cb(null, res);
       }, function(err) {
         cb(err);

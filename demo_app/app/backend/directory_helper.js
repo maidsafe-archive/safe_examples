@@ -4,25 +4,34 @@ import env from '../env';
 import async from 'async';
 import FileHelper from './file_helper';
 
-export let computeDirectorySize = function(localPath) {
+export let getDirectoryStats = function(localPath) {
   let size = 0;
   let stat;
+  let tempStat;
   let tempPath;
+  let stats = {
+    size: 0,
+    files: 0,
+    directories: 0
+  };
   try {
     let contents = fs.readdirSync(localPath);
     for (var i in contents) {
       tempPath = localPath + '/' + contents[i];
       stat = fs.statSync(tempPath);
       if (stat.isDirectory()) {
-        size += computeDirectorySize(tempPath);
+        tempStat = getDirectoryStats(tempPath);
+        stats.size += tempStat.size;
+        stats.directories += tempStat.directories;
       } else {
         if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
           throw new Error('File more than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
         }
-        size += stat.size;
+        stats.files++;
+        stats.size += stat.size;
       }
     }
-    return size;
+    return stats;
   } catch (e) {
     throw new Error(e.message);
   }
@@ -88,7 +97,7 @@ export class DirectoryHelper {
     this.localPath = localPath;
     this.networkParentDirPath = networkParentDirPath;
     this.onError = function(err) {
-      self.uploader.onError(networkParentDirPath + '\n' + err.data.description);
+      self.uploader.onError(networkParentDirPath + '\n' + (err.data ? err.data.description : err));
     };
     this.taskQueue = new TaskQueue(this.onError);
   }

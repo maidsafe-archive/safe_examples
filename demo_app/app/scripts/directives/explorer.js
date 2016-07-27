@@ -140,7 +140,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
             networkPath += dirName;
           }
           try {
-            var progressCallback = function(completed, total, filePath) {
+            var progressCallback = function(completed, total, countStatus) {
               if ($rootScope.$loader.isLoading) {
                 $rootScope.$loader.hide();
               }
@@ -150,7 +150,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
               }
               $scope.onProgress({
                 percentage: progressCompletion,
-                isUpload: true
+                isUpload: true,
+                status: countStatus
               });
               if (progressCompletion === 100) {
                 getDirectory();
@@ -161,8 +162,12 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
               // TODO Krishna - progressbar has too many inderictions - try to make it simpler
               $scope.onProgress({
                 percentage: 100,
-                isUpload: true
+                isUpload: true,
+                status: ''
               });
+              if (msg.data) {
+                msg = msg.data.description;
+              }
               $rootScope.prompt.show('Failed to create file', msg.split('\n')[0], function() {
                 getDirectory();
               }, { title: 'Reason', ctx: msg.split('\n')[1] });

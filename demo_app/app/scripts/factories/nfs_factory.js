@@ -92,7 +92,14 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       if (response && response.statusCode === 200) {
         return callback(null, factor);
       }
-      var errMsg = e ? {description: 'Request connection closed - ' + e.code } : JSON.parse(response.body);
+      var errMsg;
+      if (e) {
+        errMsg = {description: 'Request connection closed - ' + e.code };
+      } else if (response.statusCode === 401) {
+        errMsg = {description: 'Could not authorise with launcher' };
+      } else {
+        errMsg = JSON.parse(response.body);
+      }
       callback({data: errMsg});
     }));
   };

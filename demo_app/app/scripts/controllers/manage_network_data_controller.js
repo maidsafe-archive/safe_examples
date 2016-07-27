@@ -45,11 +45,11 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
       });
     };
 
-    $scope.onProgress = function(percentage, isUpload) {
+    $scope.onProgress = function(percentage, isUpload, status) {
       if (!$rootScope.progressBar.isDisplayed()) {
         $rootScope.progressBar.start(isUpload ? 'Uploading' : 'Downloading');
       }
-      $rootScope.progressBar.update(Math.floor(percentage));
+      $rootScope.progressBar.update(Math.floor(percentage), status);
     };
 
     $scope.mapService = function() {
