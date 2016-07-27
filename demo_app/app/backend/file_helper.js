@@ -63,6 +63,6 @@ export default class FileHelper {
       return;
     }
     this.stream.abort();
-    this.uploader.onError('File upload was aborted');
+    this.uploader.onError('Upload cancelled.');
   }
 }

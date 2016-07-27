@@ -53,7 +53,7 @@ class TaskQueue {
     let UploadTask = function(helper) {
       this.upload = function(callback) {
         if (helper.uploader.isAborted) {
-          return callback('Task was aborted');
+          return callback('Task was cancelled');
         }
         if (helper instanceof DirectoryCreationHelper) {
           helper.create(callback);

@@ -171,7 +171,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
               if (msg.data) {
                 msg = msg.data.description;
               }
-              $rootScope.prompt.show('Failed to create file', msg.split('\n')[0], function() {
+              $rootScope.prompt.show('Operation Failed', msg.split('\n')[0], function() {
                 getDirectory();
               }, { title: 'Reason', ctx: msg.split('\n')[1] });
             });
@@ -179,7 +179,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           } catch (err) {
             console.error(err);
             $rootScope.$loader.hide();
-            $rootScope.prompt.show('Failed to create file', err.message);
+            $rootScope.prompt.show('Operation Failed', err.message);
           }
         });
       };
