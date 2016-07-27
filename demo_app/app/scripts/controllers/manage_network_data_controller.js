@@ -38,8 +38,7 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
       });
     };
 
-    $scope.goToPublicFolder = function() {
-      debugger;
+    $scope.goToPublicFolder = function() {      
       $state.go('manageNetworkData', {
         folderPath: 'public'
       });

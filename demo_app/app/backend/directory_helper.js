@@ -51,9 +51,13 @@ class TaskQueue {
     let tasks = [];
     let UploadTask = function(helper) {
       this.upload = function(callback) {
+        if (helper.uploader.isAborted) {
+          return callback('Task was aborted');
+        }
         if (helper instanceof DirectoryCreationHelper) {
           helper.create(callback);
         } else {
+          helper.uploader.currentFileHelperInstance = helper;
           helper.upload(callback);
         }
       };
@@ -73,6 +77,7 @@ class TaskQueue {
   add(helper) {
     this.queue.push(helper);
   }
+
 }
 
 class DirectoryCreationHelper {
@@ -97,7 +102,7 @@ export class DirectoryHelper {
     this.localPath = localPath;
     this.networkParentDirPath = networkParentDirPath;
     this.onError = function(err) {
-      self.uploader.onError(networkParentDirPath + '\n' + (err.data ? err.data.description : err));
+      self.uploader.onError('Task was not completed successfully' + '\n' + (err.data ? err.data.description : err));
     };
     this.taskQueue = new TaskQueue(this.onError);
   }
@@ -129,5 +134,11 @@ export class DirectoryHelper {
       this.taskQueue.add(new FileHelper(this.uploader, this.localPath, this.networkParentDirPath));
     }
     this.taskQueue.run();
+  }
+
+  cancel() {
+    if (this.uploader.currentFileHelperInstance) {
+      this.uploader.currentFileHelperInstance.cancel();
+    }
   }
 }

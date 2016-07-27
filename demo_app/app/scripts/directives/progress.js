@@ -4,7 +4,7 @@
 window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', function($rootScope, $timeout) {
   'use strict';
 
-  var ProgressBar = function() {
+  var ProgressBar = function(rootScope) {
     var self = this;
 
     self.text = 'Status';
@@ -36,6 +36,10 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
       self.percentageCompleted = 0;
     };
 
+    self.cancel = function() {
+      rootScope.$broadcast('cancel-upload');
+    }
+
     return self;
   };
 
@@ -43,7 +47,7 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
     restrict: 'E',
     templateUrl: './views/progress.html',
     link: function() {
-      $rootScope.progressBar = new ProgressBar();
+      $rootScope.progressBar = new ProgressBar($rootScope);
     }
   };
 } ]);

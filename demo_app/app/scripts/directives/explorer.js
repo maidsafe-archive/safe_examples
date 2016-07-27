@@ -10,6 +10,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         VIDEO: 'ms-icn-file-video'
       };
 
+      var uploader;
+
       $scope.rootDirectories = [
         {
           displayName: 'Public folder',
@@ -157,8 +159,9 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
                 getDirectory();
               }
             };
-            var uploader = new window.uiUtils.Uploader(safeApi, progressCallback);
+            uploader = new window.uiUtils.Uploader(safeApi, progressCallback);
             uploader.setOnErrorCallback(function(msg) {
+              uploader = null;
               // TODO Krishna - progressbar has too many inderictions - try to make it simpler
               $scope.onProgress({
                 percentage: 100,
@@ -286,6 +289,13 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         $scope.selectedPath = null;
         getDirectory();
       };
+
+      $scope.$on('cancel-upload', function() {
+        if (!uploader) {
+          return;
+        }
+        uploader.cancel();
+      });
 
       $scope.rename = false;
       releaseSelection();
