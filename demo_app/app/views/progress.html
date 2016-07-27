@@ -1,5 +1,6 @@
 <div class="progress" ng-show="progressBar.show">
     <div class="progress-b">
+        <div ng-if="progressBar.statusText">{{progressBar.statusText}}</div>
         {{ progressBar.text }}<span class="progress-slider-b"><span class="progress-slider" style="width: {{ progressBar.percentageCompleted }}%"></span></span>{{ progressBar.percentageCompleted }}%
     </div>
 </div>

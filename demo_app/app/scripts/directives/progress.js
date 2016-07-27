@@ -10,6 +10,7 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
     self.text = 'Status';
     self.percentageCompleted = 0;
     self.show = false;
+    self.statusText = '';
 
     self.start = function(text) {
       self.text = text || 'Status';
@@ -21,11 +22,12 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
       return self.show;
     };
 
-    self.update = function(newValue) {
+    self.update = function(newValue, statusText) {
       self.percentageCompleted = newValue;
       if (self.percentageCompleted === 100) {
         $timeout(self.close, 200);
       }
+      self.statusText = statusText || '';
       $rootScope.$applyAsync();
     };
 

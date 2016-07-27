@@ -23,8 +23,11 @@ export default class FileHelper {
       return this.uploader.onError(err);
     }
     this.uploadedSize += uploadedSize;
-    if (this.uploadedSize === this.size && this.onCompleteCallback) {
-      this.onCompleteCallback();
+    if (this.uploadedSize === this.size) {
+      this.uploader.progressListener.filesCompletedCount++;
+      if (this.onCompleteCallback) {
+        this.onCompleteCallback();
+      }
     }
     this.uploader.progressListener.onSuccess(uploadedSize, this.networkParentDirPath + this.fileName);
   }
