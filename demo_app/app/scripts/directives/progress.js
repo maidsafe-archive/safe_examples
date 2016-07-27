@@ -43,7 +43,6 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
     };
 
     self.cancel = function() {
-      debugger
       self.cancelling = true;
       rootScope.$broadcast('cancel-upload');
     }
