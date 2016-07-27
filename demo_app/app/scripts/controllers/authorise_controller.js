@@ -70,6 +70,9 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$stat
         $scope.authorisationTasks.appSetupStatus.creatingPrivateDirectory = $scope.authorisationTasks.state.IN_PROGRESS;
         $scope.authorisationTasks.appSetupStatus.creatingPublicDirectory = $scope.authorisationTasks.state.IN_PROGRESS;
         safe.createDir('/public', false, '', false, createPubDirCb);
+      } else if (res.subDirectories.length === 1) {
+        $scope.authorisationTasks.appSetupStatus.creatingPrivateDirectory = $scope.authorisationTasks.state.IN_PROGRESS;
+        safe.createDir('/private', true, '', false, createPvtDirCb);
       } else {
         $state.go('home');
       }
