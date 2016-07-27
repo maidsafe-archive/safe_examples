@@ -5,7 +5,7 @@
         <span class="progress-slider-b"><span class="progress-slider" style="width: {{ progressBar.percentageCompleted }}%"></span></span>
         <div class="status-bar">
           <div class="status-lt" ng-if="progressBar.statusText">Files: {{progressBar.statusText}}</div>
-          <div class="status-rt" ng-if="progressBar.statusText">{{ progressBar.percentageCompleted }}%</div>
+          <div class="status-rt">{{ progressBar.percentageCompleted }}%</div>
         </div>
         <div class="opt">
           <div class="opt-i" ng-if="progressBar.showCancel && !progressBar.cancelling">
