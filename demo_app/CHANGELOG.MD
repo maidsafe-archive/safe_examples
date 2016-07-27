@@ -1,5 +1,17 @@
 # MaidSafe Demo App Change Log
 
+##[0.5.0]
+- New UI workflow integration
+  - Separation of website and network data management
+- Ability to cancel uploads
+- Show file count status while uploading folders
+- Open the download folder instead of opening the downloaded file
+- Initial root folder creation failure recovery
+- Show initial authorisation stages on loading
+- Ability to remap service home directory
+- Option to delete a service
+- various bug fixes and UX updates
+
 ##[0.4.0]
   - File size limit increased to 50 MB
   - Compatibility with safe launcher v0.6.0
