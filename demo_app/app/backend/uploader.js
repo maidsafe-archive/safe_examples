@@ -2,11 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import env from '../env';
 import FileHelper from './file_helper';
-import { computeDirectorySize, DirectoryHelper } from './directory_helper';
+import { getDirectoryStats, DirectoryHelper } from './directory_helper';
 
 class ProgressListener {
   constructor(updateCallback) {
     this.total = 0;
+    this.totalFileCount = 0;
+    this.filesCompletedCount = 0;
     this._completed = 0;
     this._success = 0;
     this._failed = 0;
@@ -27,7 +29,12 @@ class ProgressListener {
     this._success += size;
     this._completed += size;
     if (this._updateCallback) {
-      this._updateCallback(this._completed, this.total, fileName);
+      var status;
+      if (this.totalFileCount > 0) {
+        status = this.filesCompletedCount
+          + '/' + this.totalFileCount;
+      }
+      this._updateCallback(this._completed, this.total, status);
     }
   }
 }
@@ -37,25 +44,30 @@ export default class Uploader {
     this.api = api;
     this.progressListener = new ProgressListener(progressCallback);
     this.onError = null;
+    this.helper;
   }
 
   uploadDirectory(isPrivate, localPath, networkParentDirPath, isRoot) {
-    new DirectoryHelper(this, isPrivate, localPath, networkParentDirPath).upload();
+    this.helper = new DirectoryHelper(this, isPrivate, localPath, networkParentDirPath);
+    this.helper.upload();
   }
 
   uploadFile(localPath, networkParentDirPath) {
     var self = this;
-    new FileHelper(this, localPath, networkParentDirPath).upload();
+    this.helper = new FileHelper(this, localPath, networkParentDirPath);
+    this.helper.upload();
   }
 
   upload(localPath, isPrivate, networkPath) {
     let stat = fs.statSync(localPath);
     if (stat.isDirectory()) {
-      this.progressListener.total = computeDirectorySize(localPath);
+      let dirStats = getDirectoryStats(localPath);
+      this.progressListener.total = dirStats.size;
+      this.progressListener.totalFileCount = dirStats.files;
       this.uploadDirectory(isPrivate, localPath, networkPath || '/', true);
     } else {
       if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
-        throw new Error('File greater than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
+        throw new Error('File larger than ' + (env.maxFileUploadSize / 1000000) + ' MB can not be uploaded');
       }
       this.progressListener.total = stat.size;
       this.uploadFile(localPath, networkPath || '/');
@@ -65,5 +77,10 @@ export default class Uploader {
 
   setOnErrorCallback(callback) {
     this.onError = callback;
+  }
+
+  cancel() {
+    this.isAborted = true;
+    this.helper.cancel();
   }
 }

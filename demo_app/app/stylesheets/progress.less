@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   display: table;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(0, 0, 0, 0.5);
   overflow: hidden;
   z-index: 998;
   .progress-b {
@@ -16,21 +16,58 @@
     font-weight: 600;
     color: @gray-900;
   }
+  .title {
+    font-size: 22px;
+    font-weight: 600;
+    color: @gray-900;
+    margin: 0 0 20px;
+    padding: 0;
+  }
+  .progress-cnt {
+    width: 400px;
+    padding: 24px;
+    background-color: #FFF;
+    margin: 0 auto;
+    text-align: left;
+  }
   .progress-slider-b {
-    width: 200px;
-    margin: 0 8px;
-    height: 5px;
+    width: 100%;
+    margin: 0;
+    height: 8px;
     display: inline-block;
     position: relative;
-    background-color: @blue-100;
+    background-color: rgba(106, 158, 209, .25);
     .progress-slider {
       width: 0%;
-      height: 5px;
+      height: 8px;
       display: inline-block;
       position: absolute;
       top: 0;
       left: 0;
       background-color: @blue-200;
     }
+  }
+  .status-bar {
+    font-size: 16px;
+    font-weight: normal;
+    color: @gray-900;
+    .status-lt {
+      display: inline-block;
+      float: left;
+    }
+    .status-rt {
+      display: inline-block;
+      float: right;
+    }
+    .clearfix();
+  }
+  .opt {
+    margin-top: 30px;
+    text-align: center;
+    // .opt-i {
+    //   button {
+    //
+    //   }
+    // }
   }
 }

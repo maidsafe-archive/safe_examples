@@ -17,15 +17,22 @@ window.maidsafeDemo = angular
   $rootScope.$stateParams = $stateParams;
   $rootScope.$loader = {
     isLoading: false,
-    show: function() {
+    description: null,
+    show: function(description) {
       this.isLoading = true;
+      this.description = description || '';
       $rootScope.$applyAsync();
     },
     hide: function() {
       this.isLoading = false;
+      this.description = null;
       $rootScope.$applyAsync();
     }
   };
+  $rootScope.openExternal = function(url) {
+    require("shell").openExternal(url);
+  };
+  $rootScope.serviceList = [];
   $rootScope.isOnlyAlphaOrNumeric = function(str) {
     return (new RegExp(/^[a-z0-9]+$/g)).test(str);
   };
@@ -48,4 +55,5 @@ window.maidsafeDemo = angular
       this.msg = '';
     }
   };
+  $rootScope.tempDirPath = require('temp').mkdirSync('safe-demo-');
 } ]);

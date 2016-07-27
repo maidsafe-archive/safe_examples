@@ -13,7 +13,8 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     'width': 1010,
     'height': 700,
-    'resizable': false
+    'resizable': false,
+    'icon': __dirname + '/images/app_icon.png'
   });
   mainWindow.loadURL('file://' + __dirname + '/app.html');
 

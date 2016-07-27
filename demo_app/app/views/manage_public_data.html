@@ -1,0 +1,40 @@
+<div class="ms-frame" ng-controller="NetworkDataCtrl">
+  <!-- header -->
+  <div class="frame-h">
+    <div class="frame-h-act">
+      <a ui-sref="manageService" class="frame-h-act-btn ms-back-btn"></a>
+    </div>
+    <h3 class="frame-h-ctx">Manage Websites</h3>
+    <div class="frame-h-act-rt">
+      <a ui-sref="home" class="frame-h-act-btn ms-home-btn"></a>
+    </div>
+  </div><!-- /header -->
+  <!-- content 1 -->
+  <div class="content-1">
+    <h3 class="content-1-h">Select the content folder for '{{$state.params.serviceName}}' service.</h3>
+    <p class="content-1-p">
+      Here you can select an existing public folder from the list below. You can also create a new public folder
+      from a <a href="" ng-click="createFromTemplate()">Template</a> or upload an existing folder from the
+      <a href="" ng-click="goToPublicFolder()">Manage Network Data</a> section.
+    </p>
+  </div><!-- /content 1 -->
+  <div>
+    <!-- explorer -->
+    <explorer
+      list-mode="true"
+      starting-path="explorerRootPath"
+      on-directory-selected="setTargetFolder(name)"
+      select-target="{{$state.params.servicePath}}"
+      on-progress="onProgress(percentage, isUpload, status)"/>
+    <!-- explorer -->
+  </div>
+  <div class="container-2 text-center no-bottom-pad">
+    <button
+      type="button"
+      class="ms-btn ms-primary-btn"
+      form="useThisFolder"
+      ng-click="mapService()"
+      name="useThisFolder"
+      ng-disabled="!selectedFolder">Publish Website</button>
+  </div>
+</div>

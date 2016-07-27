@@ -11,7 +11,7 @@
   <!-- root node -->
   <div class="ms-root" ui-view="">
   </div>
-  <ms-loader ng-show="$loader.isLoading"></ms-loader>
+  <ms-loader ng-show="$loader.isLoading" description="{{$loader.description}}"></ms-loader>
   <prompt></prompt>
   <progress-indicator></progress-indicator>
   <!-- /root node -->
@@ -25,6 +25,7 @@
   <script src="./app.js"></script>
   <script src="./scripts/main.js"></script>
   <script src="./scripts/router.js"></script>
+  <script src="./scripts/constants.js"></script>
 
   <!-- directives -->
 
@@ -38,12 +39,13 @@
   <script src="scripts/controllers/public_id_controller.js" charset="utf-8"></script>
   <script src="scripts/controllers/service_controller.js" charset="utf-8"></script>
   <script src="scripts/controllers/sample_template_controller.js" charset="utf-8"></script>
-  <script src="scripts/controllers/manage_private_data_controller.js" charset="utf-8"></script>
+  <script src="scripts/controllers/manage_network_data_controller.js" charset="utf-8"></script>
 
   <!-- Directives -->
   <script src="scripts/directives/loader.js" charset="utf-8"></script>
   <script src="scripts/directives/explorer.js" charset="utf-8"></script>
   <script src="scripts/directives/progress.js" charset="utf-8"></script>
   <script src="scripts/directives/prompt.js" charset="utf-8"></script>
+  <script src="scripts/directives/field_focus.js" charset="utf-8"></script>
 </body>
 </html>

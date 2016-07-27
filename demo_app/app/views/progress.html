@@ -1,5 +1,20 @@
 <div class="progress" ng-show="progressBar.show">
     <div class="progress-b">
-        {{ progressBar.text }}<span class="progress-slider-b"><span class="progress-slider" style="width: {{ progressBar.percentageCompleted }}%"></span></span>{{ progressBar.percentageCompleted }}%
+      <div class="progress-cnt">
+        <h3 class="title">{{ progressBar.text }}</h3>
+        <span class="progress-slider-b"><span class="progress-slider" style="width: {{ progressBar.percentageCompleted }}%"></span></span>
+        <div class="status-bar">
+          <div class="status-lt" ng-if="progressBar.statusText">Files: {{progressBar.statusText}}</div>
+          <div class="status-rt">{{ progressBar.percentageCompleted }}%</div>
+        </div>
+        <div class="opt" ng-if="progressBar.showCancel">
+          <div class="opt-i" ng-if="!progressBar.cancelling">
+            <button class="ms-btn ms-primary-btn" ng-click="progressBar.cancel()">CANCEL UPLOAD</button>
+          </div>
+          <div class="opt-i" ng-if="progressBar.cancelling">
+            <button class="ms-btn ms-primary-btn" disabled="disabled">CANCELLING..</button>
+          </div>
+        </div>
+      </div>
     </div>
 </div>

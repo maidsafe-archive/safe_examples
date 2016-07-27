@@ -1,35 +1,23 @@
 /**
  * Sample site controller
  */
-window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$state', '$rootScope', 'safeApiFactory',
-  function($scope, $http, $state, $rootScope, safe) {
+window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$state', '$rootScope', 'MESSAGES', 'safeApiFactory',
+  function($scope, $http, $state, $rootScope, $msg, safe) {
     'use strict';
     $scope.siteTitle = 'My Page';
     $scope.siteDesc = 'This page is created and published on the SAFE Network using the MaidSafe demo app';
+    $scope.longName = safe.getUserLongName();
+    $scope.targetFolderName = $state.params.serviceName + '-service';
     var dirPath = 'views/sample_template';
 
-    var onServiceCreated = function(err) {
-      var goToManageService = function() {
-        $state.go('manageService');
-      };
-      $rootScope.$loader.hide();
-      if (err) {
-        return $rootScope.prompt.show('Publish Service Error', 'Failed to add new service\n', goToManageService, {
-          title: 'Reason',
-          ctx: err.data.description
-        });
-      }
-      var msg = 'Template has been published for the service: ' + $state.params.serviceName;
-      $rootScope.prompt.show('Service Published', msg, goToManageService);
-    };
-
     var onTemplateReady = function(err, tempPath) {
+      $rootScope.$loader.hide();
       if (err) {
         console.error(err);
         return $rootScope.prompt.show('Upload Template', err);
       }
       var serviceName = $state.params.serviceName;
-      var progressCallback = function(completed, total) {
+      var progressCallback = function(completed, total, status) {
         if (!$rootScope.$loader.isLoading) {
           $rootScope.$loader.hide();
         }
@@ -40,22 +28,30 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
         if (!$rootScope.progressBar.isDisplayed()) {
           $rootScope.progressBar.start('Uploading');
         }
-        $rootScope.progressBar.update(Math.floor(progressCompletion));
+        $rootScope.progressBar.update(Math.floor(progressCompletion), status);
         if (progressCompletion === 100) {
-          $rootScope.$loader.show();
-          safe.addService(safe.getUserLongName(), serviceName, false, '/public/' + serviceName, onServiceCreated);
+          return $state.go('managePublicData', {
+            serviceName: $state.params.serviceName,
+            remap: $state.params.remap,
+            folderPath: 'public',
+            servicePath: $scope.targetFolderName
+          });
         }
       };
       var uploader = new window.uiUtils.Uploader(safe, progressCallback);
       uploader.setOnErrorCallback(function(msg) {
         $rootScope.$loader.hide();
-        $rootScope.prompt.show('Failed to upload Template', msg);
+        $rootScope.progressBar.close();
+        $rootScope.prompt.show('Failed to Create Folder', msg);
       });
-      uploader.upload(tempPath, false, '/public/' + serviceName);
+      if (!$scope.targetFolderName) {
+        return $rootScope.prompt.show('Failed to Create Folder ', 'Folder name cannot be empty.', function() {});
+      }
+      uploader.upload(tempPath, false, '/public/' + $scope.targetFolderName);
     };
 
     var writeFile = function(title, content, dirPath) {
-      $rootScope.$loader.show();
+      $rootScope.$loader.show($msg.PREPARING_TEMPLATE);
       window.uiUtils.createTemplateFile(title, content, dirPath, onTemplateReady);
     };
 
@@ -63,7 +59,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
       $scope.progressIndicator = progressScope;
     };
 
-    $scope.publish = function() {
+    $scope.createTeamplate = function() {
       console.log($scope.siteTitle + ' ' + $scope.siteDesc);
       writeFile($scope.siteTitle, $scope.siteDesc, dirPath);
     };

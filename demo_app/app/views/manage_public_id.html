@@ -1,10 +1,13 @@
-<div class="ms-frame">
+<div class="ms-frame" ng-controller="PublicIdCtrl" >
   <!-- header -->
   <div class="frame-h">
     <div class="frame-h-act">
       <a ui-sref="home" class="frame-h-act-btn ms-back-btn"></a>
     </div>
     <h3 class="frame-h-ctx">Create Public ID</h3>
+    <div class="frame-h-act-rt">
+      <a ui-sref="home" class="frame-h-act-btn ms-home-btn"></a>
+    </div>
   </div><!-- /header -->
   <!-- content 1 -->
   <div class="content-1">
@@ -16,16 +19,22 @@
   </div><!-- /content 1 -->
 
   <!-- create public ID form -->
-  <div class="ms-form" ng-controller="PublicIdCtrl" ng-init="init()">
-    <div class="heading-1 text-center" ng-show="longName">Your Public ID is: <b><i>{{ longName }}</i></b></div>
-    <form name="createPublicID" ng-submit="createPublicId()" ng-show="!longName">
+  <div class="ms-form" ng-init="init()">
+    <form id="createPublicID" name="createPublicID" ng-submit="createPublicId()">
       <div class="form-grp drk">
-        <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId" autofocus>
-      </div>
-      <div class="form-grp-btn">
-        <button type="submit" class="ms-btn ms-primary-btn" name="submitPublicID">Done</button>
+        <input type="text" name="publicID" required="required" placeholder="Public ID" ng-model="publicId" focus="true">
       </div>
     </form>
   </div><!-- create public ID form -->
-
+  <div class="container-3">
+    <p class="heading-sm">
+      This is how your Public ID will look in the browser.
+    </p>
+  </div><!-- /content 1 -->
+  <div class="service-preview">
+    <span class="service-preview-ctx">http://&lt;service name&gt;.<b>{{(publicId ? publicId : '&lt;public id&gt;')}}</b>.safenet</span>
+  </div>
+  <div class="container-2 text-center">
+    <button type="submit" class="ms-btn ms-primary-btn" form="createPublicID" ng-disabled="!publicId" name="submitPublicID">Done</button>
+  </div>
 </div>
