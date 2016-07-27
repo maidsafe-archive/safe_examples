@@ -22,6 +22,7 @@ export let getDirectoryStats = function(localPath) {
       if (stat.isDirectory()) {
         tempStat = getDirectoryStats(tempPath);
         stats.size += tempStat.size;
+        stats.files += tempStat.files;
         stats.directories += tempStat.directories;
       } else {
         if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {

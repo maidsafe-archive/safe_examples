@@ -11,11 +11,15 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
     self.percentageCompleted = 0;
     self.show = false;
     self.statusText = '';
+    self.showCancel = false;
+    self.canceling = false;
 
-    self.start = function(text) {
+    self.start = function(text, showCancel) {
       self.text = text || 'Status';
       self.percentageCompleted = 0;
       self.show = true;
+      self.showCancel = showCancel || false;
+      self.canceling = false;
     };
 
     self.isDisplayed = function() {
@@ -33,10 +37,13 @@ window.maidsafeDemo.directive('progressIndicator', [ '$rootScope', '$timeout', f
 
     self.close = function() {
       self.show = false;
+      self.showCancel = false;
+      self.canceling = false;
       self.percentageCompleted = 0;
     };
 
     self.cancel = function() {
+      self.canceling = true;
       rootScope.$broadcast('cancel-upload');
     }
 
