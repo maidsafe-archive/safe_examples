@@ -26,7 +26,7 @@ export let getDirectoryStats = function(localPath) {
         stats.directories += tempStat.directories;
       } else {
         if (env.isFileUploadSizeRestricted && stat.size > env.maxFileUploadSize) {
-          throw new Error('File more than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
+          throw new Error('File larger  than ' + (env.maxFileUploadSize / 1000000) + ' Mb can not be uploaded');
         }
         stats.files++;
         stats.size += stat.size;
