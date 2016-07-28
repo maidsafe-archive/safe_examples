@@ -1,5 +1,8 @@
 # MaidSafe Demo App Change Log
 
+##[0.5.1]
+- Close application on authorisation failure
+
 ##[0.5.0]
 - New UI workflow integration
   - Separation of website and network data management
