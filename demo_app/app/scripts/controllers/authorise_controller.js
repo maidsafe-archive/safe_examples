@@ -98,6 +98,10 @@ window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$stat
     var authoriseCb = function(err, res) {
       if (err) {
         console.error(err);
+        $rootScope.$loader.hide();
+        $rootScope.prompt.show('Authorisation failed', 'Failed to authorise with launcher.', function() {
+          window.uiUtils.closeApp();
+        });
         return;
       }
       $scope.authorisationTasks.currentState = $scope.authorisationTasks.state.INITIALISING;
