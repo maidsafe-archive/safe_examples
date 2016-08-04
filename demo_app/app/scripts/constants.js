@@ -12,3 +12,10 @@ window.maidsafeDemo.constant('MESSAGES', {
   'CREATE_PUBLIC_ID': 'Creating Public ID',
   'PREPARING_TEMPLATE': 'Preparing Template'
 });
+
+window.maidsafeDemo.constant('CONSTANT', {
+  ROOT_PATH: {
+    APP: 'app',
+    DRIVE: 'drive'
+  }
+});

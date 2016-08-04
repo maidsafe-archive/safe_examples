@@ -4,22 +4,41 @@
   padding-top: 20px;
   .ms-explr-h {
     display: flex;
-    background-color: @blue-200;
-    padding: 3px 0;
+    background-color: @exp-light;
     .ms-explr-h-lt, .ms-explr-h-rt {
       display: inline-block;
       float: left;
-      button {
+      .dark {
+        display: inline-block;
+        float: right;
+        background-color: @exp-dark;
+      }
+      .ms-btn {
         width: 40px;
-        height: 30px;
+        height: 36px;
         float: left;
         background-color: transparent;
         color: white;
         padding: 0 8px;
         display: inline-block;
+        &:hover {
+          opacity: 0.3;
+        }
+        &:active {
+          background-color: @exp-light-active;
+        }
+        &.dark {
+          &:active {
+            background-color: @exp-dark-active;
+          }
+        }
         &:disabled {
-          opacity: 0.5;
+          opacity: 0.2;
           cursor: not-allowed;
+          background-color: @exp-light !important;
+          &.dark {
+            background-color: @exp-dark !important;
+          }
         }
       }
     }
@@ -27,6 +46,7 @@
       flex: 1;
       display: inline-block;
       float: left;
+      padding: 3px 0;
       input {
         width: 100%;
         height: 30px;
@@ -43,7 +63,40 @@
     height: 250px;
     overflow: auto;
     background-color: white;
-    box-shadow: 0 0 1px @gray-500;  
+    box-shadow: 0 0 1px @gray-500;
+    position: relative;
+  }
+  .context-menu {
+    width: 120px;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #FFFFFF;
+    border-radius: 3px;
+    border: 1px solid #EEE;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+      li {
+        button {
+          width: 100%;
+          text-align: left;
+          padding: 8px 16px;
+          background-color: transparent;
+          border: 0;
+          margin: 0;
+          outline: 0;
+          font-size: inherit;
+          cursor: pointer;
+        }
+        &:hover {
+          background-color: @gray-450;
+        }
+      }
+    }
   }
 }
 
@@ -60,6 +113,7 @@
     padding: 24px;
     display: flex;
     position: relative;
+    border: 0;
     &:before {
       content: '';
       width: 94%;
