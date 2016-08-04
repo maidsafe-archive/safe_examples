@@ -9,7 +9,7 @@
       <input type="text" name="addrBar" readonly value="" ng-model="currentDirectory">
     </div>
     <div class="ms-explr-h-rt ms-dropdown">
-      <button type="button" class="ms-btn ms-add-btn" name="upload" ng-click="uploadDialog = !uploadDialog"
+      <button type="button" class="ms-btn ms-add-btn" name="upload" title="Upload" ng-click="uploadDialog = !uploadDialog"
         ng-disabled="listMode || currentDirectory === '/'"></button>
       <div ng-show="uploadDialog" class="ms-dropdown-b">
         <ul style="list-style-type:none">
@@ -21,15 +21,15 @@
           </li>
         </ul>
       </div>
-      <button type="button" class="ms-btn ms-rename-btn" name="rename" ng-click="showRenameField()"
+      <button type="button" class="ms-btn ms-rename-btn" name="rename" title="Rename" ng-click="showRenameField()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-cut-btn dark" name="cut" ng-click="cut()"
+      <button type="button" class="ms-btn ms-cut-btn dark" name="cut" title="Cut" ng-click="cutAction()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-copy-btn dark" name="copy" ng-click="copy()"
+      <button type="button" class="ms-btn ms-copy-btn dark" name="copy" title="Copy" ng-click="copyAction()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-paste-btn dark" name="paste" ng-click="paste()"
+      <button type="button" class="ms-btn ms-paste-btn dark" name="paste" title="Paste" ng-click="pasteAction()"
         ng-disabled="!currentManipulateAction || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-delete-btn dark" name="delete" ng-click="delete()"
+      <button type="button" class="ms-btn ms-delete-btn dark" name="delete" title="Delete" ng-click="deleteAction()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
     </div>
   </div>
@@ -56,7 +56,7 @@
           <div class="ms-list-2-i-ctx size" ng-if="!listMode">Size</div>
           <div class="ms-list-2-i-ctx date">Date</div>
         </div>
-        <div class="ms-list-2-i" ng-repeat="dir in dir.subDirectories | orderBy: 'name'" ng-click="select($event, dir.name, false)" ng-dblclick="openDirectory($event, dir.name)">
+        <div class="ms-list-2-i" ng-repeat="dir in dir.subDirectories | orderBy: 'name'" ng-click="select($event, dir.name, false)" data-is-file="false" data-name="{{dir.name}}" ng-dblclick="openDirectory($event, dir.name)">
           <div class="ms-list-2-i-ctx icn ms-icn-folder">&nbsp;</div>
           <div class="ms-list-2-i-ctx name">{{ dir.name }}</div>
           <div class="ms-list-2-i-ctx rename">
@@ -67,7 +67,7 @@
           <div class="ms-list-2-i-ctx size" ng-if="!listMode">&nbsp;</div>
           <div class="ms-list-2-i-ctx date">{{ dir.createdOn | date : 'dd-MM-yy HH:mm' }}</div>
         </div>
-        <div ng-show="!listMode" class="ms-list-2-i" ng-repeat='file in dir.files' ng-click="select($event, file.name, true)" ng-dblclick="download($event, file.name, file.size)">
+        <div ng-show="!listMode" class="ms-list-2-i" ng-repeat='file in dir.files' ng-click="select($event, file.name, true)" data-is-file="true" data-name="{{file.name}}" ng-dblclick="download($event, file.name, file.size)">
           <div class="ms-list-2-i-ctx icn" ng-class="getFileIconClass(file.name)">&nbsp;</div>
           <div class="ms-list-2-i-ctx name">{{ file.name }}</div>
           <div class="ms-list-2-i-ctx rename">
@@ -82,6 +82,15 @@
           <div class="ms-list-2-i-ctx icn">Empty</div>
         </div> -->
       </div>
+    </div>
+    <div class="context-menu" id="ContextMenu">
+      <ul>
+        <li><button type="button" name="CopyBtn" ng-click="copyAction()" ng-disabled="!listSelected || listMode || currentDirectory === '/'">Copy</button></li>
+        <li><button type="button" name="CutBtn" ng-click="cutAction()" ng-disabled="!listSelected || listMode || currentDirectory === '/'">Cut</button></li>
+        <li><button type="button" name="PasteBtn" ng-click="pasteAction()" ng-disabled="!currentManipulateAction || listMode || currentDirectory === '/'">Paste</button></li>
+        <li><button type="button" name="RenameBtn" ng-click="showRenameField()" ng-disabled="!listSelected || listMode || currentDirectory === '/'">Rename</button></li>
+        <li><button type="button" name="DeleteBtn" ng-click="deleteAction()" ng-disabled="!listSelected || listMode || currentDirectory === '/'">Delete</button></li>
+      </ul>
     </div>
   </div>
 </div>

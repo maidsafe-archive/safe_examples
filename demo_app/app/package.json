@@ -1,6 +1,6 @@
 {
   "name": "maidsafe-demo-app",
-  "productName": "MaidSafe Demo App",
+  "productName": "Launcher Demo App",
   "identifier": "com.maidsafe.demo_app",
   "description": "MaidSafe Demo Application",
   "version": "0.5.1",

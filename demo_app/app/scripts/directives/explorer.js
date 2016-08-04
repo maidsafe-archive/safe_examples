@@ -42,6 +42,28 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       $scope.currentManipulatePath = null;
       $scope.currentManipulateSelectedIsFile = null;
 
+      var selection = function(target, name, isFile) {
+        var reset = function() {
+          $('.ms-list-2-i').removeClass('active');
+          if (target.className.split(' ').indexOf('edit') === -1) {
+            resetRename();
+          }
+        };
+        reset();
+        var ele = angular.element(target);
+        $scope.selectedEle = ele;
+        $scope.listSelected = true;
+        ele.addClass('active');
+        $scope.isFileSelected = isFile;
+        $scope.selectedPath = name;
+        if (isFile || !$scope.onDirectorySelected) {
+          return;
+        }
+        $scope.onDirectorySelected({
+          name: $scope.currentDirectory + $scope.selectedPath + '/'
+        });
+      };
+
       var resetRename = function() {
         var listItems = $('.ms-list-2-i');
         var renameField = $('.ms-list-2-i .rename input[name=rename]');
@@ -57,17 +79,70 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         $scope.currentManipulateSelectedIsFile = null;
       };
 
+      var resetSelection = function() {
+        $scope.selectedPath = '';
+        $scope.selectedEle = null;
+        $scope.listSelected = false;
+      };
+
+      var showContextMenu = function(e) {
+        var contextMenu = $('#ContextMenu');
+        var listItems = $('.ms-list-2-i');
+        var list = $('.ms-list-2');
+        var targetList = null;
+        resetSelection();
+        if ($(e.target).is(listItems)) {
+          targetList = e.target;
+        }
+        if ($(e.target.parentElement).is(listItems)) {
+          targetList = e.target.parentElement;
+        }
+        if ($(e.target).is(list)) {
+          targetList = e.target;
+        }
+        if (!targetList) {
+          return;
+        }
+        var targetName = targetList.dataset['name'];
+        var targetIsFile = targetList.dataset['isFile'] ? JSON.parse(targetList.dataset['isFile']) : false;
+        if (targetName) {
+          selection(targetList, targetName, targetIsFile);
+        }
+        var posX = e.clientX;
+        var posY = e.clientY;
+        contextMenu.show();
+        contextMenu.css('top', posY);
+        contextMenu.css('left', posX);
+        $scope.$applyAsync();
+      };
+
+      var hideContextMenu = function() {
+        var contextMenu = $('#ContextMenu');
+        if ($scope.selectedEle) {
+          $scope.selectedEle.removeClass('active');
+        }
+        contextMenu.hide();
+        contextMenu.css('top', 0);
+        contextMenu.css('left', 0);
+      };
+
       var releaseSelection = function() {
         $(document).on('mouseup', function(e) {
           var listItems = $('.ms-list-2-i');
           var explorer = $('.ms-explr');
+          var contextMenu = $('#ContextMenu');
 
-          if (!listItems.is(e.target) && (listItems.has(e.target).length === 0) && (explorer.has(e.target).length !== 0)) {
+          // show context menu
+          if(e.button === 2) {
+            return showContextMenu(e);
+          }
+          hideContextMenu();
+          if (!listItems.is(e.target) && (listItems.has(e.target).length === 0) && (explorer.has(e.target).length !== 0) && (contextMenu.has(e.target).length === 0)) {
             if ($scope.listSelected) {
               $scope.onDirectorySelected({
                 name: null
               });
-              $scope.listSelected = false;
+              resetSelection();
             }
             resetRename();
             listItems.removeClass('active');
@@ -276,7 +351,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         downloader.download();
       };
 
-      $scope.delete = function() {
+      $scope.deleteAction = function() {
+        resetPaste();
         var path = $scope.currentDirectory + '/' + $scope.selectedPath;
         $rootScope.$loader.show();
         var onDelete = function(err) {
@@ -303,62 +379,39 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         }
         $scope.listSelected = false;
         $scope.selectedPath = directoryName;
-        var selectedDir = $scope.currentDirectory + $scope.selectedPath + '/';
+        var selectedDir = $scope.currentDirectory + $scope.selectedPath;
         if (($scope.currentManipulatePath === selectedDir) && $scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
           resetPaste();
           return;
         }
-        $scope.currentDirectory = selectedDir;
+        $scope.currentDirectory = selectedDir + '/';
+        resetSelection();
         getDirectory();
       };
 
       $scope.select = function($event, name, isFile) {
-        var reset = function() {
-          $('.ms-list-2-i').removeClass('active');
-          if ($event.currentTarget.className.split(' ').indexOf('edit') === -1) {
-            resetRename();
-          }
-        };
-        reset();
-        var ele = angular.element($event.currentTarget);
-        $scope.selectedEle = ele;
-        $scope.listSelected = true;
-        ele.addClass('active');
-        $scope.isFileSelected = isFile;
-        $scope.selectedPath = name;
-        if (isFile || !$scope.onDirectorySelected) {
-          return;
-        }
-        $scope.onDirectorySelected({
-          name: $scope.currentDirectory + $scope.selectedPath + '/'
-        });
+        selection($event.currentTarget, name, isFile);
       };
 
       $scope.showRenameField = function() {
-        console.log($scope.selectedEle);
         $scope.selectedEle.addClass('active edit');
+        $scope.selectedEle.children('.rename').find('input').select();
       };
 
-      $scope.cut = function() {
+      $scope.cutAction = function() {
         $scope.currentManipulateAction = MANIPULATE_ACTION.MOVE;
         $scope.currentManipulatePath = $scope.currentDirectory + $scope.selectedPath;
-        if (!$scope.isFileSelected) {
-          $scope.currentManipulatePath += '/';
-        }
         $scope.currentManipulateSelectedIsFile = $scope.isFileSelected;
-        $scope.selectedEle.addClass('cut')
+        $scope.selectedEle.addClass('cut');
       };
 
-      $scope.copy = function() {
+      $scope.copyAction = function() {
         $scope.currentManipulateAction = MANIPULATE_ACTION.COPY;
         $scope.currentManipulatePath = $scope.currentDirectory + $scope.selectedPath;
-        if (!$scope.isFileSelected) {
-          $scope.currentManipulatePath += '/';
-        }
         $scope.currentManipulateSelectedIsFile = $scope.isFileSelected;
       };
 
-      $scope.paste = function() {
+      $scope.pasteAction = function() {
         var reset = function() {
           $scope.currentManipulatePath = null;
           $scope.currentManipulateAction = null;
@@ -390,17 +443,18 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           getDirectory();
         };
         $rootScope.$loader.show();
+        var selectedPath = $scope.selectedPath ? ($scope.currentDirectory + $scope.selectedPath + '/') : $scope.currentDirectory;
         if ($scope.currentManipulateSelectedIsFile) {
           if ($scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
-            safeApi.moveFile($scope.currentManipulatePath, false, $scope.currentDirectory, false, moveCallback);
+            safeApi.moveFile($scope.currentManipulatePath, false, selectedPath, false, moveCallback);
           } else {
-            safeApi.copyFile($scope.currentManipulatePath, false, $scope.currentDirectory, false, moveCallback);
+            safeApi.copyFile($scope.currentManipulatePath, false, selectedPath, false, moveCallback);
           }
         } else {
           if ($scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
-            safeApi.moveDirectory($scope.currentManipulatePath, false, $scope.currentDirectory, false, copyCallback);
+            safeApi.moveDirectory($scope.currentManipulatePath, false, selectedPath, false, copyCallback);
           } else {
-            safeApi.copyDirectory($scope.currentManipulatePath, false, $scope.currentDirectory, false, copyCallback);
+            safeApi.copyDirectory($scope.currentManipulatePath, false, selectedPath, false, copyCallback);
           }
         }
       };
