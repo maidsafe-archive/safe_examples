@@ -125,12 +125,12 @@
      }
   }
   .ms-list-2-i {
+    border-width: 2px;
+    border-color: transparent;
+    border-style: solid;
     cursor: pointer;
-    &.active {
-      background-color: @blue-100;
-    }
-    &:hover {
-      background-color: @blue-100;
+    &.active, &:hover {
+      background-color: @exp-highlight;
     }
     > .ms-list-2-i-ctx {
       display: inline-block;
@@ -143,11 +143,47 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    &.edit {
+      > .name {
+        display: none;
+      }
+      > .rename {
+        display: block;
+      }
+    }
+    &.cut {
+      border-style: dashed;
+      border-color: @exp-light;
+    }
     > .icn {
       width: 5%;
     }
     > .name {
       width: 40%;
+    }
+    > .rename {
+      width: 40%;
+      position: relative;
+      display: none;
+      input {
+        width: 100%;
+        padding-right: 30px;
+        font-size: 16px;
+        line-height: 29px;
+        border: 0;
+        outline: 0;
+      }
+      button {
+        position: absolute;
+        width: 30px;
+        height: 29px;
+        top: 3px;
+        right: 8px;
+        border: 0;
+        background-color: @blue-300;
+        color: #FFF;
+        outline: 0;
+      }
     }
     > .date {
       width: 15%;

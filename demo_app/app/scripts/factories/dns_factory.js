@@ -1,10 +1,9 @@
 /**
  * DNS factory
  */
-window.maidsafeDemo.factory('dnsFactory', [ function(Shared) {
+window.maidsafeDemo.factory('dnsFactory', [ 'CONSTANT', function(CONSTANT) {
   'use strict';
   var self = this;
-
   self.createPublicId = function(longName, callback) {
     var payload = {
       url: this.SERVER + 'dns/' + longName,
@@ -42,6 +41,7 @@ window.maidsafeDemo.factory('dnsFactory', [ function(Shared) {
 
   // add service
   self.addService = function(longName, serviceName, isPathShared, serviceHomeDirPath, callback) {
+    var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
     var payload = {
       url: this.SERVER + 'dns',
       method: 'PUT',
@@ -51,8 +51,8 @@ window.maidsafeDemo.factory('dnsFactory', [ function(Shared) {
       data: {
         longName: longName,
         serviceName: serviceName,
-        isPathShared: isPathShared,
-        serviceHomeDirPath: serviceHomeDirPath
+        serviceHomeDirPath: serviceHomeDirPath,
+        rootPath: rootPath
       }
     };
     (new this.Request(payload, callback)).send();
