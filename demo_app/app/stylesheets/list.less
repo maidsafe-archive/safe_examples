@@ -129,7 +129,10 @@
     border-color: transparent;
     border-style: solid;
     cursor: pointer;
-    &.active, &:hover {
+    &:hover {
+      background-color: @exp-hover;
+    }
+    &.active {
       background-color: @exp-highlight;
     }
     > .ms-list-2-i-ctx {

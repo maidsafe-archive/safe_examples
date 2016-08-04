@@ -8,6 +8,11 @@
     .ms-explr-h-lt, .ms-explr-h-rt {
       display: inline-block;
       float: left;
+      .dark {
+        display: inline-block;
+        float: right;
+        background-color: @exp-dark;
+      }
       .ms-btn {
         width: 40px;
         height: 36px;
@@ -16,19 +21,13 @@
         color: white;
         padding: 0 8px;
         display: inline-block;
-        &.dark {
-          background-color: @exp-dark;
-        }
         &:hover {
-          background-color: @exp-light-hover;
+          opacity: 0.3;
         }
         &:active {
           background-color: @exp-light-active;
         }
         &.dark {
-          &:hover {
-            background-color: @exp-dark-hover;
-          }
           &:active {
             background-color: @exp-dark-active;
           }

@@ -23,14 +23,16 @@
       </div>
       <button type="button" class="ms-btn ms-rename-btn" name="rename" title="Rename" ng-click="showRenameField()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-cut-btn dark" name="cut" title="Cut" ng-click="cutAction()"
+      <div class="dark">
+        <button type="button" class="ms-btn ms-cut-btn dark" name="cut" title="Cut" ng-click="cutAction()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-copy-btn dark" name="copy" title="Copy" ng-click="copyAction()"
+        <button type="button" class="ms-btn ms-copy-btn dark" name="copy" title="Copy" ng-click="copyAction()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-paste-btn dark" name="paste" title="Paste" ng-click="pasteAction()"
+        <button type="button" class="ms-btn ms-paste-btn dark" name="paste" title="Paste" ng-click="pasteAction()"
         ng-disabled="!currentManipulateAction || listMode || currentDirectory === '/'"></button>
-      <button type="button" class="ms-btn ms-delete-btn dark" name="delete" title="Delete" ng-click="deleteAction()"
-        ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
+        <button type="button" class="ms-btn ms-delete-btn dark" name="delete" title="Delete" ng-click="deleteAction()"
+        ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>        
+      </div>
     </div>
   </div>
   <div class="ms-explr-cont">

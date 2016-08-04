@@ -56,6 +56,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         ele.addClass('active');
         $scope.isFileSelected = isFile;
         $scope.selectedPath = name;
+        $scope.$applyAsync();
         if (isFile || !$scope.onDirectorySelected) {
           return;
         }
@@ -80,8 +81,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       };
 
       var resetSelection = function() {
-        $scope.selectedPath = '';
-        $scope.selectedEle = null;
         $scope.listSelected = false;
       };
 
@@ -385,7 +384,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           return;
         }
         $scope.currentDirectory = selectedDir + '/';
-        resetSelection();
+        $scope.selectedPath = '';
         getDirectory();
       };
 
@@ -402,7 +401,9 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         $scope.currentManipulateAction = MANIPULATE_ACTION.MOVE;
         $scope.currentManipulatePath = $scope.currentDirectory + $scope.selectedPath;
         $scope.currentManipulateSelectedIsFile = $scope.isFileSelected;
-        $scope.selectedEle.addClass('cut');
+        if ($scope.selectedEle) {
+          $scope.selectedEle.addClass('cut');
+        }
       };
 
       $scope.copyAction = function() {
