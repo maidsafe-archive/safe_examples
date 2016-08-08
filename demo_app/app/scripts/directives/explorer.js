@@ -163,6 +163,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var onResponse = function(err, dir) {
           $rootScope.$loader.hide();
           if (err) {
+            $rootScope.prompt.show('Operation Failed', 'Failed to fetch Directory', function() {
+            }, { title: 'Reason', ctx: err.data.description });
             return console.error(err);
           }
           $scope.dir = dir;
@@ -288,7 +290,10 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       };
 
       $scope.renameTarget = function(e) {
-        var renameEle = e.currentTarget.previousElementSibling;
+        var renameEle = e.target.children.rename;
+        var reset = function() {
+          $('.ms-list-2-i').removeClass('active');
+        };
         if (renameEle.nodeName !== 'INPUT') {
           return;
         }
@@ -296,13 +301,22 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         if (!newName) {
           return;
         }
+        reset();
+        var fileOrFolderlist = $scope.isFileSelected ? $scope.dir.files.map(function(obj) {
+          return obj.name;
+        }) : $scope.dir.subDirectories.map(function(obj) {
+          return obj.name;
+        });
+        if ((newName === renameEle.dataset.originalVal) || (fileOrFolderlist.indexOf(newName) !== -1)) {
+          return resetRename();
+        }
         var callback = function(err) {
           $rootScope.$loader.hide();
           if (err) {
             $rootScope.prompt.show('MaidSafe Demo', 'Rename failed', function() {},
             {
               title: 'Reason',
-              ctx: err
+              ctx: err.data.description
             });
           }
           getDirectory();
@@ -352,6 +366,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
 
       $scope.deleteAction = function() {
         resetPaste();
+        resetSelection();
         var path = $scope.currentDirectory + '/' + $scope.selectedPath;
         $rootScope.$loader.show();
         var onDelete = function(err) {
@@ -389,10 +404,16 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       };
 
       $scope.select = function($event, name, isFile) {
+        var renameInput = $('.ms-list-2-i-ctx.rename');
+        if (renameInput.is($event.target) || (renameInput.has($event.target).length !== 0)) {
+          $($event.target).parents('.ms-list-2-i').addClass('active');
+          return;
+        }
         selection($event.currentTarget, name, isFile);
       };
 
       $scope.showRenameField = function() {
+        resetSelection();
         $scope.selectedEle.addClass('active edit');
         $scope.selectedEle.children('.rename').find('input').select();
       };
@@ -404,18 +425,21 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         if ($scope.selectedEle) {
           $scope.selectedEle.addClass('cut');
         }
+        resetSelection();
       };
 
       $scope.copyAction = function() {
         $scope.currentManipulateAction = MANIPULATE_ACTION.COPY;
         $scope.currentManipulatePath = $scope.currentDirectory + $scope.selectedPath;
         $scope.currentManipulateSelectedIsFile = $scope.isFileSelected;
+        resetSelection();
       };
 
       $scope.pasteAction = function() {
         var reset = function() {
           $scope.currentManipulatePath = null;
           $scope.currentManipulateAction = null;
+          resetSelection();
         };
 
         var moveCallback = function(err, res) {

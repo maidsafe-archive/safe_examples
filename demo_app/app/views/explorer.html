@@ -21,17 +21,17 @@
           </li>
         </ul>
       </div>
-      <button type="button" class="ms-btn ms-rename-btn" name="rename" title="Rename" ng-click="showRenameField()"
-        ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
       <div class="dark">
-        <button type="button" class="ms-btn ms-cut-btn dark" name="cut" title="Cut" ng-click="cutAction()"
+        <button type="button" class="ms-btn ms-rename-btn" name="rename" title="Rename" ng-click="showRenameField()"
+          ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
+        <button type="button" class="ms-btn ms-cut-btn" name="cut" title="Cut" ng-click="cutAction()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-        <button type="button" class="ms-btn ms-copy-btn dark" name="copy" title="Copy" ng-click="copyAction()"
+        <button type="button" class="ms-btn ms-copy-btn" name="copy" title="Copy" ng-click="copyAction()"
         ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
-        <button type="button" class="ms-btn ms-paste-btn dark" name="paste" title="Paste" ng-click="pasteAction()"
+        <button type="button" class="ms-btn ms-paste-btn" name="paste" title="Paste" ng-click="pasteAction()"
         ng-disabled="!currentManipulateAction || listMode || currentDirectory === '/'"></button>
-        <button type="button" class="ms-btn ms-delete-btn dark" name="delete" title="Delete" ng-click="deleteAction()"
-        ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>        
+        <button type="button" class="ms-btn ms-delete-btn" name="delete" title="Delete" ng-click="deleteAction()"
+        ng-disabled="!listSelected || listMode || currentDirectory === '/'"></button>
       </div>
     </div>
   </div>
@@ -62,8 +62,10 @@
           <div class="ms-list-2-i-ctx icn ms-icn-folder">&nbsp;</div>
           <div class="ms-list-2-i-ctx name">{{ dir.name }}</div>
           <div class="ms-list-2-i-ctx rename">
-            <input type="text" name="rename" ng-value="dir.name" data-original-val="{{dir.name}}">
-            <button type="button" class="ms-tick-btn" name="renameSubmit" ng-click="renameTarget($event)"></button>
+            <form ng-submit="renameTarget($event)">
+              <input type="text" name="rename" ng-value="dir.name" data-original-val="{{dir.name}}">
+              <button type="submit" class="ms-tick-btn" name="renameSubmit"></button>
+            </form>
           </div>
           <div class="ms-list-2-i-ctx type" ng-if="!listMode">&nbsp;</div>
           <div class="ms-list-2-i-ctx size" ng-if="!listMode">&nbsp;</div>
@@ -73,8 +75,10 @@
           <div class="ms-list-2-i-ctx icn" ng-class="getFileIconClass(file.name)">&nbsp;</div>
           <div class="ms-list-2-i-ctx name">{{ file.name }}</div>
           <div class="ms-list-2-i-ctx rename">
-            <input type="text" name="rename" ng-value="file.name" data-original-val="{{file.name}}">
-            <button type="button" class="ms-tick-btn" name="renameSubmit" ng-click="renameTarget($event)"></button>
+            <form ng-submit="renameTarget($event)">
+              <input type="text" name="rename" ng-value="file.name" data-original-val="{{file.name}}">
+              <button type="submit" class="ms-tick-btn" name="renameSubmit"></button>
+            </form>
           </div>
           <div class="ms-list-2-i-ctx type">{{ mime.lookup(file.name) }}</div>
           <div class="ms-list-2-i-ctx size">{{ bytesToSize(file.size) }}</div>
