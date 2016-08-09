@@ -160,6 +160,21 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           return;
         }
         $rootScope.$loader.show();
+        var setCutItem = function() {
+          var dirName = $scope.currentManipulatePath;
+          var baseName = '';
+          if (dirName.slice(-1) === '/') {
+            dirName = dirName.slice(0, -1);
+          }
+          dirName = dirName.split('/');
+          baseName = dirName.pop();
+          dirName = dirName.join('/') + '/';
+          if ($scope.currentDirectory !== dirName) {
+            return;
+          }
+          angular.element(element.find('.ms-list-2 .ms-list-2-i[data-name="' + baseName + '"]')).addClass('cut');
+        };
+
         var onResponse = function(err, dir) {
           $rootScope.$loader.hide();
           if (err) {
@@ -184,6 +199,11 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
                 element.find('.ms-explr-cont').scrollTop(targetFolderEle.position().top);
               }
             }, 200);
+          }
+          if ($scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
+            $timeout(function() {
+              setCutItem();
+            }, 50);
           }
         };
         safeApi.getDir(onResponse, $scope.currentDirectory, false);
@@ -313,7 +333,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var callback = function(err) {
           $rootScope.$loader.hide();
           if (err) {
-            $rootScope.prompt.show('MaidSafe Demo', 'Rename failed', function() {},
+            $rootScope.prompt.show('Operation Failed', 'Rename failed', function() {},
             {
               title: 'Reason',
               ctx: err.data.description
@@ -343,7 +363,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
             console.log(err);
-            return $rootScope.prompt.show('MaidSafe Demo', 'Download failed', function() {
+            return $rootScope.prompt.show('Operation Failed', 'Download failed', function() {
               $rootScope.progressBar.close();
             },
             {
@@ -373,7 +393,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            $rootScope.prompt.show('MaidSafe Demo', 'Delete failed', function() {}, {
+            $rootScope.prompt.show('Operation Failed', 'Delete failed', function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });
@@ -446,7 +466,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            $rootScope.prompt.show('MaidSafe Demo', 'Move failed', function() {}, {
+            $rootScope.prompt.show('Operation Failed', 'Move failed', function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });
@@ -459,7 +479,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            $rootScope.prompt.show('MaidSafe Demo', 'Copy failed', function() {}, {
+            $rootScope.prompt.show('Operation Failed', 'Copy failed', function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });
