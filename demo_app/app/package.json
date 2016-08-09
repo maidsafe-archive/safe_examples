@@ -1,8 +1,8 @@
 {
-  "name": "maidsafe-demo-app",
-  "productName": "Launcher Demo App",
+  "name": "safe-demo-app",
+  "productName": "SAFE Demo App",
   "identifier": "com.maidsafe.demo_app",
-  "description": "MaidSafe Demo Application",
+  "description": "SAFE Demo Application",
   "version": "0.5.1",
   "author": "MaidSafe",
   "copyright": "",

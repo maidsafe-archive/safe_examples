@@ -1,6 +1,6 @@
 {
-  "name": "maidsafe-demo-app",
-  "description": "MaidSafe Demo App",
+  "name": "safe-demo-app",
+  "description": "SAFE Demo App",
   "dependencies": {
     "angular": "^1.4.0",
     "angular-ui-router": "~0.2.15",
