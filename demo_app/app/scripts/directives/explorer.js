@@ -333,7 +333,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var callback = function(err) {
           $rootScope.$loader.hide();
           if (err) {
-            $rootScope.prompt.show('Operation Failed', 'Rename failed', function() {},
+            $rootScope.prompt.show('Operation Failed', 'Failed to rename ' + ($scope.isFileSelected ? 'file': 'directory' ), function() {},
             {
               title: 'Reason',
               ctx: err.data.description
@@ -363,7 +363,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
             console.log(err);
-            return $rootScope.prompt.show('Operation Failed', 'Download failed', function() {
+            return $rootScope.prompt.show('Operation Failed', 'Failed to download ' + ($scope.isFileSelected ? 'file': 'directory' ), function() {
               $rootScope.progressBar.close();
             },
             {
@@ -393,7 +393,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            $rootScope.prompt.show('Operation Failed', 'Delete failed', function() {}, {
+            $rootScope.prompt.show('Operation Failed', 'Failed to delete ' + ($scope.isFileSelected ? 'file': 'directory' ), function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });
@@ -466,7 +466,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            $rootScope.prompt.show('Operation Failed', 'Move failed', function() {}, {
+            $rootScope.prompt.show('Operation Failed', 'Failed to move ' + ($scope.currentManipulateSelectedIsFile ? 'file': 'directory' ), function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });
@@ -479,7 +479,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $rootScope.$loader.hide();
           if (err) {
             console.error(err)
-            $rootScope.prompt.show('Operation Failed', 'Copy failed', function() {}, {
+            $rootScope.prompt.show('Operation Failed', 'Failed to copy ' + ($scope.currentManipulateSelectedIsFile ? 'file': 'directory' ), function() {}, {
               title: 'Reason',
               ctx: err.data.description
             });
@@ -493,11 +493,11 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           if ($scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
             safeApi.moveFile($scope.currentManipulatePath, false, selectedPath, false, moveCallback);
           } else {
-            safeApi.copyFile($scope.currentManipulatePath, false, selectedPath, false, moveCallback);
+            safeApi.copyFile($scope.currentManipulatePath, false, selectedPath, false, copyCallback);
           }
         } else {
           if ($scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
-            safeApi.moveDirectory($scope.currentManipulatePath, false, selectedPath, false, copyCallback);
+            safeApi.moveDirectory($scope.currentManipulatePath, false, selectedPath, false, moveCallback);
           } else {
             safeApi.copyDirectory($scope.currentManipulatePath, false, selectedPath, false, copyCallback);
           }
