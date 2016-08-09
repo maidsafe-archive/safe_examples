@@ -71,7 +71,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         renameField.val(function() {
           return this.dataset['originalVal'];
         });
-        listItems.removeClass('edit cut');
+        listItems.removeClass('edit');
       };
 
       var resetPaste = function() {
@@ -178,9 +178,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var onResponse = function(err, dir) {
           $rootScope.$loader.hide();
           if (err) {
-            $rootScope.prompt.show('Operation Failed', 'Failed to fetch Directory', function() {
+            return $rootScope.prompt.show('Operation Failed', 'Failed to fetch Directory', function() {
             }, { title: 'Reason', ctx: err.data.description });
-            return console.error(err);
           }
           $scope.dir = dir;
           $scope.$applyAsync();
@@ -302,7 +301,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
             });
             uploader.upload(selection[0], $scope.isPrivate, networkPath);
           } catch (err) {
-            console.error(err);
             $rootScope.$loader.hide();
             $rootScope.prompt.show('Operation Failed', err.message);
           }
@@ -362,7 +360,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           $scope.currentDirectory + $scope.selectedPath, size, false, $rootScope.tempDirPath);
         downloader.setOnCompleteCallback(function(err) {
           if (err) {
-            console.log(err);
             return $rootScope.prompt.show('Operation Failed', 'Failed to download ' + ($scope.isFileSelected ? 'file': 'directory' ), function() {
               $rootScope.progressBar.close();
             },
@@ -392,7 +389,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var onDelete = function(err) {
           $rootScope.$loader.hide();
           if (err) {
-            console.error(err)
             $rootScope.prompt.show('Operation Failed', 'Failed to delete ' + ($scope.isFileSelected ? 'file': 'directory' ), function() {}, {
               title: 'Reason',
               ctx: err.data.description
@@ -434,7 +430,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
 
       $scope.showRenameField = function() {
         resetSelection();
-        $scope.selectedEle.addClass('active edit');
+        resetPaste();
+        $scope.selectedEle.addClass('active edit').removeClass('cut');
         $scope.selectedEle.children('.rename').find('input').select();
       };
 
@@ -465,7 +462,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var moveCallback = function(err, res) {
           $rootScope.$loader.hide();
           if (err) {
-            console.error(err)
             $rootScope.prompt.show('Operation Failed', 'Failed to move ' + ($scope.currentManipulateSelectedIsFile ? 'file': 'directory' ), function() {}, {
               title: 'Reason',
               ctx: err.data.description
@@ -478,7 +474,6 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var copyCallback = function(err, res) {
           $rootScope.$loader.hide();
           if (err) {
-            console.error(err)
             $rootScope.prompt.show('Operation Failed', 'Failed to copy ' + ($scope.currentManipulateSelectedIsFile ? 'file': 'directory' ), function() {}, {
               title: 'Reason',
               ctx: err.data.description
@@ -488,7 +483,13 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           getDirectory();
         };
         $rootScope.$loader.show();
-        var selectedPath = $scope.selectedPath ? ($scope.currentDirectory + $scope.selectedPath + '/') : $scope.currentDirectory;
+        var selectedPath = '';
+        if ($scope.isFileSelected) {
+          selectedPath = $scope.currentDirectory;
+        } else {
+          selectedPath = $scope.selectedPath ? ($scope.currentDirectory + $scope.selectedPath) : $scope.currentDirectory;
+        }
+        selectedPath += '/';
         if ($scope.currentManipulateSelectedIsFile) {
           if ($scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
             safeApi.moveFile($scope.currentManipulatePath, false, selectedPath, false, moveCallback);
