@@ -84,6 +84,10 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         $scope.listSelected = false;
       };
 
+      var resetCut = function() {
+        $('.ms-list-2-i').removeClass('cut');
+      };
+
       var showContextMenu = function(e) {
         var contextMenu = $('#ContextMenu');
         var listItems = $('.ms-list-2-i');
@@ -431,7 +435,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       $scope.showRenameField = function() {
         resetSelection();
         resetPaste();
-        $scope.selectedEle.addClass('active edit').removeClass('cut');
+        resetCut();
+        $scope.selectedEle.addClass('active edit');
         $scope.selectedEle.children('.rename').find('input').select();
       };
 
@@ -442,6 +447,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         if ($scope.selectedEle) {
           $scope.selectedEle.addClass('cut');
         }
+        $scope.selectedPath = null;
         resetSelection();
       };
 
@@ -449,7 +455,9 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         $scope.currentManipulateAction = MANIPULATE_ACTION.COPY;
         $scope.currentManipulatePath = $scope.currentDirectory + $scope.selectedPath;
         $scope.currentManipulateSelectedIsFile = $scope.isFileSelected;
+        $scope.selectedPath = null;
         resetSelection();
+        resetCut();
       };
 
       $scope.pasteAction = function() {
