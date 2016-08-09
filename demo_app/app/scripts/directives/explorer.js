@@ -45,7 +45,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
       var selection = function(target, name, isFile) {
         var reset = function() {
           $('.ms-list-2-i').removeClass('active');
-          if (target.className.split(' ').indexOf('edit') === -1) {
+          if (target.className && target.className.split(' ').indexOf('edit') === -1) {
             resetRename();
           }
         };
@@ -416,6 +416,8 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
         var selectedDir = $scope.currentDirectory + $scope.selectedPath;
         if (($scope.currentManipulatePath === selectedDir) && $scope.currentManipulateAction === MANIPULATE_ACTION.MOVE) {
           resetPaste();
+          resetCut();
+          $('.ms-list-2-i').removeClass('active');
           return;
         }
         $scope.currentDirectory = selectedDir + '/';
