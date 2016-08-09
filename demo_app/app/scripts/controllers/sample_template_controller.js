@@ -5,7 +5,7 @@ window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$stat
   function($scope, $http, $state, $rootScope, $msg, safe) {
     'use strict';
     $scope.siteTitle = 'My Page';
-    $scope.siteDesc = 'This page is created and published on the SAFE Network using the MaidSafe demo app';
+    $scope.siteDesc = 'This page is created and published on the SAFE Network using the SAFE demo app';
     $scope.longName = safe.getUserLongName();
     $scope.targetFolderName = $state.params.serviceName + '-service';
     var dirPath = 'views/sample_template';
