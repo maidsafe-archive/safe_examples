@@ -16,6 +16,10 @@ module.exports.os = function() {
   return 'unsupported';
 };
 
+module.exports.getArch = function() {
+  return argv.arch || os.arch();
+};
+
 module.exports.replace = function(str, patterns) {
   Object.keys(patterns).forEach(function(pattern) {
     var matcher = new RegExp('{{' + pattern + '}}', 'g');

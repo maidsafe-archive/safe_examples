@@ -47,28 +47,7 @@ npm run package
 ```
 this will generate the package files in the `app_dist` folder
 
+Additional `arch` argument can be passed to the `package` command. If this argument is not specified,
+the current nodejs platform architecture will be used. Accepted values are `x86` and `x64`.
 
-# Making a release
-
-To make ready for distribution installer use command:
-```
-npm run release
-```
-It will start the packaging process for operating system you are running this command on. Ready for distribution file will be outputted to `releases` directory.
-
-You can create Windows installer only when running on Windows, the same is true for Linux and OSX. So to generate all three installers you need all three operating systems.
-
-## Mac only
-
-#### App signing
-
-The Mac release supports [code signing](https://developer.apple.com/library/mac/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html). To sign the `.app` in the release image, include the certificate ID in the command as so,
-```
-npm run release -- --sign A123456789
-```
-
-## Windows only
-
-#### Installer
-
-The installer is built using [NSIS](http://nsis.sourceforge.net). You have to install NSIS version 3.0, and add its folder to PATH in Environment Variables.
+Example usage `npm run package -- --arch=x64`
