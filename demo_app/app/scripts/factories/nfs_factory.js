@@ -1,20 +1,16 @@
 /**
  * Nfs factory
  */
-window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
+window.maidsafeDemo.factory('nfsFactory', [ 'CONSTANT', function(CONSTANT) {
   'use strict';
   var self = this;
   var mime = require('mime');
-  var ROOT_PATH = {
-    APP: 'app',
-    DRIVE: 'drive'
-  };
   var fs = require('fs');
   var request = require('request');
 
   // create new directory
   self.createDir = function(dirPath, isPrivate, userMetadata, isPathShared, callback) {
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+    var rootPath = isPathShared ? CONSTANT.CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
     dirPath = dirPath[0] === '/' ? dirPath.slice(1) : dirPath;
     var payload = {
       url: this.SERVER + 'nfs/directory/' + rootPath + '/' + dirPath,
@@ -32,7 +28,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
 
   // get specific directory
   self.getDir = function(callback, dirPath, isPathShared) {
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+    var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
     var URL = this.SERVER + 'nfs/directory/' + rootPath + '/' + dirPath;
     var payload = {
       url: URL,
@@ -45,7 +41,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
   };
 
   self.deleteDirectory = function(dirPath, isPathShared, callback) {
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+    var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
     var url = this.SERVER + 'nfs/directory/' + rootPath + '/' + dirPath;
     var payload = {
       url: url,
@@ -58,7 +54,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
   };
 
   self.deleteFile = function(filePath, isPathShared, callback) {
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+    var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
     var payload = {
       url: this.SERVER + 'nfs/file/' + rootPath + '/' + filePath,
       method: 'DELETE',
@@ -70,7 +66,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
   };
 
   self.createFile = function(filePath, metadata, isPathShared, localPath, callback) {
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+    var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
     var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
 
     var factor = 0;
@@ -103,13 +99,13 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
       callback({data: errMsg});
     });
     fileStream.pipe(writeStream);
-    return writeStream;    
+    return writeStream;
   };
 
   // self.modifyFileContent = function(filePath, isPathShared, localPath, offset, callback) {
   //   offset = offset || 0;
   //   var self = this;
-  //   var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+  //   var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
   //   var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
   //   // TODO this factor usage is just a patch - must use a better implementation for progress bar handling
   //   var factor = 0;
@@ -136,7 +132,7 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
   // };
 
   self.getFile = function(filePath, isPathShared, downloadPath, callback) {
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
+    var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
     var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
     var headers = {
       auth: {
@@ -155,28 +151,66 @@ window.maidsafeDemo.factory('nfsFactory', [ function(Shared) {
     .pipe(fs.createWriteStream(downloadPath));
   };
 
-  var rename = function(path, isPathShared, newName, isFile, callback) {
-    var rootPath = isPathShared ? ROOT_PATH.DRIVE : ROOT_PATH.APP;
-    var url = this.SERVER + (isFile ? 'nfs/file/metadata/' : 'nfs/directory/') + rootPath + '/' + path;
+  self.rename = function(self, path, isPathShared, newName, isFile, callback) {
+    var rootPath = isPathShared ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
+    var url = self.SERVER + (isFile ? 'nfs/file/metadata/' : 'nfs/directory/') + rootPath + '/' + path;
     var payload = {
       url: url,
       method: 'PUT',
       headers: {
-        authorization: 'Bearer ' + this.getAuthToken()
+        authorization: 'Bearer ' + self.getAuthToken()
       },
       data: {
         name: newName
       }
     };
-    (new this.Request(payload, callback)).send();
+    (new self.Request(payload, callback)).send();
   };
 
   self.renameDirectory = function(dirPath, isPathShared, newName, callback) {
-    rename(dirPath, isPathShared, newName, false, callback);
+    self.rename(this, dirPath, isPathShared, newName, false, callback);
   };
 
   self.renameFile = function(oldPath, isPathShared, newPath, callback) {
-    rename(dirPath, isPathShared, newName, true, callback);
+    self.rename(this, oldPath, isPathShared, newPath, true, callback);
   };
+
+  self.moveOrCopy = function(self, srcPath, srcRootPath, destPath, destRootPath, isFile, toMove, callback) {
+    srcRootPath = srcRootPath ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
+    destRootPath = destRootPath ? CONSTANT.ROOT_PATH.DRIVE : CONSTANT.ROOT_PATH.APP;
+    var url = self.SERVER + (isFile ? 'nfs/movefile/' : 'nfs/movedir/');
+    var payload = {
+      url: url,
+      method: 'POST',
+      headers: {
+        authorization: 'Bearer ' + self.getAuthToken()
+      },
+      data: {
+        srcPath: srcPath,
+        destPath: destPath,
+        srcRootPath: srcRootPath,
+        destRootPath: destRootPath,
+        action: (toMove ? 'MOVE' : 'COPY')
+      }
+    };
+    (new self.Request(payload, callback)).send();
+  };
+
+  self.moveDirectory = function(srcPath, srcRootPath, destPath, destRootPath, callback) {
+    self.moveOrCopy(this, srcPath, srcRootPath, destPath, destRootPath, false, true, callback);
+  };
+
+  self.moveFile = function(srcPath, srcRootPath, destPath, destRootPath, callback) {
+    self.moveOrCopy(this, srcPath, srcRootPath, destPath, destRootPath, true, true, callback);
+  };
+
+  self.copyDirectory = function(srcPath, srcRootPath, destPath, destRootPath, callback) {
+    self.moveOrCopy(this, srcPath, srcRootPath, destPath, destRootPath, false, false, callback);
+  };
+
+  self.copyFile = function(srcPath, srcRootPath, destPath, destRootPath, callback) {
+    self.moveOrCopy(this, srcPath, srcRootPath, destPath, destRootPath, true, false, callback);
+  };
+
   return self;
 } ]);

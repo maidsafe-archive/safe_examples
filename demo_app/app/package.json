@@ -1,11 +1,11 @@
 {
-  "name": "maidsafe-demo-app",
-  "productName": "MaidSafe Demo App",
+  "name": "safe-demo-app",
+  "productName": "SAFE Demo App",
   "identifier": "com.maidsafe.demo_app",
-  "description": "MaidSafe Demo Application",
+  "description": "SAFE Demo Application",
   "version": "0.5.1",
   "author": "MaidSafe",
-  "copyright": "",
+  "copyright": "© 2016, MaidSafe.net Ltd",
   "main": "background.js",
   "dependencies": {
     "async": "^1.5.2",
