@@ -12,7 +12,7 @@ export default class FileHelper {
     this.networkParentDirPath = networkParentDirPath[networkParentDirPath.length - 1] === '/' ?
       networkParentDirPath : networkParentDirPath + '/';
   }
-
+  /* jscs:disable disallowDanglingUnderscores*/
   _OnContentUploaded(err, uploadedSize) {
     uploadedSize = uploadedSize || 0;
     if (err) {
@@ -31,6 +31,7 @@ export default class FileHelper {
     }
     this.uploader.progressListener.onSuccess(uploadedSize, this.networkParentDirPath + this.fileName);
   }
+  /* jscs:enable disallowDanglingUnderscores*/
   //
   // _uploadFileContent(err) {
   //   let self = this;
@@ -52,10 +53,12 @@ export default class FileHelper {
     let self = this;
     this.onCompleteCallback = callback;
     console.log('Creating file', this.networkParentDirPath + this.fileName);
+    /* jscs:disable disallowDanglingUnderscores*/
     this.stream = self.uploader.api.createFile(this.networkParentDirPath + this.fileName, '',
-                                  false, this.localPath, function(err, uploadedSize) {
-                                  self._OnContentUploaded(err, uploadedSize);
-                                 });
+    false, this.localPath, function(err, uploadedSize) {
+      self._OnContentUploaded(err, uploadedSize);
+    });
+    /* jscs:enable disallowDanglingUnderscores*/
   }
 
   cancel() {
