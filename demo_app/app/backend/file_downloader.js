@@ -25,12 +25,13 @@ export default class Downloader {
   setOnCompleteCallback(callback) {
     this.onComplete = callback;
   }
-
+  /* jscs:disable disallowDanglingUnderscores*/
   _postStatus() {
     if (!this.statusCallback) {
       return;
     }
-    let status = (this.downloadedSize === 0 && this.size === 0) ? 100 : Math.floor((this.downloadedSize * 100) / this.size);
+    let status = (this.downloadedSize === 0 && this.size === 0) ? 100 :
+      Math.floor((this.downloadedSize * 100) / this.size);
     this.statusCallback(status);
   }
 
@@ -52,6 +53,7 @@ export default class Downloader {
       self._onResponse(err, sizeDownloaded);
     });
   }
+  /* jscs:enable disallowDanglingUnderscores*/
 
   download() {
     var self = this;
@@ -60,16 +62,20 @@ export default class Downloader {
     if (this.size === 0) {
       this.onComplete();
     } else {
+      /* jscs:disable disallowDanglingUnderscores*/
       this._downloadContent();
     }
     this._postStatus();
+    /* jscs:enable disallowDanglingUnderscores*/
   }
 
   open() {
     var self = this;
-    fse.ensureFile(this.downloadPath, function (err) {
+    fse.ensureFile(this.downloadPath, function(err) {
       if (err) {
+        /* jscs:disable disallowDanglingUnderscores*/
         return self._onResponse('Not able to write file on local machine', self.size);
+        /* jscs:enable disallowDanglingUnderscores*/
       }
       remote.shell.showItemInFolder(self.downloadPath);
     });

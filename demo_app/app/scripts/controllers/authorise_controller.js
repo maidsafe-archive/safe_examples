@@ -1,7 +1,8 @@
 /**
  * Authorisation controller
  */
-window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$state', 'safeApiFactory', function($scope, $rootScope, $state, safe) {
+window.maidsafeDemo.controller('AuthoriseCtrl', [ '$scope', '$rootScope', '$state', 'safeApiFactory',
+function($scope, $rootScope, $state, safe) {
   'use strict';
   $scope.authorisationTasks = {
     state: {
