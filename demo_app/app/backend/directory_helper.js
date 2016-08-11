@@ -66,7 +66,7 @@ class TaskQueue {
     };
     this.queue.every(function(helper) {
       tasks.push(new UploadTask(helper));
-      return true
+      return true;
     });
     async.series(tasks, function(err) {
       if (err && self.onError) {
@@ -108,6 +108,7 @@ export class DirectoryHelper {
     this.taskQueue = new TaskQueue(this.onError);
   }
 
+  /* jscs:disable disallowDanglingUnderscores*/
   _createTasks(localPath, networkPath) {
     let stat;
     let tempPath;
@@ -124,13 +125,15 @@ export class DirectoryHelper {
       }
     }
   }
-
+  /* jscs:enable disallowDanglingUnderscores*/
   upload() {
     let stat = fs.statSync(this.localPath);
     if (stat.isDirectory()) {
       let networkPath = this.networkParentDirPath || '/';
       this.taskQueue.add(new DirectoryCreationHelper(this.networkParentDirPath, this.isPrivate, this.uploader));
+      /* jscs:disable disallowDanglingUnderscores*/
       this._createTasks(this.localPath, this.networkParentDirPath);
+      /* jscs:enable disallowDanglingUnderscores*/
     } else {
       this.taskQueue.add(new FileHelper(this.uploader, this.localPath, this.networkParentDirPath));
     }

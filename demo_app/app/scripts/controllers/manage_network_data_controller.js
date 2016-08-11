@@ -25,7 +25,8 @@ window.maidsafeDemo.controller('NetworkDataCtrl', [ '$rootScope', '$scope', '$st
 
     $scope.setTargetFolder = function(name) {
       if (name) {
-        return $scope.selectedFolder = name;
+        $scope.selectedFolder = name;
+        return;
       }
       $scope.selectedFolder = null;
       $scope.$applyAsync();

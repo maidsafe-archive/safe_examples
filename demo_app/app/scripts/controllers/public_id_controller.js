@@ -10,7 +10,7 @@ window.maidsafeDemo.controller('PublicIdCtrl', [ '$scope', '$state', '$rootScope
     $scope.init = function() {
       var longName = safe.getUserLongName();
       if (longName) {
-        return $state.go('manageService', {longName: longName});
+        return $state.go('manageService', { longName: longName });
       }
     };
 
