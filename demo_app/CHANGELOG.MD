@@ -1,5 +1,12 @@
 # MaidSafe Demo App Change Log
 
+##[0.6.0]
+- Compatibility with launcher 0.8.0
+- Rename files and folders
+- Cut/Copy files and folders
+- Packaging fixes
+- Minor style fixes
+
 ##[0.5.1]
 - Close application on authorisation failure
 
