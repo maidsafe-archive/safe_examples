@@ -1,7 +1,8 @@
 /**
  * Service controller
  */
-window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope', '$timeout', 'MESSAGES', 'safeApiFactory',
+window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope',
+'$timeout', 'MESSAGES', 'safeApiFactory',
   function($scope, $state, $rootScope, $timeout, $msg, safe) {
     'use strict';
     $scope.serviceName = '';
@@ -30,7 +31,8 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             if (err) {
               console.error(err);
               $rootScope.$loader.hide();
-              return $rootScope.prompt.show('Get Services', 'Failed to map service to \'HOME DIRECTORY\'', function() {}, {
+              return $rootScope.prompt.show('Get Services', 'Failed to map service to \'HOME DIRECTORY\'',
+              function() {}, {
                 title: 'Reason',
                 ctx: err.data.description
               });
@@ -38,7 +40,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
             if (index === (serviceList.length - 1)) {
               $rootScope.$loader.hide();
             }
-            addServices(longName, service, homeDir.info.name)
+            addServices(longName, service, homeDir.info.name);
           });
         });
       };
@@ -139,7 +141,7 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
           });
         }
         $rootScope.prompt.show('Service Deleted', 'Service deleted successfully!', function() {
-          $state.go('manageService', {}, {reload: true});
+          $state.go('manageService', {}, { reload: true });
         });
       });
     };

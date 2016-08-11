@@ -1,7 +1,8 @@
 /**
  * Sample site controller
  */
-window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$state', '$rootScope', 'MESSAGES', 'safeApiFactory',
+window.maidsafeDemo.controller('SampleTemplateCtrl', [ '$scope', '$http', '$state',
+'$rootScope', 'MESSAGES', 'safeApiFactory',
   function($scope, $http, $state, $rootScope, $msg, safe) {
     'use strict';
     $scope.siteTitle = 'My Page';
