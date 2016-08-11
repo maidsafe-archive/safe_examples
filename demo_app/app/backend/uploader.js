@@ -9,33 +9,39 @@ class ProgressListener {
     this.total = 0;
     this.totalFileCount = 0;
     this.filesCompletedCount = 0;
+    /* jscs:disable disallowDanglingUnderscores*/
     this._completed = 0;
     this._success = 0;
     this._failed = 0;
     this._failedPaths = [];
     this._updateCallback = updateCallback;
+    /* jscs:enable disallowDanglingUnderscores*/
   }
 
   onError(size, path) {
+    /* jscs:disable disallowDanglingUnderscores*/
     this._failed += size;
     this._completed += size;
     this._failedPaths.push(path);
     if (this._updateCallback) {
       this._updateCallback(this._completed, this.total);
     }
+    /* jscs:enable disallowDanglingUnderscores*/
   }
 
   onSuccess(size, fileName) {
+    /* jscs:disable disallowDanglingUnderscores*/
     this._success += size;
     this._completed += size;
     if (this._updateCallback) {
       var status;
       if (this.totalFileCount > 0) {
-        status = this.filesCompletedCount
-          + '/' + this.totalFileCount;
+        status = this.filesCompletedCount +
+        '/' + this.totalFileCount;
       }
       this._updateCallback(this._completed, this.total, status);
     }
+    /* jscs:enable disallowDanglingUnderscores*/
   }
 }
 
@@ -44,7 +50,7 @@ export default class Uploader {
     this.api = api;
     this.progressListener = new ProgressListener(progressCallback);
     this.onError = null;
-    this.helper;
+    this.helper = null;
   }
 
   uploadDirectory(isPrivate, localPath, networkParentDirPath, isRoot) {

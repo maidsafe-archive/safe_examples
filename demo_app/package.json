@@ -34,7 +34,8 @@
     "release": "gulp release --env=production",
     "start": "node ./tasks/start",
     "test": "gulp test",
-    "package": "gulp package --env=production"
+    "package": "gulp package --env=production",
+    "lint": "gulp lint"
   },
   "dependencies": {}
 }

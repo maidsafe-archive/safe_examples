@@ -30,7 +30,7 @@ window.maidsafeDemo = angular
     }
   };
   $rootScope.openExternal = function(url) {
-    require("shell").openExternal(url);
+    require('shell').openExternal(url);
   };
   $rootScope.serviceList = [];
   $rootScope.isOnlyAlphaOrNumeric = function(str) {

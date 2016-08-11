@@ -90,13 +90,13 @@ window.maidsafeDemo.factory('nfsFactory', [ 'CONSTANT', function(CONSTANT) {
       }
       var errMsg;
       if (e) {
-        errMsg = {description: 'Request connection closed' + (e.code ? (' - ' + e.code) : '') };
+        errMsg = { description: 'Request connection closed' + (e.code ? (' - ' + e.code) : '') };
       } else if (response.statusCode === 401) {
-        errMsg = {description: 'Could not authorise with launcher' };
+        errMsg = { description: 'Could not authorise with launcher' };
       } else {
         errMsg = JSON.parse(response.body);
       }
-      callback({data: errMsg});
+      callback({ data: errMsg });
     });
     fileStream.pipe(writeStream);
     return writeStream;
@@ -136,7 +136,7 @@ window.maidsafeDemo.factory('nfsFactory', [ 'CONSTANT', function(CONSTANT) {
     var url = this.SERVER + 'nfs/file/' + rootPath + '/' + filePath;
     var headers = {
       auth: {
-      'bearer': this.getAuthToken()
+        'bearer': this.getAuthToken()
       }
     };
     request.get(url, headers)
