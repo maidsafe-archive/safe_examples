@@ -17,7 +17,7 @@ window.maidsafeDemo.directive('explorer', [ '$rootScope', '$state', '$timeout', 
           displayName: 'Public folder',
           name: 'public',
           description: 'Public data is content that you wish to share with other ' +
-          'users, such as websites. Public data is not encrypted and therefore not 2' +
+          'users, such as websites. Public data is not encrypted and therefore not ' +
           'suitable for information which you wish to remain private.'
         },
         {
