@@ -77,9 +77,8 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
       }
       if (!serviceCheck.test($scope.serviceName)) {
         return $rootScope.prompt.show('Invalid input',
-          'Service name should be minimum of 3 characters and maximum of 63 characters. Should be lower case and ' +
-          'should not contain special characters or space. In addition \'-\' is permitted if it is not at the ' +
-          'start or end',
+          'Service name should contain a minimum of 3 characters and a maximum of 62 characters. It must be lowercase and ' +
+          'may not contain any special characters or spaces. However, \'-\' is permitted if it is not at the start or end.',
           function() {
             $scope.serviceName = '';
             $scope.$applyAsync();
