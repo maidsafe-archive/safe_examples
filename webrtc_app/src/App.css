@@ -18,6 +18,36 @@
   font-size: large;
 }
 
+.Room-header {
+  background-color: #5593D7;
+  padding: 5px;
+  color: white;
+}
+
+.Room-header .App-logo {
+  display: inline-block;
+  vertical-align: middle;
+  height: 40px;
+  margin: 0 10px;
+}
+
+.Room-header  h2 {
+  display: inline;
+  font-size: 20px;
+}
+
+.room-wrap {
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+  margin-top: 5em;
+}
+.room-select {
+  background-color: #5593D7;
+  padding: 3em;
+  color: white;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

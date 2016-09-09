@@ -167,7 +167,22 @@ class PeerView extends Component {
   }
 }
 
+class Room extends Component {
+  render() {
+    return <VideoBlock />
+  }
+}
+
 class App extends Component {
+  constructor (){
+    super()
+    this.state = {
+      "room": null
+    }
+  }
+  selectRoom() {
+    this.setState({"room": this.refs['room'].value})
+  }
   render() {
     if (!Peer.WEBRTC_SUPPORT) {
       return (
@@ -181,13 +196,31 @@ class App extends Component {
         </div>
       );
     }
+    if (this.state.room){
+      return (
+        <div className="App">
+          <div className="Room-header">
+            <img src={logo} className="App-logo" alt="logo" />
+            <h2>SAFE Signaling Demo <a href={"/#" + this.state.room}>#{this.state.room}</a></h2>
+          </div>
+          <Room room={this.state.room} />
+        </div>
+      );
+    }
+
     return (
       <div className="App">
         <div className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to SAFE Signaling Demo</h2>
+          <h2>Welcome to the SAFE Signaling Demo</h2>
         </div>
-        <VideoBlock />
+        <div className="room-wrap">
+          <form className="room-select" onSubmit={this.selectRoom.bind(this)}>
+            <label>
+              Room: #<input ref='room' required={true} minLength={5} />
+            </label>
+          </form>
+        </div>
       </div>
     );
   }
