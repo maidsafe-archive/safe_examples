@@ -41,7 +41,9 @@ class VideoBlock extends Component {
     }
 
     return (<div>
-      <video className="me" autoPlay={true}
+      <video className="me"
+        autoPlay={true}
+        muted={true}
         src={this.state.myVideo}></video>
       <PeerView stream={this.state.stream} />
     </div>)
