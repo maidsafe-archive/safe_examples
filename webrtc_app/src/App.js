@@ -3,6 +3,51 @@ import Peer from 'simple-peer';
 import logo from './logo.svg';
 import './App.css';
 
+class VideoBlock extends Component {
+  constructor() {
+    super()
+    this.state = {
+      myVideo: null,
+      state: null,
+      error: false,
+      stream: null
+    }
+  }
+  componentWillMount() {
+    this.setState({"state": "requesting"});
+    navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: {
+        facingMode: "user",
+        // frameRate: { ideal: 10, max: 15 }
+      }
+    }).then((stream) => {
+      this.setState({
+        "state": "received",
+        "stream": stream,
+        "myVideo": window.URL.createObjectURL(stream)
+      });
+    }).catch((err) => {
+      this.setState({"error": err})
+    })
+  }
+  render() {
+    if (this.state.error){
+      return <div>{this.state.error.toString()}</div>
+    }
+
+    if (this.state.state === "requesting"){
+      return <div><h1>Please give us access to your video devices</h1></div>
+    }
+
+    return (<div>
+      <video className="me" autoPlay={true}
+        src={this.state.myVideo}></video>
+      <PeerView stream={this.state.stream} />
+    </div>)
+  }
+}
+
 class PeerView extends Component {
   constructor() {
     super()
@@ -11,7 +56,6 @@ class PeerView extends Component {
       connectionPayload: '',
       connectionState: 'initializing',
       messages: [],
-      myVideo: null,
       peerVideo: null
     }
   }
@@ -33,84 +77,64 @@ class PeerView extends Component {
   }
 
   componentWillMount() {
-    this.setState({"connectionState": "requesting video permissions"});
-    navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: {
-        facingMode: "user",
-        // frameRate: { ideal: 10, max: 15 }
-      }
-    }).then((stream) => {
-
-      this.setState({
-        "connectionState": "connecting",
-        "myVideo": window.URL.createObjectURL(stream)
-      })
-
-      var peer = new Peer({ initiator: location.hash.length <= 1,
-                            stream: stream,
-                            trickle: false });
-      var conData = location.hash.slice(1);
-
-      this.peer = peer;
-      console.log("mounting")
-
-      // we are the second peer
-      if (conData){
-        var parse = JSON.parse(window.atob(conData))
-        console.log("sending", parse)
-        peer.signal(parse)
-      }
-
-      peer.on('signal',  (data) => {
-        // automatically establish connection
-        console.log("SIGNAL", data)
-        this.setState({'connectionPayload': data });
-      })
-      peer.on('error', (err) => {
-        this.addMsg('-- ERROR ' + (new Date()).toISOString() + ':' + err)
-        console.log('error', err)
-      })
-
-      peer.on('connect', () => {
-        this.setState({"connectionState": "connected"});
-        this.addMsg('-- Connection Established: ' + (new Date()).toISOString())
-      })
-
-      peer.on('stream', (stream) => {
-        this.setState({"peerVideo": window.URL.createObjectURL(stream)})
-      })
-
-      peer.on('data', (data) => {
-        // incoming message
-        console.log('data: ' + data)
-        this.addMsg("Peer: " + data)
-      })
-
-
-    }).catch( (err) => {
-      this.setState({"connectionState": err.toString()})
+    this.setState({
+      "connectionState": "connecting"
     })
 
+    var peer = new Peer({ initiator: location.hash.length <= 1,
+                          stream: this.props.stream,
+                          trickle: false });
+    var conData = location.hash.slice(1);
+
+    this.peer = peer;
+    console.log("mounting")
+
+    // we are the second peer
+    if (conData){
+      var parse = JSON.parse(window.atob(conData))
+      console.log("sending", parse)
+      peer.signal(parse)
+    }
+
+    peer.on('signal',  (data) => {
+      // automatically establish connection
+      console.log("SIGNAL", data)
+      this.setState({'connectionPayload': data });
+    })
+    peer.on('error', (err) => {
+      this.addMsg('-- ERROR ' + (new Date()).toISOString() + ':' + err)
+      console.log('error', err)
+    })
+
+    peer.on('connect', () => {
+      this.setState({"connectionState": "connected"});
+      this.addMsg('-- Connection Established: ' + (new Date()).toISOString())
+    })
+
+    peer.on('stream', (stream) => {
+      this.setState({"peerVideo": window.URL.createObjectURL(stream)})
+    })
+
+    peer.on('data', (data) => {
+      // incoming message
+      console.log('data: ' + data)
+      this.addMsg("Peer: " + data)
+    })
   }
   render() {
     if (this.state.connectionState === 'connected') {
       return (<div>
+      <div>
         <form onSubmit={this.sendDraft.bind(this)}>
           <input type="text" ref="draft"
           /><button  type="submit">send</button>
-      </form>
-      <div>
+        </form>
         <ul>
           {this.state.messages.map((m) => <li>{m}</li>)}
         </ul>
       </div>
-      <div>
-        <video className="me" autoPlay={true}
-          src={this.state.myVideo}></video>
-        <video className="peer" autoPlay={true}
+      <video className="peer" autoPlay={true}
           src={this.state.peerVideo}></video>
-      </div>
       </div>);
     }
     if (this.state.connectionPayload.type === "offer") {
@@ -158,7 +182,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to SAFE Signaling Demo</h2>
         </div>
-        <PeerView />
+        <VideoBlock />
       </div>
     );
   }
