@@ -4,6 +4,9 @@
   "license": "GPL",
   "private": true,
   "devDependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "express-rawbody": "^1.0.2",
     "react-scripts": "0.4.1"
   },
   "dependencies": {
@@ -12,6 +15,7 @@
     "simple-peer": "^6.0.7"
   },
   "scripts": {
+    "mock-launcher": "node mock_launcher",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
@@ -19,5 +23,6 @@
   },
   "eslintConfig": {
     "extends": "./node_modules/react-scripts/config/eslint.js"
-  }
+  },
+  "proxy": "http://localhost:9999/"
 }

@@ -3,6 +3,26 @@ import Peer from 'simple-peer';
 import logo from './logo.svg';
 import './App.css';
 
+// const appInfo = )
+//
+// auth = fetch("/auth", {method: 'POST', , body: appInfo}).then(console.log.bind(console)).catch(console.warn.bind(this))
+//
+
+const APP_ID = "example.signaling.v1"
+
+function apiRequest(method, url, token, body) {
+  const headers = { "Content-Type" : "application/json"}
+  if (token){
+    headers['Authorization'] = "Bearer " + token
+  }
+  return fetch(url, {method: method, headers: headers, body: body}
+    ).then((x) => {
+      // for debugging purposes
+      console.log("response", x)
+      return x
+    }).catch(console.error.bind(console))
+}
+
 class VideoBlock extends Component {
   constructor() {
     super()
@@ -27,6 +47,7 @@ class VideoBlock extends Component {
         "stream": stream,
         "myVideo": window.URL.createObjectURL(stream)
       });
+      this.props.onStream(stream)
     }).catch((err) => {
       this.setState({"error": err})
     })
@@ -45,7 +66,6 @@ class VideoBlock extends Component {
         autoPlay={true}
         muted={true}
         src={this.state.myVideo}></video>
-      <PeerView stream={this.state.stream} />
     </div>)
   }
 }
@@ -79,30 +99,65 @@ class PeerView extends Component {
     this.setState({"messages": this.state.messages})
   }
 
+  componentWillReceiveProps(newProps){
+    this.setUpPeer(newProps)
+  }
+
   componentWillMount() {
+    this.setUpPeer(this.props)
+  }
+
+  setUpPeer(props){
+    // we've already started setup
+    if (this.peer) return;
     this.setState({
       "connectionState": "connecting"
     })
 
-    var peer = new Peer({ initiator: location.hash.length <= 1,
-                          stream: this.props.stream,
+    // we are also not yet in a ready state
+    if (!props.stream || !props.token) return
+
+    const initiator = !!!props.peerPayload
+    const peer = new Peer({ initiator: initiator,
+                          stream: props.stream,
                           trickle: false });
-    var conData = location.hash.slice(1);
+    const targetId = initiator ? APP_ID + "-" + props.room :  props.peerPayload.targetId;
+    const myNewId =  APP_ID + "-" + this.props.room + "-" + (Math.random())
 
     this.peer = peer;
-    console.log("mounting")
+    console.log("mounting", initiator, targetId, props)
 
-    // we are the second peer
-    if (conData){
-      var parse = JSON.parse(window.atob(conData))
-      console.log("sending", parse)
-      peer.signal(parse)
+    if (!initiator) {
+      // let's connect to the other peer
+      peer.signal(props.peerPayload.payload)
     }
 
-    peer.on('signal',  (data) => {
-      // automatically establish connection
-      console.log("SIGNAL", data)
-      this.setState({'connectionPayload': data });
+    peer.on('signal', (d) => {
+      // try to automatically establish connection
+      const data = {payload: d, targetId: myNewId}
+      apiRequest("POST",
+          '/structured-data/' + targetId,
+          this.props.token, JSON.stringify(data))
+      if (initiator) {
+        let poller = window.setInterval( ()=> {
+          apiRequest("GET",
+              '/structured-data/handle/' + myNewId,
+              this.props.token).then((resp) => {
+                if (resp.status !== 200) return
+                window.clearInterval(poller);
+
+                let handle = resp.headers.get("Handle-Id")
+                console.log('handle', handle)
+                return apiRequest('GET',
+                  '/structured-data/' + handle,
+                  this.props.token).then((resp) => resp.json()).then((resp) => {
+                    console.log(resp)
+                    peer.signal(resp.payload)
+                  })
+              })
+              // .catch(console.warn.bind(console))
+        }, 1000) // we poll once a second
+      }
     })
     peer.on('error', (err) => {
       this.addMsg({type: "error", "msg": '' + err})
@@ -168,8 +223,68 @@ class PeerView extends Component {
 }
 
 class Room extends Component {
+  constructor() {
+    super()
+    this.state = {
+      'token': null,
+      'peerPayload': false,
+      'stream': null
+    }
+  }
+
+  componentWillMount() {
+    if (!this.state.token) {
+      apiRequest('POST', '/auth', null, JSON.stringify({
+          "app": {
+            "name": "SAFE Signaling Demo",
+            id: APP_ID,
+            "version": "0.6",
+            "vendor": "MaidSafe Ltd."},
+          "permissions" : ["LOW_LEVEL_API"]})
+        ).then((resp) => resp.json()).then( (auth) => {
+          return apiRequest('GET',
+              '/structured-data/handle/' + APP_ID + "-" + this.props.room,
+                auth.token).then((resp) => {
+                  // we are connecting to someone, who knows us
+                  if (resp.status !== 200) {
+                    return this.setState({"peerPayload": false,
+                                          'token': auth.token})
+                  }
+
+                  let handleId = resp.headers.get("Handle-Id")
+                  console.log("handleId", handleId)
+                  // so let's read what they want us to do
+                  return apiRequest('GET',
+                    '/structured-data/' + handleId + '/',
+                    auth.token
+                  ).then((resp) => (resp.status === 200)
+                    ? resp.json().then((payload) => {
+                        console.log("peerPayload", payload)
+                        this.setState({"peerPayload": payload,
+                                       'token': auth.token})
+                    })
+                    // we need to initiate
+                    : this.setState({"peerPayload": false,
+                                   'token': auth.token})
+                  )
+                })
+      }).catch(console.warn.bind(console))
+
+    }
+  }
+
   render() {
-    return <VideoBlock />
+    if (!this.state.token) {
+      return <h1>Please authorise the app with SAFE Launcher</h1>
+    }
+    return (<div>
+      <VideoBlock onStream={(s) => this.setState({"stream": s})}/>
+      <PeerView
+        stream={this.state.stream}
+        room={this.props.room}
+        token={this.state.token}
+        peerPayload={this.state.peerPayload}/>
+    </div>)
   }
 }
 
@@ -177,7 +292,7 @@ class App extends Component {
   constructor (){
     super()
     this.state = {
-      "room": null
+      "room": location.hash.length > 1 ? location.hash.slice(1) : null
     }
   }
   selectRoom() {

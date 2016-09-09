@@ -16,15 +16,17 @@ And start the development server by running
 npm run start
 ```
 
-This should open a browser window with the app starting up. Otherwise redirect your browser to `http://localhost:3000/`
+This should open a browser window with the app starting up. Otherwise redirect your browser to `http://localhost:3000/`. The development server expects a SAFE Launcher to be accessible under `http://localhost:9999`. If that is not the case you can start the mock-launcher, by executing the following in another shell:
+
+```bash
+npm run mock-launcher
+```
 
 ## Usage
 
-The app should automatically try to establish an WebRTC Connection. It will then promptly give you a link for a second screen to join. *Copy* that link and open it in another browser (or share it with another person over some form of instant messenger).
+Just type a random room name (support to autogenerate rooms will be added later), give the requested permissions, open another session and type the same room name (or click on the link provided in the header).
 
-When opening the second link, the app will automatically connect to through WebRTC, too, using the provided token. However the first client still needs to know about the second one. So the that app should show a text box and ask the user to transfer the content to the first. Just copy that content and send it to the first user.
-
-That first user should put that content into the provided textarea and push "send". The connection should be established immediately and text field pop up. Type your message there and press send (or enter) to send a message. Messages send by you and received from the other party will be shown below in a newest-first-order.
+You should be able to connect to one another with video, audio and a small chat on the left. You can see yourself on the bottom right, your peer is visible in the center. Enjoy
 
 ## Development
 
