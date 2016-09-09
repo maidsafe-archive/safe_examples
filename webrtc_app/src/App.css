@@ -30,7 +30,53 @@ video.me {
   bottom: 0;
 }
 
-video.peer {
-  max-width: 75vw;
-  max-height: 75vh;
+.peerview {
+  display: flex;
+  justify-content: center;
+}
+
+.chat {
+  width: 25vw;
+  padding: 1em;
+  text-align: right;
+}
+
+.chat ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chat ul li {
+  padding: 3px;
+}
+
+.chat ul li.peer {
+  text-align: left;
+  margin-right: 2em;
+}
+
+.chat ul li.me {
+  margin-left: 2em;
+}
+
+.chat ul li.system {
+  font-size: 0.8em;
+  font-style: italic;
+  text-align: center;
+  color: #999999;
+}
+.chat ul li.system:after,
+.chat ul li.system:before {
+  content: " -- "
+}
+
+
+.chat ul li.error {
+  font-size: 1.1em;
+  text-align: center;
+}
+.chat ul li.error:after,
+.chat ul li.error:before {
+  color: red;
+  content: " ⚠ "
 }

@@ -64,7 +64,7 @@ class PeerView extends Component {
   sendDraft() {
     let msg = this.refs['draft'].value
     this.peer.send(msg)
-    this.addMsg("Me: " + msg)
+    this.addMsg({type: "me", "msg": msg})
     this.refs['draft'].value = ""
   }
 
@@ -74,6 +74,7 @@ class PeerView extends Component {
   }
 
   addMsg (msg) {
+    msg.tstamp = new Date()
     this.state.messages.unshift(msg)
     this.setState({"messages": this.state.messages})
   }
@@ -104,35 +105,37 @@ class PeerView extends Component {
       this.setState({'connectionPayload': data });
     })
     peer.on('error', (err) => {
-      this.addMsg('-- ERROR ' + (new Date()).toISOString() + ':' + err)
+      this.addMsg({type: "error", "msg": '' + err})
       console.log('error', err)
     })
 
     peer.on('connect', () => {
       this.setState({"connectionState": "connected"});
-      this.addMsg('-- Connection Established: ' + (new Date()).toISOString())
+      this.addMsg({type: "system", "msg": 'connection established'})
     })
 
     peer.on('stream', (stream) => {
+      this.addMsg({type: "system", "msg": 'video established'})
       this.setState({"peerVideo": window.URL.createObjectURL(stream)})
     })
 
     peer.on('data', (data) => {
       // incoming message
       console.log('data: ' + data)
-      this.addMsg("Peer: " + data)
+      this.addMsg({type: "peer", "msg": data.toString()})
     })
   }
   render() {
     if (this.state.connectionState === 'connected') {
-      return (<div>
-      <div>
+      return (<div className="peerview">
+      <div className="chat">
         <form onSubmit={this.sendDraft.bind(this)}>
           <input type="text" ref="draft"
           /><button  type="submit">send</button>
         </form>
         <ul>
-          {this.state.messages.map((m) => <li>{m}</li>)}
+          {this.state.messages.map(
+            (m) => <li className={m.type} title={m.tstamp.toISOString()}>{m.msg}</li>)}
         </ul>
       </div>
       <video className="peer" autoPlay={true}
