@@ -22,3 +22,15 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+video.me {
+  position: absolute;
+  max-width: 25vw;
+  right: 0;
+  bottom: 0;
+}
+
+video.peer {
+  max-width: 75vw;
+  max-height: 75vh;
+}
