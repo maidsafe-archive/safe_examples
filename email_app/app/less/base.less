@@ -1,0 +1,84 @@
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none;   /* Chrome/Safari/Opera */
+	-khtml-user-select: none;    /* Konqueror */
+	-moz-user-select: none;      /* Firefox */
+	-ms-user-select: none;       /* Internet Explorer/Edge */
+	user-select: none;           /* Non-prefixed version, currently                              not supported by any browser */
+}
+
+.nodrag {
+	-webkit-user-drag: none;
+	user-drag: none;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	.noselect();
+	.nodrag();
+}
+
+body {
+	font-family: 'Open Sans';
+}
+
+#root {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	.root-base {
+		width: inherit;
+		height: inherit;
+	}
+}
+
+.clearfix {
+	&:after {
+		content: '';
+		clear: both;
+		display: block;
+	}
+}
+
+.initializer {
+	.initializer-b {
+		padding: 40px;
+		text-align: center;
+		ul {
+			display: inline-block;
+			margin-top: 60px;
+			li {
+				list-style-type: none;
+				opacity: 0.5;
+			}
+		}
+	}
+}
+
+.bold {
+	font-weight: 600;
+}
+
+.float-btn {
+	position: fixed;
+	bottom: 40px;
+	right: 40px;
+	z-index: 99;
+	a {
+		color: #FFFFFF;
+		text-decoration: none;
+	}
+	&.hide {
+		display: none;
+	}
+}
+
+.bg-primary {
+	background-color: @primary-blue;
+	color: #FFFFFF;
+}
+.btn-eq {
+	min-width: 110px;
+}

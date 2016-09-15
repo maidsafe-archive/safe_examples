@@ -1,0 +1,56 @@
+.view-mail {
+	background-color: @gray-200;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	.head {
+		background-color: @primary-blue;
+		.action {
+			&.back {
+				button {
+					line-height: 40px;
+					background-color: transparent;
+					color: #FFFFFF;
+				}
+			}
+		}
+	}
+	.view-mail-b {
+		margin-top: 50px;
+		padding: 0 40px;
+		.opt {
+			width: 100%;
+			padding: 0 40px;
+			position: absolute;
+			bottom: 40px;
+			left: 0;
+			.opt-i {
+				float: right;
+				margin-left: 24px;
+				&.right {
+					float: right;
+				}
+				&.left {
+					float: left;
+				}
+			}
+			.clearfix();
+		}
+		.fields {
+			margin-bottom: 16px;
+			font-size: 16px;
+			.name {
+				margin-right: 24px;
+				font-weight: 600;
+			}
+			.val {
+				opacity: 0.8;
+			}
+		}
+		.content {
+			padding: 16px;
+			background-color: #FFFFFF;
+			min-height: 200px;
+		}
+	}
+}
