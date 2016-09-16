@@ -23,7 +23,7 @@ export default class Home extends Component {
         <div className="home-b">
           <div className={className('float-btn', { hide: router.isActive('/compose_mail')  })}>
             <button className="mdl-button mdl-js-button mdl-button--fab mdl-button--primary">
-              <Link to="/compose_mail"><i className="material-icons">add</i></Link>
+              <Link id="new_mail" to="/compose_mail"><i className="material-icons">add</i></Link>
             </button>
           </div>
           <header className="home-head">
