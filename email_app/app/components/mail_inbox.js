@@ -26,9 +26,10 @@ export default class MailInbox extends Component {
   }
 
   dropAppendableData() {
-    const { token, dropHandler } = this.props;
+    const { token, dropHandler, clearMailProcessing } = this.props;
     dropHandler(token, this.appendableHandler)
       .then(res => {
+        clearMailProcessing();
         if (res.error) {
           return showError('Drop Appendable data error', res.error.message);
         }
@@ -36,10 +37,11 @@ export default class MailInbox extends Component {
   }
 
   getAppendableDataLength() {
-    const { token, getAppendableDataLength } = this.props;
+    const { token, getAppendableDataLength, clearMailProcessing } = this.props;
     getAppendableDataLength(token, this.appendableHandler)
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Get Appendable Data Length Error', res.error.message);
         }
         return this.dropAppendableData();
@@ -47,10 +49,11 @@ export default class MailInbox extends Component {
   }
 
   fetchMail(handlerId) {
-    const { token, fetchMail, pushToInbox } = this.props;
+    const { token, fetchMail, pushToInbox, clearMailProcessing } = this.props;
     fetchMail(token, handlerId)
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Fetch Mail Error', res.error.message);
         }
         const data = new Buffer(res.payload.data).toString();
@@ -65,10 +68,11 @@ export default class MailInbox extends Component {
   }
 
   iterateAppendableData() {
-    const { token, appendableDataId, fetchDataIdAt } = this.props;
+    const { token, appendableDataId, fetchDataIdAt, clearMailProcessing } = this.props;
     fetchDataIdAt(token, appendableDataId, this.currentIndex)
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Fetch Data Id At Error', res.error.message);
         }
         return this.fetchMail(res.payload.headers['handle-id']);
@@ -76,11 +80,12 @@ export default class MailInbox extends Component {
   }
 
   fetchAppendableData() {
-    const { token, fetchAppendableData } = this.props;
+    const { token, fetchAppendableData, clearMailProcessing } = this.props;
 
     fetchAppendableData(token, this.appendableHandler)
       .then((res) => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Fetch Appendable Data Error', res.error.message);
         }
         const dataLength = parseInt(res.payload.headers['data-length']);
@@ -93,12 +98,13 @@ export default class MailInbox extends Component {
   }
 
   fetchAppendableDataHandler() {
-    const { token, coreData, fetchAppendableDataHandler, setAppendableDataId } = this.props;
+    const { token, coreData, fetchAppendableDataHandler, setAppendableDataId, clearMailProcessing } = this.props;
     const hashedEmailId = hashEmailId(coreData.id);
 
     fetchAppendableDataHandler(token, base64.encode(hashedEmailId))
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Get Appendable Data Handler Error', res.error.message);
         }
         this.appendableHandler = res.payload.headers['handle-id'];
@@ -109,6 +115,7 @@ export default class MailInbox extends Component {
 
   fetchMails() {
     this.props.clearInbox();
+    this.props.setMailProcessing();
     return this.fetchAppendableDataHandler();
   }
 

@@ -23,7 +23,6 @@
 			background-color: #FFFFFF;
 			padding: 16px;
 			margin-bottom: 8px;
-			cursor: pointer;
 			position: relative;
 			min-height: 0;
 			.icon {
@@ -83,6 +82,8 @@
 					display: inline-block;
 					margin-bottom: 20px;
 					line-height: normal;
+					-webkit-user-select: all;
+					cursor: default;
 				}
 				.date {
 					display: inline-block;
@@ -91,6 +92,8 @@
 					line-height: normal;
 					font-weight: normal;
 					opacity: 0.5;
+					-webkit-user-select: text;
+					cursor: text;
 				}
 				.subject {
 					display: block;
@@ -100,12 +103,16 @@
 					line-height: normal;
 					padding: 0;
 					margin: 0 0 5px;
+					-webkit-user-select: text;
+					cursor: text;
 				}
 				.context {
 					padding: 0;
 					margin: 0;
 					font-size: 16px;
 					line-height: normal;
+					-webkit-user-select: text;
+					cursor: text;
 				}
 			}
 			&.error {
