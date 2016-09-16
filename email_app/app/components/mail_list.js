@@ -255,7 +255,12 @@ export default class MailList extends Component {
                     </div>
                     <div className="opt">
                       <div className="opt-i">
-                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={i}>delete</i></button>
+                        <button
+                          className="mdl-button mdl-js-button mdl-button--icon"
+                          name="delete" onClick={this.handleDelete}
+                        >
+                          <i className="material-icons" data-index={i}>delete</i>
+                        </button>
                       </div>
                     </div>
                   </li>
