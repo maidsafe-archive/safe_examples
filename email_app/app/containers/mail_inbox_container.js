@@ -5,7 +5,7 @@ import { fetchMail } from '../actions/immutable_data_actions';
 import { updateCoreStructure, fetchCoreStructure } from '../actions/core_structure_actions';
 import { serialiseDataId, dropHandler } from '../actions/data_handle_actions';
 import { pushToInbox, clearInbox } from '../actions/initializer_actions';
-import { setMailProcessing, setActiveMail } from '../actions/mail_actions';
+import { setMailProcessing, clearMailProcessing, setActiveMail } from '../actions/mail_actions';
 
 const mapStateToProps = state => {
   return {
@@ -23,6 +23,7 @@ const mapDispatchToProps = dispatch => {
   return {
     clearInbox: _ => (dispatch(clearInbox())),
     setMailProcessing: () => (dispatch(setMailProcessing())),
+    clearMailProcessing: () => (dispatch(clearMailProcessing())),
     setActiveMail: (data) => (dispatch(setActiveMail(data))),
     pushToInbox: data => (dispatch(pushToInbox(data))),
     setAppendableDataId: id => (dispatch(setAppendableDataId(id))),

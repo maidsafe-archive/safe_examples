@@ -28,22 +28,23 @@ export default class ComposeMail extends Component {
     const { token, dropAppendableData, clearMailProcessing } = this.props;
     dropAppendableData(token, this.appendableDataId)
       .then(res => {
+        clearMailProcessing();
         if (res.error) {
           return showError('Drop Appendable Handler Error', res.error.message);
         }
-        clearMailProcessing();
         showSuccess('Mail Success', 'Mail sent successfully!');
         return this.context.router.push('/inbox');
       });
   }
 
   updateOutbox() {
-    const { token, coreDataHandler, coreData, updateCoreStructure, serialiseDataId } = this.props;
+    const { token, coreDataHandler, coreData, updateCoreStructure, serialiseDataId, clearMailProcessing } = this.props;
     const newMail = { ...this.newMail };
     coreData.outbox.push(newMail);
     updateCoreStructure(token, coreDataHandler, coreData)
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Update Outbox Error', res.error.message);
         }
         return this.dropAppendableData();
@@ -51,11 +52,12 @@ export default class ComposeMail extends Component {
   }
 
   appendAppendableData() {
-    const { token, appendAppendableData } = this.props;
+    const { token, appendAppendableData, clearMailProcessing } = this.props;
 
     appendAppendableData(token, this.appendableDataId, this.newMailId)
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Append Appendable Data Error', res.error.message);
         }
         return this.updateOutbox();
@@ -63,11 +65,12 @@ export default class ComposeMail extends Component {
   }
 
   createMail(encryptKeyHandler) {
-    const { token, createMail } = this.props;
+    const { token, createMail, clearMailProcessing } = this.props;
 
     createMail(token, this.newMail, encryptKeyHandler)
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Create Mail Failed', res.error.message);
         }
         this.newMailId = res.payload.headers['handle-id'];
@@ -76,10 +79,11 @@ export default class ComposeMail extends Component {
   }
 
   getEncryptedKey() {
-    const { token, getEncryptedKey } = this.props;
+    const { token, getEncryptedKey, clearMailProcessing } = this.props;
     getEncryptedKey(token, this.appendableDataId)
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Get Encrypted Key Error', res.error.message);
         }
         return this.createMail(res.payload.headers['handle-id']);
@@ -87,10 +91,11 @@ export default class ComposeMail extends Component {
   }
 
   fetchAppendableDataHandler(emailId) {
-    const { token, fetchAppendableDataHandler } = this.props;
+    const { token, fetchAppendableDataHandler, clearMailProcessing } = this.props;
     fetchAppendableDataHandler(token, base64.encode(hashEmailId(emailId)))
       .then(res => {
         if (res.error) {
+          clearMailProcessing();
           return showError('Fetch Appendable Data Error', res.error.message);
         }
         this.appendableDataId = res.payload.headers['handle-id'];
