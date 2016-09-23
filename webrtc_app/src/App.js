@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+// eslint-disable-next-line
+import webrtc from 'webrtc-adapter';
 import Peer from 'simple-peer';
 import logo from './logo.svg';
 import './App.css';

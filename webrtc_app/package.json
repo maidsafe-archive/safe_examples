@@ -12,7 +12,8 @@
   "dependencies": {
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
-    "simple-peer": "^6.0.7"
+    "simple-peer": "^6.0.7",
+    "webrtc-adapter": "^2.0.3"
   },
   "scripts": {
     "mock-launcher": "node mock_launcher",
