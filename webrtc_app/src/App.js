@@ -94,6 +94,7 @@ class PeerView extends Component {
     this.peer.send(msg)
     this.addMsg({type: "me", "msg": msg})
     this.refs['draft'].value = ""
+    return false
   }
 
   submitResponse (){
@@ -303,8 +304,10 @@ class App extends Component {
       "room": location.hash.length > 1 ? location.hash.slice(1) : null
     }
   }
-  selectRoom() {
+  selectRoom(pr, e, evt) {
+    evt.preventDefault()
     this.setState({"room": this.refs['room'].value})
+    return false
   }
   render() {
     if (!Peer.WEBRTC_SUPPORT) {
@@ -342,6 +345,9 @@ class App extends Component {
             <label>
               Room: #<input ref='room' required={true} minLength={5} />
             </label>
+            <button onClick={this.selectRoom.bind(this)}>
+              connect
+            </button>
           </form>
         </div>
       </div>
