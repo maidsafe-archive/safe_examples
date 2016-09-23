@@ -25,6 +25,12 @@ function apiRequest(method, url, token, body) {
     }).catch(console.error.bind(console))
 }
 
+function parseJsonResponse(resp) {
+  console.log(resp)
+  if (resp.json) return resp.json()
+  return resp.body().then((content) => JSON.parse(content))
+}
+
 class VideoBlock extends Component {
   constructor() {
     super()
@@ -152,7 +158,7 @@ class PeerView extends Component {
                 console.log('handle', handle)
                 return apiRequest('GET',
                   '/structured-data/' + handle,
-                  this.props.token).then((resp) => resp.json()).then((resp) => {
+                  this.props.token).then(parseJsonResponse).then((resp) => {
                     console.log(resp)
                     peer.signal(resp.payload)
                   })
@@ -243,7 +249,7 @@ class Room extends Component {
             "version": "0.6",
             "vendor": "MaidSafe Ltd."},
           "permissions" : ["LOW_LEVEL_API"]})
-        ).then((resp) => resp.json()).then( (auth) => {
+        ).then(parseJsonResponse).then( (auth) => {
           return apiRequest('GET',
               '/structured-data/handle/' + APP_ID + "-" + this.props.room,
                 auth.token).then((resp) => {
@@ -260,7 +266,7 @@ class Room extends Component {
                     '/structured-data/' + handleId + '/',
                     auth.token
                   ).then((resp) => (resp.status === 200)
-                    ? resp.json().then((payload) => {
+                    ? parseJsonResponse(resp).then((payload) => {
                         console.log("peerPayload", payload)
                         this.setState({"peerPayload": payload,
                                        'token': auth.token})
