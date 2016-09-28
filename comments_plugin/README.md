@@ -9,10 +9,12 @@ Add following libraries to your html page:
   * [Jquery](https://jquery.com/)
 
 Add the stylesheet to your html page:
-<link href="./comments-tutorial.css" rel="stylesheet">
+    
+    <link href="./comments-tutorial.css" rel="stylesheet">
 
 Add the script to your html page:
-<script type="application/javascript" src="./comments-tutorial.js"/>
+    
+    <script type="application/javascript" src="./comments-tutorial.js"/>
 
 ### Initialise
 
