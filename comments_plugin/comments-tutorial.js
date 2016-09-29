@@ -46,9 +46,16 @@ class CommentsTutorial {
     this.authToken = token;
     window.localStorage.setItem(this.LOCAL_STORAGE_TOKEN_KEY, token);
   }
+
   getAuthToken() {
     return window.localStorage.getItem(this.LOCAL_STORAGE_TOKEN_KEY);
   }
+
+  clearAuthToken() {
+    this.authToken = null;
+    window.localStorage.clear();
+  }
+
   isAdmin() {
     let currentDns = window.location.host.split('.').slice(-1)[0];
     if (!this.user.dns) {
@@ -498,6 +505,7 @@ class CommentsTutorial {
       }, (err) => {
         console.error(err);
         this.errorHandler(err);
+        this.clearAuthToken();
         if (err.message.indexOf('401 Unauthorized') !== -1) {
           return this.fetchComments();
         }
