@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tutorial Blog</title>
+    <!-- External dependencies -->
+    <link type="text/css" rel="stylesheet" href="../bootstrap-v3.3.7.min.css"/>
+    <!-- Comment plugin resources -->
+    <link type="text/css" rel="stylesheet" href="../comments-tutorial.css"/>
+</head>
+<body>
+    <div class="container">
+      <h1 class="text-center">
+          A sample blog using tutorial resources
+      </h1>
+      <div class="text-center">
+          This is a sample tutorial to show case how the comments plugin can be
+          integrated to any static page.
+      </div>
+      <div id="comments"></div>
+    </div>
+    <script type="application/javascript" src="../jquery-3.1.1.min.js"></script>
+    <script type="application/javascript" src="../comments-tutorial.js"></script>
+    <script>
+        commentsTutorial.loadComments();
+    </script>
+</body>
+</html>

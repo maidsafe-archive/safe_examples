@@ -1,27 +1,36 @@
+# Comments Plugin Tutorial
+
 The plugin works on safe_browser. This provides ability to add comments to any html page.
 
 ## Usage instructions:
 
-### Include the library
+### Dependencies
 
-Add following libraries to your html page:
-  * [Bootstrap](http://getbootstrap.com/)
-  * [Jquery](https://jquery.com/)
+The plugin depends on **bootstrap v3.3.7** for UI and also **jquery v3.1.1.**
+The dependencies are included in this repository itself.
 
+
+### Getting Started
+
+#### Include dependencies
+   `<link href="./bootstrap-v3.3.7.min.css" rel="stylesheet">`
+    `<script type="application/javascript" src="./jquery-3.1.1.min.js"/>`
+
+#### Include tutorial plugin
 Add the stylesheet to your html page:
-<link href="./comments-tutorial.css" rel="stylesheet">
+    `<link href="./comments-tutorial.css" rel="stylesheet">`
 
 Add the script to your html page:
-<script type="application/javascript" src="./comments-tutorial.js"/>
+    `<script type="application/javascript" src="./comments-tutorial.js"/>`
 
 ### Initialise
 
-The library must be initialised by invoking the `new window.Comment();` function.
+The library must be initialised by invoking the `commentsTutorial.loadComments();` function.
 
 The library will add comments UI to the `#comments` `div` element or the UI can be added to
 a specific DOM element by passing it's selector to the `init` method.
 
-Example, `new window.Comment('#myDiv')`
+Example, `commentsTutorial.loadComments('#myDiv')`
 
 
 ## Enabling Comments for page
@@ -30,6 +39,11 @@ The admin must enable the comments on a page by visiting the page and clicking o
 
 This step is need at this time to make sure the admin becomes the owner of the `AppendableData` used to hold the comments.
 
+## Example
+
+An sample usage is demonstrated in the [example](./example) folder.
+
+A simple static page with comments integrated is demonstrated.
 
 # Limitations
  - Can not unblock blocked users

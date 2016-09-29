@@ -1,634 +1,594 @@
-const LOCAL_STORAGE_TOKEN_KEY = 'SAFE_TOKEN';
-const app = {
-  name: "Safe Blog",
-  id: "blog.maidsafe.net",
-  version: "0.0.1",
-  vendor: "maidsafe",
-  permissions: [
-    'SAFE_DRIVE_ACCESS',
-    'LOW_LEVEL_API'
-  ]
-};
+class CommentsTutorial {
+  constructor() {
+    this.LOCAL_STORAGE_TOKEN_KEY = 'SAFE_TOKEN';
+    this.app = {
+      name: "Comment tutorial plugin",
+      id: "tutorial.maidsafe.net",
+      version: "0.0.1",
+      vendor: "maidsafe",
+      permissions: [
+        'LOW_LEVEL_API'
+      ]
+    };
 
-const SD_ENCRYPTION = {
-  NONE: 'NONE',
-  SYMMETRIC: 'SYMMETRIC',
-  HYBRID: 'HYBRID'
-};
+    this.DEST_ELEMENT_ID = '#comments';
+    this.TARGET_ELEMENT_ID = '#_commets'; // prefix with #
+    this.COMMENT_ENABLE_BTN_ELEMENT_ID = '#_commentEnable'; // prefix with #
+    this.COMMENT_LIST_ELEMENT_ID = '#_commentList'; // prefix with #
+    this.COMMENT_TEXT_ELEMENT_ID = '#_commentText'; // prefix with #
+    this.COMMENT_FORM_ELEMENT_ID = '#_commentForm'; // prefix with #
+    this.COMMENT_INPUT_ELEMENT_ID = '#_commentInput'; // prefix with #
+    this.DNS_LIST_ELEMENT_ID = '#_dnsList'; // prefix with #
+    this.COMMENT_SPINNER_ELEMENT_ID = '#_commentSpinner'; // prefix with #
+    this.user = {};
 
-let DEST_ELEMENT_ID = null;
-const TARGET_ELEMENT_ID = '#_commets'; // prefix with #
-const COMMENT_ENABLE_BTN_ELEMENT_ID = '#_commentEnable'; // prefix with #
-const COMMENT_LIST_ELEMENT_ID = '#_commentList'; // prefix with #
-const COMMET_TEXT_ELEMENT_ID = '#_commentText'; // prefix with #
-const COMMET_FORM_ELEMENT_ID = '#_commentForm'; // prefix with #
-const COMMENT_INPUT_ELEMENT_ID = '#_commentInput'; // prefix with #
-const DNS_LIST_ELEMENT_ID = '#_dnsList'; // prefix with #
-const COMMENT_SPINNER_ELEMENT_ID = '#_commentSpinner'; // prefix with #
-const user = {};
+    this.authToken = null;
+    this.totalComments = 0;
+    this.currentPostHandleId = null;
+    this.commentList = [];
+    window.isAdmin = false;
+  }
 
-const APP_FLOW = [
-  'authoriseApp'
-];
-
-var authToken = null;
-var totalComments = 0;
-var currentPostHandleId = null;
-var commentList = [];
-window.isAdmin = false;
-
-// utility functions
-var utils = {
-  toggleEnableCommentBtn: function(status) {
-    var commentEnableEle = $(TARGET_ELEMENT_ID).children(COMMENT_ENABLE_BTN_ELEMENT_ID);
+  toggleEnableCommentBtn(status) {
+    let commentEnableEle = $(this.TARGET_ELEMENT_ID).find(this.COMMENT_ENABLE_BTN_ELEMENT_ID);
     return status ? commentEnableEle.show() : commentEnableEle.hide();
-  },
-  toggleComments: function(status) {
-    var commentsEle = $(TARGET_ELEMENT_ID).children(COMMENT_LIST_ELEMENT_ID);
+  }
+  toggleComments(status) {
+    let commentsEle = $(this.TARGET_ELEMENT_ID).find(this.COMMENT_LIST_ELEMENT_ID);
     return status ? commentsEle.show() : commentsEle.hide();
-  },
-  toggleCommentsInput: function(state) {
-    var commentInputEle = $(TARGET_ELEMENT_ID).find(COMMENT_INPUT_ELEMENT_ID);
+  }
+
+  toggleCommentsInput(state) {
+    let commentInputEle = $(this.TARGET_ELEMENT_ID).find(this.COMMENT_INPUT_ELEMENT_ID);
     return state ? commentInputEle.show() : commentInputEle.hide();
-  },
-  setAuthToken: function(token) {
-    authToken = token;
-    window.localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token);
-  },
-  getAuthToken: function() {
-    return window.localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
-  },
-  isAdmin: function() {
-    var currentDns = window.location.host.split('.').slice(-1)[0];
-    if (!user.dns) {
+  }
+  setAuthToken(token) {
+    this.authToken = token;
+    window.localStorage.setItem(this.LOCAL_STORAGE_TOKEN_KEY, token);
+  }
+  getAuthToken() {
+    return window.localStorage.getItem(this.LOCAL_STORAGE_TOKEN_KEY);
+  }
+  isAdmin() {
+    let currentDns = window.location.host.split('.').slice(-1)[0];
+    if (!this.user.dns) {
       return;
     }
-    return user.dns.indexOf(currentDns) !== -1;
-  },
-  getSelectedDns: function() {
-    return $(DNS_LIST_ELEMENT_ID).val();
-  },
-  getCurrentPostId: function() {
+    return this.user.dns.indexOf(currentDns) !== -1;
+  }
+  getSelectedDns() {
+    return $(this.DNS_LIST_ELEMENT_ID).val();
+  }
+  getCurrentPostId() {
     return window.location.host + '/' + window.location.pathname;
-  },
-  generateRandomString: function() {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for( var i=0; i < 5; i++ ) {
+  }
+  generateRandomString() {
+    let text = '';
+    let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for( let i=0; i < 5; i++ ) {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
-  },
-  clearComments: function() {
-    $(TARGET_ELEMENT_ID).children(COMMENT_LIST_ELEMENT_ID).children('.media').remove();
-  },
-  resetCommentForm: function() {
-    $(COMMET_FORM_ELEMENT_ID)[0].reset();
-  },
-  toggleSpinner: function(state) {
-    var spinnerEle = $(COMMENT_SPINNER_ELEMENT_ID);
+  }
+
+  clearComments() {
+    $(this.TARGET_ELEMENT_ID).find(this.COMMENT_LIST_ELEMENT_ID).find('.media').remove();
+  }
+
+  resetCommentForm() {
+    $(this.COMMENT_FORM_ELEMENT_ID)[0].reset();
+  }
+
+  toggleSpinner(state) {
+    let spinnerEle = $(this.COMMENT_SPINNER_ELEMENT_ID);
     return state ? spinnerEle.show() : spinnerEle.hide();
   }
-};
 
-var log = function(str) {
-  console.log((new Date()).toLocaleString() + ' :: ' + str);
-};
-
-var handleErrorInCommon = function() {
-  utils.toggleSpinner();
-};
-
-var postAppendableData = function(handlerId) {
-  return window.appendableData.post(authToken, handlerId);
-};
-
-var putAppendableData = function(handlerId) {
-  return window.appendableData.put(authToken, handlerId);
-};
-
-var dropAppendableDataHandler = function(handlerId) {
-  return window.appendableData.dropHandle(authToken, handlerId);
-};
-
-var putStructureData = function(handlerId) {
-  return window.structuredData.put(authToken, handlerId);
-};
-
-var blockUser = function(index) {
-  log('Block User');
-  var signedKeyhandleId = null;
-  utils.toggleSpinner(true);
-
-  // drop signed key handle id
-  var dropSignedKeyHandle = function() {
-    log('Drop signed key handle id');
-    window.appendableData.dropSignKeyHandle(authToken, signedKeyhandleId)
-    .then(function(res) {
-      console.log(res);
-      utils.toggleSpinner(true);
-    }, function(err) {
-      console.log(err);
-      handleErrorInCommon(err);
-    });
-  };
-
-  // post appendable data to network
-  var post = function() {
-    log('Post appendable data');
-    postAppendableData(currentPostHandleId)
-    .then(function(res) {
-      console.log(res);
-      dropSignedKeyHandle();
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
-
-  // add filter
-  var addFilter = function() {
-    log('Add filter');
-    window.appendableData.addToFilter(authToken, currentPostHandleId, [signedKeyhandleId])
-    .then(function(res) {
-      console.log(res);
-      post();
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
-
-  // get appendable data signed key at index
-  var getSignKey = function() {
-    log('Get signed key at :: ' + index);
-    window.appendableData.getSignKeyAt(authToken, currentPostHandleId, index)
-    .then(function(res) {
-      signedKeyhandleId = res.__parsedResponseBody__.handleId;
-      addFilter();
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
-
-  getSignKey();
-};
-
-// delete comment
-var deleteComment = function(ele, index) {
-  log('Delete comment');
-  if (typeof index == 'undefined') {
-    return;
+  log(str) {
+    console.log((new Date()).toLocaleString() + ' :: ' + str);
   }
-  utils.toggleSpinner(true);
 
-  // post data to network after delete
-  var post = function() {
-    log('Post appendable data');
-    postAppendableData(currentPostHandleId)
-    .then(function(res) {
-      console.log(res);
-      utils.clearComments();
-      utils.toggleSpinner(false);
-      fetchComments();
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+  errorHandler() {
+    this.toggleSpinner();
+  }
 
-  // clear all deleted data from appendable data
-  var clearAllDeletedDatas = function() {
-    log('Clear appendable deleted datas');
-    window.appendableData.clearAll(authToken, currentPostHandleId, true)
-    .then(function(res) {
-      post();
-      console.log(res);
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+  postAppendableData(handleId) {
+    return window.appendableData.post(this.authToken, handleId);
+  }
 
-  // remove appendable data at index
-  var removeAppendableDataAt = function() {
-    log('Remove appendable data at :: ' + index);
-    window.appendableData.removeAt(authToken, currentPostHandleId, index)
-    .then(function(res) {
-      postAppendableData(currentPostHandleId)
-      .then(function(res) {
-        console.log(res);
-        clearAllDeletedDatas();
-      }, function(err) {
+  putAppendableData(handleId) {
+    return window.appendableData.put(this.authToken, handleId);
+  }
+
+  dropAppendableDataHandle(handleId) {
+    return window.appendableData.dropHandle(this.authToken, handleId);
+  }
+
+  putStructureData(handleId) {
+    return window.structuredData.put(this.authToken, handleId);
+  }
+
+  dropStructuredDataHandle(handleId) {
+    window.structuredData.dropHandle(this.authToken, handleId);
+  }
+
+  dropDataIdHandle(dataIdHandle) {
+    window.dataId.dropHandle(this.authToken, dataIdHandle);
+  }
+
+  blockUser(index) {
+    this.log('Block User');
+    let signKeyHandleId = null;
+    this.toggleSpinner(true);
+
+    // drop signed key handle id
+    const dropSignKeyHandle = () => {
+      this.log('Drop signed key handle id');
+      window.appendableData.dropSignKeyHandle(this.authToken, signKeyHandleId)
+        .then((res) => {
+          console.log(res);
+          this.toggleSpinner(false);
+        }, (err) => {
+          console.log(err);
+          this.errorHandler(err);
+        });
+    };
+
+    // post appendable data to network
+    const post = () => {
+      this.log('Post appendable data');
+      this.postAppendableData(this.currentPostHandleId)
+        .then((res) => {
+          console.log(res);
+          dropSignKeyHandle();
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
+
+    const addFilter = () => {
+      this.log('Add filter');
+      window.appendableData.addToFilter(this.authToken, this.currentPostHandleId, [signKeyHandleId])
+        .then((res) => {
+          console.log(res);
+          post();
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
+
+    // get appendable data signed key at index
+    this.log('Get signed key at :: ' + index);
+    window.appendableData.getSignKeyAt(this.authToken, this.currentPostHandleId, index)
+      .then((res) => {
+        signKeyHandleId = res.__parsedResponseBody__.handleId;
+        addFilter();
+      }, (err) => {
         console.error(err);
+        this.errorHandler(err);
       });
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+  }
 
-  removeAppendableDataAt();
-};
+  deleteComment(ele, index) {
+    this.log('Delete comment');
+    if (typeof index == 'undefined') {
+      return;
+    }
+    this.toggleSpinner(true);
 
-// write new comment
-var writeComment = function(e) {
-  log('Write comments');
-  utils.toggleSpinner(true);
+    // post data to network after delete
+    const post = () => {
+      this.log('Post appendable data');
+      this.postAppendableData(this.currentPostHandleId)
+        .then((res) => {
+          console.log(res);
+          this.clearComments();
+          this.toggleSpinner(false);
+          this.fetchComments();
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
 
-  var currentSDHandleId = null;
-  var content = $(COMMET_TEXT_ELEMENT_ID).val();
-  var publicName = utils.getSelectedDns();
-  var timeStamp = (new Date()).getTime();
-  var name = publicName + timeStamp + utils.generateRandomString();
-  var payload = {
-    name: publicName,
-    comment: content,
-    time: timeStamp
-  };
-  payload = new Buffer(JSON.stringify(payload)).toString('base64');
+    // clear all deleted data from appendable data
+    const clearAllDeletedDatas = () => {
+      this.log('Clear appendable deleted data');
+      window.appendableData.clearAll(this.authToken, this.currentPostHandleId, true)
+        .then((res) => {
+          post();
+          console.log(res);
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
 
-  // drop structured data data handle id
-  var dropStructureDataHandler = function(handlerId) {
-    log('Drop structured data handle id');
-    window.structuredData.dropHandle(authToken, handlerId)
-      .then(function(res) {
-        console.log(res);
-      }, function(err) {
+    // remove appendable data at index
+    this.log('Remove appendable data at :: ' + index);
+    window.appendableData.removeAt(this.authToken, this.currentPostHandleId, index)
+      .then((res) => {
+        this.postAppendableData(this.currentPostHandleId)
+          .then((res) => {
+            console.log(res);
+            clearAllDeletedDatas();
+          }, (err) => {
+            console.error(err);
+          });
+      }, (err) => {
         console.error(err);
+        this.errorHandler(err);
       });
   };
 
-  // append structured data data handle id to appendable data
-  var appendToAppendableData = function(dataHandleId) {
-    log('Append structured data handle id');
-    window.appendableData.append(authToken, currentPostHandleId, dataHandleId)
-    .then(function(res) {
-      dropStructureDataHandler(dataHandleId);
-      utils.resetCommentForm();
-      utils.toggleSpinner();
-      fetchComments();
-    }, function(err) {
-      // handle error
-      console.error(err);
-      handleErrorInCommon(err);
-    });
+  writeComment(e) {
+    this.log('Write comments');
+    this.toggleSpinner(true);
+
+    let currentSDHandleId = null;
+    let content = $(this.COMMENT_TEXT_ELEMENT_ID).val();
+    let publicName = this.getSelectedDns();
+    let timeStamp = (new Date()).getTime();
+    let name = publicName + timeStamp + this.generateRandomString();
+    let payload = {
+      name: publicName,
+      comment: content,
+      time: timeStamp
+    };
+    payload = new Buffer(JSON.stringify(payload)).toString('base64');
+
+    // append structured data data handle id to appendable data
+    const appendToAppendableData = (dataHandleId) => {
+      this.log('Append structured data handle id');
+      window.appendableData.append(this.authToken, this.currentPostHandleId, dataHandleId)
+        .then((res) => {
+          this.dropDataIdHandle();
+          this.dropStructuredDataHandle(currentSDHandleId);
+          this.resetCommentForm();
+          this.toggleSpinner();
+          this.fetchComments();
+        }, (err) => {
+          // handle error
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
+
+    // get structured data data handler id
+    const getSDDataHandleId = () => {
+      this.log('Get structured data handle id');
+      window.structuredData.getDataIdHandle(this.authToken, currentSDHandleId)
+        .then((res) => {
+          appendToAppendableData(res.__parsedResponseBody__.handleId);
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
+
+    // put structured data to network
+    const put = () => {
+      this.log('Put structured data');
+      this.putStructureData(currentSDHandleId)
+        .then((res) => {
+          getSDDataHandleId();
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
+
+    // create new structured data
+    const createStructureData = () => {
+      this.log('Create structured data');
+      window.structuredData.create(this.authToken, name, 501, payload)
+        .then((res) => {
+          currentSDHandleId = res.__parsedResponseBody__.handleId;
+          put();
+        }, (err) => {
+          // handle error
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
+    createStructureData();
   };
 
-  // get structured data data handler id
-  var getSDDataHandleId = function() {
-    log('Get structured data handle id');
-    window.structuredData.getDataIdHandle(authToken, currentSDHandleId)
-    .then(function(res) {
-      appendToAppendableData(res.__parsedResponseBody__.handleId);
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+  fetchComments(){
+    this.log('Fetch comments');
+    let currentIndex = 0;
+    this.commentList = [];
 
-  // put structured data to network
-  var put = function() {
-    log('Put structured data');
-    putStructureData(currentSDHandleId)
-    .then(function(res) {
-      getSDDataHandleId();
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+    this.toggleSpinner(true);
 
-  // create new structured data
-  var createStructureData = function() {
-    log('Create structured data');
-    window.structuredData.create(authToken, name, 501, payload)
-    .then(function(res) {
-      currentSDHandleId = res.__parsedResponseBody__.handleId;
-      put();
-    }, function(err) {
-      // handle error
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
-  createStructureData();
-};
-
-// fetch comments
-var fetchComments = function() {
-  log('Fetch comments');
-  var currentIndex = 0;
-  commentList = [];
-
-  utils.toggleSpinner(true);
-
-  // prepare comment template
-  var prepareTemplate = function(comment, index) {
-    var template = '<div class="media">' +
+    // prepare comment template
+    const prepareTemplate = (comment, index) => {
+      let template = '<div class="media">' +
         '<div class="media-body">' +
-            '<h4 class="media-heading">::HEADING::' +
-                '<small>::DATE_TIME::</small>' +
-            '</h4>' +
-            '::CONTENT::' +
+        '<h4 class="media-heading">::HEADING::' +
+        '<small>::DATE_TIME::</small>' +
+        '</h4>' +
+        '::CONTENT::' +
         '</div>';
 
-    if (utils.isAdmin()) {
-      template += '<div class="media-options">' +
-        '<button class="btn btn-danger btn-xs" type="button" onclick="window.deleteComment(this, ::INDEX::)">Delete</button>' +
-        '<button class="btn btn-warning btn-xs" type="button" onclick="window.blockUser(::INDEX::)">Block</button>' +
-      '</div>';
-    }
+      if (this.isAdmin()) {
+        template += '<div class="media-options">' +
+          '<button class="btn btn-danger btn-xs" type="button" onclick="window.commentsTutorial.deleteComment(this, ::INDEX::)">Delete</button>' +
+          '<button class="btn btn-warning btn-xs" type="button" onclick="window.commentsTutorial.blockUser(::INDEX::)">Block</button>' +
+          '</div>';
+      }
 
-    template += '<hr></div>';
-    template = template.replace(/::HEADING::/, comment.name)
-      .replace(/::DATE_TIME::/, (new Date(comment.time)).toLocaleString())
-      .replace(/::CONTENT::/, comment.comment)
-      .replace(/::INDEX::/g, index);
+      template += '<hr></div>';
+      template = template.replace(/::HEADING::/, comment.name)
+        .replace(/::DATE_TIME::/, (new Date(comment.time)).toLocaleString())
+        .replace(/::CONTENT::/, comment.comment)
+        .replace(/::INDEX::/g, index);
 
-    return template;
-  };
+      return template;
+    };
 
-  // add comment
-  var addComment = function() {
-    utils.clearComments();
-    commentList.sort(function(a, b) {
-      return new Date(b.data.time) - new Date(a.data.time);
-    });
-    commentList.forEach(function(comment) {
-      var template = prepareTemplate(comment.data, comment.index);
-      $(TARGET_ELEMENT_ID).children(COMMENT_LIST_ELEMENT_ID).append(template);
-    });
-  };
-
-  // get structured data
-  var getStructureData = function(handleId) {
-    log('Fetch structured data');
-    console.log('handle id :: ', handleId);
-    window.structuredData.readData(authToken, handleId)
-    .then(function(res) {
-      commentList.unshift({
-        index: currentIndex,
-        data: res.__parsedResponseBody__
+    // add comment
+    const addComment = () => {
+      this.clearComments();
+      this.commentList.sort((a, b) => {
+        return new Date(b.data.time) - new Date(a.data.time);
       });
-      commentsIterator();
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+      this.commentList.forEach((comment) => {
+        let template = prepareTemplate(comment.data, comment.index);
+        $(this.TARGET_ELEMENT_ID).find(this.COMMENT_LIST_ELEMENT_ID).append(template);
+      });
+    };
 
-  // drop data Id handle
-  var dropDataIdHandle = function(dataHandleId) {
-    window.dataId.dropHandle(authToken, dataHandleId)
-    .then(function(res) {
-      console.log(res);
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  }
 
-  // get structured data handle
-  var getStructureDataHandle = function(dataHandleId) {
-    window.structuredData.getHandle(authToken, dataHandleId)
-    .then(function(res) {
-      dropDataIdHandle(dataHandleId);
-      getStructureData(res.__parsedResponseBody__.handleId);
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+    // get structured data
+    const getStructureData = (handleId) => {
+      this.log('Fetch structured data');
+      console.log('handle id :: ', handleId);
+      window.structuredData.readData(this.authToken, handleId)
+        .then((res) => {
+          this.commentList.unshift({
+            index: currentIndex,
+            data: res.__parsedResponseBody__
+          });
+          this.dropStructuredDataHandle(handleId);
+          insertCommentsOnUI();
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
 
-  // fetch appendable data at index
-  var fetchAppendableDataVal = function(index) {
-    log('Fetch appendable data value for index :: ' + index);
-    window.appendableData.getDataIdAt(authToken, currentPostHandleId, index)
-    .then(function(res) {
-      return getStructureDataHandle(res.__parsedResponseBody__.handleId);
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+    // get structured data handle
+    const getStructureDataHandle = (dataHandleId) => {
+      window.structuredData.getHandle(this.authToken, dataHandleId)
+        .then((res) => {
+          this.dropDataIdHandle(dataHandleId);
+          getStructureData(res.__parsedResponseBody__.handleId);
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
 
-  // iterate comment
-  var commentsIterator = function() {
-    currentIndex = commentList.length % (totalComments + 1);
-    if (totalComments === 0 || (currentIndex === totalComments)) {
-      addComment();
-      return utils.toggleSpinner();
-    }
-    log('Iterate for index :: ' + currentIndex);
-    fetchAppendableDataVal(currentIndex);
-  };
+    // fetch appendable data at index
+    const fetchAppendableDataVal = (index) => {
+      this.log('Fetch appendable data value for index :: ' + index);
+      window.appendableData.getDataIdAt(this.authToken, this.currentPostHandleId, index)
+        .then((res) => {
+          return getStructureDataHandle(res.__parsedResponseBody__.handleId);
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
 
-  // get appendable data length
-  var getAppenableDataLength = function() {
-    log('Fetch appendable data length');
-    window.appendableData.getMetadata(authToken, currentPostHandleId)
-    .then(function(res) {
-      totalComments = res.__parsedResponseBody__.dataLength;
-      commentsIterator();
-    }, function(err) {
-      // handle error
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
+    // iterate comment
+    const insertCommentsOnUI = () => {
+      currentIndex = this.commentList.length % (this.totalComments + 1);
+      if (this.totalComments === 0 || (currentIndex === this.totalComments)) {
+        addComment();
+        return this.toggleSpinner();
+      }
+      this.log('Iterate for index :: ' + currentIndex);
+      fetchAppendableDataVal(currentIndex);
+    };
 
-  dropAppendableDataDataHandle = function(dataHandleId) {
-    window.dataId.dropHandle(authToken, dataHandleId)
-    .then(function(res) {
-      console.log(res);
-      getAppenableDataLength();
-    }, function(err) {
-      handleErrorInCommon(err);
-      console.error(err);
-    });
-  }
+    // get appendable data length
+    const getAppendableDataLength = () => {
+      this.log('Fetch appendable data length');
+      window.appendableData.getMetadata(this.authToken, this.currentPostHandleId)
+        .then((res) => {
+          this.totalComments = res.__parsedResponseBody__.dataLength;
+          insertCommentsOnUI();
+        }, (err) => {
+          // handle error
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
 
-  // fetch appendableData
-  var fetchAppendableData = function(dataHandleId) {
-    log('Fetch appendable data');
+    // fetch appendableData
+    const fetchAppendableData = (dataHandleId) => {
+      this.log('Fetch appendable data');
 
-    window.appendableData.getHandle(authToken, dataHandleId)
-      .then(function(res) {
-        utils.toggleComments(true);
-        utils.toggleCommentsInput(!!authToken);
-        currentPostHandleId = res.__parsedResponseBody__.handleId;
-        dropAppendableDataDataHandle(dataHandleId);
-      }, function(err) {
-        // handle error
+      window.appendableData.getHandle(this.authToken, dataHandleId)
+        .then((res) => {
+          this.toggleComments(true);
+          this.toggleCommentsInput(!!this.authToken);
+          this.currentPostHandleId = res.__parsedResponseBody__.handleId;
+          this.dropDataIdHandle(dataHandleId);
+          getAppendableDataLength();
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+          if (this.isAdmin()) {
+            this.toggleEnableCommentBtn(true);
+          }
+        });
+    };
+
+    this.log('Fetch appendable data data handle id');
+    let ID = this.getCurrentPostId();
+    window.dataId.getAppendableDataHandle(this.authToken, ID)
+      .then((res) => {
+        console.log(res);
+        fetchAppendableData(res.__parsedResponseBody__.handleId);
+      }, (err) => {
+        this.errorHandler(err);
         console.error(err);
-        handleErrorInCommon(err);
-        if (utils.isAdmin()) {
-          utils.toggleEnableCommentBtn(true);
+      });
+  };
+
+  enableComments() {
+    if (!this.isAdmin()) {
+      return console.error('Admin has the privilege to enable comment');
+    }
+    this.toggleSpinner(true);
+    this.log('Enable Comment');
+    let ID = this.getCurrentPostId();
+
+    const put = (handleId) => {
+      this.log('Put appendable data');
+      this.putAppendableData(handleId)
+        .then((res) => {
+          this.toggleEnableCommentBtn(false);
+          this.toggleComments(true);
+          this.currentPostHandleId = handleId;
+          this.toggleSpinner(false);
+        }, (err) => {
+          console.error(err);
+          this.errorHandler(err);
+        });
+    };
+
+    // create appendable data
+    const createAppendableData = () => {
+      this.log('Create appendable data');
+      window.appendableData.create(this.authToken, ID, false)
+        .then((res) => {
+          put(res.__parsedResponseBody__.handleId);
+        }, (err) => {
+          this.errorHandler(err);
+          console.error(err);
+        });
+    };
+
+    createAppendableData();
+  };
+
+  addDnsList() {
+    if (!this.user.dns) {
+      return;
+    }
+    this.user.dns.forEach((list, i) => {
+      let option = '<option value="' + list + '" ' + (i === 0 ? ' selected' : '') + '>' + list + '</option>';
+      $(this.DNS_LIST_ELEMENT_ID).prepend(option);
+    });
+  };
+
+  getDns() {
+    this.log('Fetching DNS records');
+    window.safeDNS.getDns(this.authToken)
+      .then((res) => {
+        this.user.dns = res.__parsedResponseBody__;
+        this.addDnsList();
+        this.fetchComments();
+      }, (err) => {
+        console.error(err);
+        this.errorHandler(err);
+        if (err.message.indexOf('401 Unauthorized') !== -1) {
+          return this.fetchComments();
         }
       });
   };
 
-  var getAppendableDataDataHandle = function() {
-    log('Fetch appendable data data handle id');
-    var ID = utils.getCurrentPostId();
-    window.dataId.getAppendableDataHandle(authToken, ID)
-    .then(function(res) {
-      console.log(res);
-      fetchAppendableData(res.__parsedResponseBody__.handleId);
-    }, function(err) {
-      handleErrorInCommon(err);
-      console.error(err);
-    });
-  };
-
-  getAppendableDataDataHandle();
-};
-
-// enable comment by admin
-var enableComments = function() {
-  if (!utils.isAdmin()) {
-    return console.error('Admin has the privilege to enable comment');
-  }
-  utils.toggleSpinner(true);
-  log('Enable Comment');
-  var ID = utils.getCurrentPostId();
-
-  var put = function(handleId) {
-    log('Put appendable data');
-    putAppendableData(handleId)
-    .then(function(res) {
-      utils.toggleEnableCommentBtn(false);
-      utils.toggleComments(true);
-      currentPostHandleId = handleId;
-      utils.toggleSpinner(false);
-    }, function(err) {
-      console.error(err);
-      handleErrorInCommon(err);
-    });
-  };
-
-  // create appendable data
-  var createAppendableData = function() {
-    log('Create appendable data');
-    window.appendableData.create(authToken, ID, false)
-    .then(function(res) {
-      put(res.__parsedResponseBody__.handleId);
-    }, function(err) {
-      // hanle error
-      handleErrorInCommon(err);
-      console.error(err);
-    });
-  };
-
-  createAppendableData();
-};
-
-var addDnsList = function() {
-  if (!user.dns) {
-    return;
-  }
-  user.dns.forEach(function(list, i) {
-    var option = '<option value="' + list + '" ' + (i === 0 ? ' selected' : '') + '>' + list + '</option>';
-    $(DNS_LIST_ELEMENT_ID).prepend(option);
-  });
-};
-
-// get longNames list
-var getDns = function() {
-  log('Fetching DNS records');
-  window.safeDNS.getDns(authToken)
-  .then(function(res) {
-    user.dns = res.__parsedResponseBody__;
-    addDnsList();
-    fetchComments();
-  }, function(err) {
-    // hanle error
-    console.error(err);
-    handleErrorInCommon(err);
-    if (err.message.indexOf('401 Unauthorized') !== -1) {
-      return fetchComments();
-    }
-  });
-};
-
 // authorise app
-var authoriseApp = function() {
-  log('Authorising application');
-  window.safeAuth.authorise(app)
-  .then(function(res) {
-    utils.setAuthToken(res.__parsedResponseBody__.token);
-    getDns();
-  }, function(err) {
-    console.error(err);
-    handleErrorInCommon(err);
-    return fetchComments();
-  });
-};
+  authoriseApp() {
+    this.log('Authorising application');
+    window.safeAuth.authorise(this.app)
+      .then((res) => {
+        this.setAuthToken(res.__parsedResponseBody__.token);
+        this.getDns();
+      }, (err) => {
+        console.error(err);
+        this.errorHandler(err);
+        return this.fetchComments();
+      });
+  };
 
-// load initial structure
-var loadInitialTemplpate = function() {
-  if (!TARGET_ELEMENT_ID) {
-    throw new Error('Target not found');
-  }
-  var initialTemplate = '<div class="comment-block center-block">' +
-    '<div class="comment-spinner" id="_commentSpinner">' +
+  loadInitialTemplate() {
+    if (!this.DEST_ELEMENT_ID) {
+      throw new Error('Target not found');
+    }
+    let initialTemplate = '<div class="comment-block center-block">' +
+      '<div class="comment-spinner" id="_commentSpinner">' +
       '<div class="comment-spinner-b">' +
-        '<i class="spinner glyphicon glyphicon-repeat" aria-hidden="true"></i>' +
+      '<i class="spinner" aria-hidden="true"></i>' +
       '</div>' +
-    '</div>' +
-    '<div id="_commets">' +
+      '</div>' +
+      '<div id="_commets">' +
       '<div id="_commentEnable" class="comment-enable">' +
-        '<div class="panel panel-default">' +
-          '<div class="panel-body">' +
-            '<button class="btn btn-primary" type="enableComments" onclick="window.enableComments()">Enable Comments</button>' +
-          '</div>' +
-        '</div>' +
+      '<div class="panel panel-default">' +
+      '<div class="panel-body">' +
+      '<button class="btn btn-primary" type="enableComments" onclick="window.commentsTutorial.enableComments()">Enable Comments</button>' +
+      '</div>' +
+      '</div>' +
       '</div>' +
       '<div class="comments" id="_commentList">' +
-        '<div class="well" id="_commentInput">' +
-            '<h4>Leave a Comment:</h4>' +
-            '<form role="form" id="_commentForm">' +
-                '<div class="form-group">' +
-                  '<select class="form-control" id="_dnsList">' +
-                    '<option value="anonymous">Anonymous</option>' +
-                  '</select>' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<textarea id="_commentText" class="form-control" rows="4"></textarea>' +
-                '</div>' +
-                '<button type="button" class="btn btn-primary" onclick="window.writeComment()">Submit</button>' +
-            '</form>' +
-        '</div>' +
+      '<div class="well" id="_commentInput">' +
+      '<h4>Leave a Comment:</h4>' +
+      '<form role="form" id="_commentForm">' +
+      '<div class="form-group">' +
+      '<select class="form-control" id="_dnsList">' +
+      '<option value="anonymous">Anonymous</option>' +
+      '</select>' +
       '</div>' +
-    '</div>' +
-  '</div>';
-  $(DEST_ELEMENT_ID).html(initialTemplate);
-};
+      '<div class="form-group">' +
+      '<textarea id="_commentText" class="form-control" rows="4"></textarea>' +
+      '</div>' +
+      '<button type="button" class="btn btn-primary" onclick="window.commentsTutorial.addComment()">Submit</button>' +
+      '</form>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+    $(this.DEST_ELEMENT_ID).html(initialTemplate);
+  };
 
-// starting point
-var run = function() {
-  loadInitialTemplpate();
-  utils.toggleSpinner(true);
-  authToken = utils.getAuthToken();
-  if (!authToken) {
-    authoriseApp();
-  } else {
-    getDns();
+  loadComments(destId) {
+    if (destId) {
+      this.DEST_ELEMENT_ID = destId;
+    }
+    this.loadInitialTemplate();
+    this.toggleSpinner(true);
+    this.authToken = this.getAuthToken();
+    if (!this.authToken) {
+      this.authoriseApp();
+    } else {
+      this.getDns();
+    }
+    $(window).on('beforeunload', () => (this.dropAppendableDataHandle(currentPostHandleId)));
+  }
+}
+
+const commentTutorial = new CommentsTutorial();
+
+window.commentsTutorial = {
+  loadComments: (destId) => {
+    commentTutorial.loadComments(destId);
+  },
+  enableComments: () => {
+    commentTutorial.enableComments();
+  },
+  addComment: (e) => {
+    commentTutorial.writeComment(e);
+  },
+  deleteComment: (ele, index) => {
+    commentTutorial.deleteComment(ele, index);
+  },
+  blockUser: (index) => {
+    commentTutorial.blockUser(index);
   }
 };
-
-window.Comment = function(targetId) {
-  DEST_ELEMENT_ID = targetId ? targetId : '#comments';
-  run();
-};
-
-$(window).unload(function() {
-  dropAppendableDataHandler(currentPostHandleId)
-  .then(function(res) {
-    console.log(res);
-  }, function(err) {
-    console.error(err);
-  });
-});
