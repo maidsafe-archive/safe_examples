@@ -1,8 +1,8 @@
 class CommentsTutorial {
   constructor() {
-    this.LOCAL_STORAGE_TOKEN_KEY = 'SAFE_TOKEN';
+    this.LOCAL_STORAGE_TOKEN_KEY = 'SAFE_TOKEN_' + window.location.host;
     this.app = {
-      name: "Comment tutorial plugin",
+      name: window.location.host,
       id: "tutorial.maidsafe.net",
       version: "0.0.1",
       vendor: "maidsafe",
@@ -44,16 +44,15 @@ class CommentsTutorial {
   }
   setAuthToken(token) {
     this.authToken = token;
-    window.localStorage.setItem(this.LOCAL_STORAGE_TOKEN_KEY, token);
+    window.safeAuth.setAuthToken(this.LOCAL_STORAGE_TOKEN_KEY, token);
   }
 
   getAuthToken() {
-    return window.localStorage.getItem(this.LOCAL_STORAGE_TOKEN_KEY);
+    return window.safeAuth.getAuthToken(this.LOCAL_STORAGE_TOKEN_KEY);
   }
 
   clearAuthToken() {
     this.authToken = null;
-    window.localStorage.clear();
   }
 
   isAdmin() {
@@ -259,6 +258,7 @@ class CommentsTutorial {
         }, (err) => {
           // handle error
           console.error(err);
+          window.alert('Could not post a comment');
           this.errorHandler(err);
         });
     };
@@ -515,9 +515,13 @@ class CommentsTutorial {
 // authorise app
   authoriseApp() {
     this.log('Authorising application');
-    window.safeAuth.authorise(this.app)
+    window.safeAuth.authorise(this.app, this.LOCAL_STORAGE_TOKEN_KEY)
       .then((res) => {
-        this.setAuthToken(res.__parsedResponseBody__.token);
+        if (typeof res === 'object') {
+          this.setAuthToken(res.__parsedResponseBody__.token);
+        } else {
+          this.authToken = this.getAuthToken();
+        }
         this.getDns();
       }, (err) => {
         console.error(err);
