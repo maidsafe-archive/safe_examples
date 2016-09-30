@@ -1,11 +1,12 @@
 class CommentsTutorial {
   constructor() {
-    this.LOCAL_STORAGE_TOKEN_KEY = 'SAFE_TOKEN_' + window.location.host;
+    this.hostName = window.location.host.replace(/.safenet$/g, '');
+    this.LOCAL_STORAGE_TOKEN_KEY = `SAFE_TOKEN_${this.hostName}`;
     this.app = {
       name: window.location.host,
-      id: "tutorial.maidsafe.net",
-      version: "0.0.1",
-      vendor: "maidsafe",
+      id: 'tutorial.maidsafe.net',
+      version: '0.0.1',
+      vendor: 'maidsafe',
       permissions: [
         'LOW_LEVEL_API'
       ]
@@ -56,7 +57,7 @@ class CommentsTutorial {
   }
 
   isAdmin() {
-    let currentDns = window.location.host.split('.').slice(-1)[0];
+    let currentDns = this.hostName.replace(/(^\w+\.|.safenet$)/g, '');
     if (!this.user.dns) {
       return;
     }
@@ -66,7 +67,7 @@ class CommentsTutorial {
     return $(this.DNS_LIST_ELEMENT_ID).val();
   }
   getCurrentPostId() {
-    return window.location.host + '/' + window.location.pathname;
+    return `${this.hostName}/${window.location.pathname}`;
   }
   generateRandomString() {
     let text = '';
@@ -505,9 +506,8 @@ class CommentsTutorial {
       }, (err) => {
         console.error(err);
         this.errorHandler(err);
-        this.clearAuthToken();
         if (err.message.indexOf('401 Unauthorized') !== -1) {
-          return this.fetchComments();
+          return (this.authToken ? this.authoriseApp() : this.fetchComments());
         }
       });
   };
@@ -519,12 +519,13 @@ class CommentsTutorial {
       .then((res) => {
         if (typeof res === 'object') {
           this.setAuthToken(res.__parsedResponseBody__.token);
-        } else {
-          this.authToken = this.getAuthToken();
         }
         this.getDns();
       }, (err) => {
         console.error(err);
+        if (this.authToken) {
+          this.clearAuthToken();
+        }
         this.errorHandler(err);
         return this.fetchComments();
       });
