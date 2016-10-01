@@ -33,8 +33,8 @@
         <div class="ms-list-1-i" ng-repeat="service in serviceList">
           <div class="ms-list-1-i-ctx">
             <span class="url"><a href=""
-                ng-click="openExternal('http://' + service.name + '.' + service.longName + '.safenet')">
-                http://<b>{{ service.name }}</b>{{ '.' + service.longName + '.safenet' }}</a></span>
+                ng-click="openExternal('safe://' + service.name + '.' + service.longName + '.safenet')">
+                safe://<b>{{ service.name }}</b>{{ '.' + service.longName + '.safenet' }}</a></span>
             <span class="path">/public/{{service.homeDir}}</span>
           </div>
           <div class="ms-list-1-i-act-lt">
