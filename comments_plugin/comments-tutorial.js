@@ -1,11 +1,12 @@
 class CommentsTutorial {
   constructor() {
-    this.LOCAL_STORAGE_TOKEN_KEY = 'SAFE_TOKEN';
+    this.hostName = window.location.host.replace(/.safenet$/g, '');
+    this.LOCAL_STORAGE_TOKEN_KEY = `SAFE_TOKEN_${this.hostName}`;
     this.app = {
-      name: "Comment tutorial plugin",
-      id: "tutorial.maidsafe.net",
-      version: "0.0.1",
-      vendor: "maidsafe",
+      name: window.location.host,
+      id: 'tutorial.maidsafe.net',
+      version: '0.0.1',
+      vendor: 'maidsafe',
       permissions: [
         'LOW_LEVEL_API'
       ]
@@ -44,20 +45,19 @@ class CommentsTutorial {
   }
   setAuthToken(token) {
     this.authToken = token;
-    window.localStorage.setItem(this.LOCAL_STORAGE_TOKEN_KEY, token);
+    window.safeAuth.setAuthToken(this.LOCAL_STORAGE_TOKEN_KEY, token);
   }
 
   getAuthToken() {
-    return window.localStorage.getItem(this.LOCAL_STORAGE_TOKEN_KEY);
+    return window.safeAuth.getAuthToken(this.LOCAL_STORAGE_TOKEN_KEY);
   }
 
   clearAuthToken() {
     this.authToken = null;
-    window.localStorage.clear();
   }
 
   isAdmin() {
-    let currentDns = window.location.host.split('.').slice(-1)[0];
+    let currentDns = this.hostName.replace(/(^\w+\.|.safenet$)/g, '');
     if (!this.user.dns) {
       return;
     }
@@ -67,7 +67,7 @@ class CommentsTutorial {
     return $(this.DNS_LIST_ELEMENT_ID).val();
   }
   getCurrentPostId() {
-    return window.location.host + '/' + window.location.pathname;
+    return `${this.hostName}/${window.location.pathname}`;
   }
   generateRandomString() {
     let text = '';
@@ -259,6 +259,7 @@ class CommentsTutorial {
         }, (err) => {
           // handle error
           console.error(err);
+          window.alert('Could not post a comment');
           this.errorHandler(err);
         });
     };
@@ -505,9 +506,8 @@ class CommentsTutorial {
       }, (err) => {
         console.error(err);
         this.errorHandler(err);
-        this.clearAuthToken();
         if (err.message.indexOf('401 Unauthorized') !== -1) {
-          return this.fetchComments();
+          return (this.authToken ? this.authoriseApp() : this.fetchComments());
         }
       });
   };
@@ -515,12 +515,17 @@ class CommentsTutorial {
 // authorise app
   authoriseApp() {
     this.log('Authorising application');
-    window.safeAuth.authorise(this.app)
+    window.safeAuth.authorise(this.app, this.LOCAL_STORAGE_TOKEN_KEY)
       .then((res) => {
-        this.setAuthToken(res.__parsedResponseBody__.token);
+        if (typeof res === 'object') {
+          this.setAuthToken(res.__parsedResponseBody__.token);
+        }
         this.getDns();
       }, (err) => {
         console.error(err);
+        if (this.authToken) {
+          this.clearAuthToken();
+        }
         this.errorHandler(err);
         return this.fetchComments();
       });
