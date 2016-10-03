@@ -18,30 +18,13 @@ export default class MailList extends Component {
     this.activeType = null;
     this.goBack = this.goBack.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.fetchCoreStructure = this.fetchCoreStructure.bind(this);
     this.handleSave = this.handleSave.bind(this);
-    this.fetchAppendableDataHandler = this.fetchAppendableDataHandler.bind(this);
-    this.deleteFromAppendableData = this.deleteFromAppendableData.bind(this);
+    this.fetchStructuredData = this.fetchStructuredData.bind(this);
+    this.getAppendableDataIdHandle = this.getAppendableDataIdHandle.bind(this);
+    this.fetchAppendableDataHandle = this.fetchAppendableDataHandle.bind(this);
+    this.removeFromAppendableData = this.removeFromAppendableData.bind(this);
     this.dropAppendableDatahandler = this.dropAppendableDatahandler.bind(this);
-    this.clearDeleteData = this.clearDeleteData.bind(this);
-  }
-
-  componentWillMount() {
-    const { coreData, setActiveMail } = this.props;
-    switch (this.activeType) {
-      case CONSTANTS.HOME_TABS.INBOX: {
-        setActiveMail(coreData.inbox[this.activeIndex]);
-        break;
-      }
-      case CONSTANTS.HOME_TABS.OUTBOX: {
-        setActiveMail(coreData.outbox[this.activeIndex]);
-        break;
-      }
-      case CONSTANTS.HOME_TABS.SAVED: {
-        setActiveMail(coreData.saved[this.activeIndex]);
-        break;
-      }
-    }
+    this.clearDeletedData = this.clearDeletedData.bind(this);
   }
 
   goBack() {
@@ -51,9 +34,6 @@ export default class MailList extends Component {
       case CONSTANTS.HOME_TABS.INBOX: {
         return this.props.inbox.refresh();
       }
-      case CONSTANTS.HOME_TABS.OUTBOX: {
-        return router.push('/outbox');
-      }
       case CONSTANTS.HOME_TABS.SAVED: {
         router.push('/home');
         return router.push('/saved');
@@ -61,12 +41,14 @@ export default class MailList extends Component {
     }
   }
 
-  fetchCoreStructure() {
-    const { token, coreDataHandler, fetchCoreStructure } = this.props;
+  fetchStructuredData() {
+    const { token, rootSDHandle, fetchStructuredData } = this.props;
+
     if (this.activeType === CONSTANTS.HOME_TABS.INBOX) {
       return this.goBack();
     }
-    fetchCoreStructure(token, coreDataHandler)
+
+    fetchStructuredData(token, rootSDHandle)
       .then(res => {
         if (res.error) {
           return showError('Get Structure Data Error', res.error.message);
@@ -76,49 +58,92 @@ export default class MailList extends Component {
   }
 
   dropAppendableDatahandler() {
-    const { token, dropHandler } = this.props;
-    dropHandler(token, this.appendableHandlerId)
+    const { token, dropAppendableDataHandle } = this.props;
+    dropAppendableDataHandle(token, this.appendableHandlerId)
       .then(res => {
         if (res.error) {
           return showError('Drop Appendable data error', res.error.message);
         }
-        return this.fetchCoreStructure();
+        return this.fetchStructuredData();
       });
   }
 
-  clearDeleteData() {
-    const { token, clearDeleteData } = this.props;
-    clearDeleteData(token, this.appendableHandlerId)
+  clearDeletedData() {
+    const { token, clearDeletedData, postAppendableData } = this.props;
+    const post = () => {
+      postAppendableData(token, this.appendableHandlerId)
+        .then(res => {
+          if (res.error) {
+            return showError('Post Appendabel Data Error', res.error.message);
+          }
+          return this.dropAppendableDatahandler();
+        });
+    };
+
+    clearDeletedData(token, this.appendableHandlerId)
       .then(res => {
         if (res.error) {
           return showError('Clear Appendabel Delete Data Error', res.error.message);
         }
-        return this.dropAppendableDatahandler();
+        return post();
       });
   }
 
-  deleteFromAppendableData() {
-    const { token, deleteAppendableData } = this.props;
-    deleteAppendableData(token, this.appendableHandlerId, this.activeIndex)
+  removeFromAppendableData() {
+    const { token, removeFromAppendableData, postAppendableData } = this.props;
+
+    const post = () => {
+      postAppendableData(token, this.appendableHandlerId)
+        .then(res => {
+          if (res.error) {
+            return showError('Post Appendabel Data Error', res.error.message);
+          }
+          return this.clearDeletedData();
+        });
+    };
+
+    removeFromAppendableData(token, this.appendableHandlerId, this.activeIndex)
       .then(res => {
         if (res.error) {
-          return showError('Delete Appendabel Data Error', res.error.message);
+          return showError('Remove From Appendabel Data Error', res.error.message);
         }
-        return this.clearDeleteData();
+        return post();
       });
   }
 
-  fetchAppendableDataHandler() {
-    const { token, coreData, fetchAppendableDataHandler } = this.props;
-    const hashedEmailId = hashEmailId(coreData.id);
+  fetchAppendableDataHandle(dataIdHandle) {
+    const { token, fetchAppendableDataHandle, dropHandler } = this.props;
 
-    fetchAppendableDataHandler(token, base64.encode(hashedEmailId))
+    const dropDataIdHandle = () => {
+      dropHandler(token, dataIdHandle)
+        .then(res => {
+          if (res.error) {
+            return console.error('Drop Appendable Data Id Handler error :: ', res.error.message);
+          }
+          console.warn(res.payload.data);
+        });
+    };
+
+    fetchAppendableDataHandle(token, dataIdHandle)
       .then(res => {
         if (res.error) {
-          return showError('Get Appendable Data Handler Error', res.error.message);
+          return showError('Get Appendable Data Handle Error', res.error.message);
         }
-        this.appendableHandlerId = res.payload.headers['handle-id'];
-        return this.deleteFromAppendableData();
+        this.appendableHandlerId = res.payload.data.handleId;
+        dropDataIdHandle(dataIdHandle);
+        return this.removeFromAppendableData();
+      });
+  }
+
+  getAppendableDataIdHandle() {
+    const { token, coreData, getAppendableDataIdHandle } = this.props;
+    const appendableDataName = base64.encode(hashEmailId(coreData.id));
+    getAppendableDataIdHandle(token, appendableDataName)
+      .then(res => {
+        if (res.error) {
+          return showError('Get Appendable Data Id Handle Error', res.error.message);
+        }
+        return this.fetchAppendableDataHandle(res.payload.data.handleId);
       });
   }
 
@@ -128,71 +153,95 @@ export default class MailList extends Component {
       if (res === 1) {
         return;
       }
+      const { token, coreData, rootSDHandle, updateStructuredData, postStructuredData, getCipherOptsHandle, deleteCipherOptsHandle } = this.props;
+
       this.activeIndex = parseInt(e.target.dataset.index);
-      const { token, coreData, coreDataHandler, updateCoreStructure } = this.props;
-      switch (this.activeType) {
-        case CONSTANTS.HOME_TABS.INBOX: {
-          return this.fetchAppendableDataHandler();
-        }
-        case CONSTANTS.HOME_TABS.OUTBOX: {
-          let outbox = [];
-          outbox = coreData.outbox.filter((mail, i) => {
-            if (i !== this.activeIndex) {
-              return mail;
-            }
-          });
-          coreData.outbox = outbox;
-          break;
-        }
-        case CONSTANTS.HOME_TABS.SAVED: {
-          let saved = [];
-          saved = coreData.saved.filter((mail, i) => {
-            if (i !== this.activeIndex) {
-              return mail;
-            }
-          });
-          coreData.saved = saved;
-          break;
-        }
+
+      if (this.activeType === CONSTANTS.HOME_TABS.INBOX) {
+        return this.getAppendableDataIdHandle();
       }
-      updateCoreStructure(token, coreDataHandler, coreData)
+
+      let saved = [];
+      saved = coreData.saved.filter((mail, i) => {
+        if (i !== this.activeIndex) {
+          return mail;
+        }
+      });
+
+      coreData.saved = saved;
+
+      const post = (cipherHandleId) => {
+        postStructuredData(token, rootSDHandle)
+          .then(res => {
+            if (res.error) {
+              return showError('Post Structure Data Error', res.error.message);
+            }
+            showSuccess('Deleted Mail', 'Mail Deleted Successfully');
+            deleteCipherOptsHandle(token, cipherHandleId);
+            return this.fetchStructuredData();
+          });
+      };
+
+      const update = (cipherHandleId) => {
+        updateStructuredData(token, rootSDHandle, coreData, cipherHandleId)
+          .then(res => {
+            if (res.error) {
+              return showError('Deleting Mail Error', res.error.message);
+            }
+            return post(cipherHandleId);
+          });
+      };
+
+      getCipherOptsHandle(token, CONSTANTS.ENCRYPTION.SYMMETRIC)
         .then(res => {
           if (res.error) {
-            return showError('Deleting Mail Error', res.error.message);
+            return showError('Get Cipher Handle Error', res.error.message);
           }
-          showSuccess('Deleted Mail', 'Mail Deleted Successfully');
-          return this.fetchCoreStructure();
+          return update(res.payload.data.handleId);
         });
     };
+
     // remote.dialog.showMessageBox({
     //   type: 'warning',
     //   title: 'Do you want to Delete?',
     //   message: '',
     //   buttons: [ 'Ok', "Cancel" ]
     // }, confirmDelete);
-
     confirmDelete(0);
   }
 
   handleSave(e) {
     e.preventDefault();
     this.activeIndex = parseInt(e.target.dataset.index);
-    const { token, coreData, coreDataHandler, updateCoreStructure } = this.props;
+    const { token, coreData, rootSDHandle, updateStructuredData, postStructuredData } = this.props;
+
     coreData.saved.unshift(coreData.inbox[this.activeIndex]);
     delete coreData.inbox[this.activeIndex];
-    updateCoreStructure(token, coreDataHandler, coreData)
+
+    const post = () => {
+      postStructuredData(token, rootSDHandle)
+        .then(res => {
+          if (res.error) {
+            return showError('Saving Mail Error', res.error.message);
+          }
+          return this.getAppendableDataIdHandle();
+        });
+    };
+
+    updateStructuredData(token, rootSDHandle, coreData)
       .then(res => {
         if (res.error) {
-          return showError('Saving Mail Error', res.error.message);
+          return showError('Update Mail Error', res.error.message);
         }
-        return this.fetchAppendableDataHandler();
+        return post();
       });
   }
 
   render() {
+    const self = this;
     const { processing, coreData, error, inbox, outbox, saved } = this.props;
     let container = null;
-    const self = this;
+
     if (processing) {
       container = <li className="mdl-card">Loading...</li>
     } else if (Object.keys(error).length > 0) {
@@ -224,43 +273,6 @@ export default class MailList extends Component {
                       </div>
                       <div className="opt-i">
                         <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={i}>delete</i></button>
-                      </div>
-                    </div>
-                  </li>
-                )
-              })
-            }
-          </div>
-        );
-      }
-      if (outbox) {
-        this.activeType = CONSTANTS.HOME_TABS.OUTBOX;
-        container = (
-          <div>
-            {
-              coreData.outbox.length === 0 ? <li className="mdl-card">Outbox empty</li> : coreData.outbox.map((mail, i) => {
-                if (!self.listColors.hasOwnProperty(mail.from)) {
-                  self.listColors[mail.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
-                }
-                return (
-                  <li className="mdl-card" key={i}>
-                    <div className="icon">
-                      <span className={this.listColors[mail.from]}>{mail.from[0]}</span>
-                    </div>
-                    <div className="cntx">
-                      <h3 className="from">{mail.from}</h3>
-                      <h4 className="date">{dateformat(new Date(mail.time), CONSTANTS.DATE_FORMAT)}</h4>
-                      <p className="subject">{mail.subject}</p>
-                      <p className="context">{mail.body}</p>
-                    </div>
-                    <div className="opt">
-                      <div className="opt-i">
-                        <button
-                          className="mdl-button mdl-js-button mdl-button--icon"
-                          name="delete" onClick={this.handleDelete}
-                        >
-                          <i className="material-icons" data-index={i}>delete</i>
-                        </button>
                       </div>
                     </div>
                   </li>

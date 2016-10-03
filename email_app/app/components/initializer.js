@@ -1,19 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { remote } from 'electron';
-import * as base64 from 'urlsafe-base64';
-import pkg from '../../package.json';
-import { MESSAGES } from '../constants';
-import { hashEmailId, generateCoreStructreId } from '../utils/app_utils';
-
-const AUTH_PAYLOAD = {
-  app: {
-    name: pkg.productName,
-    vendor: pkg.author.name,
-    version: pkg.version,
-    id: pkg.identifier
-  },
-  permissions: ['LOW_LEVEL_API']
-};
+import { generateStructredDataId } from '../utils/app_utils';
+import { CONSTANTS, AUTH_PAYLOAD, MESSAGES } from '../constants';
 
 const showDialog = (title, message) => {
   remote.dialog.showMessageBox({
@@ -32,26 +20,27 @@ export default class Initializer extends Component {
   constructor() {
     super();
     this.createCoreCount = 0;
-    this.checkConfiguration = this.checkConfiguration.bind(this);
+    this.getConfiguration = this.getConfiguration.bind(this);
     this.writeConfigFile = this.writeConfigFile.bind(this);
-    this.getCoreStructureHandler = this.getCoreStructureHandler.bind(this);
-    this.createCoreStructure = this.createCoreStructure.bind(this);
-    this.fetchCoreStructure = this.fetchCoreStructure.bind(this);
+    this.getStructuredDataHandle = this.getStructuredDataHandle.bind(this);
+    this.getStructuredDataIdHandle = this.getStructuredDataIdHandle.bind(this);
+    this.createStructuredData = this.createStructuredData.bind(this);
+    this.fetchStructuredData = this.fetchStructuredData.bind(this);
   }
 
   componentDidMount() {
-    const { authoriseApplication, setAuthorisedToken, setInitializerTask } = this.props;
+    const { authoriseApplication, setInitializerTask } = this.props;
     authoriseApplication(AUTH_PAYLOAD)
-      .then(res => {
+      .then(() => {
         setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
-        return this.checkConfiguration();
+        return this.getConfiguration();
       })
-      .catch(err => {
+      .catch(() => {
         return showDialog('Authorisation Error', MESSAGES.AUTHORISATION_ERROR);
       });
   }
 
-  checkConfiguration() {
+  getConfiguration() {
     const { token, getConfigFile, setInitializerTask } = this.props;
     if (!token) {
       throw new Error('Application token not found.');
@@ -61,28 +50,38 @@ export default class Initializer extends Component {
       .then(res => {
         if (res.error) {
           setInitializerTask(MESSAGES.INITIALIZE.CREATE_CORE_STRUCTURE);
-          return this.createCoreStructure();
+          return this.createStructuredData();
         }
         setInitializerTask(MESSAGES.INITIALIZE.FETCH_CORE_STRUCTURE);
-        const corehandlerId = new Buffer(res.payload.data).toString();
-        return this.getCoreStructureHandler(corehandlerId);
+        return this.getStructuredDataIdHandle(new Buffer(res.payload.data).toString());
       });
   }
 
-  getCoreStructureHandler(coreId) {
-    const { token, fetchCoreStructureHandler } = this.props;
-    fetchCoreStructureHandler(token, coreId)
+  getStructuredDataIdHandle(name) {
+    const { token, getStructuredDataIdHandle } = this.props;
+    getStructuredDataIdHandle(token, name)
+      .then((res) => {
+        if (res.error) {
+          return showDialog('Get Structure Data Handler Error', res.error.message);
+        }
+        return this.getStructuredDataHandle(res.payload.data.handleId);
+      });
+  }
+
+  getStructuredDataHandle(handleId) {
+    const { token, fetchStructuredDataHandle } = this.props;
+    fetchStructuredDataHandle(token, handleId)
       .then(res => {
         if (res.error) {
           return showDialog('Get Structure Data Handler Error', res.error.message);
         }
-        return this.fetchCoreStructure(res.payload.headers['handle-id']);
+        return this.fetchStructuredData(res.payload.data.handleId);
       });
   }
 
-  fetchCoreStructure(handlerId) {
-    const { token, fetchCoreStructure } = this.props;
-    fetchCoreStructure(token, handlerId)
+  fetchStructuredData(handleId) {
+    const { token, fetchStructuredData } = this.props;
+    fetchStructuredData(token, handleId)
       .then(res => {
         if (res.error) {
           return showDialog('Get Structure Data Error', res.error.message);
@@ -95,31 +94,67 @@ export default class Initializer extends Component {
       });
   }
 
-  createCoreStructure() {
-    const { token, createCoreStructure, setInitializerTask } = this.props;
+  createStructuredData() {
+    const { token, createStructuredData, putStructuredData, getCipherOptsHandle, deleteCipherOptsHandle, dropStructuredDataHandle, setInitializerTask } = this.props;
     this.createCoreCount++;
-    const coreId = generateCoreStructreId();
+    const structuredDataId = generateStructredDataId();
     const data = {
       id: '',
       saved: [],
       outbox: []
     };
-    createCoreStructure(token, coreId, data)
-      .then((res) => {
-        if (res.error) {
-          if (this.createCoreCount > 5) {
-            return showDialog('Create Core Structure Error', 'Failed to create Core structure');
+
+    const deleteCipherHandle = (handleId) => {
+      deleteCipherOptsHandle(token, handleId)
+        .then((res) => {
+          if (res.error) {
+            return showDialog('Delete Cipher Opts Handle Error', res.error.message);
           }
-          return this.createCoreStructure();
-        }
-        setInitializerTask(MESSAGES.INITIALIZE.WRITE_CONFIG_FILE);
-        this.writeConfigFile(coreId);
-      });
+          console.warn('Deleted Cipher Opts Handle');
+        });
+    };
+
+    const put = (handleId) => {
+      putStructuredData(token, handleId)
+        .then((res) => {
+          if (res.error) {
+            return showDialog('Put Structure Data Error', res.error.message);
+          }
+          this.writeConfigFile(structuredDataId);
+        });
+    };
+
+    const create = (cipherOptsHandle) => {
+      createStructuredData(token, structuredDataId, data, cipherOptsHandle)
+        .then((res) => {
+          if (res.error) {
+            if (this.createCoreCount > 5) {
+              return showDialog('Create Core Structure Error', 'Failed to create Core structure');
+            }
+            return this.createStructuredData();
+          }
+          setInitializerTask(MESSAGES.INITIALIZE.WRITE_CONFIG_FILE);
+          deleteCipherHandle(cipherOptsHandle);
+          put(res.payload.data.handleId);
+        });
+    };
+
+    const getCipherHandle = () => {
+      getCipherOptsHandle(token, CONSTANTS.ENCRYPTION.SYMMETRIC)
+        .then((res) => {
+          if (res.error) {
+            return showDialog('Get Cipher Opts Handle Error', res.error.message);
+          }
+          return create(res.payload.data.handleId);
+        });
+    };
+
+    getCipherHandle();
   }
 
-  writeConfigFile(coreId) {
+  writeConfigFile(structuredDataId) {
     const { token, writeConfigFile } = this.props;
-    writeConfigFile(token, coreId)
+    writeConfigFile(token, structuredDataId)
       .then((res) => {
         if (res.error) {
           return showDialog('Write Configuration File Error', res.error.message);

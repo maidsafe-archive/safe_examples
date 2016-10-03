@@ -2,8 +2,9 @@ import { connect } from 'react-redux';
 import Initializer from '../components/initializer';
 import { setInitializerTask, authoriseApplication } from '../actions/initializer_actions';
 import { getConfigFile, writeConfigFile } from '../actions/nfs_actions';
-import { createCoreStructure, fetchCoreStructure, fetchCoreStructureHandler } from '../actions/core_structure_actions';
-import { fetchAppendableDataHandler, setAppendableDataId } from '../actions/appendable_data_actions';
+import { createStructuredData, fetchStructuredData, fetchStructuredDataHandle, putStructuredData, dropStructuredDataHandle } from '../actions/structured_data_actions';
+import { getStructuredDataIdHandle } from '../actions/data_id_handle_actions';
+import { getCipherOptsHandle, deleteCipherOptsHandle } from '../actions/cipher-opts_actions';
 
 const mapStateToProps = state => {
   return {
@@ -18,14 +19,16 @@ const mapDispatchToProps = dispatch => {
   return {
     setInitializerTask: task => (dispatch(setInitializerTask(task))),
     authoriseApplication: payload => (dispatch(authoriseApplication(payload))),
-    setAuthorisedToken: token => (dispatch(setAuthorisedToken(token))),
     getConfigFile: (token) => (dispatch(getConfigFile(token))),
     writeConfigFile: (token, data) => (dispatch(writeConfigFile(token, data))),
-    createCoreStructure: (token, id, data) => (dispatch(createCoreStructure(token, id, data))),
-    fetchCoreStructure: (token, id) => (dispatch(fetchCoreStructure(token, id))),
-    fetchAppendableDataHandler: (token, id) => (dispatch(fetchAppendableDataHandler(token, id))),
-    setAppendableDataId: id => (dispatch(setAppendableDataId(id))),
-    fetchCoreStructureHandler: (token, coreId) => (dispatch(fetchCoreStructureHandler(token, coreId)))
+    getCipherOptsHandle: (token, encType, keyHandle) => (dispatch(getCipherOptsHandle(token, encType, keyHandle))),
+    deleteCipherOptsHandle: (token, handleId) => (dispatch(deleteCipherOptsHandle(token, handleId))),
+    getStructuredDataIdHandle: (token, name) => (dispatch(getStructuredDataIdHandle(token, name))),
+    createStructuredData: (token, name, data) => (dispatch(createStructuredData(token, name, data))),
+    fetchStructuredData: (token, handleId) => (dispatch(fetchStructuredData(token, handleId))),
+    fetchStructuredDataHandle: (token, dataIdHandle) => (dispatch(fetchStructuredDataHandle(token, dataIdHandle))),
+    putStructuredData: (token, handleId) => (dispatch(putStructuredData(token, handleId))),
+    dropStructuredDataHandle: (token, handleId) => (dispatch(dropStructuredDataHandle(token, handleId)))
   };
 };
 

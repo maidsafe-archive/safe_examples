@@ -1,43 +1,58 @@
 import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
-import { fetchAppendableData, fetchAppendableDataHandler, setAppendableDataId, deleteAppendableData, fetchDataIdAt, clearDeleteData, getAppendableDataLength } from '../actions/appendable_data_actions';
-import { fetchMail } from '../actions/immutable_data_actions';
-import { updateCoreStructure, fetchCoreStructure } from '../actions/core_structure_actions';
-import { serialiseDataId, dropHandler } from '../actions/data_handle_actions';
+import {
+  fetchAppendableDataMeta,
+  fetchAppendableDataHandle,
+  fetchDataIdAt,
+  removeFromAppendableData,
+  clearDeleteData,
+  postAppendableData,
+  getAppendableDataLength,
+  dropAppendableDataHandle,
+  clearDeletedData
+} from '../actions/appendable_data_actions';
+import { getImmutableDataReadHandle, readImmutableData, closeImmutableDataReader } from '../actions/immutable_data_actions';
+import { updateStructuredData, fetchStructuredData, postStructuredData } from '../actions/structured_data_actions';
+import { getAppendableDataIdHandle, dropHandler } from '../actions/data_id_handle_actions';
 import { pushToInbox, clearInbox } from '../actions/initializer_actions';
-import { setMailProcessing, clearMailProcessing, setActiveMail } from '../actions/mail_actions';
+import { setMailProcessing, clearMailProcessing } from '../actions/mail_actions';
+import { getCipherOptsHandle, deleteCipherOptsHandle } from '../actions/cipher-opts_actions';
 
 const mapStateToProps = state => {
   return {
     coreData: state.initializer.coreData,
-    coreDataHandler: state.initializer.coreDataHandler,
+    rootSDHandle: state.initializer.rootSDHandle,
     inboxSize: state.initializer.inboxSize,
     processing: state.mail.processing,
     error: state.mail.error,
-    token: state.initializer.token,
-    appendableDataId: state.initializer.appendableDataId
+    token: state.initializer.token
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    clearInbox: _ => (dispatch(clearInbox())),
     setMailProcessing: () => (dispatch(setMailProcessing())),
     clearMailProcessing: () => (dispatch(clearMailProcessing())),
-    setActiveMail: (data) => (dispatch(setActiveMail(data))),
     pushToInbox: data => (dispatch(pushToInbox(data))),
-    setAppendableDataId: id => (dispatch(setAppendableDataId(id))),
-    fetchAppendableData: (token, id) => (dispatch(fetchAppendableData(token, id))),
-    fetchAppendableDataHandler: (token, id) => (dispatch(fetchAppendableDataHandler(token, id))),
-    fetchCoreStructure: (token, handleId) => (dispatch(fetchCoreStructure(token, handleId))),
-    fetchMail: (token, id) => (dispatch(fetchMail(token, id))),
-    updateCoreStructure: (token, coreData, mail) => (dispatch(updateCoreStructure(token, coreData, mail))),
-    serialiseDataId: (token, id) => (dispatch(serialiseDataId(token, id))),
+    clearInbox: _ => (dispatch(clearInbox())),
+    getAppendableDataIdHandle: (token, name) => (dispatch(getAppendableDataIdHandle(token, name))),
+    dropHandler: (token, handleId) => dispatch(dropHandler(token, handleId)),
+    fetchAppendableDataHandle: (token, dataIdHandle) => (dispatch(fetchAppendableDataHandle(token, dataIdHandle))),
+    fetchAppendableDataMeta: (token, handleId) => (dispatch(fetchAppendableDataMeta(token, handleId))),
     fetchDataIdAt: (token, handlerId, index) => (dispatch(fetchDataIdAt(token, handlerId, index))),
-    deleteAppendableData: (token, handlerId, index) => (dispatch(deleteAppendableData(token, handlerId, index))),
-    clearDeleteData: (token, handlerId) => (dispatch(clearDeleteData(token, handlerId))),
+    removeFromAppendableData: (token, handlerId, index) => (dispatch(removeFromAppendableData(token, handlerId, index))),
     getAppendableDataLength: (token, handlerId) => (dispatch(getAppendableDataLength(token, handlerId))),
-    dropHandler: (token, handleId) => dispatch(dropHandler(token, handleId))
+    clearDeletedData: (token, handlerId) => (dispatch(clearDeletedData(token, handlerId))),
+    postAppendableData: (token, handlerId) => (dispatch(postAppendableData(token, handlerId))),
+    dropAppendableDataHandle: (token, handlerId) => (dispatch(dropAppendableDataHandle(token, handlerId))),
+    updateStructuredData: (token, handleId, data, cipherOpts) => (dispatch(updateStructuredData(token, handleId, data, cipherOpts))),
+    postStructuredData: (token, handleId) => (dispatch(postStructuredData(token, handleId))),
+    fetchStructuredData: (token, handleId) => (dispatch(fetchStructuredData(token, handleId))),
+    getImmutableDataReadHandle: (token, handleId) => (dispatch(getImmutableDataReadHandle(token, handleId))),
+    readImmutableData: (token, handleId) => (dispatch(readImmutableData(token, handleId))),
+    closeImmutableDataReader: (token, handleId) => (dispatch(closeImmutableDataReader(token, handleId))),
+    getCipherOptsHandle: (token, encType, keyHandle) => (dispatch(getCipherOptsHandle(token, encType, keyHandle))),
+    deleteCipherOptsHandle: (token, handleId) => (dispatch(deleteCipherOptsHandle(token, handleId)))
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(MailInbox);
