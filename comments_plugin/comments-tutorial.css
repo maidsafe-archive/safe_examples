@@ -11,6 +11,11 @@
   display: none;
 }
 
+.comment-block .comment-opt {
+  display: none;
+  margin-bottom: 16px;
+}
+
 .comment-block .comment-spinner {
   display: none;
   position: absolute;
@@ -91,4 +96,39 @@
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+.popup {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.popup .popup-container {
+  width: 585px;
+  min-height: 200px;
+  margin: 150px auto 0;
+  background-color: #FFF;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.popup .popup-container .head {
+  margin: 0;
+  font-size: 18px;
+  line-height: 50px;
+  padding: 0 16px;
+  background-color: #EEE;
+}
+.popup .popup-container .content {
+  padding-top: 16px;
+}
+.popup .popup-container .foot {
+  padding: 16px;
+  text-align: right;
+}
+.popup .popup-container .foot button {
+  margin-left: 12px;
 }
