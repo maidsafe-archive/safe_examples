@@ -1,14 +1,14 @@
 import { connect } from 'react-redux';
 import CreateAccount from '../components/create_account';
-import { createAppendableData, setAppendableDataId } from '../actions/appendable_data_actions';
-import { updateCoreStructure } from '../actions/core_structure_actions';
+import { createAppendableData, dropAppendableDataHandle, putAppendableData } from '../actions/appendable_data_actions';
+import { updateStructuredData, postStructuredData } from '../actions/structured_data_actions';
+import { getCipherOptsHandle, deleteCipherOptsHandle } from '../actions/cipher-opts_actions';
 import { setCreateAccountError, setCreateAccountProcessing } from '../actions/create_account_actions';
-import { dropHandler } from '../actions/data_handle_actions';
 
 const mapStateToProps = state => {
   return {
     token: state.initializer.token,
-    coreDataHandler: state.initializer.coreDataHandler,
+    rootSDHandle: state.initializer.rootSDHandle,
     coreData: state.initializer.coreData,
     authorised: state.createAccount.authorised,
     processing: state.createAccount.processing,
@@ -18,12 +18,15 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    createAppendableData: (token, id) => (dispatch(createAppendableData(token, id))),
-    setAppendableDataId: id => (dispatch(setAppendableDataId(id))),
-    updateCoreStructure: (token, id, data) => (dispatch(updateCoreStructure(token, id, data))),
+    createAppendableData: (token, name) => (dispatch(createAppendableData(token, name))),
+    putAppendableData: (token, id) => (dispatch(putAppendableData(token, id))),
+    updateStructuredData: (token, handleId, data, cipherOpts) => (dispatch(updateStructuredData(token, handleId, data, cipherOpts))),
+    postStructuredData: (token, handleId) => (dispatch(postStructuredData(token, handleId))),
     setCreateAccountError: error => (dispatch(setCreateAccountError(error))),
     setCreateAccountProcessing: () => (dispatch(setCreateAccountProcessing())),
-    dropHandler: (token, handleId) => (dispatch(dropHandler(token, handleId)))
+    dropAppendableDataHandle: (token, handleId) => (dispatch(dropAppendableDataHandle(token, handleId))),
+    getCipherOptsHandle: (token, encType, keyHandle) => (dispatch(getCipherOptsHandle(token, encType, keyHandle))),
+    deleteCipherOptsHandle: (token, handleId) => (dispatch(deleteCipherOptsHandle(token, handleId)))
   };
 };
 

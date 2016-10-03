@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { hashEmailId, showError } from '../utils/app_utils';
+import { hashEmailId } from '../utils/app_utils';
 import { MESSAGES, CONSTANTS } from '../constants';
 
 export default class CreateAccount extends Component {
@@ -15,47 +15,83 @@ export default class CreateAccount extends Component {
   constructor() {
     super();
     this.errMrg = null;
-    this.appendableHandler = 0;
+    this.appendableDataHandle = 0;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
     this.createAppendableData = this.createAppendableData.bind(this);
-    this.updateCoreStructure = this.updateCoreStructure.bind(this);
+    this.updateStructuredData = this.updateStructuredData.bind(this);
     this.dropAppendableData = this.dropAppendableData.bind(this);
   }
 
   dropAppendableData() {
-    const { token, dropHandler } = this.props;
-    dropHandler(token, this.appendableHandler)
+    const { token, dropAppendableDataHandle, setCreateAccountError } = this.props;
+    dropAppendableDataHandle(token, this.appendableDataHandle)
       .then(res => {
         if (res.error) {
-          return setCreateAccountError(this.errMrg || res.error);
+          return setCreateAccountError(res.error);
         }
-        return this.context.router.push('/home');
+        console.warn('Dropped Appendable Data Handle');
       });
   }
 
-  updateCoreStructure(emailId) {
-    const { token, coreDataHandler, coreData, updateCoreStructure, setCreateAccountError } = this.props;
+  updateStructuredData(emailId) {
+    const { token, rootSDHandle, coreData, updateStructuredData, postStructuredData, setCreateAccountError, getCipherOptsHandle, deleteCipherOptsHandle } = this.props;
     coreData.id = emailId;
-    updateCoreStructure(token, coreDataHandler, coreData)
-      .then((res) => {
-        if (res.error) {
-          this.errMrg = res.error;
-        }
-        return this.dropAppendableData();
-      });
+
+    const post = () => {
+      postStructuredData(token, rootSDHandle)
+        .then((res) => {
+          if (res.error) {
+            return setCreateAccountError(res.error);
+          }
+          return this.context.router.push('/home');
+        });
+    };
+
+    const update = (cipherHandleId) => {
+      updateStructuredData(token, rootSDHandle, coreData, cipherHandleId)
+        .then((res) => {
+          if (res.error) {
+            return setCreateAccountError(res.error);
+          }
+          deleteCipherOptsHandle(token, cipherHandleId);
+          return post();
+        });
+    };
+
+    const getCipherHandle = () => {
+      getCipherOptsHandle(token, CONSTANTS.ENCRYPTION.SYMMETRIC)
+        .then(res => {
+          if (res.error) {
+            return setCreateAccountError(res.error);
+          }
+          return update(res.payload.data.handleId);
+        });
+    };
+
+    getCipherHandle();
   }
 
   createAppendableData(emailId) {
-    const { token, createAppendableData, setAppendableDataId, setCreateAccountError } = this.props;
-    const hashedEmailId = hashEmailId(emailId);
+    const { token, createAppendableData, setCreateAccountError, putAppendableData } = this.props;
+    const appendableDataName = hashEmailId(emailId);
+    const put = () => {
+      putAppendableData(token, this.appendableDataHandle)
+        .then(res => {
+          if (res.error) {
+            return setCreateAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
+          }
+          this.dropAppendableData();
+          return this.updateStructuredData(emailId);
+        });
+    };
 
-    createAppendableData(token, hashedEmailId)
+    createAppendableData(token, appendableDataName)
       .then(res => {
         if (res.error) {
           return setCreateAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
         }
-        this.appendableHandler = res.payload.headers['handle-id'];
-        return this.updateCoreStructure(emailId);
+        this.appendableDataHandle = res.payload.data.handleId;
+        return put();
       });
   }
 

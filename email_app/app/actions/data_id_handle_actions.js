@@ -1,11 +1,46 @@
 import ACTION_TYPES from './actionTypes';
 import * as base64 from 'urlsafe-base64';
+import { CONSTANTS } from '../constants';
+
+export const getStructuredDataIdHandle = (token, name) => ({
+  type: ACTION_TYPES.GET_STRUCTURED_DATA_ID_HANDLE,
+  payload: {
+    request: {
+      method: 'post',
+      url: '/data-id/structured-data',
+      headers: {
+        'Authorization': token
+      },
+      data: {
+        typeTag: CONSTANTS.TAG_TYPE.DEFAULT,
+        name
+      }
+    }
+  }
+});
+
+export const getAppendableDataIdHandle = (token, name) => ({
+  type: ACTION_TYPES.GET_STRUCTURED_DATA_ID_HANDLE,
+  payload: {
+    request: {
+      method: 'post',
+      url: '/data-id/appendable-data',
+      headers: {
+        'Authorization': token
+      },
+      data: {
+        isPrivate: true,
+        name
+      }
+    }
+  }
+});
 
 export const serialiseDataId = (token, handleId) => ({
   type: ACTION_TYPES.SERIALISE_DATA_ID,
   payload: {
     request: {
-      url: `/dataId/${handleId}`,
+      url: `/data-id/${handleId}`,
       headers: {
         'Authorization': token
       },
@@ -19,7 +54,7 @@ export const deserialiseDataId = (token, data) => ({
   payload: {
     request: {
       method: 'post',
-      url: '/dataId',
+      url: '/data-id',
       headers: {
         'Content-Type': 'text/plain',
         'Authorization': token
@@ -34,7 +69,7 @@ export const dropHandler = (token, handleId) => ({
   payload: {
     request: {
       method: 'delete',
-      url: `/dataId/${handleId}`,
+      url: `/data-id/${handleId}`,
       headers: {
         'Authorization': token
       }

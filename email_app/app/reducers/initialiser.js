@@ -12,8 +12,7 @@ const initialState = {
     outbox: []
   },
   inboxSize: 0,
-  appendableDataId: 0,
-  coreDataHandler: 0
+  rootSDHandle: 0
 };
 
 const initializer = (state = initialState, action) => {
@@ -30,28 +29,22 @@ const initializer = (state = initialState, action) => {
     case ACTION_TYPES.SET_INITIALIZER_TASK:
       const tasks = state.tasks.slice();
       tasks.push(action.task);
-      return { ...state, tasks }
-      break;
-    case ACTION_TYPES.SET_APPENDABLE_DATA_ID:
-      return { ...state, appendableDataId: action.id };
-      break;
-    case `${ACTION_TYPES.CREATE_APPENDABLE_DATA}_SUCCESS`:
-      return { ...state, appendableDataId: action.id };
+      return { ...state, tasks };
       break;
     case `${ACTION_TYPES.GET_CONFIG_FILE}_SUCCESS`:
       return { ...state, config: action.payload.data };
       break;
-    case `${ACTION_TYPES.FETCH_CORE_STRUCTURE_HANDLER}_SUCCESS`:
-      return { ...state, coreDataHandler: action.payload.headers['handle-id'] };
+    case `${ACTION_TYPES.FETCH_STRUCTURE_DATA_HANDLE}_SUCCESS`:
+      return { ...state, rootSDHandle: action.payload.data.handleId };
       break;
-    case `${ACTION_TYPES.CREATE_CORE_STRUCTURE}_SUCCESS`:
-      return { ...state, coreDataHandler: action.payload.headers['handle-id'] };
+    case `${ACTION_TYPES.CREATE_STRUCTURED_DATA}_SUCCESS`:
+      return { ...state, rootSDHandle: action.payload.data.handleId };
       break;
     case `${ACTION_TYPES.GET_APPENDABLE_DATA_LENGTH}_SUCCESS`: {
       const inboxSize = ((new Buffer(action.payload.data)).length / 1024).toFixed(2);
       return { ...state, inboxSize }
     }
-    case `${ACTION_TYPES.FETCH_CORE_STRUCTURE}_SUCCESS`:
+    case `${ACTION_TYPES.FETCH_STRUCTURED_DATA}_SUCCESS`:
       if (!action.payload.data) {
         return state;
       }

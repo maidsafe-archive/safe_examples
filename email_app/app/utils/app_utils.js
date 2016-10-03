@@ -28,7 +28,7 @@ export const hashEmailId = emailId => {
   return crypto.createHash('sha256').update(emailId).digest('base64');
 };
 
-export const generateCoreStructreId = () => {
+export const generateStructredDataId = () => {
   return base64.encode(crypto.randomBytes(32).toString('base64'));
 };
 

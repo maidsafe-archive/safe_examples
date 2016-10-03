@@ -7,7 +7,7 @@ import { CONSTANTS } from '../constants';
 export default class MailInbox extends Component {
   constructor() {
     super();
-    this.appendableHandler = 0;
+    this.appendableDataHandle = 0;
     this.dataLength = 0;
     this.currentIndex = 0;
     this.refresh = this.refresh.bind(this);
@@ -16,8 +16,9 @@ export default class MailInbox extends Component {
     this.iterateAppendableData = this.iterateAppendableData.bind(this);
     this.getAppendableDataLength = this.getAppendableDataLength.bind(this);
     this.dropAppendableData = this.dropAppendableData.bind(this);
-    this.fetchAppendableDataHandler = this.fetchAppendableDataHandler.bind(this);
-    this.fetchAppendableData = this.fetchAppendableData.bind(this);
+    this.getAppendableDataIdHandle = this.getAppendableDataIdHandle.bind(this);
+    this.fetchAppendableDataHandle = this.fetchAppendableDataHandle.bind(this);
+    this.fetchAppendableDataMeta = this.fetchAppendableDataMeta.bind(this);
     this.refresh = this.refresh.bind(this);
   }
 
@@ -26,8 +27,8 @@ export default class MailInbox extends Component {
   }
 
   dropAppendableData() {
-    const { token, dropHandler, clearMailProcessing } = this.props;
-    dropHandler(token, this.appendableHandler)
+    const { token, dropAppendableDataHandle, clearMailProcessing } = this.props;
+    dropAppendableDataHandle(token, this.appendableDataHandle)
       .then(res => {
         clearMailProcessing();
         if (res.error) {
@@ -38,7 +39,7 @@ export default class MailInbox extends Component {
 
   getAppendableDataLength() {
     const { token, getAppendableDataLength, clearMailProcessing } = this.props;
-    getAppendableDataLength(token, this.appendableHandler)
+    getAppendableDataLength(token, this.appendableDataHandle)
       .then(res => {
         if (res.error) {
           clearMailProcessing();
@@ -48,47 +49,74 @@ export default class MailInbox extends Component {
       });
   }
 
-  fetchMail(handlerId) {
-    const { token, fetchMail, pushToInbox, clearMailProcessing } = this.props;
-    fetchMail(token, handlerId)
-      .then(res => {
-        if (res.error) {
-          clearMailProcessing();
-          return showError('Fetch Mail Error', res.error.message);
-        }
-        const data = new Buffer(res.payload.data).toString();
-        pushToInbox(JSON.parse(data));
-        this.currentIndex++;
-        if (this.dataLength === this.currentIndex) {
-          return this.getAppendableDataLength();
-        }
+  fetchMail(immutableHandleId) {
 
-        return this.iterateAppendableData();
-      });
+    const { token, getImmutableDataReadHandle, readImmutableData, closeImmutableDataReader, pushToInbox, clearMailProcessing } = this.props;
+
+    const closeReader = (handleId) => {
+      closeImmutableDataReader(token, handleId)
+        .then(res => {
+          if (res.error) {
+            return console.error('Close Immutable Data Reader Error', res.error.message);
+          }
+          console.warn('Closed Immutable Data Reader');
+        });
+    };
+
+    const read = (handleId) => {
+      readImmutableData(token, handleId)
+        .then(res => {
+          if (res.error) {
+            clearMailProcessing();
+            return showError('Read Immutable Data Error', res.error.message);
+          }
+          closeReader(handleId);
+          const data = new Buffer(res.payload.data).toString();
+          pushToInbox(JSON.parse(data));
+          this.currentIndex++;
+          if (this.dataLength === this.currentIndex) {
+            return this.getAppendableDataLength();
+          }
+          return this.iterateAppendableData();
+        });
+    };
+
+    const getImmutReader = () => {
+      console.log('====', immutableHandleId);
+      getImmutableDataReadHandle(token, immutableHandleId)
+        .then(res => {
+          if (res.error) {
+            clearMailProcessing();
+            return showError('Get Immutable Data Reader Error', res.error.message);
+          }
+          return read(res.payload.data.handleId);
+        });
+    };
+    getImmutReader();
   }
 
   iterateAppendableData() {
-    const { token, appendableDataId, fetchDataIdAt, clearMailProcessing } = this.props;
-    fetchDataIdAt(token, appendableDataId, this.currentIndex)
+    const { token, fetchDataIdAt, clearMailProcessing } = this.props;
+    fetchDataIdAt(token, this.appendableDataHandle, this.currentIndex)
       .then(res => {
         if (res.error) {
           clearMailProcessing();
           return showError('Fetch Data Id At Error', res.error.message);
         }
-        return this.fetchMail(res.payload.headers['handle-id']);
+        return this.fetchMail(res.payload.data.handleId);
       });
   }
 
-  fetchAppendableData() {
-    const { token, fetchAppendableData, clearMailProcessing } = this.props;
+  fetchAppendableDataMeta() {
+    const { token, fetchAppendableDataMeta, clearMailProcessing } = this.props;
 
-    fetchAppendableData(token, this.appendableHandler)
+    fetchAppendableDataMeta(token, this.appendableDataHandle)
       .then((res) => {
         if (res.error) {
           clearMailProcessing();
-          return showError('Fetch Appendable Data Error', res.error.message);
+          return showError('Fetch Appendable Data Meta Error', res.error.message);
         }
-        const dataLength = parseInt(res.payload.headers['data-length']);
+        const dataLength = parseInt(res.payload.data.dataLength);
         if (dataLength === 0) {
           return this.getAppendableDataLength();
         }
@@ -97,26 +125,50 @@ export default class MailInbox extends Component {
       });
   }
 
-  fetchAppendableDataHandler() {
-    const { token, coreData, fetchAppendableDataHandler, setAppendableDataId, clearMailProcessing } = this.props;
-    const hashedEmailId = hashEmailId(coreData.id);
+  fetchAppendableDataHandle(dataIdHandle) {
+    const { token, fetchAppendableDataHandle, dropHandler, clearMailProcessing } = this.props;
 
-    fetchAppendableDataHandler(token, base64.encode(hashedEmailId))
+    const dropDataIdHandle = () => {
+      dropHandler(token, dataIdHandle)
+        .then((res) => {
+          if (res.error) {
+            return console.error(res.error.message);
+          }
+          console.warn(res.payload.data);
+        });
+    };
+
+    fetchAppendableDataHandle(token, dataIdHandle)
       .then(res => {
         if (res.error) {
           clearMailProcessing();
           return showError('Get Appendable Data Handler Error', res.error.message);
         }
-        this.appendableHandler = res.payload.headers['handle-id'];
-        setAppendableDataId(res.payload.headers['handle-id']);
-        return this.fetchAppendableData();
+        this.appendableDataHandle = res.payload.data.handleId;
+        dropDataIdHandle();
+        return this.fetchAppendableDataMeta();
+      });
+  }
+
+  getAppendableDataIdHandle() {
+    const { token, coreData, getAppendableDataIdHandle, clearMailProcessing } = this.props;
+    const appendableDataName = hashEmailId(coreData.id);
+
+    getAppendableDataIdHandle(token, appendableDataName)
+      .then((res) => {
+        if (res.error) {
+          clearMailProcessing();
+          return showError('Get Appendable Data Handler Error', res.error.message);
+        }
+        this.fetchAppendableDataHandle(res.payload.data.handleId);
       });
   }
 
   fetchMails() {
-    this.props.clearInbox();
-    this.props.setMailProcessing();
-    return this.fetchAppendableDataHandler();
+    const { clearInbox, setMailProcessing } = this.props;
+    clearInbox();
+    setMailProcessing();
+    return this.getAppendableDataIdHandle();
   }
 
   refresh(e) {

@@ -1,18 +1,18 @@
 import ACTION_TYPES from './actionTypes';
 import { CONSTANTS } from '../constants';
 
-export const createAppendableData = (token, hashedEmailId) => {
+export const createAppendableData = (token, name) => {
   return {
     type: ACTION_TYPES.CREATE_APPENDABLE_DATA,
     payload: {
       request: {
         method: 'post',
-        url: '/appendableData',
+        url: '/appendable-data',
         headers: {
           'Authorization': token
         },
         data: {
-          id: hashedEmailId,
+          name,
           isPrivate: true,
           filterType: CONSTANTS.APPENDABLE_DATA_FILTER_TYPE.BLACK_LIST,
           filterKeys: []
@@ -22,13 +22,12 @@ export const createAppendableData = (token, hashedEmailId) => {
   };
 };
 
-export const fetchAppendableData = (token, handlerId) => {
+export const fetchAppendableDataMeta = (token, handleId) => {
   return {
-    type: ACTION_TYPES.FETCH_APPENDABLE_DATA,
+    type: ACTION_TYPES.FETCH_APPENDABLE_DATA_META,
     payload: {
       request: {
-        method: 'head',
-        url: `/appendableData/${handlerId}`,
+        url: `/appendable-data/metadata/${handleId}`,
         headers: {
           'Authorization': token
         }
@@ -37,12 +36,12 @@ export const fetchAppendableData = (token, handlerId) => {
   };
 };
 
-export const fetchAppendableDataHandler = (token, id) => { // id => appendable data id
+export const fetchAppendableDataHandle = (token, dataIdHandle) => { // id => appendable data id
   return {
     type: ACTION_TYPES.FETCH_APPENDABLE_DATA_HANDLER,
     payload: {
       request: {
-        url: `/appendableData/handle/${id}`,
+        url: `/appendable-data/handle/${dataIdHandle}`,
         headers: {
           'Authorization': token,
           'Is-Private': true
@@ -52,11 +51,11 @@ export const fetchAppendableDataHandler = (token, id) => { // id => appendable d
   };
 };
 
-export const fetchDataIdAt = (token, handlerId, index) => ({
+export const fetchDataIdAt = (token, handleId, index) => ({
   type: ACTION_TYPES.FETCH_DATA_ID_AT,
   payload: {
     request: {
-      url: `/appendableData/${handlerId}/${index}`,
+      url: `/appendable-data/${handleId}/${index}`,
       headers: {
         'Authorization': token
       }
@@ -68,7 +67,7 @@ export const getEncryptedKey = (token, handleId) => ({
   type: ACTION_TYPES.GET_ENCRYPTED_KEY,
   payload: {
     request: {
-      url: `/appendableData/encryptKey/${handleId}`,
+      url: `/appendable-data/encrypt-key/${handleId}`,
       headers: {
         'Authorization': token
       }
@@ -76,13 +75,26 @@ export const getEncryptedKey = (token, handleId) => ({
   }
 });
 
-export const deleteAppendableData = (token, handleId, index) => {
+export const deleteEncryptedKey = (token, handleId) => ({
+  type: ACTION_TYPES.DELETE_ENCRYPTED_KEY,
+  payload: {
+    request: {
+      method: 'delete',
+      url: `/appendable-data/encrypt-key/${handleId}`,
+      headers: {
+        'Authorization': token
+      }
+    }
+  }
+});
+
+export const removeFromAppendableData = (token, handleId, index) => {
   return {
-    type: ACTION_TYPES.DELETE_APPENDABLE_DATA,
+    type: ACTION_TYPES.REMOVE_FROM_APPENDABLE_DATA,
     payload: {
       request: {
         method: 'delete',
-        url: `/appendableData/${handleId}/${index}`,
+        url: `/appendable-data/${handleId}/${index}`,
         headers: {
           'Authorization': token
         }
@@ -91,12 +103,12 @@ export const deleteAppendableData = (token, handleId, index) => {
   };
 };
 
-export const appendAppendableData = (token, id, dataId) => ({
+export const appendAppendableData = (token, handleId, dataIdHandle) => ({
   type: ACTION_TYPES.APPEND_APPENDABLE_DATA,
   payload: {
     request: {
       method: 'put',
-      url: `/appendableData/${id}/${dataId}`,
+      url: `/appendable-data/${handleId}/${dataIdHandle}`,
       headers: {
         'Authorization': token
       }
@@ -104,12 +116,12 @@ export const appendAppendableData = (token, id, dataId) => ({
   }
 });
 
-export const clearDeleteData = (token, handleId) => ({
+export const clearDeletedData = (token, handleId) => ({
   type: ACTION_TYPES.CLEAR_DELETE_DATA,
   payload: {
     request: {
       method: 'delete',
-      url: `/appendableData/clearDeletedData/${handleId}`,
+      url: `/appendable-data/clear-deleted-data/${handleId}`,
       headers: {
         'Authorization': token
       }
@@ -121,11 +133,51 @@ export const getAppendableDataLength = (token, handleId) => ({
   type: ACTION_TYPES.GET_APPENDABLE_DATA_LENGTH,
   payload: {
     request: {
-      url: `/appendableData/serialise/${handleId}`,
+      url: `/appendable-data/serialise/${handleId}`,
       headers: {
         'Authorization': token
       },
       responseType: 'arraybuffer'
+    }
+  }
+});
+
+export const dropAppendableDataHandle = (token, handleId) => ({
+  type: ACTION_TYPES.DROP_APPENDABLE_DATA_HANDLE,
+  payload: {
+    request: {
+      method: 'delete',
+      url: `/appendable-data/handle/${handleId}`,
+      headers: {
+        'Authorization': token
+      }
+    }
+  }
+});
+
+
+export const postAppendableData = (token, handleId) => ({
+  type: ACTION_TYPES.POST_APPENDABLE_DATA,
+  payload: {
+    request: {
+      method: 'post',
+      url: `/appendable-data/${handleId}`,
+      headers: {
+        'Authorization': token
+      }
+    }
+  }
+});
+
+export const putAppendableData = (token, handleId) => ({
+  type: ACTION_TYPES.PUT_APPENDABLE_DATA,
+  payload: {
+    request: {
+      method: 'put',
+      url: `/appendable-data/${handleId}`,
+      headers: {
+        'Authorization': token
+      }
     }
   }
 });

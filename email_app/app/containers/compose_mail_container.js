@@ -1,16 +1,14 @@
 import { connect } from 'react-redux';
 import ComposeMail from '../components/compose_mail';
-import { fetchAppendableDataHandler, appendAppendableData, getEncryptedKey } from '../actions/appendable_data_actions';
-import { updateCoreStructure } from '../actions/core_structure_actions';
-import { createMail } from '../actions/immutable_data_actions';
-import { serialiseDataId, dropHandler } from '../actions/data_handle_actions';
+import { fetchAppendableDataHandle, appendAppendableData, getEncryptedKey, deleteEncryptedKey, dropAppendableDataHandle } from '../actions/appendable_data_actions';
+import { getCipherOptsHandle, deleteCipherOptsHandle } from '../actions/cipher-opts_actions';
+import { createImmutableDataWriterHandle, writeImmutableData, putImmutableData, closeImmutableDataWriter } from '../actions/immutable_data_actions';
+import { getAppendableDataIdHandle, dropHandler } from '../actions/data_id_handle_actions';
 import { cancelCompose, setMailProcessing, clearMailProcessing } from '../actions/mail_actions';
 
 const mapStateToProps = state => {
   return {
     token: state.initializer.token,
-    coreData: state.initializer.coreData,
-    coreDataHandler: state.initializer.coreDataHandler,
     fromMail: state.initializer.coreData.id,
     error: state.mail.error,
     processing: state.mail.processing
@@ -19,18 +17,24 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    setMailProcessing: _ => (dispatch(setMailProcessing())),
     clearMailProcessing: _ => (dispatch(clearMailProcessing())),
-    fetchAppendableDataHandler: (token, id) => (dispatch(fetchAppendableDataHandler(token, id))),
-    dropAppendableData: (token, id) => (dispatch(dropHandler(token, id))),
+    cancelCompose: _ => dispatch(cancelCompose()),
+    getAppendableDataIdHandle: (token, name) => (dispatch(getAppendableDataIdHandle(token, name))),
+    dropHandler: (token, id) => (dispatch(dropHandler(token, id))),
+    fetchAppendableDataHandle: (token, id) => (dispatch(fetchAppendableDataHandle(token, id))),
+    getEncryptedKey: (token, handleId) => dispatch(getEncryptedKey(token, handleId)),
+    deleteEncryptedKey: (token, handleId) => dispatch(deleteEncryptedKey(token, handleId)),
+    getCipherOptsHandle: (token, encType, keyHandle) => (dispatch(getCipherOptsHandle(token, encType, keyHandle))),
+    deleteCipherOptsHandle: (token, handleId) => (dispatch(deleteCipherOptsHandle(token, handleId))),
+    createImmutableDataWriterHandle: (token) => (dispatch(createImmutableDataWriterHandle(token))),
+    writeImmutableData : (token, handleId, data) => (dispatch(writeImmutableData(token, handleId, data))),
+    putImmutableData: (token, handleId, cipherHandle) => (dispatch(putImmutableData(token, handleId, cipherHandle))),
+    closeImmutableDataWriter: (token, handleId) => (dispatch(closeImmutableDataWriter(token, handleId))),
     appendAppendableData: (token, id, dataId) => (
       dispatch(appendAppendableData(token, id, dataId))
     ),
-    setMailProcessing: _ => (dispatch(setMailProcessing())),
-    createMail: (token, data, encryptKeyHandler) => dispatch(createMail(token, data, encryptKeyHandler)),
-    cancelCompose: _ => dispatch(cancelCompose()),
-    getEncryptedKey: (token, handleId) => dispatch(getEncryptedKey(token, handleId)),
-    serialiseDataId: (token, handlerId) => dispatch(serialiseDataId(token, handlerId)),
-    updateCoreStructure: (token, id, data) => (dispatch(updateCoreStructure(token, id, data)))
+    dropAppendableDataHandle: (token, handleId) => (dispatch(dropAppendableDataHandle(token, handleId)))
   };
 };
 
