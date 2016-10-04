@@ -46,6 +46,5 @@ An sample usage is demonstrated in the [example](./example) folder.
 A simple static page with comments integrated is demonstrated.
 
 # Limitations
- - Can not unblock blocked users
  - Can not edit comments
  - AppendableData has a size limitation of 100Kb. Comments can not be added if the size of the appendable data has reached the max

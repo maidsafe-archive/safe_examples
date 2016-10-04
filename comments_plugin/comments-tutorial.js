@@ -5,7 +5,7 @@ class CommentsTutorial {
     this.app = {
       name: window.location.host,
       id: 'tutorial.maidsafe.net',
-      version: '0.0.1',
+      version: '0.1.0',
       vendor: 'maidsafe',
       permissions: [
         'LOW_LEVEL_API'
@@ -36,6 +36,10 @@ class CommentsTutorial {
     this.blockedUsers = null;
     this.symmetricCipherOptsHandle = null;
     window.isAdmin = false;
+  }
+
+  version() {
+    return this.app.version;
   }
 
   toggleEnableCommentBtn(status) {
@@ -835,5 +839,8 @@ window.commentsTutorial = {
   },
   setUserNameForAnonymous: () => {
     commentTutorial.setUserNameForAnonymous();
+  },
+  version: () => {
+    return commentTutorial.version();
   }
 };
