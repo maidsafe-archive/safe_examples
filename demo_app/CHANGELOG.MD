@@ -1,5 +1,9 @@
 # MaidSafe Demo App Change Log
 
+##[0.6.1]
+- Reverse DNS specifier updated in package.json
+- Updated service links on UI to `safe://` scheme
+
 ##[0.6.0]
 - Compatibility with launcher 0.8.0
 - Rename files and folders
