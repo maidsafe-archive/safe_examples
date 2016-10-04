@@ -1,5 +1,15 @@
 # Safe Mail Tutorial Application
 
+The tutorial app show cases how to use the low level API from launcher to
+build a simple email application.
+
+Demonstrates the usage of
+ - Private AppendableData
+ - StructuredData
+ - Immutable data
+
+Requires [safe_launcher](https://github.com/maidsafe/safe_launcher) version 0.9.1
+
 ## Install
 
 First, clone the repo and then install dependencies.
@@ -24,7 +34,6 @@ $ npm run dev
 ```
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
-
 
 ## DevTools
 
