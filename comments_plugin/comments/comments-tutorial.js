@@ -1,8 +1,350 @@
-class CommentsTutorial {
-  constructor() {
-    this.hostName = window.location.host.replace(/.safenet$/g, '');
-    this.LOCAL_STORAGE_TOKEN_KEY = `SAFE_TOKEN_${this.hostName}`;
-    this.app = {
+/* global $, window, console */
+function log (inp) {
+  console.log ? console.log((new Date()).toLocaleString() + ' :: ', inp) : ''
+}
+
+
+function generateRandomString () {
+  let text = ''
+  let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  for (let i = 0; i < 5; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+  return text
+}
+
+class _EventEmitter {
+  // jQuery Based Event Emitter
+  on (name, fn) {
+    return $(this).on(name, fn)
+  }
+
+  emit (name, param) {
+    return $(this).trigger(name, param)
+  }
+}
+
+
+class CommentsView {
+  constructor (app, targetElement) {
+    this.DEFAULT_DNS_NAME = 'Anonymous'
+    this.app = app
+
+    this.init(targetElement || '#comments')
+
+    // link to data driven updates
+    this.app.data.on('comments-updated', this._refresh.bind(this))
+    this.app.data.on('dns-updated', this._refreshDNSList.bind(this))
+  }
+
+  init (elemId) {
+    this._$ = $(elemId)
+    if (!this._$.length) {
+      throw Error('Element not found: ' + elemId)
+    }
+    this._initialRender()
+    this._setupInitialEvents()
+  }
+
+  $ (target) {
+    return this._$.find(target)
+  }
+
+  // Global UI
+
+  enableComments () {
+    if (!this.app.data.isAdmin()) {
+      return console.error('Admin has the privilege to enable comment')
+    }
+    this._spinUntil(this.app.data.enableComments())
+  }
+
+  showBlockedUsers () {
+    const prepareTemplate = () => {
+      let template = '<ul class="list-group">'
+      Object.keys(this.app.data.blockedUsers).forEach(user => {
+        template += `<li class="list-group-item">
+        <div class="checkbox">
+          <label>
+            <input type="radio" name="blockedUsers" value="${user}"> ${user}
+          </label>
+        </div>
+      </li>`
+      })
+      template += '</ul>'
+      return template
+    }
+    this._showPopup('Blocked Users', prepareTemplate(), [
+      { name: 'Cancel', call: () => this.closePopup() },
+      { name: 'Unblock User', call: () => this._selectUnBlockUser() }
+    ])
+  }
+
+  // comment interactions
+  addComment () {
+    var comment = this.$('#_commentText').val()
+    var name = this.$('#_dnsList').val()
+    if (!!name && !!comment) {
+      this._spinUntil(this.app.data.postComment(comment, name))
+    }
+  }
+
+  deleteComment (comment, index) {
+    this._spinUntil(this.app.data.deleteComment(index))
+  }
+
+  blockUser (userName, index) {
+    if (userName === this.DEFAULT_DNS_NAME) {
+      this._toggleSpinner()
+      return this._getUserNameForAnonymous(index)
+    }
+    this._spinUntil(this.app.data.blockUser(userName, index))
+  }
+
+  // internal init
+  _initialRender () {
+    this._$.html(`
+    <div class="comment-block center-block">
+      <div class="comment-spinner" id="_commentSpinner">
+        <div class="comment-spinner-b">
+          <i class="spinner" aria-hidden="true"></i>
+        </div>
+      </div>
+      <div class="comment-opt" id="_commentOpt">
+        <button type="button" class="btn btn-primary">Unblock User</button>
+      </div>
+      <div id="_comments">
+        <div id="_commentEnable" class="comment-enable">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <button class="btn btn-primary" type="enableComments" >Enable Comments</button>
+            </div>
+          </div>
+        </div>
+        <div class="well" id="_commentInput">
+          <h4>Leave a Comment:</h4>
+          <form role="form" id="_commentForm">
+            <div class="form-group">
+              <select class="form-control" id="_dnsList">
+                <option value="${this.DEFAULT_DNS_NAME}">${this.DEFAULT_DNS_NAME}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <textarea id="_commentText" class="form-control" rows="4"></textarea>
+            </div>
+            <button type="button" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+        <div class="comments" id="_commentList">
+        </div>
+      </div>
+    </div>
+    <div id="popup" class="popup">
+      <div class="popup-container" id="_popupContainer">
+        <h3 class="head"></h3>
+        <div class="content">
+        </div>
+        <div class="foot">
+        </div>
+      </div>
+    </div>`)
+  }
+
+  _setupInitialEvents () {
+    this.$('#_commentOpt button').click(() => this.showBlockedUsers())
+    this.$('#_commentEnable button').click(() => this.enableComments())
+    this.$('#_commentForm button').click(() => this.addComment())
+  }
+
+  // Data driven UI updates
+
+  _refresh () {
+    this._toggleSpinner(false)
+    if (!this.app.data.commentsEnabled()) {
+      // indicating we aren't enbled yet
+      log('show button')
+      this._toggleEnableCommentBtn(true)
+    } else {
+      // refresh comments
+      log('show comments')
+      this._renderComments()
+      this._toggleEnableCommentBtn(false)
+      this._toggleCommentsInput(true)
+    }
+  }
+
+  _renderComments () {
+    log('refreshing comments list')
+
+    const isBlockedUser = (name) => {
+      if (!this.app.data.blockedUsers) {
+        return false
+      }
+      return !!this.app.data.blockedUsers.hasOwnProperty(name)
+    }
+
+    // prepare comment template
+    const renderComment = (comment, index) => {
+      let item = $(`
+      <div class="media">
+        <div class="media-body">
+          <h4 class="media-heading">${comment.name}
+            <small>${(new Date(comment.time)).toLocaleString()}</small>
+          </h4>
+          ${comment.comment}
+        </div>
+      </div>`)
+
+      if (this.app.data.isAdmin()) {
+        let $adminMenu = item.append('<div class="media-options"></div>')
+        log($adminMenu)
+
+        $adminMenu.append($(
+          `<button class="btn btn-danger btn-xs" type="button">Delete</button>`
+          ).click(() => this.deleteComment(comment, index)))
+
+        if (!isBlockedUser(comment.name)) {
+          $adminMenu.append($(
+            `<button class="btn btn-warning btn-xs" type="button" >Block</button>`
+          ).click(() => this.blockUser(comment.name, index)))
+        }
+      }
+      return item
+    }
+
+    // render comments
+    let target = this.$('#_commentList')
+    target.empty()
+    if (this.app.data.commentList.length) {
+      this.app.data.commentList.forEach((comment) => {
+        target.append(renderComment(comment.comment, comment.index))
+      })
+      target.show()
+    } else {
+      target.hide()
+    }
+  }
+
+  _refreshDNSList () {
+    if (!this.app.data.user.dns) {
+      return
+    }
+    this.$('#_dnsList').html(
+      this.app.data.user.dns.map(
+        (list, i) => `<option value="${list}" ${(i === 0 ? ' selected' : '')}>${list}</option>`
+      ).join('\n'))
+  }
+
+  // User blocking flow
+  _selectUnBlockUser () {
+    const selected = this.$('input[name=blockedUsers]:checked').val()
+    this._hidePopup()
+    if (!selected) {
+      return
+    }
+
+    return this._spinUntil(this.app.data.unblockUser(selected))
+  }
+
+  _setUserNameForAnonymous (index) {
+    const userName = this.$('#_blockUserName').val()
+    this._hidePopup()
+    if (this.app.data.blockedUsers && this.app.data.blockedUsers.hasOwnProperty(userName)) {
+      return window.alert('User Name already exist')
+    }
+    this._spinUntil(this.app.data.blockUser(userName, index))
+  }
+
+  _getUserNameForAnonymous (index) {
+    const template = `
+    <div class="form-group row">
+      <div class="col-lg-12">
+        <div class="col-lg-12">
+          <input type="text" class="form-control" id="_blockUserName" placeholder="Enter Reference Name">
+        </div>
+      </div>
+    </div>`
+    this._showPopup('Anonymous User Reference Name', template, [
+        { name: 'Cancel', call: this.closePopup() },
+        { name: 'Block', call: () => this._setUserNameForAnonymous(index) }
+    ])
+  }
+
+  // General UI Features
+  _toggleSpinner (state) {
+    log(state)
+    let spinnerEle = this.$('#_commentSpinner')
+    log(spinnerEle)
+    return state ? spinnerEle.show() : spinnerEle.hide()
+  }
+
+  _toggleEnableCommentBtn (status) {
+    let commentEnableEle = this.$('#_commentEnable')
+    log(commentEnableEle)
+    return status ? commentEnableEle.show() : commentEnableEle.hide()
+  }
+
+  _toggleComments (status) {
+    let commentsEle = this.$('#_commentList')
+    return status ? commentsEle.show() : commentsEle.hide()
+  }
+
+  _toggleCommentsOptions (status) {
+    let commentsOptsEle = this.$('#_commentOpt')
+    return status ? commentsOptsEle.show() : commentsOptsEle.hide()
+  }
+
+  _toggleCommentsInput (state) {
+    let commentInputEle = this.$('#_commentInput')
+    return state ? commentInputEle.show() : commentInputEle.hide()
+  }
+
+  _showPopup (title, template, foot) {
+    const popupEle = this.$('.popup')
+    const popupContainer = popupEle.find('#_popupContainer')
+    const footer = popupEle.find('.foot')
+
+    popupContainer.find('.head').html(title)
+    popupContainer.find('.content').html(template)
+    foot.forEach(opt => {
+      if (!opt.name) {
+        return
+      }
+      $(footer.appendChild(`
+        <button name="close" class="btn btn-primary" >${opt.name}</button>`)).click(opt.call)
+    })
+    popupEle.show()
+  }
+
+  _hidePopup () {
+    const popupEle = this.$('.popup')
+    const popupContainer = popupEle.find('#_popupContainer')
+    popupContainer.find('.head').html('')
+    popupContainer.find('.content').html('')
+    popupEle.find('.foot').html('')
+    popupEle.hide()
+  }
+
+  // UI helpers:
+  _spinUntil (promise) {
+    this._toggleSpinner(true)
+    return promise.then(
+      (res) => this._toggleSpinner(false),
+      (err) => {
+        console.error(err)
+        this._toggleSpinner(false)
+      }
+    )
+  }
+
+}
+
+class CommentsData extends _EventEmitter {
+  constructor (app) {
+    super()
+    this.hostName = window.location.host.replace(/.safenet$/g, '')
+    this.LOCAL_STORAGE_TOKEN_KEY = `SAFE_TOKEN_${this.hostName}`
+    this.appInfo = {
       name: window.location.host,
       id: 'tutorial.maidsafe.net',
       version: '0.1.0',
@@ -10,837 +352,397 @@ class CommentsTutorial {
       permissions: [
         'LOW_LEVEL_API'
       ]
-    };
+    }
 
-    this.DEFAULT_DNS_NAME = 'Anonymous';
-    this.DEST_ELEMENT_ID = '#comments';
-    this.TARGET_ELEMENT_ID = '#_commets'; // prefix with #
-    this.COMMENT_ENABLE_BTN_ELEMENT_ID = '#_commentEnable'; // prefix with #
-    this.COMMENT_LIST_ELEMENT_ID = '#_commentList'; // prefix with #
-    this.COMMENT_TEXT_ELEMENT_ID = '#_commentText'; // prefix with #
-    this.COMMENT_FORM_ELEMENT_ID = '#_commentForm'; // prefix with #
-    this.COMMENT_INPUT_ELEMENT_ID = '#_commentInput'; // prefix with #
-    this.DNS_LIST_ELEMENT_ID = '#_dnsList'; // prefix with #
-    this.COMMENT_SPINNER_ELEMENT_ID = '#_commentSpinner'; // prefix with #
-    this.COMMENT_OPTIONS_ELEMENT_ID = '#_commentOpt'; // prefix with #
-    this.POPUP_CONTAINER_ELEMENT_ID = '#_popupContainer'; // prefix with #
-    this.BLOCK_USERNAME_ELEMENT_ID = '#_blockUserName'; // prefix with #
+    this.user = {}
 
-    this.user = {};
+    this.authToken = null
+    this.totalComments = 0
+    this.currentPostHandleId = null
+    this.commentList = []
+    this.blockedUserStructureDataHandle = null
+    this.blockedUsers = null
+    this.symmetricCipherOptsHandle = null
 
-    this.authToken = null;
-    this.totalComments = 0;
-    this.currentPostHandleId = null;
-    this.commentList = [];
-    this.blockedUserStructureDataHandle = null;
-    this.blockedUsers = null;
-    this.symmetricCipherOptsHandle = null;
-    window.isAdmin = false;
+    $(window).on('beforeunload', () => {
+      // ensure we are cleaning up properly before closing
+      if (this.currentPostHandleId) {
+        window.safeAppendableData.dropHandle(this.authToken, this.currentPostHandleId)
+      }
+      if (this.symmetricCipherOptsHandle) {
+        window.safeCipherOpts.dropHandle(this.symmetricCipherOptsHandle)
+      }
+    })
   }
 
-  version() {
-    return this.app.version;
+  // system specifics
+  init () {
+    this.authToken = window.safeAuth.getAuthToken(this.LOCAL_STORAGE_TOKEN_KEY)
+    return (this.authToken ? this._getDns() : this._authoriseApp())
+      .then(() => this.fetchComments())
   }
 
-  toggleEnableCommentBtn(status) {
-    let commentEnableEle = $(this.TARGET_ELEMENT_ID).find(this.COMMENT_ENABLE_BTN_ELEMENT_ID);
-    return status ? commentEnableEle.show() : commentEnableEle.hide();
+  version () {
+    return this.appInfo.version
   }
 
-  toggleComments(status) {
-    let commentsEle = $(this.TARGET_ELEMENT_ID).find(this.COMMENT_LIST_ELEMENT_ID);
-    return status ? commentsEle.show() : commentsEle.hide();
+  getLocation () {
+    // FIXME: this means we are globally all trying the same ...
+    return `${this.hostName}/${window.location.pathname}/1`
   }
 
-  toggleCommentsOptions(status) {
-    let commentsOptsEle = $(this.COMMENT_OPTIONS_ELEMENT_ID);
-    return status ? commentsOptsEle.show() : commentsOptsEle.hide();
-  }
+  isAdmin () {
+    if (this._isDevMode()) {
+      return true
+    }
 
-  toggleCommentsInput(state) {
-    let commentInputEle = $(this.TARGET_ELEMENT_ID).find(this.COMMENT_INPUT_ELEMENT_ID);
-    return state ? commentInputEle.show() : commentInputEle.hide();
-  }
-  setAuthToken(token) {
-    this.authToken = token;
-    window.safeAuth.setAuthToken(this.LOCAL_STORAGE_TOKEN_KEY, token);
-  }
-
-  getAuthToken() {
-    return window.safeAuth.getAuthToken(this.LOCAL_STORAGE_TOKEN_KEY);
-  }
-
-  clearAuthToken() {
-    this.authToken = null;
-  }
-
-  isAdmin() {
-    let currentDns = this.hostName.replace(/(^\w+\.|.safenet$)/g, '');
+    let currentDns = this.hostName.replace(/(^\w+\.|.safenet$)/g, '')
     if (!this.user.dns) {
-      return;
+      return
     }
-    return this.user.dns.indexOf(currentDns) !== -1;
+    return this.user.dns.indexOf(currentDns) !== -1
   }
 
-  showPopup(title, template, foot) {
-    const popupEle = $('.popup');
-    const popupContainer = popupEle.find(this.POPUP_CONTAINER_ELEMENT_ID);
-
-    popupContainer.find('.head').html(title);
-    popupContainer.find('.content').html(template);
-    let footer = '';
-    foot.forEach(opt => {
-      if (!opt.name) {
-        return;
-      }
-      footer += `<button name="close" class="btn btn-primary" onclick="${opt.call}">${opt.name}</button>`;
-    });
-    popupEle.find('.foot').html(footer);
-    popupEle.show();
+  commentsEnabled () {
+    return !!this.currentPostHandleId
   }
 
-  hidePopup() {
-    const popupEle = $('.popup');
-    const popupContainer = popupEle.find(this.POPUP_CONTAINER_ELEMENT_ID);
-    popupContainer.find('.head').html('');
-    popupContainer.find('.content').html('');
-    popupEle.find('.foot').html('');
-    popupEle.hide();
+  //
+  // global activities
+  //
+
+  enableComments () {
+    return window.safeAppendableData.create(this.authToken, this.getLocation(), false)
+      .then((res) => res.__parsedResponseBody__.handleId)
+      .then((handleId) => {
+        log('Put appendable data')
+        return window.safeAppendableData.put(this.authToken, handleId)
+          .then(res => { this.currentPostHandleId = handleId })
+      })
+      .then(() => {
+        this.emit('comments-updated')
+      })
   }
 
-  showBlockedUsers () {
-    const prepareTemplate = () => {
-      let template = '<ul class="list-group">';
-      Object.keys(this.blockedUsers).forEach(user => {
-        template += `<li class="list-group-item"><div class="checkbox"><label><input type="radio" name="blockedUsers" value="${user}"> ${user}</label></div></li>`
-      });
-      template += '</ul>';
-      return template;
-    };
-    this.showPopup('Blocked Users', prepareTemplate(), [
-      { name: 'Cancel', call: 'commentsTutorial.closePopup()' },
-      { name: 'Unblock User', call: 'commentsTutorial.selectUnBlockUser()' }
-    ]);
-  }
+  //
+  // comment activities
+  //
 
-  selectUnBlockUser() {
-    const seletctedUser = $(document).find('input[name=blockedUsers]:checked').val();
-    this.hidePopup();
-    if (!seletctedUser) {
-      return;
-    }
-    return this.unblockUser(seletctedUser);
-  }
+  fetchComments () {
+    log('Fetch comments')
+    this.commentList = []
 
-  setUserNameForAnonymous(index) {
-    const userName = $(document).find(this.BLOCK_USERNAME_ELEMENT_ID).val();
-    this.hidePopup();
-    if (this.blockedUsers && this.blockedUsers.hasOwnProperty(userName)) {
-      return window.alert('User Name already exist');
-    }
-    this.blockUser(userName, index);
-  }
-
-  getUserNameForAnonymous(index) {
-    const template = '<div class="form-group row">' +
-      '<div class="col-lg-12">' +
-      '<div class="col-lg-12">' +
-      '<input type="text" class="form-control" id="_blockUserName" placeholder="Enter Reference Name">' +
-      '</div>' +
-      '</div>' +
-      '</div>';
-    this.showPopup('Anonymous User Reference Name', template, [
-      { name: 'Cancel', call: 'commentTutorial.closePopup()' },
-      { name: 'Block', call: `commentTutorial.setUserNameForAnonymous(${index})` }
-    ]);
-  }
-
-  getSelectedDns() {
-    return $(this.DNS_LIST_ELEMENT_ID).val();
-  }
-  getLocation() {
-    return `${this.hostName}/${window.location.pathname}`;
-  }
-  generateRandomString() {
-    let text = '';
-    let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for( let i=0; i < 5; i++ ) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  }
-
-  clearComments() {
-    $(this.TARGET_ELEMENT_ID).find(this.COMMENT_LIST_ELEMENT_ID).find('.media').remove();
-  }
-
-  resetCommentForm() {
-    $(this.COMMENT_FORM_ELEMENT_ID)[0].reset();
-  }
-
-  toggleSpinner(state) {
-    let spinnerEle = $(this.COMMENT_SPINNER_ELEMENT_ID);
-    return state ? spinnerEle.show() : spinnerEle.hide();
-  }
-
-  log(str) {
-    console.log((new Date()).toLocaleString() + ' :: ' + str);
-  }
-
-  errorHandler() {
-    this.toggleSpinner();
-  }
-
-  postAppendableData(handleId) {
-    return window.safeAppendableData.post(this.authToken, handleId);
-  }
-
-  putAppendableData(handleId) {
-    return window.safeAppendableData.put(this.authToken, handleId);
-  }
-
-  dropAppendableDataHandle(handleId) {
-    return window.safeAppendableData.dropHandle(this.authToken, handleId);
-  }
-
-  putStructureData(handleId) {
-    return window.safeStructuredData.put(this.authToken, handleId);
-  }
-
-  dropStructuredDataHandle(handleId) {
-    window.safeStructuredData.dropHandle(this.authToken, handleId);
-  }
-
-  dropDataIdHandle(dataIdHandle) {
-    window.safeDataId.dropHandle(this.authToken, dataIdHandle);
-  }
-
-  getBlockedUsersStructuredData() {
-    window.safeCipherOpts.getHandle(this.authToken, window.safeCipherOpts.getEncryptionTypes().SYMMETRIC)
-      .then(res => {
-        console.info('Got Symmetric cipher opts handle');
-        this.symmetricCipherOptsHandle = res.__parsedResponseBody__.handleId;
-        window.safeDataId.getStructuredDataHandle(this.authToken, this.getLocation() + '_blocked_users', 501)
-          .then(res => {
-            console.info('DataId handle of blocked user structured data fetched');
-            const dataIdHandle = res.__parsedResponseBody__.handleId;
-            window.safeStructuredData.getHandle(this.authToken, dataIdHandle)
-              .then(res => {
-                console.info('Blocked user structured data handle fetched');
-                this.dropDataIdHandle(dataIdHandle);
-                this.blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId;
-                window.safeStructuredData.readData(this.authToken, this.blockedUserStructureDataHandle)
-                  .then(data => {
-                    console.info('Blocked user structured data read');
-                    this.blockedUsers = JSON.parse(new Buffer(data).toString());
-                    if (Object.keys(this.blockedUsers).length > 0) {
-                      this.toggleCommentsOptions(true); // enable comments unblock user button
-                    }
-                  }, console.error);
-              }, err => {
-                this.dropDataIdHandle(dataIdHandle);
-                console.error(err);
-                console.info('No blocked user structured data found');
-              });
-          }, err => {
-            console.info('No blocked user structured data found');
-          });
-      }, console.error);
-  }
-
-  saveBlockedUser(userName, signKeyHandle) {
-    console.info('Updating blocked user list');
-    if (this.blockedUserStructureDataHandle !== null) {
-      window.safeSignKey.serialise(this.authToken, signKeyHandle)
-        .then(res => {
-          const serialisedSignKey = new Buffer(res).toString('base64');
-          this.blockedUsers[userName] = serialisedSignKey;
-          window.safeStructuredData.updateData(this.authToken, this.blockedUserStructureDataHandle,
-            new Buffer(JSON.stringify(this.blockedUsers)), this.symmetricCipherOptsHandle)
-            .then(res => {
-              console.info('Updated data of blocked user Structured Data');
-              window.safeStructuredData.post(this.authToken, this.blockedUserStructureDataHandle)
-                .then(res => {
-                  window.safeSignKey.dropHandle(this.authToken, signKeyHandle);
-                  this.toggleSpinner(false);
-                  alert('User has been blocked');
-                }, console.error);
-            }, console.error);
-        }, console.error);
-    } else {
-      window.safeSignKey.serialise(this.authToken, signKeyHandle)
-        .then(res => {
-          const serialisedSignKey = new Buffer(res).toString('base64');
-          this.blockedUsers = {};
-          this.blockedUsers[userName] = serialisedSignKey;
-          const data = new Buffer(JSON.stringify(this.blockedUsers)).toString('base64');
-          window.safeStructuredData.create(this.authToken, this.getLocation() + '_blocked_users', 501,
-            data, this.symmetricCipherOptsHandle)
-            .then(res => {
-              console.info('Creating blocked user structured data');
-              this.blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId;
-              window.safeStructuredData.put(this.authToken, this.blockedUserStructureDataHandle)
-                .then(res => {
-                  this.toggleSpinner(false);
-                  window.safeSignKey.dropHandle(this.authToken, signKeyHandle);
-                  alert('User has been blocked');
-                }, console.error);
-            }, console.error);
-        }, console.error);
-    }
-  }
-
-  unblockUser(userName) {
-    window.safeSignKey.deserialise(this.authToken, new Buffer(this.blockedUsers[userName], 'base64'))
-      .then(res => {
-        console.info('Deserialised sign key');
-        const signKeyHandle = res.__parsedResponseBody__.handleId;
-        window.safeAppendableData.removeFromFilter(this.authToken, this.currentPostHandleId,
-          [signKeyHandle])
-          .then(res => {
-            window.safeAppendableData.post(this.authToken, this.currentPostHandleId)
-              .then(res => {
-                delete this.blockedUsers[userName];
-                const data = new Buffer(JSON.stringify(this.blockedUsers)).toString('base64');
-                window.safeStructuredData.updateData(this.authToken, this.blockedUserStructureDataHandle,
-                  data, this.symmetricCipherOptsHandle)
-                  .then(res => {
-                    console.info('Updated data of blocked user Structured Data');
-                    window.safeStructuredData.post(this.authToken, this.blockedUserStructureDataHandle)
-                      .then(res => {
-                        window.safeSignKey.dropHandle(this.authToken, signKeyHandle);
-                        alert('User has been unblocked');
-                        this.fetchComments();
-                      }, console.error);
-                  }, console.error);
-              }, console.error);
-          }, console.error);
-      }, console.error);
-  }
-
-  blockUser(userName, index) {
-    this.log('Block User');
-    let signKeyHandleId = null;
-    this.toggleSpinner(true);
-
-    // post appendable data to network
-    const post = () => {
-      this.log('Post appendable data');
-      this.postAppendableData(this.currentPostHandleId)
-        .then((res) => {
-          console.log(res);
-          this.saveBlockedUser(userName, signKeyHandleId);
-          this.fetchComments();
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    const addFilter = () => {
-      this.log('Add filter');
-      window.safeAppendableData.addToFilter(this.authToken, this.currentPostHandleId, [signKeyHandleId])
-        .then((res) => {
-          console.log(res);
-          post();
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    if (userName === this.DEFAULT_DNS_NAME) {
-      this.toggleSpinner();
-      return this.getUserNameForAnonymous(index);
-    }
-
-    // get appendable data signed key at index
-    this.log('Get signed key at :: ' + index);
-    window.safeAppendableData.getSignKeyAt(this.authToken, this.currentPostHandleId, index)
-      .then((res) => {
-        signKeyHandleId = res.__parsedResponseBody__.handleId;
-        addFilter();
-      }, (err) => {
-        console.error(err);
-        this.errorHandler(err);
-      });
-  }
-
-  deleteComment(index) {
-    this.log('Delete comment');
-    if (typeof index == 'undefined') {
-      return;
-    }
-    this.toggleSpinner(true);
-
-    // post data to network after delete
-    const post = () => {
-      this.log('Post appendable data');
-      this.postAppendableData(this.currentPostHandleId)
-        .then((res) => {
-          console.log(res);
-          this.clearComments();
-          this.toggleSpinner(false);
-          this.fetchComments();
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    // clear all deleted data from appendable data
-    const clearAllDeletedData = () => {
-      this.log('Clear appendable deleted data');
-      window.safeAppendableData.clearAll(this.authToken, this.currentPostHandleId, true)
-        .then((res) => {
-          post();
-          console.log(res);
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    // remove appendable data at index
-    this.log('Remove appendable data at :: ' + index);
-    window.safeAppendableData.removeAt(this.authToken, this.currentPostHandleId, index)
-      .then((res) => {
-        this.postAppendableData(this.currentPostHandleId)
-          .then((res) => {
-            console.log(res);
-            clearAllDeletedData();
-          }, (err) => {
-            console.error(err);
-          });
-      }, (err) => {
-        console.error(err);
-        this.errorHandler(err);
-      });
-  };
-
-  writeComment(e) {
-    this.log('Write comments');
-    this.toggleSpinner(true);
-
-    let currentSDHandleId = null;
-    let content = $(this.COMMENT_TEXT_ELEMENT_ID).val();
-    let publicName = this.getSelectedDns();
-    let timeStamp = (new Date()).getTime();
-    let name = publicName + timeStamp + this.generateRandomString();
-    let payload = {
-      name: publicName,
-      comment: content,
-      time: timeStamp
-    };
-    payload = new Buffer(JSON.stringify(payload)).toString('base64');
-
-    // append structured data data handle id to appendable data
-    const appendToAppendableData = (dataHandleId) => {
-      this.log('Append structured data handle id');
-      window.safeAppendableData.append(this.authToken, this.currentPostHandleId, dataHandleId)
-        .then((res) => {
-          this.dropDataIdHandle();
-          this.dropStructuredDataHandle(currentSDHandleId);
-          this.resetCommentForm();
-          this.toggleSpinner();
-          this.fetchComments();
-        }, (err) => {
-          // handle error
-          console.error(err);
-          window.alert('Could not post a comment');
-          this.errorHandler(err);
-        });
-    };
-
-    // get structured data data handler id
-    const getSDDataHandleId = () => {
-      this.log('Get structured data handle id');
-      window.safeStructuredData.getDataIdHandle(this.authToken, currentSDHandleId)
-        .then((res) => {
-          appendToAppendableData(res.__parsedResponseBody__.handleId);
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    // put structured data to network
-    const put = () => {
-      this.log('Put structured data');
-      this.putStructureData(currentSDHandleId)
-        .then((res) => {
-          getSDDataHandleId();
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    // create new structured data
-    const createStructureData = () => {
-      this.log('Create structured data');
-      window.safeStructuredData.create(this.authToken, name, 501, payload)
-        .then((res) => {
-          currentSDHandleId = res.__parsedResponseBody__.handleId;
-          put();
-        }, (err) => {
-          // handle error
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-    createStructureData();
-  };
-
-  fetchComments(){
-    this.log('Fetch comments');
-    let currentIndex = 0;
-    this.commentList = [];
-
-    this.toggleSpinner(true);
-
-    const isBlockedUser = (name) => {
-      let check = false;
-      if (!this.blockedUsers) {
-        return check;
-      }
-      check = this.blockedUsers.hasOwnProperty(name);
-      return !!check;
-    };
-
-    // prepare comment template
-    const prepareTemplate = (comment, index) => {
-      let template = '<div class="media">' +
-        '<div class="media-body">' +
-        '<h4 class="media-heading">::HEADING::' +
-        '<small>::DATE_TIME::</small>' +
-        '</h4>' +
-        '::CONTENT::' +
-        '</div>';
-
-      if (this.isAdmin()) {
-        template += '<div class="media-options">' +
-          '<button class="btn btn-danger btn-xs" type="button" onclick="window.commentsTutorial.deleteComment(::INDEX::)">Delete</button>';
-
-        if (!isBlockedUser(comment.name)) {
-          template += '<button class="btn btn-warning btn-xs" type="button" onclick="window.commentsTutorial.blockUser(\'::HEADING::\', ::INDEX::)">Block</button>';
-        }
-
-        template +='</div>';
+    const fetchAll = () => {
+      let all = []
+      for (var i = 0; i < this.totalComments; i++) {
+        all.push(i)
       }
 
-      template += '<hr></div>';
-      template = template.replace(/::HEADING::/g, comment.name)
-        .replace(/::DATE_TIME::/, (new Date(comment.time)).toLocaleString())
-        .replace(/::CONTENT::/, comment.comment)
-        .replace(/::INDEX::/g, index);
-
-      return template;
-    };
-
-    // add comment
-    const addComment = () => {
-      this.clearComments();
-      this.commentList.sort((a, b) => {
-        return new Date(b.data.time) - new Date(a.data.time);
-      });
-      this.commentList.forEach((comment) => {
-        let template = prepareTemplate(comment.data, comment.index);
-        $(this.TARGET_ELEMENT_ID).find(this.COMMENT_LIST_ELEMENT_ID).append(template);
-      });
-    };
-
-
-    // get structured data
-    const getStructureData = (handleId) => {
-      this.log('Fetch structured data');
-      console.log('handle id :: ', handleId);
-      window.safeStructuredData.readData(this.authToken, handleId)
-        .then((data) => {
-          const comment = JSON.parse(new Buffer(data).toString());
-          this.commentList.unshift({
-            index: currentIndex,
-            data: comment
-          });
-          this.dropStructuredDataHandle(handleId);
-          insertCommentsOnUI();
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    // get structured data handle
-    const getStructureDataHandle = (dataHandleId) => {
-      window.safeStructuredData.getHandle(this.authToken, dataHandleId)
-        .then((res) => {
-          this.dropDataIdHandle(dataHandleId);
-          getStructureData(res.__parsedResponseBody__.handleId);
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    // fetch appendable data at index
-    const fetchAppendableDataVal = (index) => {
-      this.log('Fetch appendable data value for index :: ' + index);
-      window.safeAppendableData.getDataIdAt(this.authToken, this.currentPostHandleId, index)
-        .then((res) => {
-          return getStructureDataHandle(res.__parsedResponseBody__.handleId);
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
-
-    // iterate comment
-    const insertCommentsOnUI = () => {
-      currentIndex = this.commentList.length % (this.totalComments + 1);
-      if (this.totalComments === 0 || (currentIndex === this.totalComments)) {
-        addComment();
-        return this.toggleSpinner();
-      }
-      fetchAppendableDataVal(currentIndex);
-    };
+      // fetch all the items in parallel
+      return Promise.all(
+        all.map(index => this._fetchComment(index).then((c) => {
+          this.commentList.push({
+            index: index,
+            comment: c
+          })
+        })))
+    }
 
     // get appendable data length
-    const getAppendableDataLength = () => {
-      this.log('Fetch appendable data length');
-      window.safeAppendableData.getMetadata(this.authToken, this.currentPostHandleId)
-        .then((res) => {
-          this.totalComments = res.__parsedResponseBody__.dataLength;
-          insertCommentsOnUI();
-        }, (err) => {
-          // handle error
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
+    const getCommentsListLength = () => {
+      log('Fetch appendable data length')
+      return window.safeAppendableData.getMetadata(
+            this.authToken, this.currentPostHandleId)
+        .then((res) => { this.totalComments = res.__parsedResponseBody__.dataLength })
+    }
 
     // fetch appendableData
-    const fetchAppendableData = (dataHandleId) => {
-      this.log('Fetch appendable data');
-
-      window.safeAppendableData.getHandle(this.authToken, dataHandleId)
-        .then((res) => {
-          this.toggleComments(true);
-          this.toggleCommentsInput(!!this.authToken);
-          this.currentPostHandleId = res.__parsedResponseBody__.handleId;
-          this.dropDataIdHandle(dataHandleId);
-          getAppendableDataLength();
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-          if (this.isAdmin()) {
-            this.toggleEnableCommentBtn(true);
-          }
-        });
-    };
-
-    this.log('Fetch appendable data data handle id');
-    window.safeDataId.getAppendableDataHandle(this.authToken, this.getLocation())
-      .then((res) => {
-        console.log(res);
-        fetchAppendableData(res.__parsedResponseBody__.handleId);
-      }, (err) => {
-        this.errorHandler(err);
-        console.error(err);
-      });
-  };
-
-  enableComments() {
-    if (!this.isAdmin()) {
-      return console.error('Admin has the privilege to enable comment');
+    const fetchCommentsListing = (dataHandleId) => {
+      log('Fetch appendable data')
+      return window.safeAppendableData.getHandle(
+            this.authToken, dataHandleId)
+        .then((res) => { this.currentPostHandleId = res.__parsedResponseBody__.handleId })
     }
-    this.toggleSpinner(true);
-    this.log('Enable Comment');
-    const put = (handleId) => {
-      this.log('Put appendable data');
-      this.putAppendableData(handleId)
-        .then((res) => {
-          this.toggleEnableCommentBtn(false);
-          this.toggleComments(true);
-          this.currentPostHandleId = handleId;
-          this.toggleSpinner(false);
-        }, (err) => {
-          console.error(err);
-          this.errorHandler(err);
-        });
-    };
 
-    // create appendable data
-    const createAppendableData = () => {
-      this.log('Create appendable data');
-      window.safeAppendableData.create(this.authToken, this.getLocation(), false)
-        .then((res) => {
-          put(res.__parsedResponseBody__.handleId);
-        }, (err) => {
-          this.errorHandler(err);
-          console.error(err);
-        });
-    };
+    const fetchComments = (handleId) =>
+      Promise.resolve(handleId)
+        .then(fetchCommentsListing)
+        .then(getCommentsListLength)
+        .then(fetchAll)
+        .then(() => this._sortComments())
+        .then((r) => this.emit('comments-updated'),
+              (e) => {
+                log(e)
+                this.emit('comments-updated')
+                return e
+              })
 
-    createAppendableData();
-  };
+    return this._autoRelease(
+      // get handle for appendable data
+      window.safeDataId.getAppendableDataHandle(this.authToken, this.getLocation()),
+      // fetch the comments with that handle
+      fetchComments,
+      // release teh appendable data handle
+      (dataIdHandle) => window.safeDataId.dropHandle(this.authToken, dataIdHandle))
+  }
 
-  addDnsList() {
-    if (!this.user.dns) {
-      return;
-    }
-    this.user.dns.forEach((list, i) => {
-      let option = '<option value="' + list + '" ' + (i === 0 ? ' selected' : '') + '>' + list + '</option>';
-      $(this.DNS_LIST_ELEMENT_ID).prepend(option);
-    });
-  };
+  postComment (comment, publicName) {
+    log(`Writing comment @${publicName}: ${comment}`)
 
-  getDns() {
-    this.log('Fetching DNS records');
-    window.safeDNS.getDns(this.authToken)
-      .then((res) => {
-        this.user.dns = res.__parsedResponseBody__;
-        this.addDnsList();
-        if (this.isAdmin()) {
-          this.getBlockedUsersStructuredData();
+    const timeStamp = (new Date()).getTime()
+    const name = publicName + timeStamp + generateRandomString()
+    const payload = new Buffer(JSON.stringify({
+      name: publicName,
+      comment: comment,
+      time: timeStamp
+    })).toString('base64')
+
+    console.log(this.authToken, "name", name, "payload", payload)
+
+    return this._autoRelease(
+        // get handle for to be created comment
+        window.safeStructuredData.create(this.authToken, name, 501, payload),
+        // with that handle
+        (currentSDHandleId) => window.safeStructuredData.put(this.authToken, currentSDHandleId)
+          // save the data then
+          .then(() => this._autoRelease(
+            // replace the structured Data handle for a dataID handle
+            window.safeStructuredData.getDataIdHandle(this.authToken, currentSDHandleId),
+            // append that handle to the appendable data
+            (dataIdHandle) => {
+              console.log(this.authToken, currentSDHandleId, this.currentPostHandleId, dataIdHandle)
+              return window.safeAppendableData.append(this.authToken, this.currentPostHandleId, dataIdHandle)
+            },
+            // release the dataId handle
+            (dataIdHandle) => window.safeDataId.dropHandle(this.authToken, dataIdHandle)
+          )),
+        // release the structured data handle
+        (currentSDHandleId) => window.safeStructuredData.dropHandle(this.authToken, currentSDHandleId))
+      // once done, refresh the comments listing
+      .then(() => this.fetchComments())
+  }
+
+  deleteComment (index) {
+    return window.safeAppendableData.removeAt(this.authToken, this.currentPostHandleId, index)
+      .then((res) =>
+        window.safeAppendableData.post(this.authToken, this.currentPostHandleId))
+      .then(() =>
+        window.safeAppendableData.clearAll(this.authToken, this.currentPostHandleId, true))
+      .then(() => this.fetchComments())
+  }
+
+  //
+  // user block management
+  //
+
+  blockUser (userName, index) {
+    // get appendable data signed key at index
+    return this._autoRelease(
+        window.safeAppendableData.getSignKeyAt(this.authToken, this.currentPostHandleId, index),
+        (signKeyHandleId) =>
+          window.safeAppendableData.addToFilter(this.authToken, this.currentPostHandleId, [signKeyHandleId])
+            .then(() => window.safeAppendableData.post(this.authToken, this.currentPostHandleId))
+            .then(() => this._saveBlockedUser(userName, signKeyHandleId))
+            .then(() => this.fetchComments()),
+        (signKeyHandleId) => window.safeSignKey.dropHandle(this.authToken, signKeyHandleId))
+      .then(data => this.emit('comments-updated'))
+  }
+
+  unblockUser (userName) {
+    return this._autoRelease(
+      // get a serialiased key
+      window.safeSignKey.deserialise(this.authToken, new Buffer(this.blockedUsers[userName], 'base64')),
+      (signKeyHandle) =>
+        window.safeAppendableData.removeFromFilter(
+          this.authToken,
+          this.currentPostHandleId,
+          [signKeyHandle])
+        .then(res => window.safeAppendableData.post(
+            this.authToken, this.currentPostHandleId)
+        .then(res => {
+          delete this.blockedUsers[userName]
+          const data = new Buffer(JSON.stringify(this.blockedUsers)).toString('base64')
+          return window.safeStructuredData.updateData(
+              this.authToken,
+              this.blockedUserStructureDataHandle,
+              data, this.symmetricCipherOptsHandle)
+            .then(res => window.safeStructuredData.post(
+                  this.authToken, this.blockedUserStructureDataHandle)
+            )
         }
-        this.fetchComments();
-      }, (err) => {
-        console.error(err);
-        this.errorHandler(err);
-        if (err.message.indexOf('401 Unauthorized') !== -1) {
-          return (this.authToken ? this.authoriseApp() : this.fetchComments());
-        }
-      });
-  };
+        )
+      ),
+      // release signing key
+      (signKeyHandle) => window.safeSignKey.dropHandle(this.authToken, signKeyHandle)
+    )
+  }
 
-// authorise app
-  authoriseApp() {
-    this.log('Authorising application');
-    window.safeAuth.authorise(this.app, this.LOCAL_STORAGE_TOKEN_KEY)
-      .then((res) => {
-        if (typeof res === 'object') {
-          this.setAuthToken(res.__parsedResponseBody__.token);
-        }
-        this.getDns();
-      }, (err) => {
-        console.error(err);
-        if (this.authToken) {
-          this.clearAuthToken();
-        }
-        this.errorHandler(err);
-        return this.fetchComments();
-      });
-  };
+  _isDevMode () {
+    return !!this.hostName.match(/^localhost(:[\d]+)?$/)
+  }
 
-  loadInitialTemplate() {
-    if (!this.DEST_ELEMENT_ID) {
-      throw new Error('Target not found');
-    }
-    let initialTemplate = '<div class="comment-block center-block">' +
-      '<div class="comment-spinner" id="_commentSpinner">' +
-      '<div class="comment-spinner-b">' +
-      '<i class="spinner" aria-hidden="true"></i>' +
-      '</div>' +
-      '</div>' +
-      '<div class="comment-opt" id="_commentOpt">' +
-      '<button type="button" class="btn btn-primary" onclick="commentTutorial.showBlockedUsers()">Unblock User</button>' +
-      '</div>' +
-      '<div id="_commets">' +
-      '<div id="_commentEnable" class="comment-enable">' +
-      '<div class="panel panel-default">' +
-      '<div class="panel-body">' +
-      '<button class="btn btn-primary" type="enableComments" onclick="window.commentsTutorial.enableComments()">Enable Comments</button>' +
-      '</div>' +
-      '</div>' +
-      '</div>' +
-      '<div class="comments" id="_commentList">' +
-      '<div class="well" id="_commentInput">' +
-      '<h4>Leave a Comment:</h4>' +
-      '<form role="form" id="_commentForm">' +
-      '<div class="form-group">' +
-      '<select class="form-control" id="_dnsList">' +
-      `<option value="${this.DEFAULT_DNS_NAME}">${this.DEFAULT_DNS_NAME}</option>` +
-      '</select>' +
-      '</div>' +
-      '<div class="form-group">' +
-      '<textarea id="_commentText" class="form-control" rows="4"></textarea>' +
-      '</div>' +
-      '<button type="button" class="btn btn-primary" onclick="window.commentsTutorial.addComment()">Submit</button>' +
-      '</form>' +
-      '</div>' +
-      '</div>' +
-      '</div>' +
-      '</div>' +
-      '<div id="popup" class="popup">' +
-      '<div class="popup-container" id="_popupContainer">' +
-      '<h3 class="head"></h3>' +
-      '<div class="content"></div>' +
-      '<div class="foot"></div>' +
-      '</div>' +
-      '</div>';
-    $(this.DEST_ELEMENT_ID).html(initialTemplate);
-  };
+  _getCypher () {
+    return window.safeCipherOpts.getHandle(
+        this.authToken,
+        window.safeCipherOpts.getEncryptionTypes().SYMMETRIC)
+      .then(res => { this.symmetricCipherOptsHandle = res.__parsedResponseBody__.handleId })
+  }
 
-  loadComments(destId) {
-    if (destId) {
-      this.DEST_ELEMENT_ID = destId;
-    }
-    this.loadInitialTemplate();
-    this.toggleSpinner(true);
-    this.authToken = this.getAuthToken();
-    if (!this.authToken) {
-      this.authoriseApp();
-    } else {
-      this.getDns();
-    }
-    $(window).on('beforeunload', () => {
-      if (this.currentPostHandleId) {
-        this.dropAppendableDataHandle(this.currentPostHandleId);
+  _autoRelease (promise, fn, release) {
+    // wraps the pull and release cycle around your function call
+    return promise
+      .then(res => res.__parsedResponseBody__ ? res.__parsedResponseBody__.handleId : res)
+      .then(handleId => fn(handleId)
+        .then((r) => release(handleId).then(() => r),
+              (e) => release(handleId).then( () => Promise.reject(e)
+        ))
+      )
+  }
+
+  _fetchBlockeUsersData () {
+    return this._autoRelease(
+      window.safeDataId.getStructuredDataHandle(
+        // get dataHandle
+        this.authToken, this.getLocation() + '_blocked_users', 501),
+        // replace dataHandle With structuredDataHandle
+        (dataHandle) => window.safeStructuredData.getHandle(this.authToken, dataHandle),
+        // release dataHandle
+        (dataHandle) => window.safeDataId.dropHandle(this.authToken, dataHandle))
+      .then(handleId => {
+        // keep the sdHandle around for later reuse
+        this.blockedUserStructureDataHandle = handleId
+        // and read the data with it
+        return window.safeStructuredData.readData(
+            this.authToken,
+            this.blockedUserStructureDataHandle)
+      })
+  }
+
+  _withSignedKey (signKeyHandle, fn) {
+    return window.safeSignKey.serialise(this.authToken, signKeyHandle)
+      .then(res => (new Buffer(res).toString('base64')))
+      .then(fn)
+  }
+
+  _readAndRelease (address) {
+    return this._autoRelease(
+      // get dataHandle for id
+      window.safeStructuredData.getHandle(this.authToken, address),
+      // read structured data from dataHandle
+      (handleId) => window.safeStructuredData.readData(this.authToken, handleId),
+      // release datahandle
+      (hId) => window.safeStructuredData.dropHandle(this.authToken, hId)
+    )
+  }
+
+  _fetchComment (index) {
+    return this._autoRelease(
+        // get data handle for position
+        window.safeAppendableData.getDataIdAt(
+              this.authToken, this.currentPostHandleId, index),
+        // read data at position
+        (dataid) => this._readAndRelease(dataid),
+        // release data handle
+        (dataIdHandle) => window.safeDataId.dropHandle(this.authToken, dataIdHandle))
+      .then((data) => JSON.parse(new Buffer(data).toString()))
+  }
+
+  _sortComments () {
+    this.commentList.sort((a, b) => {
+      return new Date((b.data || b.comment).time) - new Date((a.data || a.comment).time)
+    })
+  }
+
+  _getBlockedUsersStructuredData () {
+    return this._fetchBlockeUsersData()
+      .then(data => { this.blockedUsers = JSON.parse(new Buffer(data).toString()) })
+      .then(data => this.emit('comments-updated'))
+      .catch(console.error)
+  }
+
+  _saveBlockedUser (userName, signKeyHandle) {
+    if (this.blockedUserStructureDataHandle !== null) {
+      return this._withSignedKey((serialisedSignKey) => {
+        this.blockedUsers[userName] = serialisedSignKey
+        return window.safeStructuredData.updateData(
+            this.authToken,
+            this.blockedUserStructureDataHandle,
+            new Buffer(JSON.stringify(this.blockedUsers)), this.symmetricCipherOptsHandle)
+          .then(res => window.safeStructuredData.post(
+              this.authToken,
+              this.blockedUserStructureDataHandle)
+          )
       }
-    });
+      )
+    } else {
+      return this._withSignedKey((serialisedSignKey) => {
+        this.blockedUsers = {}
+        this.blockedUsers[userName] = serialisedSignKey
+        return window.safeStructuredData.create(
+            this.authToken,
+            this.getLocation() + '_blocked_users', 501,
+            this.blockedUsers,
+            this.symmetricCipherOptsHandle)
+          .then(res => { this.blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
+          .then(res => window.safeStructuredData.put(
+                this.authToken,
+                this.blockedUserStructureDataHandle)
+          )
+      }
+      )
+    }
+  }
+
+  _getDns () {
+    log('Fetching DNS records')
+    return window.safeDNS.getDns(this.authToken)
+      .then((res) => res.__parsedResponseBody__)
+      .then((dnsData) => {
+        this.user.dns = dnsData
+        if (this.isAdmin()) {
+          // dont block comments loading, but do it right after
+          window.setTimeout(() => this._getBlockedUsersStructuredData(), 10)
+        }
+        this.emit('dns-updated')
+      })
+  }
+
+  _authoriseApp () {
+    log('Authorising application')
+    return window.safeAuth.authorise(this.appInfo, this.LOCAL_STORAGE_TOKEN_KEY)
+      .then((res) => res.__parsedResponseBody__.token)
+      .then((token) => {
+        this.authToken = token
+        window.safeAuth.setAuthToken(this.LOCAL_STORAGE_TOKEN_KEY, token)
+      })
+      .then(() => this._getDns())
+      .catch((err) => {
+        console.error(err)
+        this.authToken = null
+      })
   }
 }
 
-const commentTutorial = new CommentsTutorial();
+class CommentsTutorial {
+  constructor (targetElement) {
+    this.data = new CommentsData(this)
+    this.view = new CommentsView(this, targetElement)
 
+    this.data.init()
+  }
+}
+
+// Expose external API
 window.commentsTutorial = {
   loadComments: (destId) => {
-    commentTutorial.loadComments(destId);
-  },
-  enableComments: () => {
-    commentTutorial.enableComments();
-  },
-  addComment: (e) => {
-    commentTutorial.writeComment(e);
-  },
-  deleteComment: (ele, index) => {
-    commentTutorial.deleteComment(ele, index);
-  },
-  blockUser: (userName, index) => {
-    commentTutorial.blockUser(userName, index);
-  },
-  getBlockedUsers: () => {
-    return commentTutorial.blockedUsers ? Object.keys(commentTutorial.blockedUsers) : [];
-  },
-  unBlockUser: (userName) => {
-    commentTutorial.unblockUser(userName);
-  },
-  showBlockedUsers: () => {
-    commentTutorial.showBlockedUsers();
-  },
-  closePopup: () => {
-    commentTutorial.hidePopup();
-  },
-  setBlockUserName: () => {
-    commentTutorial.setBlockUserName();
-  },
-  selectUnBlockUser: () => {
-    commentTutorial.selectUnBlockUser();
-  },
-  setUserNameForAnonymous: () => {
-    commentTutorial.setUserNameForAnonymous();
-  },
-  version: () => {
-    return commentTutorial.version();
+    return new CommentsTutorial(destId)
   }
-};
+}
+
+window.onload = function () {
+  if (window.__COMMENTS_ID) {
+    // automatic invokation
+    log('in', window.__COMMENTS_ID)
+    window.commentsTutorial.loadComments(window.__COMMENTS_ID)
+  };
+}

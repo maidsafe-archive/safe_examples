@@ -41,7 +41,3 @@ const elements = [
 
 
 elements.map(head.appendChild.bind(head))
-
-if (window.__COMMENTS_ID)
-  // automatic invokation
-  window.commentsTutorial.loadComments(window.__COMMENTS_ID);
