@@ -22,7 +22,7 @@ If you specify the `__COMMENTS_ID` as shown the library will automatically initi
 
 ```
 <script>
-  commentsTutorial.loadComments();
+  window.safeComments.init('#myCommentsId');
 </script>
 ```
 

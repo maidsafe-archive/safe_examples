@@ -1,17 +1,12 @@
 /* global $, window */
 
+
+//
+// This module contains and exposes the
+// Data Controller. This is where all the SAFE-Access happens
+//
 (function (MODULE) {
-  class _EventEmitter {
-    // jQuery Based Event Emitter
-    on (name, fn) {
-      return $(this).on(name, fn)
-    }
-
-    emit (name, param) {
-      return $(this).trigger(name, param)
-    }
-  }
-
+  // helper function to generate a random string for us
   function generateRandomString () {
     let text = ''
     let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -20,22 +15,21 @@
     }
     return text
   }
-
-  class Controller extends _EventEmitter {
+  //
+  // The Controller holds the data and is the bridge to interact with
+  // SAFE.
+  class Controller {
     constructor () {
-      super()
-      // internal state
+      // setup the internal state
       this._hostName = window.location.host.replace(/.safenet$/g, '')
       this._LOCAL_STORAGE_TOKEN_KEY = `SAFE_TOKEN_${this._hostName}`
-
       this._authToken = null
       this._currentPostHandleId = null
       this._blockedUserStructureDataHandle = null
-
       this._symmetricCipherOptsHandle = null
 
+      // ensure we are cleaning up properly before closing
       $(window).on('beforeunload', () => {
-        // ensure we are cleaning up properly before closing
         if (this._currentPostHandleId) {
           window.safeAppendableData.dropHandle(this._authToken, this._currentPostHandleId)
         }
@@ -44,28 +38,46 @@
         }
       })
 
+      // start up the data container
       this._data = new MODULE.DataContainer()
     }
 
-    // system specifics
+    //
+    // Whenever something changes, the controller will emit an
+    // event. The view (and any other interested party) can listen
+    // to events and react accordingly.
+    //
+    // At the moment, the controller emits the follwing events:
+    //  - `comments-updated` : the comments have changed
+    //  - `user-updated`     : the user object has changed
+    on (name, fn) {
+      return $(this).on(name, fn)
+    }
+
+    emit (name, param) {
+      return $(this).trigger(name, param)
+    }
+
+    // Once all is linked up, this is called to start up the connection
+    // to save
     init () {
       this._authToken = window.safeAuth.getAuthToken(this._LOCAL_STORAGE_TOKEN_KEY)
-      return (this._authToken ? this._getDns() : this._authoriseApp())
+      // check if we have a local auth token
+      return (this._authToken
+          // if so, skip ahead to load DNS
+          ? this._getDns()
+          // if not we need to start by authorising the App
+          : this._authoriseApp())
+        // either way, once we have this setup, go ahead and fetch the comments
         .then(() => this.fetchComments())
     }
 
+    // helper to gain access to the internal data
     getData () {
       return this._data
     }
 
-    getLocation () {
-      if (this._isDevMode() && this._data.user.dns) {
-        return "comments-dev-" + this._data.user.dns + `/${window.location.pathname}`
-
-      }
-      return `${this._hostName}/${window.location.pathname}`
-    }
-
+    // is the current user owner of this URL
     isAdmin () {
       if (this._isDevMode() && this._data.user.dns) {
         return true
@@ -78,23 +90,31 @@
       return this._data.user.dns.indexOf(currentDns) !== -1
     }
 
+    // are comments generally enabled yet?
     commentsEnabled () {
       return !!this._currentPostHandleId
     }
 
     //
-    // global activities
+    // Global activities
     //
 
+    //
+    // If comments aren't enabled yet, this call allows one to start them
+    // by creating the initial appendable data entry.
+    //
     enableComments () {
-      return window.safeAppendableData.create(this._authToken, this.getLocation(), false)
+      // create appendable dataHandleId for location
+      return window.safeAppendableData.create(this._authToken, this._getLocation(), false)
+        // remap handleID
         .then((res) => res.__parsedResponseBody__.handleId)
-        .then((handleId) => {
-          MODULE.log('Put appendable data')
-          return window.safeAppendableData.put(this._authToken, handleId)
-            .then(res => { this._currentPostHandleId = handleId })
-        })
+        .then((handleId) =>
+          // now put the handleID, this actually creates the appendableData
+          window.safeAppendableData.put(this._authToken, handleId)
+            // after: store the handleID for later reuse
+            .then(res => { this._currentPostHandleId = handleId }))
         .then(() => {
+          // then emit to inform listeners that the comments state has changed
           this.emit('comments-updated')
         })
     }
@@ -102,9 +122,9 @@
     //
     // comment activities
     //
-
+    // Fetch all comments from the network
     fetchComments () {
-      MODULE.log('Fetch comments')
+      // start by clearing the list
       this._data.commentList = []
 
       const fetchAll = (totalComments) => {
@@ -113,9 +133,10 @@
           all.push(i)
         }
 
-        // fetch all the items in parallel
+        // fetch all the items in parallel, one at each index
         return Promise.all(
           all.map(index => this._fetchComment(index).then((c) => {
+            // for each item found, append them to the commentsList
             this._data.commentList.push({
               index: index,
               comment: c
@@ -123,7 +144,7 @@
           })))
       }
 
-      // get appendable data length
+      // learn how many items there are in our list
       const getCommentsListLength = () => {
         MODULE.log('Fetch appendable data length')
         return window.safeAppendableData.getMetadata(
@@ -131,7 +152,7 @@
           .then((res) => res.__parsedResponseBody__.dataLength)
       }
 
-      // fetch appendableData
+      // fetch the actual appendableData
       const fetchCommentsListing = (dataHandleId) => {
         MODULE.log('Fetch appendable data')
         return window.safeAppendableData.getHandle(
@@ -139,12 +160,18 @@
           .then((res) => { this._currentPostHandleId = res.__parsedResponseBody__.handleId })
       }
 
+      // tying it all together
       const fetchComments = (handleId) =>
         Promise.resolve(handleId)
+          // first fetch the listing itself
           .then(fetchCommentsListing)
+          // learn about the count
           .then(getCommentsListLength)
+          // then fetch each item
           .then(fetchAll)
+          // once we have all comments, sort them
           .then(() => this._sortComments())
+          // and emit the events, even if something failed
           .then((r) => this.emit('comments-updated'),
                 (e) => {
                   MODULE.log(e)
@@ -152,18 +179,23 @@
                   return e
                 })
 
+      // put it all in motion:
       return this._autoRelease(
         // get handle for appendable data
-        window.safeDataId.getAppendableDataHandle(this._authToken, this.getLocation()),
+        window.safeDataId.getAppendableDataHandle(this._authToken, this._getLocation()),
         // fetch the comments with that handle
         fetchComments,
         // release teh appendable data handle
         (dataIdHandle) => window.safeDataId.dropHandle(this._authToken, dataIdHandle))
     }
 
+    //
+    // Posting a new comment
+    //
     postComment (comment, publicName) {
       MODULE.log(`Writing comment @${publicName}: ${comment}`)
 
+      // convert the input into data SAFEnet understands
       const timeStamp = (new Date()).getTime()
       const name = publicName + timeStamp + generateRandomString()
       const payload = new Buffer(JSON.stringify({
@@ -172,7 +204,7 @@
         time: timeStamp
       })).toString('base64')
 
-
+      // and off it goes
       return this._autoRelease(
           // get handle for to be created comment
           window.safeStructuredData.create(this._authToken, name, 501, payload),
@@ -193,17 +225,25 @@
         .then(() => this.fetchComments())
     }
 
+    //
+    // Delete a comment at the given index
+    //
+
     deleteComment (index) {
+      // prepare the removable of a specific index
       return window.safeAppendableData.removeAt(this._authToken, this._currentPostHandleId, index)
         .then((res) =>
+          // send that off
           window.safeAppendableData.post(this._authToken, this._currentPostHandleId))
         .then(() =>
+          // clear our local cache
           window.safeAppendableData.clearAll(this._authToken, this._currentPostHandleId, true))
+        // and refresh all comments
         .then(() => this.fetchComments())
     }
 
     //
-    // user block management
+    // user blocking management
     //
 
     blockUser (userName, index) {
@@ -248,6 +288,19 @@
       )
     }
 
+    //
+    // Internals
+    //
+
+    // figure out the location the information is to be stored
+    _getLocation () {
+      if (this._isDevMode() && this._data.user.dns) {
+        return `comments-dev-${this._data.user.dns}/${window.location.pathname}`
+      }
+      return `${this._hostName}/${window.location.pathname}`
+    }
+
+    // if we are running from localhost, put the app into developer mode
     _isDevMode () {
       return !!this._hostName.match(/^localhost(:[\d]+)?$/)
     }
@@ -259,8 +312,13 @@
         .then(res => { this._symmetricCipherOptsHandle = res.__parsedResponseBody__.handleId })
     }
 
+    //
+    // Helper function for a typical use case:
+    //  1. get a data handle (as `promise`)
+    //  2. run the code `fn` (with the handle as the first parameter)
+    //  3. once execution completed, clean up the handle by calling `release`
+    //
     _autoRelease (promise, fn, release) {
-      // wraps the pull and release cycle around your function call
       return promise
         .then(res => res.__parsedResponseBody__ ? res.__parsedResponseBody__.handleId : res)
         .then(handleId => fn(handleId)
@@ -272,15 +330,15 @@
 
     _fetchBlockeUsersData () {
       return this._autoRelease(
-        window.safeDataId.getStructuredDataHandle(
           // get dataHandle
-          this._authToken, this.getLocation() + '_blocked_users', 501),
+          window.safeDataId.getStructuredDataHandle(
+            this._authToken, this._getLocation() + '_blocked_users', 501),
           // replace dataHandle With structuredDataHandle
           (dataHandle) => window.safeStructuredData.getHandle(this._authToken, dataHandle),
           // release dataHandle
           (dataHandle) => window.safeDataId.dropHandle(this._authToken, dataHandle))
         .then(handleId => {
-          // keep the sdHandle around for later reuse
+          // keep the structured data handle around for later reuse
           this._blockedUserStructureDataHandle = handleId
           // and read the data with it
           return window.safeStructuredData.readData(
@@ -289,12 +347,15 @@
         })
     }
 
+    // serialise the key then call fn
     _withSignedKey (signKeyHandle, fn) {
       return window.safeSignKey.serialise(this._authToken, signKeyHandle)
         .then(res => (new Buffer(res).toString('base64')))
         .then(fn)
     }
 
+    // given a specific address, get a handle, read it, release the handle
+    // and return the read Data
     _readAndRelease (address) {
       return this._autoRelease(
         // get dataHandle for id
@@ -306,6 +367,7 @@
       )
     }
 
+    // fetch the comment at `index
     _fetchComment (index) {
       return this._autoRelease(
           // get data handle for position
@@ -315,15 +377,18 @@
           (dataid) => this._readAndRelease(dataid),
           // release data handle
           (dataIdHandle) => window.safeDataId.dropHandle(this._authToken, dataIdHandle))
+        // convert the given data to JSON
         .then((data) => JSON.parse(new Buffer(data).toString()))
     }
 
+    // we like our comments sorted by time
     _sortComments () {
       this.commentList.sort((a, b) => {
         return new Date((b.data || b.comment).time) - new Date((a.data || a.comment).time)
       })
     }
 
+    // refresh the blocked users structure
     _getBlockedUsersStructuredData () {
       return this._fetchBlockeUsersData()
         .then(data => { this.data.blockedUsers = JSON.parse(new Buffer(data).toString()) })
@@ -331,7 +396,10 @@
         .catch(console.error)
     }
 
+    // let's block a user
     _saveBlockedUser (userName, signKeyHandle) {
+      // we already have a list of blocked users
+      // update the block
       if (this._blockedUserStructureDataHandle !== null) {
         return this._withSignedKey((serialisedSignKey) => {
           this.data.blockedUsers[userName] = serialisedSignKey
@@ -343,15 +411,16 @@
                 this._authToken,
                 this._blockedUserStructureDataHandle)
             )
-        }
-        )
+        })
       } else {
+        // This is the first time a user is blocked, created
+        // the block structure to keep track of the users blocked
         return this._withSignedKey((serialisedSignKey) => {
           this.data.blockedUsers = {}
           this.data.blockedUsers[userName] = serialisedSignKey
           return window.safeStructuredData.create(
               this._authToken,
-              this.getLocation() + '_blocked_users', 501,
+              this._getLocation() + '_blocked_users', 501,
               this.data.blockedUsers,
               this._symmetricCipherOptsHandle)
             .then(res => { this._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
@@ -364,35 +433,48 @@
       }
     }
 
+    // fetch the public names of the user
     _getDns () {
       MODULE.log('Fetching DNS records')
       return window.safeDNS.getDns(this._authToken)
+        // convert
         .then((res) => res.__parsedResponseBody__)
         .then((dnsData) => {
+          // store dnsData on the user for later reuse
           this._data.user.dns = dnsData
           if (this.isAdmin()) {
-            // dont block comments loading, but do it right after
+            // As the admin, we should also read the blocked user structure
+            // but do that once we are done with this cycle
             window.setTimeout(() => this._getBlockedUsersStructuredData(), 10)
           }
+          // and emit an event so the UI can update
           this.emit('user-updated')
         })
     }
 
+    // starting up, we need to authorise the app
     _authoriseApp () {
       MODULE.log('Authorising application')
       return window.safeAuth.authorise(this._data.appInfo, this._LOCAL_STORAGE_TOKEN_KEY)
+        // convert tokeb
         .then((res) => res.__parsedResponseBody__.token)
         .then((token) => {
+          // keep token for later reuse
           this._authToken = token
-          window.safeAuth.set_AuthToken(this._LOCAL_STORAGE_TOKEN_KEY, token)
+          window.safeAuth.setAuthToken(this._LOCAL_STORAGE_TOKEN_KEY, token)
         })
+        // then refresh the DNS
         .then(() => this._getDns())
         .catch((err) => {
+          // something went terribly wrong,
+          // remove the auth token
           console.error(err)
           this._authToken = null
+          return Promise.reject(err)
         })
     }
   }
 
+  // Expose the Controller to the global MODULE
   MODULE.Controller = Controller
 })(window.safeComments)
