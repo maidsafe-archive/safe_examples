@@ -1,5 +1,8 @@
 // main file loads all the other dependencies.
 
+// initialize the global MODULE
+window.safeComments = {}
+
 const loaderElement = document.getElementById("comments-loader")
 const rootPath = loaderElement ? loaderElement.src.replace(/main\.js(.?)$/, '') : './comments/'
 const libsPath = "vendor/"
@@ -36,7 +39,11 @@ const elements = [
   libsPath + 'jquery-3.1.1.min.js',
 
   // local files
-  'comments-tutorial.js'
+  'src/helpers.js',
+  'src/model.js',
+  'src/view.js',
+  'src/controller.js',
+  'src/app.js'
 ].map(_makeJSLoader))
 
 
