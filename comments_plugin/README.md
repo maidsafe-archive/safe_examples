@@ -42,3 +42,11 @@ A simple static page with comments integrated is demonstrated.
 # Limitations
  - Can not edit comments
  - AppendableData has a size limitation of 100Kb. Comments can not be added if the size of the appendable data has reached the max
+
+## Inline Documentation
+
+Is rendered using (docco](https://jashkenas.github.io/docco/) and can be found in the [docs/](./docs/app.html] folder. To refresh the documentation to the latest inline comments run:
+
+```bash
+docco comments/src/*
+```
