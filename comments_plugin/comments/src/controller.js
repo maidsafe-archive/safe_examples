@@ -59,12 +59,15 @@
     }
 
     getLocation () {
-      // FIXME: this means we are globally all trying the same ...
-      return `${this._hostName}/${window.location.pathname}/1`
+      if (this._isDevMode() && this._data.user.dns) {
+        return "comments-dev-" + this._data.user.dns + `/${window.location.pathname}`
+
+      }
+      return `${this._hostName}/${window.location.pathname}`
     }
 
     isAdmin () {
-      if (this._isDevMode()) {
+      if (this._isDevMode() && this._data.user.dns) {
         return true
       }
 

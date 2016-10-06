@@ -141,6 +141,7 @@
         // indicating we aren't enbled yet
         MODULE.log('show button')
         this._toggleEnableCommentBtn(true)
+        this._toggleCommentsInput(false)
       } else {
         // refresh comments
         MODULE.log('show comments')
