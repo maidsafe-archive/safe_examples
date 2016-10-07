@@ -489,6 +489,11 @@ by creating the initial appendable data entry.</p>
 
       <span class="hljs-keyword">const</span> fetchAll = <span class="hljs-function">(<span class="hljs-params">totalComments</span>) =&gt;</span> {
         <span class="hljs-keyword">let</span> all = []
+        
+        <span class="hljs-keyword">if</span> (totalComments === <span class="hljs-number">0</span>) {
+          <span class="hljs-keyword">return</span>;
+        } 
+        
         <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; totalComments; i++) {
           all.push(i)
         }</pre></div></div>
@@ -791,7 +796,7 @@ by creating the initial appendable data entry.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">window</span>.safeStructuredData.create(<span class="hljs-keyword">this</span>._authToken, name, <span class="hljs-number">501</span>, payload),</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">window</span>.safeStructuredData.create(<span class="hljs-keyword">this</span>._authToken, name, <span class="hljs-number">500</span>, payload),</pre></div></div>
             
         </li>
         
@@ -898,6 +903,9 @@ by creating the initial appendable data entry.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.fetchComments())
+        .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+          <span class="hljs-built_in">window</span>.alert(<span class="hljs-string">''</span>);
+        });
     }</pre></div></div>
             
         </li>
@@ -1035,7 +1043,7 @@ by creating the initial appendable data entry.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-built_in">window</span>.safeSignKey.deserialise(<span class="hljs-keyword">this</span>._authToken, <span class="hljs-keyword">new</span> Buffer(<span class="hljs-keyword">this</span>.data.blockedUsers[userName], <span class="hljs-string">'base64'</span>)),
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-built_in">window</span>.safeSignKey.deserialise(<span class="hljs-keyword">this</span>._authToken, <span class="hljs-keyword">new</span> Buffer(<span class="hljs-keyword">this</span>._data.blockedUsers[userName], <span class="hljs-string">'base64'</span>)),
         (signKeyHandle) =&gt;
           <span class="hljs-built_in">window</span>.safeAppendableData.removeFromFilter(
             <span class="hljs-keyword">this</span>._authToken,
@@ -1044,8 +1052,8 @@ by creating the initial appendable data entry.</p>
           .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> <span class="hljs-built_in">window</span>.safeAppendableData.post(
               <span class="hljs-keyword">this</span>._authToken, <span class="hljs-keyword">this</span>._currentPostHandleId)
           .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> {
-            <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>.data.blockedUsers[userName]
-            <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">new</span> Buffer(<span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>.data.blockedUsers)).toString(<span class="hljs-string">'base64'</span>)
+            <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>._data.blockedUsers[userName]
+            <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">new</span> Buffer(<span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>._data.blockedUsers)).toString(<span class="hljs-string">'base64'</span>)
             <span class="hljs-keyword">return</span> <span class="hljs-built_in">window</span>.safeStructuredData.updateData(
                 <span class="hljs-keyword">this</span>._authToken,
                 <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle,
@@ -1072,6 +1080,14 @@ by creating the initial appendable data entry.</p>
             
             <div class="content"><div class='highlight'><pre>        (signKeyHandle) =&gt; <span class="hljs-built_in">window</span>.safeSignKey.dropHandle(<span class="hljs-keyword">this</span>._authToken, signKeyHandle)
       )
+    }
+
+    hasAuthToken() {
+      <span class="hljs-keyword">return</span> !!<span class="hljs-keyword">this</span>._authToken;
+    }
+
+    hasBlockedUsers () {
+      <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>._data.blockedUsers &amp;&amp; (<span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>._data.blockedUsers).length !== <span class="hljs-number">0</span>));
     }</pre></div></div>
             
         </li>
@@ -1176,7 +1192,7 @@ by creating the initial appendable data entry.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">window</span>.safeDataId.getStructuredDataHandle(
-            <span class="hljs-keyword">this</span>._authToken, <span class="hljs-keyword">this</span>._getLocation() + <span class="hljs-string">'_blocked_users'</span>, <span class="hljs-number">501</span>),</pre></div></div>
+            <span class="hljs-keyword">this</span>._authToken, <span class="hljs-keyword">this</span>._getLocation() + <span class="hljs-string">'_blocked_users'</span>, <span class="hljs-number">500</span>),</pre></div></div>
             
         </li>
         
@@ -1207,6 +1223,7 @@ by creating the initial appendable data entry.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>          (dataHandle) =&gt; <span class="hljs-built_in">window</span>.safeDataId.dropHandle(<span class="hljs-keyword">this</span>._authToken, dataHandle))
+        .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> res.__parsedResponseBody__.handleId)
         .then(<span class="hljs-function"><span class="hljs-params">handleId</span> =&gt;</span> {</pre></div></div>
             
         </li>
@@ -1418,7 +1435,7 @@ and return the read Data</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    _sortComments () {
-      <span class="hljs-keyword">this</span>.commentList.sort(<span class="hljs-function">(<span class="hljs-params">a, b</span>) =&gt;</span> {
+      <span class="hljs-keyword">this</span>._data.commentList.sort(<span class="hljs-function">(<span class="hljs-params">a, b</span>) =&gt;</span> {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>((b.data || b.comment).time) - <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>((a.data || a.comment).time)
       })
     }</pre></div></div>
@@ -1438,9 +1455,13 @@ and return the read Data</p>
             
             <div class="content"><div class='highlight'><pre>    _getBlockedUsersStructuredData () {
       <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._fetchBlockeUsersData()
-        .then(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> { <span class="hljs-keyword">this</span>.data.blockedUsers = <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-keyword">new</span> Buffer(data).toString()) })
+        .then(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {
+          <span class="hljs-keyword">this</span>._data.blockedUsers = <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-keyword">new</span> Buffer(data).toString()) 
+        })
         .then(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> <span class="hljs-keyword">this</span>.emit(<span class="hljs-string">'comments-updated'</span>))
-        .catch(<span class="hljs-built_in">console</span>.error)
+        .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+          <span class="hljs-built_in">console</span>.error(err);
+        });
     }</pre></div></div>
             
         </li>
@@ -1456,7 +1477,9 @@ and return the read Data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    _saveBlockedUser (userName, signKeyHandle) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    _saveBlockedUser (userName, signKeyHandle) {
+      <span class="hljs-keyword">this</span>._getCypher()
+        .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {</pre></div></div>
             
         </li>
         
@@ -1472,19 +1495,19 @@ update the block</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._blockedUserStructureDataHandle !== <span class="hljs-literal">null</span>) {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._withSignedKey(<span class="hljs-function">(<span class="hljs-params">serialisedSignKey</span>) =&gt;</span> {
-          <span class="hljs-keyword">this</span>.data.blockedUsers[userName] = serialisedSignKey
-          <span class="hljs-keyword">return</span> <span class="hljs-built_in">window</span>.safeStructuredData.updateData(
-              <span class="hljs-keyword">this</span>._authToken,
-              <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle,
-              <span class="hljs-keyword">new</span> Buffer(<span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>.data.blockedUsers)), <span class="hljs-keyword">this</span>._symmetricCipherOptsHandle)
-            .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> <span class="hljs-built_in">window</span>.safeStructuredData.post(
-                <span class="hljs-keyword">this</span>._authToken,
-                <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle)
-            )
-        })
-      } <span class="hljs-keyword">else</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._blockedUserStructureDataHandle !== <span class="hljs-literal">null</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._withSignedKey(signKeyHandle, (serialisedSignKey) =&gt; {
+              <span class="hljs-keyword">this</span>._data.blockedUsers[userName] = serialisedSignKey
+              <span class="hljs-keyword">return</span> <span class="hljs-built_in">window</span>.safeStructuredData.updateData(
+                  <span class="hljs-keyword">this</span>._authToken,
+                  <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle,
+                  <span class="hljs-keyword">new</span> Buffer(<span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>._data.blockedUsers)).toString(<span class="hljs-string">'base64'</span>), <span class="hljs-keyword">this</span>._symmetricCipherOptsHandle)
+                .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> <span class="hljs-built_in">window</span>.safeStructuredData.post(
+                    <span class="hljs-keyword">this</span>._authToken,
+                    <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle)
+                )
+            })
+          } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -1500,22 +1523,23 @@ the block structure to keep track of the users blocked</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._withSignedKey(<span class="hljs-function">(<span class="hljs-params">serialisedSignKey</span>) =&gt;</span> {
-          <span class="hljs-keyword">this</span>.data.blockedUsers = {}
-          <span class="hljs-keyword">this</span>.data.blockedUsers[userName] = serialisedSignKey
-          <span class="hljs-keyword">return</span> <span class="hljs-built_in">window</span>.safeStructuredData.create(
-              <span class="hljs-keyword">this</span>._authToken,
-              <span class="hljs-keyword">this</span>._getLocation() + <span class="hljs-string">'_blocked_users'</span>, <span class="hljs-number">501</span>,
-              <span class="hljs-keyword">this</span>.data.blockedUsers,
-              <span class="hljs-keyword">this</span>._symmetricCipherOptsHandle)
-            .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> { <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
-            .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> <span class="hljs-built_in">window</span>.safeStructuredData.put(
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._withSignedKey(signKeyHandle, (serialisedSignKey) =&gt; {
+              <span class="hljs-keyword">this</span>._data.blockedUsers = {}
+              <span class="hljs-keyword">this</span>._data.blockedUsers[userName] = serialisedSignKey
+              <span class="hljs-keyword">return</span> <span class="hljs-built_in">window</span>.safeStructuredData.create(
                   <span class="hljs-keyword">this</span>._authToken,
-                  <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle)
+                  <span class="hljs-keyword">this</span>._getLocation() + <span class="hljs-string">'_blocked_users'</span>, <span class="hljs-number">500</span>,
+                  <span class="hljs-keyword">new</span> Buffer(<span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>._data.blockedUsers)).toString(<span class="hljs-string">'base64'</span>),
+                  <span class="hljs-keyword">this</span>._symmetricCipherOptsHandle)
+                .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> { <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
+                .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> <span class="hljs-built_in">window</span>.safeStructuredData.put(
+                      <span class="hljs-keyword">this</span>._authToken,
+                      <span class="hljs-keyword">this</span>._blockedUserStructureDataHandle)
+                )
+            }
             )
-        }
-        )
-      }
+          }
+        });
     }</pre></div></div>
             
         </li>
@@ -1599,6 +1623,11 @@ but do that once we are done with this cycle</p>
             
             <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">this</span>.emit(<span class="hljs-string">'user-updated'</span>)
         })
+        .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+          <span class="hljs-keyword">if</span> (err.message.indexOf(<span class="hljs-string">'401 Unauthorized'</span>) !== <span class="hljs-number">-1</span>) {
+            <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span>._authToken ? <span class="hljs-keyword">this</span>._authoriseApp() : <span class="hljs-keyword">this</span>.fetchComments());
+          }
+        });
     }</pre></div></div>
             
         </li>
@@ -1631,8 +1660,16 @@ but do that once we are done with this cycle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        .then(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> res.__parsedResponseBody__.token)
-        .then(<span class="hljs-function">(<span class="hljs-params">token</span>) =&gt;</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        .then(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> {
+          <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> res === <span class="hljs-string">'object'</span>) {
+            <span class="hljs-keyword">return</span> res.__parsedResponseBody__.token
+          }
+          <span class="hljs-keyword">return</span> res;
+        })
+        .then(<span class="hljs-function">(<span class="hljs-params">token</span>) =&gt;</span> {
+          <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> token !== <span class="hljs-string">'string'</span>) {
+            <span class="hljs-keyword">return</span>;
+          }</pre></div></div>
             
         </li>
         
@@ -1643,7 +1680,7 @@ but do that once we are done with this cycle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
-              <p>keep token for later reuse</p>
+              <p>keep token for later reus`e</p>
 
             </div>
             
@@ -1683,6 +1720,7 @@ remove the auth token</p>
             
             <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">console</span>.error(err)
           <span class="hljs-keyword">this</span>._authToken = <span class="hljs-literal">null</span>
+          <span class="hljs-keyword">this</span>.fetchComments();
           <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.reject(err)
         })
     }

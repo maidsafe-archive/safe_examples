@@ -296,7 +296,7 @@ in the tree that we are managing</p>
         <span class="hljs-keyword">return</span> template
       }
       <span class="hljs-keyword">this</span>._showPopup(<span class="hljs-string">'Blocked Users'</span>, prepareTemplate(), [
-        { <span class="hljs-attr">name</span>: <span class="hljs-string">'Cancel'</span>, <span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.closePopup() },
+        { <span class="hljs-attr">name</span>: <span class="hljs-string">'Cancel'</span>, <span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>._hidePopup() },
         { <span class="hljs-attr">name</span>: <span class="hljs-string">'Unblock User'</span>, <span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>._selectUnBlockUser() }
       ])
     }</pre></div></div>
@@ -328,10 +328,12 @@ in the tree that we are managing</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    addComment () {
-      <span class="hljs-keyword">var</span> comment = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'#_commentText'</span>).val()
+      <span class="hljs-keyword">var</span> commentEle = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'#_commentText'</span>);
+      <span class="hljs-keyword">var</span> comment = commentEle.val()
       <span class="hljs-keyword">var</span> name = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'#_dnsList'</span>).val()
       <span class="hljs-keyword">if</span> (!!name &amp;&amp; !!comment) {
         <span class="hljs-keyword">this</span>._spinUntil(<span class="hljs-keyword">this</span>.controller.postComment(comment, name))
+        commentEle.val(<span class="hljs-string">''</span>);
       }
     }</pre></div></div>
             
@@ -418,12 +420,11 @@ in the tree that we are managing</p>
               &lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt;
-          &lt;div class="well" id="_commentInput"&gt;
+          &lt;div class="well comment-input" id="_commentInput"&gt;
             &lt;h4&gt;Leave a Comment:&lt;/h4&gt;
             &lt;form role="form" id="_commentForm"&gt;
               &lt;div class="form-group"&gt;
                 &lt;select class="form-control" id="_dnsList"&gt;
-                  &lt;option value="<span class="hljs-subst">${<span class="hljs-keyword">this</span>.DEFAULT_DNS_NAME}</span>"&gt;<span class="hljs-subst">${<span class="hljs-keyword">this</span>.DEFAULT_DNS_NAME}</span>&lt;/option&gt;
                 &lt;/select&gt;
               &lt;/div&gt;
               &lt;div class="form-group"&gt;
@@ -556,7 +557,11 @@ triggered by events emitted from the controller</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>._toggleEnableCommentBtn(<span class="hljs-literal">false</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>._toggleEnableCommentBtn(<span class="hljs-literal">false</span>)
+
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.controller.hasBlockedUsers()) {
+          <span class="hljs-keyword">this</span>._toggleCommentOpts(<span class="hljs-literal">true</span>);
+        }</pre></div></div>
             
         </li>
         
@@ -572,7 +577,9 @@ triggered by events emitted from the controller</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>._renderComments()
-        <span class="hljs-keyword">this</span>._toggleCommentsInput(<span class="hljs-literal">true</span>)
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.controller.hasAuthToken()) {
+         <span class="hljs-keyword">this</span>._toggleCommentsInput(<span class="hljs-literal">true</span>)
+        }
       }
     }
 
@@ -624,7 +631,7 @@ triggered by events emitted from the controller</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.controller.isAdmin()) {
-          <span class="hljs-keyword">let</span> $adminMenu = item.append(<span class="hljs-string">'&lt;div class="media-options"&gt;&lt;/div&gt;'</span>)
+          <span class="hljs-keyword">let</span> $adminMenu = $(<span class="hljs-string">'&lt;div class="media-options"&gt;&lt;/div&gt;'</span>)
           MODULE.log($adminMenu)
 
           $adminMenu.append($(
@@ -636,6 +643,7 @@ triggered by events emitted from the controller</p>
               <span class="hljs-string">`&lt;button class="btn btn-warning btn-xs" type="button" &gt;Block&lt;/button&gt;`</span>
             ).click(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.blockUser(comment.name, index)))
           }
+          item.append($adminMenu);
         }
         <span class="hljs-keyword">return</span> item
       }</pre></div></div>
@@ -715,6 +723,7 @@ triggered by events emitted from the controller</p>
         <span class="hljs-keyword">this</span>.data.user.dns.map(
           <span class="hljs-function">(<span class="hljs-params">list, i</span>) =&gt;</span> <span class="hljs-string">`&lt;option value="<span class="hljs-subst">${list}</span>" <span class="hljs-subst">${(i === <span class="hljs-number">0</span> ? <span class="hljs-string">' selected'</span> : <span class="hljs-string">''</span>)}</span>&gt;<span class="hljs-subst">${list}</span>&lt;/option&gt;`</span>
         ).join(<span class="hljs-string">'\n'</span>))
+      .append(<span class="hljs-string">`&lt;option value="<span class="hljs-subst">${<span class="hljs-keyword">this</span>.DEFAULT_DNS_NAME}</span>"&gt;<span class="hljs-subst">${<span class="hljs-keyword">this</span>.DEFAULT_DNS_NAME}</span>&lt;/option&gt;`</span>);
     }</pre></div></div>
             
         </li>
@@ -744,7 +753,7 @@ triggered by events emitted from the controller</p>
             
             <div class="content"><div class='highlight'><pre>    _selectUnBlockUser () {
       <span class="hljs-keyword">const</span> selected = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'input[name=blockedUsers]:checked'</span>).val()
-      <span class="hljs-keyword">this</span>._hidePopup()
+      <span class="hljs-keyword">this</span>._hidePopup();
       <span class="hljs-keyword">if</span> (!selected) {
         <span class="hljs-keyword">return</span>
       }
@@ -771,7 +780,7 @@ triggered by events emitted from the controller</p>
         &lt;/div&gt;
       &lt;/div&gt;`</span>
       <span class="hljs-keyword">this</span>._showPopup(<span class="hljs-string">'Anonymous User Reference Name'</span>, template, [
-          { <span class="hljs-attr">name</span>: <span class="hljs-string">'Cancel'</span>, <span class="hljs-attr">call</span>: <span class="hljs-keyword">this</span>.closePopup() },
+          { <span class="hljs-attr">name</span>: <span class="hljs-string">'Cancel'</span>, <span class="hljs-attr">call</span>: <span class="hljs-keyword">this</span>._hidePopup() },
           { <span class="hljs-attr">name</span>: <span class="hljs-string">'Block'</span>, <span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>._setUserNameForAnonymous(index) }
       ])
     }</pre></div></div>
@@ -835,6 +844,25 @@ triggered by events emitted from the controller</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
+              <p>Show/hide commentsOptions button</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _toggleCommentOpts (status) {
+      <span class="hljs-keyword">let</span> commentOptsEle = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'#_commentOpt'</span>)
+      MODULE.log(commentOptsEle)
+      <span class="hljs-keyword">return</span> status ? commentOptsEle.show() : commentOptsEle.hide()
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
               <p>Show/hide comment form</p>
 
             </div>
@@ -847,11 +875,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>helper to render a pop up</p>
 
@@ -868,8 +896,8 @@ triggered by events emitted from the controller</p>
         <span class="hljs-keyword">if</span> (!opt.name) {
           <span class="hljs-keyword">return</span>
         }
-        $(footer.appendChild(<span class="hljs-string">`
-          &lt;button name="close" class="btn btn-primary" &gt;<span class="hljs-subst">${opt.name}</span>&lt;/button&gt;`</span>)).click(opt.call)
+        $(footer.append($(<span class="hljs-string">`
+          &lt;button name="close" class="btn btn-primary" &gt;<span class="hljs-subst">${opt.name}</span>&lt;/button&gt;`</span>).click(opt.call)))
       })
       popupEle.show()
     }</pre></div></div>
@@ -877,11 +905,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>hiding the popup</p>
 
@@ -899,11 +927,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-43">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>Spin until the given <code>promise</code> resolved or rejected</p>
 
@@ -924,11 +952,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>Export the View to the MODULE namespace</p>
 
