@@ -313,9 +313,8 @@
         <div class="media">
           <div class="media-body">
             <h4 class="media-heading">
-              <span class="name">${comment.comment.name}</span>
-              <span class="versions"></span>
-              <small>${(new Date(comment.comment.time)).toLocaleString()}</small>
+              <span class="name">${comment.comment.name}</span> 
+              <small><span class="versions"></span> ${(new Date(comment.comment.time)).toLocaleString()}</small>
             </h4>
             ${comment.comment.comment}
             <div class="media-options"></div>

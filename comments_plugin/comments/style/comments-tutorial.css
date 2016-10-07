@@ -41,6 +41,11 @@
   text-transform: capitalize;
 }
 
+.media .media-heading .versions {
+  cursor: pointer;
+  margin-right: 0.5em;
+}
+
 .media .media-heading small {
   margin-left: 8px;
 }
