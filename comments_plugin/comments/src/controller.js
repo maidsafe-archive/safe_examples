@@ -144,7 +144,9 @@
             // for each item found, append them to the commentsList
             this._data.commentList.push({
               index: index,
-              comment: c
+              comment: c.comment,
+              isOwner: c.isOwner,
+              versions: c.dataVersionLength
             })
           })))
       }
@@ -212,7 +214,7 @@
       // and off it goes
       return this._autoRelease(
           // get handle for to be created comment
-          window.safeStructuredData.create(this._authToken, name, 500, payload),
+          window.safeStructuredData.create(this._authToken, name, 501, payload),
           // with that handle
           (currentSDHandleId) => window.safeStructuredData.put(this._authToken, currentSDHandleId)
             // save the data then
@@ -335,13 +337,23 @@
     //  3. once execution completed, clean up the handle by calling `release`
     //
     _autoRelease (promise, fn, release) {
+
+      return this._fullPayloadAutoRelease(
+          promise,
+          (payload) => fn(payload.handleId), // fetch the handleId from the payload
+          release
+        )
+    }
+
+    _fullPayloadAutoRelease(promise, fn, release) {
       return promise
-        .then(res => res.__parsedResponseBody__ ? res.__parsedResponseBody__.handleId : res)
-        .then(handleId => fn(handleId)
-          .then((r) => release(handleId).then(() => r),
-                (e) => release(handleId).then(() => Promise.reject(e)
+        .then(res => res.__parsedResponseBody__ || res)
+        .then( (payload) => fn(payload)
+          .then((r) => release(payload.handleId).then(() => r),
+                (e) => release(payload.handleId).then(() => Promise.reject(e)
           ))
         )
+
     }
 
     _fetchBlockeUsersData () {
@@ -373,12 +385,16 @@
 
     // given a specific address, get a handle, read it, release the handle
     // and return the read Data
-    _readAndRelease (address) {
-      return this._autoRelease(
+    _readCommentAndRelease (address) {
+      return this._fullPayloadAutoRelease(
         // get dataHandle for id
         window.safeStructuredData.getHandle(this._authToken, address),
         // read structured data from dataHandle
-        (handleId) => window.safeStructuredData.readData(this._authToken, handleId),
+        (payload) => window.safeStructuredData.readData(this._authToken, payload.handleId)
+          .then( (data) => {
+            payload.comment = JSON.parse(new Buffer(data).toString())
+            return payload
+          }),
         // release datahandle
         (hId) => window.safeStructuredData.dropHandle(this._authToken, hId)
       )
@@ -391,11 +407,9 @@
           window.safeAppendableData.getDataIdAt(
                 this._authToken, this._currentPostHandleId, index),
           // read data at position
-          (dataid) => this._readAndRelease(dataid),
+          (dataid) => this._readCommentAndRelease(dataid),
           // release data handle
           (dataIdHandle) => window.safeDataId.dropHandle(this._authToken, dataIdHandle))
-        // convert the given data to JSON
-        .then((data) => JSON.parse(new Buffer(data).toString()))
     }
 
     // we like our comments sorted by time
