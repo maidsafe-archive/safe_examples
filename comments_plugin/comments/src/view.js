@@ -72,7 +72,7 @@
         return template
       }
       this._showPopup('Blocked Users', prepareTemplate(), [
-        { name: 'Cancel', call: () => this.closePopup() },
+        { name: 'Cancel', call: () => this._hidePopup() },
         { name: 'Unblock User', call: () => this._selectUnBlockUser() }
       ])
     }
@@ -184,6 +184,11 @@
       } else {
         // all cool, disable the enable button
         this._toggleEnableCommentBtn(false)
+
+        if (this.controller.hasBlockedUsers()) {
+          this._toggleCommentOpts(true);
+        }
+
         // render the comments and the comment box
         this._renderComments()
         if (this.controller.hasAuthToken()) {
@@ -268,7 +273,7 @@
     //
     _selectUnBlockUser () {
       const selected = this.$('input[name=blockedUsers]:checked').val()
-      this._hidePopup()
+      this._hidePopup();
       if (!selected) {
         return
       }
@@ -295,7 +300,7 @@
         </div>
       </div>`
       this._showPopup('Anonymous User Reference Name', template, [
-          { name: 'Cancel', call: this.closePopup() },
+          { name: 'Cancel', call: this._hidePopup() },
           { name: 'Block', call: () => this._setUserNameForAnonymous(index) }
       ])
     }
@@ -313,6 +318,13 @@
       let commentEnableEle = this.$('#_commentEnable')
       MODULE.log(commentEnableEle)
       return status ? commentEnableEle.show() : commentEnableEle.hide()
+    }
+
+    // Show/hide commentsOptions button
+    _toggleCommentOpts (status) {
+      let commentOptsEle = this.$('#_commentOpt')
+      MODULE.log(commentOptsEle)
+      return status ? commentOptsEle.show() : commentOptsEle.hide()
     }
 
     // Show/hide comment form
@@ -333,8 +345,8 @@
         if (!opt.name) {
           return
         }
-        $(footer.appendChild(`
-          <button name="close" class="btn btn-primary" >${opt.name}</button>`)).click(opt.call)
+        $(footer.append($(`
+          <button name="close" class="btn btn-primary" >${opt.name}</button>`).click(opt.call)))
       })
       popupEle.show()
     }

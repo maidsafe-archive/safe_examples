@@ -129,6 +129,11 @@
 
       const fetchAll = (totalComments) => {
         let all = []
+        
+        if (totalComments === 0) {
+          return;
+        } 
+        
         for (var i = 0; i < totalComments; i++) {
           all.push(i)
         }
@@ -223,6 +228,9 @@
           (currentSDHandleId) => window.safeStructuredData.dropHandle(this._authToken, currentSDHandleId))
         // once done, refresh the comments listing
         .then(() => this.fetchComments())
+        .catch(err => {
+          window.alert('');
+        });
     }
 
     //
@@ -262,7 +270,7 @@
     unblockUser (userName) {
       return this._autoRelease(
         // get a serialiased key
-        window.safeSignKey.deserialise(this._authToken, new Buffer(this.data.blockedUsers[userName], 'base64')),
+        window.safeSignKey.deserialise(this._authToken, new Buffer(this._data.blockedUsers[userName], 'base64')),
         (signKeyHandle) =>
           window.safeAppendableData.removeFromFilter(
             this._authToken,
@@ -271,8 +279,8 @@
           .then(res => window.safeAppendableData.post(
               this._authToken, this._currentPostHandleId)
           .then(res => {
-            delete this.data.blockedUsers[userName]
-            const data = new Buffer(JSON.stringify(this.data.blockedUsers)).toString('base64')
+            delete this._data.blockedUsers[userName]
+            const data = new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64')
             return window.safeStructuredData.updateData(
                 this._authToken,
                 this._blockedUserStructureDataHandle,
@@ -290,6 +298,10 @@
 
     hasAuthToken() {
       return !!this._authToken;
+    }
+
+    hasBlockedUsers () {
+      return (this._data.blockedUsers && (Object.keys(this._data.blockedUsers).length !== 0));
     }
 
     //
@@ -341,6 +353,7 @@
           (dataHandle) => window.safeStructuredData.getHandle(this._authToken, dataHandle),
           // release dataHandle
           (dataHandle) => window.safeDataId.dropHandle(this._authToken, dataHandle))
+        .then(res => res.__parsedResponseBody__.handleId)
         .then(handleId => {
           // keep the structured data handle around for later reuse
           this._blockedUserStructureDataHandle = handleId
@@ -395,9 +408,13 @@
     // refresh the blocked users structure
     _getBlockedUsersStructuredData () {
       return this._fetchBlockeUsersData()
-        .then(data => { this._data.blockedUsers = JSON.parse(new Buffer(data).toString()) })
+        .then(data => {
+          this._data.blockedUsers = JSON.parse(new Buffer(data).toString()) 
+        })
         .then(data => this.emit('comments-updated'))
-        .catch(console.error)
+        .catch(err => {
+          console.error(err);
+        });
     }
 
     // let's block a user
@@ -412,7 +429,7 @@
               return window.safeStructuredData.updateData(
                   this._authToken,
                   this._blockedUserStructureDataHandle,
-                  new Buffer(JSON.stringify(this.data.blockedUsers)), this._symmetricCipherOptsHandle)
+                  new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64'), this._symmetricCipherOptsHandle)
                 .then(res => window.safeStructuredData.post(
                     this._authToken,
                     this._blockedUserStructureDataHandle)
@@ -427,7 +444,7 @@
               return window.safeStructuredData.create(
                   this._authToken,
                   this._getLocation() + '_blocked_users', 500,
-                  this._data.blockedUsers,
+                  new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64'),
                   this._symmetricCipherOptsHandle)
                 .then(res => { this._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
                 .then(res => window.safeStructuredData.put(
