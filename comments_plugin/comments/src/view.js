@@ -222,6 +222,64 @@
       }
     }
 
+    _showCommentsHistory (comment) {
+      console.log(comment.history)
+      let length = comment.history.length
+      let curIdx = 0
+      let popup
+
+      let setIndex = (newIdx) => {
+        // show right item
+        popup.find(".historyItem").hide()
+        popup.find('#historyItem-' + newIdx).show()
+        
+        // update buttons
+        popup.find('.prev').attr('disabled', newIdx <= 0)
+        popup.find('.next').attr('disabled', newIdx >= length)
+        curIdx = newIdx
+      }
+
+      let template = `<div>
+        <div>
+          <button class="prev">←</button> <button class="next">→</button>
+        <div>
+        <div>`
+
+      let renderComment = (entry, index) => {
+        template += `
+          <div class="historyItem" id="historyItem-${index}">
+            <h4 class="media-heading">edit ${(new Date(entry.editedTime || entry.time)).toLocaleString()} <small>version ${index + 1} / ${length +1}</small></h4>
+            ${entry.comment}
+          </div>
+        `
+      }
+
+      comment.history.forEach(renderComment)
+      renderComment(comment.comment, length)
+      template += "</div>"
+
+      popup = this._showPopup('Comment History', template, [
+        { name: 'Cancel', call: () => this._hidePopup() }
+      ])
+
+      popup.find('.prev').click( () => setIndex(curIdx - 1) )
+      popup.find('.next').click( () => setIndex(curIdx + 1) )
+
+      setIndex(length - 1) // we startup with the last item
+    }
+
+    showCommentHistory (comment, index) {
+      if (comment.history) {
+        // have been fetch already
+        this._showCommentsHistory(comment)
+      }
+
+      this._spinUntil(this.controller.fetchHistory(comment, index)).then( () => {
+        this._showCommentsHistory(comment)
+      })
+
+    }
+
     _renderComments () {
       MODULE.log('refreshing comments list')
 
@@ -251,7 +309,7 @@
           let version = item.find('.versions')
             version.attr('title', 'Last edited: ' + (new Date(comment.comment.editedTime)).toLocaleString())
             version.html(`✎ ${comment.versions}`)
-            version.click(() => this.showCommentVersions(comment, index))
+            version.click(() => this.showCommentHistory(comment, index))
         }
 
         let $actionMenu = item.find('.media-options')
@@ -390,6 +448,7 @@
           <button name="close" class="btn btn-primary" >${opt.name}</button>`).click(opt.call)))
       })
       popupEle.show()
+      return popupEle
     }
 
     // hiding the popup

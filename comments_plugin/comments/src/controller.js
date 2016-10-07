@@ -119,6 +119,43 @@
         })
     }
 
+    fetchHistory (comment, index) {
+      let versionsCount = comment.versions;
+
+      let readAllPreviousVersions = (handleId) => {
+        let all = []
+
+        for (var i = 0; i < versionsCount -1; i++) {
+          all.push(i)
+        }
+
+        // fetch all the items in parallel, one per version
+        return Promise.all(
+          // read the comment per version
+          all.map(v => window.safeStructuredData.readData(this._authToken, handleId, v)
+              .then(data => JSON.parse(new Buffer(data).toString()))
+        ))
+      }
+      return this._autoRelease(
+        // get data handle for position
+        window.safeAppendableData.getDataIdAt(
+              this._authToken, this._currentPostHandleId, index),
+        (address) => this._autoRelease(
+          // exchange the address for a structured data handle
+          window.safeStructuredData.getHandle(this._authToken, address),
+          // read all the versions
+          readAllPreviousVersions,
+          // release structured data handl
+          (hId) => window.safeStructuredData.dropHandle(this._authToken, hId)),
+        // release data handle
+        (dataIdHandle) => window.safeDataId.dropHandle(this._authToken, dataIdHandle))
+      .then(history => {
+        // then safe them on the original comment
+        comment.history = history
+        return comment
+      })
+    }
+
     //
     // comment activities
     //
@@ -245,8 +282,6 @@
         time: original.time,  // we keep the original time so the order stays in tact
         editedTime: (new Date()).getTime()
       })).toString('base64')
-
-      console.log(this._authToken, this._currentPostHandleId, index, payload)
 
       return this._autoRelease(
           // get data handle for position
