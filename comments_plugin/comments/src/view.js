@@ -223,8 +223,8 @@
     }
 
     _showCommentsHistory (comment) {
-      console.log(comment.history)
       let length = comment.history.length
+      let current = comment.comment.comment
       let curIdx = 0
       let popup
 
@@ -239,17 +239,28 @@
         curIdx = newIdx
       }
 
-      let template = `<div>
-        <div>
-          <button class="prev">←</button> <button class="next">→</button>
-        <div>
-        <div>`
+      let updateDiffToggle = (showDiff) => {
+        if (showDiff) {
+          popup.find('.diff').show()
+          popup.find('.raw').hide()
+        } else {
+          popup.find('.raw').show()
+          popup.find('.diff').hide()
+        }
+      }
+
+      let template = `<div class="history">`
 
       let renderComment = (entry, index) => {
         template += `
           <div class="historyItem" id="historyItem-${index}">
             <h4 class="media-heading">edit ${(new Date(entry.editedTime || entry.time)).toLocaleString()} <small>version ${index + 1} / ${length +1}</small></h4>
-            ${entry.comment}
+            <div class="raw">
+              ${entry.comment}
+            </div>
+            <div class="diff">
+              ${MODULE.inlineDiff(entry.comment, current)}
+            </div>
           </div>
         `
       }
@@ -258,14 +269,20 @@
       renderComment(comment.comment, length)
       template += "</div>"
 
-      popup = this._showPopup('Comment History', template, [
-        { name: 'Cancel', call: () => this._hidePopup() }
+      popup = this._showPopup(`Comment History
+          <div class="actions">
+             <input type="checkbox" id="diffToggle" name="diffToggle" checked> Show as Diff</label> <button class="prev">←</button> <button class="next">→</button> <label for="diffToggle">
+          </div>
+        `, template, [
+        { name: 'close', call: () => this._hidePopup() }
       ])
 
       popup.find('.prev').click( () => setIndex(curIdx - 1) )
       popup.find('.next').click( () => setIndex(curIdx + 1) )
+      popup.find('#diffToggle').change( () => updateDiffToggle(popup.find('#diffToggle:checked').length > 0))
 
       setIndex(length - 1) // we startup with the last item
+      updateDiffToggle(true)
     }
 
     showCommentHistory (comment, index) {
@@ -313,7 +330,6 @@
         }
 
         let $actionMenu = item.find('.media-options')
-        console.log($actionMenu, comment.isOwner)
 
         if (comment.isOwner) {
           $actionMenu.append($(

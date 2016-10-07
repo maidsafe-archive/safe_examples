@@ -132,3 +132,28 @@
 .popup .popup-container .foot button {
   margin-left: 12px;
 }
+
+.popup .actions {
+  display: inline-block;
+  float: right;
+  font-size: 0.75em;
+}
+.popup .actions label {
+  margin-right: 5px;
+} 
+
+.popup .actions button {
+  line-height: 1.25em;
+}
+
+.popup .history {
+  margin: 0 5px;
+}
+
+.popup .history del {
+  color: #a94442;
+}
+
+.popup .history ins {
+  color: #3c763d;
+}
