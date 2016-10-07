@@ -7,7 +7,7 @@
 	margin-top: 24px;
 }
 
-.comment-block .comment-enable, .comment-block .comments {
+.comment-block .comment-enable, .comment-block .comment-input, .comment-block .comments {
   display: none;
 }
 

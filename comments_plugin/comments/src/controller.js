@@ -207,7 +207,7 @@
       // and off it goes
       return this._autoRelease(
           // get handle for to be created comment
-          window.safeStructuredData.create(this._authToken, name, 501, payload),
+          window.safeStructuredData.create(this._authToken, name, 500, payload),
           // with that handle
           (currentSDHandleId) => window.safeStructuredData.put(this._authToken, currentSDHandleId)
             // save the data then
@@ -288,6 +288,10 @@
       )
     }
 
+    hasAuthToken() {
+      return !!this._authToken;
+    }
+
     //
     // Internals
     //
@@ -332,7 +336,7 @@
       return this._autoRelease(
           // get dataHandle
           window.safeDataId.getStructuredDataHandle(
-            this._authToken, this._getLocation() + '_blocked_users', 501),
+            this._authToken, this._getLocation() + '_blocked_users', 500),
           // replace dataHandle With structuredDataHandle
           (dataHandle) => window.safeStructuredData.getHandle(this._authToken, dataHandle),
           // release dataHandle
@@ -383,7 +387,7 @@
 
     // we like our comments sorted by time
     _sortComments () {
-      this.commentList.sort((a, b) => {
+      this._data.commentList.sort((a, b) => {
         return new Date((b.data || b.comment).time) - new Date((a.data || a.comment).time)
       })
     }
@@ -391,46 +395,49 @@
     // refresh the blocked users structure
     _getBlockedUsersStructuredData () {
       return this._fetchBlockeUsersData()
-        .then(data => { this.data.blockedUsers = JSON.parse(new Buffer(data).toString()) })
+        .then(data => { this._data.blockedUsers = JSON.parse(new Buffer(data).toString()) })
         .then(data => this.emit('comments-updated'))
         .catch(console.error)
     }
 
     // let's block a user
     _saveBlockedUser (userName, signKeyHandle) {
-      // we already have a list of blocked users
-      // update the block
-      if (this._blockedUserStructureDataHandle !== null) {
-        return this._withSignedKey((serialisedSignKey) => {
-          this.data.blockedUsers[userName] = serialisedSignKey
-          return window.safeStructuredData.updateData(
-              this._authToken,
-              this._blockedUserStructureDataHandle,
-              new Buffer(JSON.stringify(this.data.blockedUsers)), this._symmetricCipherOptsHandle)
-            .then(res => window.safeStructuredData.post(
-                this._authToken,
-                this._blockedUserStructureDataHandle)
-            )
-        })
-      } else {
-        // This is the first time a user is blocked, created
-        // the block structure to keep track of the users blocked
-        return this._withSignedKey((serialisedSignKey) => {
-          this.data.blockedUsers = {}
-          this.data.blockedUsers[userName] = serialisedSignKey
-          return window.safeStructuredData.create(
-              this._authToken,
-              this._getLocation() + '_blocked_users', 501,
-              this.data.blockedUsers,
-              this._symmetricCipherOptsHandle)
-            .then(res => { this._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
-            .then(res => window.safeStructuredData.put(
+      this._getCypher()
+        .then(() => {
+          // we already have a list of blocked users
+          // update the block
+          if (this._blockedUserStructureDataHandle !== null) {
+            return this._withSignedKey(signKeyHandle, (serialisedSignKey) => {
+              this._data.blockedUsers[userName] = serialisedSignKey
+              return window.safeStructuredData.updateData(
                   this._authToken,
-                  this._blockedUserStructureDataHandle)
+                  this._blockedUserStructureDataHandle,
+                  new Buffer(JSON.stringify(this.data.blockedUsers)), this._symmetricCipherOptsHandle)
+                .then(res => window.safeStructuredData.post(
+                    this._authToken,
+                    this._blockedUserStructureDataHandle)
+                )
+            })
+          } else {
+            // This is the first time a user is blocked, created
+            // the block structure to keep track of the users blocked
+            return this._withSignedKey(signKeyHandle, (serialisedSignKey) => {
+              this._data.blockedUsers = {}
+              this._data.blockedUsers[userName] = serialisedSignKey
+              return window.safeStructuredData.create(
+                  this._authToken,
+                  this._getLocation() + '_blocked_users', 500,
+                  this._data.blockedUsers,
+                  this._symmetricCipherOptsHandle)
+                .then(res => { this._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
+                .then(res => window.safeStructuredData.put(
+                      this._authToken,
+                      this._blockedUserStructureDataHandle)
+                )
+            }
             )
-        }
-        )
-      }
+          }
+        });
     }
 
     // fetch the public names of the user
@@ -450,6 +457,11 @@
           // and emit an event so the UI can update
           this.emit('user-updated')
         })
+        .catch(err => {
+          if (err.message.indexOf('401 Unauthorized') !== -1) {
+            return (this._authToken ? this._authoriseApp() : this.fetchComments());
+          }
+        });
     }
 
     // starting up, we need to authorise the app
@@ -457,9 +469,17 @@
       MODULE.log('Authorising application')
       return window.safeAuth.authorise(this._data.appInfo, this._LOCAL_STORAGE_TOKEN_KEY)
         // convert tokeb
-        .then((res) => res.__parsedResponseBody__.token)
+        .then((res) => {
+          if (typeof res === 'object') {
+            return res.__parsedResponseBody__.token
+          }
+          return res;
+        })
         .then((token) => {
-          // keep token for later reuse
+          if (typeof token !== 'string') {
+            return;
+          }
+          // keep token for later reus`e
           this._authToken = token
           window.safeAuth.setAuthToken(this._LOCAL_STORAGE_TOKEN_KEY, token)
         })
@@ -470,6 +490,7 @@
           // remove the auth token
           console.error(err)
           this._authToken = null
+          this.fetchComments();
           return Promise.reject(err)
         })
     }

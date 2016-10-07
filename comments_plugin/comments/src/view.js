@@ -83,10 +83,12 @@
 
     // Fired when the comment form is submitted via click
     addComment () {
-      var comment = this.$('#_commentText').val()
+      var commentEle = this.$('#_commentText');
+      var comment = commentEle.val()
       var name = this.$('#_dnsList').val()
       if (!!name && !!comment) {
         this._spinUntil(this.controller.postComment(comment, name))
+        commentEle.val('');
       }
     }
 
@@ -128,12 +130,11 @@
               </div>
             </div>
           </div>
-          <div class="well" id="_commentInput">
+          <div class="well comment-input" id="_commentInput">
             <h4>Leave a Comment:</h4>
             <form role="form" id="_commentForm">
               <div class="form-group">
                 <select class="form-control" id="_dnsList">
-                  <option value="${this.DEFAULT_DNS_NAME}">${this.DEFAULT_DNS_NAME}</option>
                 </select>
               </div>
               <div class="form-group">
@@ -185,7 +186,9 @@
         this._toggleEnableCommentBtn(false)
         // render the comments and the comment box
         this._renderComments()
-        this._toggleCommentsInput(true)
+        if (this.controller.hasAuthToken()) {
+         this._toggleCommentsInput(true)
+        }
       }
     }
 
@@ -213,7 +216,7 @@
 
         // admins have extra actions they can do on the item
         if (this.controller.isAdmin()) {
-          let $adminMenu = item.append('<div class="media-options"></div>')
+          let $adminMenu = $('<div class="media-options"></div>')
           MODULE.log($adminMenu)
 
           $adminMenu.append($(
@@ -225,6 +228,7 @@
               `<button class="btn btn-warning btn-xs" type="button" >Block</button>`
             ).click(() => this.blockUser(comment.name, index)))
           }
+          item.append($adminMenu);
         }
         return item
       }
@@ -254,6 +258,7 @@
         this.data.user.dns.map(
           (list, i) => `<option value="${list}" ${(i === 0 ? ' selected' : '')}>${list}</option>`
         ).join('\n'))
+      .append(`<option value="${this.DEFAULT_DNS_NAME}">${this.DEFAULT_DNS_NAME}</option>`);
     }
 
     //
