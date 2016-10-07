@@ -4,33 +4,27 @@ The plugin works on safe_browser. This provides ability to add comments to any h
 
 ## Usage instructions:
 
-### Dependencies
-
-The plugin depends on **bootstrap v3.3.7** for UI and also **jquery v3.1.1.**
-The dependencies are included in this repository itself.
-
-
 ### Getting Started
 
-#### Include dependencies
-   `<link href="./bootstrap-v3.3.7.min.css" rel="stylesheet">`
-    `<script type="application/javascript" src="./jquery-3.1.1.min.js"/>`
+Copy the `comments`-folder script into your website.
 
-#### Include tutorial plugin
-Add the stylesheet to your html page:
-    `<link href="./comments-tutorial.css" rel="stylesheet">`
-
-Add the script to your html page:
-    `<script type="application/javascript" src="./comments-tutorial.js"/>`
+Add the script to your html page :
+```HTML
+<script>
+window.__COMMENTS_ID = "#comments"
+</script>
+<script type="application/javascript" id="comments-loader" src="./comments/main.js"/>
+```
 
 ### Initialise
 
-The library must be initialised by invoking the `commentsTutorial.loadComments();` function.
+If you specify the `__COMMENTS_ID` as shown the library will automatically initialize at startup and add the comments UI to the specified element. You can specify any id there. Omitting that reference, comments won't be loaded directly but need to be invoked directly via:
 
-The library will add comments UI to the `#comments` `div` element or the UI can be added to
-a specific DOM element by passing it's selector to the `init` method.
-
-Example, `commentsTutorial.loadComments('#myDiv')`
+```
+<script>
+  window.safeComments.init('#myCommentsId');
+</script>
+```
 
 
 ## Enabling Comments for page
@@ -48,3 +42,11 @@ A simple static page with comments integrated is demonstrated.
 # Limitations
  - Can not edit comments
  - AppendableData has a size limitation of 100Kb. Comments can not be added if the size of the appendable data has reached the max
+
+## Inline Documentation
+
+Is rendered using (docco](https://jashkenas.github.io/docco/) and can be found in the [docs/](./docs/app.html] folder. To refresh the documentation to the latest inline comments run:
+
+```bash
+docco comments/src/*
+```
