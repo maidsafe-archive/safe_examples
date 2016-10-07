@@ -92,6 +92,19 @@
       }
     }
 
+    editComment (comment, index) {
+      this._showPopup('Edit Comment', `
+        <form role="form" id="_editCommentForm">
+          <div class="form-group">
+            <textarea id="_editCommentText" class="form-control" rows="4">${comment.comment.comment}</textarea>
+          </div>
+        </form>
+        `, [
+        { name: 'Cancel', call: () => this._hidePopup() },
+        { name: 'Save new version', call: () => this._saveEditedComment() }
+      ])
+    }
+
     // Delete the comment at a specific index
     deleteComment (comment, index) {
       this._spinUntil(this.controller.deleteComment(index))
@@ -212,28 +225,43 @@
         let item = $(`
         <div class="media">
           <div class="media-body">
-            <h4 class="media-heading">${comment.name}
-              <small>${(new Date(comment.time)).toLocaleString()}</small>
+            <h4 class="media-heading">
+              <span class="name">${comment.comment.name}</span>
+              <span class="versions"></span>
+              <small>${(new Date(comment.comment.time)).toLocaleString()}</small>
             </h4>
-            ${comment.comment}
+            ${comment.comment.comment}
+            <div class="media-options"></div>
           </div>
         </div>`)
 
+        if (comment.versions > 1) {
+          let version = item.find('.versions')
+            version.html(`✎ ${comment.versions}`)
+            version.click(() => this.showCommentVersions(comment, index))
+        }
+
+        let $actionMenu = item.find('.media-options')
+        console.log($actionMenu, comment.isOwner)
+
+        if (comment.isOwner) {
+          $actionMenu.append($(
+            `<button class="btn btn-xs" type="button">Edit</button>`
+            ).click(() => this.editComment(comment, index)))
+        }
+
         // admins have extra actions they can do on the item
         if (this.controller.isAdmin()) {
-          let $adminMenu = $('<div class="media-options"></div>')
-          MODULE.log($adminMenu)
 
-          $adminMenu.append($(
+          $actionMenu.append($(
             `<button class="btn btn-danger btn-xs" type="button">Delete</button>`
             ).click(() => this.deleteComment(comment, index)))
 
           if (!isBlockedUser(comment.name)) {
-            $adminMenu.append($(
+            $actionMenu.append($(
               `<button class="btn btn-warning btn-xs" type="button" >Block</button>`
             ).click(() => this.blockUser(comment.name, index)))
           }
-          item.append($adminMenu);
         }
         return item
       }
@@ -245,7 +273,7 @@
       if (this.data.commentList.length) {
         // for every comment found, render the comment at the index
         this.data.commentList.forEach((comment) => {
-          target.append(renderComment(comment.comment, comment.index))
+          target.append(renderComment(comment, comment.index))
         })
         target.show()
       } else {
