@@ -207,30 +207,29 @@
         name: publicName,
         comment: comment,
         time: timeStamp
-      })).toString('base64')
+      }));
 
       // and off it goes
       return this._autoRelease(
-          // get handle for to be created comment
-          window.safeStructuredData.create(this._authToken, name, 500, payload),
-          // with that handle
-          (currentSDHandleId) => window.safeStructuredData.put(this._authToken, currentSDHandleId)
-            // save the data then
-            .then(() => this._autoRelease(
-              // replace the structured Data handle for a dataID handle
-              window.safeStructuredData.getDataIdHandle(this._authToken, currentSDHandleId),
-              // append that handle to the appendable data
-              (dataIdHandle) => window.safeAppendableData.append(this._authToken, this._currentPostHandleId, dataIdHandle),
-              // release the dataId handle
-              (dataIdHandle) => window.safeDataId.dropHandle(this._authToken, dataIdHandle)
-            )),
-          // release the structured data handle
-          (currentSDHandleId) => window.safeStructuredData.dropHandle(this._authToken, currentSDHandleId))
-        // once done, refresh the comments listing
-        .then(() => this.fetchComments())
-        .catch(err => {
-          window.alert('');
-        });
+        window.safeImmutableData.getWriterHandle(this._authToken),
+        // write data
+        (writerHandle) => window.safeImmutableData.write(this._authToken, writerHandle, payload)
+          // save the data then
+          .then(() => this._autoRelease(
+            // replace the structured Data handle for a dataID handle
+            window.safeImmutableData.closeWriter(this._authToken, writerHandle, this._symmetricCipherOptsHandle),
+            // append that handle to the appendable data
+            (dataIdHandle) => window.safeAppendableData.append(this._authToken, this._currentPostHandleId, dataIdHandle),
+            // release the dataId handle
+            (dataIdHandle) => window.safeDataId.dropHandle(this._authToken, dataIdHandle)
+            )
+            .catch(err => {
+              window.alert('Could not post a comment');
+            })
+          ),
+          (writerHandle) => window.safeImmutableData.dropWriter(this._authToken, writerHandle)
+          .then(() => this.fetchComments())
+        );
     }
 
     //
@@ -375,13 +374,13 @@
     // and return the read Data
     _readAndRelease (address) {
       return this._autoRelease(
-        // get dataHandle for id
-        window.safeStructuredData.getHandle(this._authToken, address),
-        // read structured data from dataHandle
-        (handleId) => window.safeStructuredData.readData(this._authToken, handleId),
-        // release datahandle
-        (hId) => window.safeStructuredData.dropHandle(this._authToken, hId)
-      )
+        // get reader handle
+        window.safeImmutableData.getReaderHandle(this._authToken, address),
+        // read immutable data from handle id
+        (handleId) => window.safeImmutableData.read(this._authToken, handleId),
+        // release handle id
+        (hId) => window.safeImmutableData.dropReader(this._authToken, hId)
+        )
     }
 
     // fetch the comment at `index
@@ -419,48 +418,45 @@
 
     // let's block a user
     _saveBlockedUser (userName, signKeyHandle) {
-      this._getCypher()
-        .then(() => {
-          // we already have a list of blocked users
-          // update the block
-          if (this._blockedUserStructureDataHandle !== null) {
-            return this._withSignedKey(signKeyHandle, (serialisedSignKey) => {
-              this._data.blockedUsers[userName] = serialisedSignKey
-              return window.safeStructuredData.updateData(
-                  this._authToken,
-                  this._blockedUserStructureDataHandle,
-                  new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64'), this._symmetricCipherOptsHandle)
-                .then(res => window.safeStructuredData.post(
-                    this._authToken,
-                    this._blockedUserStructureDataHandle)
-                )
-            })
-          } else {
-            // This is the first time a user is blocked, created
-            // the block structure to keep track of the users blocked
-            return this._withSignedKey(signKeyHandle, (serialisedSignKey) => {
-              this._data.blockedUsers = {}
-              this._data.blockedUsers[userName] = serialisedSignKey
-              return window.safeStructuredData.create(
-                  this._authToken,
-                  this._getLocation() + '_blocked_users', 500,
-                  new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64'),
-                  this._symmetricCipherOptsHandle)
-                .then(res => { this._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
-                .then(res => window.safeStructuredData.put(
-                      this._authToken,
-                      this._blockedUserStructureDataHandle)
-                )
-            }
+      // we already have a list of blocked users
+      // update the block
+      if (this._blockedUserStructureDataHandle !== null) {
+        return this._withSignedKey(signKeyHandle, (serialisedSignKey) => {
+          this._data.blockedUsers[userName] = serialisedSignKey
+          return window.safeStructuredData.updateData(
+              this._authToken,
+              this._blockedUserStructureDataHandle,
+              new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64'), this._symmetricCipherOptsHandle)
+            .then(res => window.safeStructuredData.post(
+                this._authToken,
+                this._blockedUserStructureDataHandle)
             )
-          }
-        });
+        })
+      } else {
+        // This is the first time a user is blocked, created
+        // the block structure to keep track of the users blocked
+        return this._withSignedKey(signKeyHandle, (serialisedSignKey) => {
+          this._data.blockedUsers = {}
+          this._data.blockedUsers[userName] = serialisedSignKey
+          return window.safeStructuredData.create(
+              this._authToken,
+              this._getLocation() + '_blocked_users', 500,
+              new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64'),
+              this._symmetricCipherOptsHandle)
+            .then(res => { this._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
+            .then(res => window.safeStructuredData.put(
+                  this._authToken,
+                  this._blockedUserStructureDataHandle)
+            )
+        }
+        )
+      }
     }
 
     // fetch the public names of the user
     _getDns () {
       MODULE.log('Fetching DNS records')
-      return window.safeDNS.getDns(this._authToken)
+      return window.safeDNS.listLongNames(this._authToken)
         // convert
         .then((res) => res.__parsedResponseBody__)
         .then((dnsData) => {
@@ -471,6 +467,7 @@
             // but do that once we are done with this cycle
             window.setTimeout(() => this._getBlockedUsersStructuredData(), 10)
           }
+          this._getCypher();
           // and emit an event so the UI can update
           this.emit('user-updated')
         })
