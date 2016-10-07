@@ -84,7 +84,7 @@
     // Fired when the comment form is submitted via click
     addComment () {
       var commentEle = this.$('#_commentText');
-      var comment = commentEle.val()
+      var comment = commentEle.val().trim()
       var name = this.$('#_dnsList').val()
       if (!!name && !!comment) {
         this._spinUntil(this.controller.postComment(comment, name))
@@ -92,6 +92,8 @@
       }
     }
 
+    // show the pop up allowing the owner to change their
+    // own comments
     editComment (comment, index) {
       this._showPopup('Edit Comment', `
         <form role="form" id="_editCommentForm">
@@ -101,8 +103,18 @@
         </form>
         `, [
         { name: 'Cancel', call: () => this._hidePopup() },
-        { name: 'Save new version', call: () => this._saveEditedComment() }
+        { name: 'Save new version', call: () => this._saveNewCommentVersion(comment.comment, index) }
       ])
+    }
+
+    _saveNewCommentVersion (payload, index) {
+      let newContent = this.$('#_editCommentText').val().trim()
+      this._hidePopup()
+      if (newContent === payload.comment) {
+        // nothing has been changed. ignore
+        return
+      }
+      this._spinUntil(this.controller.updateComment(index, payload, newContent))
     }
 
     // Delete the comment at a specific index
@@ -237,6 +249,7 @@
 
         if (comment.versions > 1) {
           let version = item.find('.versions')
+            version.attr('title', 'Last edited: ' + (new Date(comment.comment.editedTime)).toLocaleString())
             version.html(`✎ ${comment.versions}`)
             version.click(() => this.showCommentVersions(comment, index))
         }

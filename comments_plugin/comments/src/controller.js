@@ -235,6 +235,38 @@
         });
     }
 
+    updateComment (index, original, newText) {
+      MODULE.log(`updating comment @${index} by ${original.name} : ${newText}`)
+
+      // convert the input into data SAFEnet understands
+      const payload = new Buffer(JSON.stringify({
+        name: original.name,
+        comment: newText,
+        time: original.time,  // we keep the original time so the order stays in tact
+        editedTime: (new Date()).getTime()
+      })).toString('base64')
+
+      console.log(this._authToken, this._currentPostHandleId, index, payload)
+
+      return this._autoRelease(
+          // get data handle for position
+          window.safeAppendableData.getDataIdAt(
+                this._authToken, this._currentPostHandleId, index),
+          // read data at position
+          (address) => this._autoRelease(
+              // get dataHandle for id
+              window.safeStructuredData.getHandle(this._authToken, address),
+              // and push a new version of the comment
+              (handleId) => window.safeStructuredData.updateData(this._authToken, handleId, payload)
+                  .then(r => window.safeStructuredData.post(this._authToken, handleId)),
+              // release structured data handle
+              (dataIdHandle) => window.safeStructuredData.dropHandle(this._authToken, dataIdHandle)),
+          // release data handle
+          (dataIdHandle) => window.safeDataId.dropHandle(this._authToken, dataIdHandle))
+        // refresh the comments
+        .then(() => this.fetchComments())
+    }
+
     //
     // Delete a comment at the given index
     //
