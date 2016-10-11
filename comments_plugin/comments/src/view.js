@@ -343,10 +343,10 @@
             `<button class="btn btn-danger btn-xs" type="button">Delete</button>`
             ).click(() => this.deleteComment(comment, index)))
 
-          if (!isBlockedUser(comment.name)) {
+          if (!isBlockedUser(comment.comment.name)) {
             $actionMenu.append($(
               `<button class="btn btn-warning btn-xs" type="button" >Block</button>`
-            ).click(() => this.blockUser(comment.name, index)))
+            ).click(() => this.blockUser(comment.comment.name, index)))
           }
         }
         return item

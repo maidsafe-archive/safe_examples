@@ -541,7 +541,7 @@
     // fetch the public names of the user
     _getDns () {
       MODULE.log('Fetching DNS records')
-      return window.safeDNS.getDns(this._authToken)
+      return window.safeDNS.listLongNames(this._authToken)
         // convert
         .then((res) => res.__parsedResponseBody__)
         .then((dnsData) => {
