@@ -329,7 +329,7 @@ in the tree that we are managing</p>
             
             <div class="content"><div class='highlight'><pre>    addComment () {
       <span class="hljs-keyword">var</span> commentEle = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'#_commentText'</span>);
-      <span class="hljs-keyword">var</span> comment = commentEle.val()
+      <span class="hljs-keyword">var</span> comment = commentEle.val().trim()
       <span class="hljs-keyword">var</span> name = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'#_dnsList'</span>).val()
       <span class="hljs-keyword">if</span> (!!name &amp;&amp; !!comment) {
         <span class="hljs-keyword">this</span>._spinUntil(<span class="hljs-keyword">this</span>.controller.postComment(comment, name))
@@ -346,6 +346,56 @@ in the tree that we are managing</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
+              <p>show the pop up allowing the owner to change their
+own comments</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    editComment (comment, index) {
+      <span class="hljs-keyword">this</span>._showPopup(<span class="hljs-string">'Edit Comment'</span>, <span class="hljs-string">`
+        &lt;form role="form" id="_editCommentForm"&gt;
+          &lt;div class="form-group"&gt;
+            &lt;textarea id="_editCommentText" class="form-control" rows="4"&gt;<span class="hljs-subst">${comment.comment.comment}</span>&lt;/textarea&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+        `</span>, [
+        { <span class="hljs-attr">name</span>: <span class="hljs-string">'Cancel'</span>, <span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>._hidePopup() },
+        { <span class="hljs-attr">name</span>: <span class="hljs-string">'Save new version'</span>, <span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>._saveNewCommentVersion(comment.comment, index) }
+      ])
+    }
+
+    _saveNewCommentVersion (payload, index) {
+      <span class="hljs-keyword">let</span> newContent = <span class="hljs-keyword">this</span>.$(<span class="hljs-string">'#_editCommentText'</span>).val().trim()
+      <span class="hljs-keyword">this</span>._hidePopup()
+      <span class="hljs-keyword">if</span> (newContent === payload.comment) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>nothing has been changed. ignore</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span>
+      }
+      <span class="hljs-keyword">this</span>._spinUntil(<span class="hljs-keyword">this</span>.controller.updateComment(index, payload, newContent))
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
               <p>Delete the comment at a specific index</p>
 
             </div>
@@ -357,11 +407,11 @@ in the tree that we are managing</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>block the userName at index</p>
 
@@ -378,11 +428,11 @@ in the tree that we are managing</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Internals</p>
 
@@ -391,11 +441,11 @@ in the tree that we are managing</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>render the inital template</p>
 
@@ -451,11 +501,11 @@ in the tree that we are managing</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>link the buttons from th starting template to the given
 actions</p>
@@ -471,46 +521,16 @@ actions</p>
         </li>
         
         
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
-              </div>
-              <p>Data driven UI updates
-triggered by events emitted from the controller</p>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-23">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
-              </div>
-              <p>the comments-updated was called, we need refresh</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    _refresh () {</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>stop spinning (we were)</p>
+              <p>Data driven UI updates
+triggered by events emitted from the controller</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">this</span>._toggleSpinner(<span class="hljs-literal">false</span>)</pre></div></div>
             
         </li>
         
@@ -521,11 +541,11 @@ triggered by events emitted from the controller</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>indicating we aren’t enbled yet</p>
+              <p>the comments-updated was called, we need refresh</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.controller.commentsEnabled()) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    _refresh () {</pre></div></div>
             
         </li>
         
@@ -535,6 +555,36 @@ triggered by events emitted from the controller</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>stop spinning (we were)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">this</span>._toggleSpinner(<span class="hljs-literal">false</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>indicating we aren’t enbled yet</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.controller.commentsEnabled()) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>so show the ‘enable’ button and disable the comments block</p>
 
@@ -547,11 +597,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>all cool, disable the enable button</p>
 
@@ -566,11 +616,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>render the comments and the comment box</p>
 
@@ -581,6 +631,119 @@ triggered by events emitted from the controller</p>
          <span class="hljs-keyword">this</span>._toggleCommentsInput(<span class="hljs-literal">true</span>)
         }
       }
+    }
+
+    _showCommentsHistory (comment) {
+      <span class="hljs-keyword">let</span> length = comment.history.length
+      <span class="hljs-keyword">let</span> current = comment.comment.comment
+      <span class="hljs-keyword">let</span> curIdx = <span class="hljs-number">0</span>
+      <span class="hljs-keyword">let</span> popup
+
+      <span class="hljs-keyword">let</span> setIndex = <span class="hljs-function">(<span class="hljs-params">newIdx</span>) =&gt;</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>show right item</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        popup.find(<span class="hljs-string">".historyItem"</span>).hide()
+        popup.find(<span class="hljs-string">'#historyItem-'</span> + newIdx).show()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>update buttons</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        popup.find(<span class="hljs-string">'.prev'</span>).attr(<span class="hljs-string">'disabled'</span>, newIdx &lt;= <span class="hljs-number">0</span>)
+        popup.find(<span class="hljs-string">'.next'</span>).attr(<span class="hljs-string">'disabled'</span>, newIdx &gt;= length)
+        curIdx = newIdx
+      }
+
+      <span class="hljs-keyword">let</span> updateDiffToggle = <span class="hljs-function">(<span class="hljs-params">showDiff</span>) =&gt;</span> {
+        <span class="hljs-keyword">if</span> (showDiff) {
+          popup.find(<span class="hljs-string">'.diff'</span>).show()
+          popup.find(<span class="hljs-string">'.raw'</span>).hide()
+        } <span class="hljs-keyword">else</span> {
+          popup.find(<span class="hljs-string">'.raw'</span>).show()
+          popup.find(<span class="hljs-string">'.diff'</span>).hide()
+        }
+      }
+
+      <span class="hljs-keyword">let</span> template = <span class="hljs-string">`&lt;div class="history"&gt;`</span>
+
+      <span class="hljs-keyword">let</span> renderComment = <span class="hljs-function">(<span class="hljs-params">entry, index</span>) =&gt;</span> {
+        template += <span class="hljs-string">`
+          &lt;div class="historyItem" id="historyItem-<span class="hljs-subst">${index}</span>"&gt;
+            &lt;h4 class="media-heading"&gt;edit <span class="hljs-subst">${(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(entry.editedTime || entry.time)).toLocaleString()}</span> &lt;small&gt;version <span class="hljs-subst">${index + <span class="hljs-number">1</span>}</span> / <span class="hljs-subst">${length +<span class="hljs-number">1</span>}</span>&lt;/small&gt;&lt;/h4&gt;
+            &lt;div class="raw"&gt;
+              <span class="hljs-subst">${entry.comment}</span>
+            &lt;/div&gt;
+            &lt;div class="diff"&gt;
+              <span class="hljs-subst">${MODULE.inlineDiff(entry.comment, current)}</span>
+            &lt;/div&gt;
+          &lt;/div&gt;
+        `</span>
+      }
+
+      comment.history.forEach(renderComment)
+      renderComment(comment.comment, length)
+      template += <span class="hljs-string">"&lt;/div&gt;"</span>
+
+      popup = <span class="hljs-keyword">this</span>._showPopup(<span class="hljs-string">`Comment History
+          &lt;div class="actions"&gt;
+             &lt;input type="checkbox" id="diffToggle" name="diffToggle" checked&gt; Show as Diff&lt;/label&gt; &lt;button class="prev"&gt;←&lt;/button&gt; &lt;button class="next"&gt;→&lt;/button&gt; &lt;label for="diffToggle"&gt;
+          &lt;/div&gt;
+        `</span>, template, [
+        { <span class="hljs-attr">name</span>: <span class="hljs-string">'close'</span>, <span class="hljs-attr">call</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>._hidePopup() }
+      ])
+
+      popup.find(<span class="hljs-string">'.prev'</span>).click( <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> setIndex(curIdx - <span class="hljs-number">1</span>) )
+      popup.find(<span class="hljs-string">'.next'</span>).click( <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> setIndex(curIdx + <span class="hljs-number">1</span>) )
+      popup.find(<span class="hljs-string">'#diffToggle'</span>).change( <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> updateDiffToggle(popup.find(<span class="hljs-string">'#diffToggle:checked'</span>).length &gt; <span class="hljs-number">0</span>))
+
+      setIndex(length - <span class="hljs-number">1</span>) <span class="hljs-comment">// we startup with the last item</span>
+      updateDiffToggle(<span class="hljs-literal">true</span>)
+    }
+
+    showCommentHistory (comment, index) {
+      <span class="hljs-keyword">if</span> (comment.history) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>have been fetch already</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>._showCommentsHistory(comment)
+      }
+
+      <span class="hljs-keyword">this</span>._spinUntil(<span class="hljs-keyword">this</span>.controller.fetchHistory(comment, index)).then( <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-keyword">this</span>._showCommentsHistory(comment)
+      })
+
     }
 
     _renderComments () {
@@ -596,11 +759,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>template renderer per comment</p>
 
@@ -610,40 +773,54 @@ triggered by events emitted from the controller</p>
         <span class="hljs-keyword">let</span> item = $(<span class="hljs-string">`
         &lt;div class="media"&gt;
           &lt;div class="media-body"&gt;
-            &lt;h4 class="media-heading"&gt;<span class="hljs-subst">${comment.name}</span>
-              &lt;small&gt;<span class="hljs-subst">${(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(comment.time)).toLocaleString()}</span>&lt;/small&gt;
+            &lt;h4 class="media-heading"&gt;
+              &lt;span class="name"&gt;<span class="hljs-subst">${comment.comment.name}</span>&lt;/span&gt; 
+              &lt;small&gt;&lt;span class="versions"&gt;&lt;/span&gt; <span class="hljs-subst">${(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(comment.comment.time)).toLocaleString()}</span>&lt;/small&gt;
             &lt;/h4&gt;
-            <span class="hljs-subst">${comment.comment}</span>
+            <span class="hljs-subst">${comment.comment.comment}</span>
+            &lt;div class="media-options"&gt;&lt;/div&gt;
           &lt;/div&gt;
-        &lt;/div&gt;`</span>)</pre></div></div>
+        &lt;/div&gt;`</span>)
+
+        <span class="hljs-keyword">if</span> (comment.versions &gt; <span class="hljs-number">1</span>) {
+          <span class="hljs-keyword">let</span> version = item.find(<span class="hljs-string">'.versions'</span>)
+            version.attr(<span class="hljs-string">'title'</span>, <span class="hljs-string">'Last edited: '</span> + (<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(comment.comment.editedTime)).toLocaleString())
+            version.html(<span class="hljs-string">`✎ <span class="hljs-subst">${comment.versions}</span>`</span>)
+            version.click(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.showCommentHistory(comment, index))
+        }
+
+        <span class="hljs-keyword">let</span> $actionMenu = item.find(<span class="hljs-string">'.media-options'</span>)
+
+        <span class="hljs-keyword">if</span> (comment.isOwner) {
+          $actionMenu.append($(
+            <span class="hljs-string">`&lt;button class="btn btn-xs" type="button"&gt;Edit&lt;/button&gt;`</span>
+            ).click(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.editComment(comment, index)))
+        }</pre></div></div>
             
         </li>
         
         
-        <li id="section-30">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>admins have extra actions they can do on the item</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.controller.isAdmin()) {
-          <span class="hljs-keyword">let</span> $adminMenu = $(<span class="hljs-string">'&lt;div class="media-options"&gt;&lt;/div&gt;'</span>)
-          MODULE.log($adminMenu)
 
-          $adminMenu.append($(
+          $actionMenu.append($(
             <span class="hljs-string">`&lt;button class="btn btn-danger btn-xs" type="button"&gt;Delete&lt;/button&gt;`</span>
             ).click(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.deleteComment(comment, index)))
 
-          <span class="hljs-keyword">if</span> (!isBlockedUser(comment.name)) {
-            $adminMenu.append($(
+          <span class="hljs-keyword">if</span> (!isBlockedUser(comment.comment.name)) {
+            $actionMenu.append($(
               <span class="hljs-string">`&lt;button class="btn btn-warning btn-xs" type="button" &gt;Block&lt;/button&gt;`</span>
-            ).click(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.blockUser(comment.name, index)))
+            ).click(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.blockUser(comment.comment.name, index)))
           }
-          item.append($adminMenu);
         }
         <span class="hljs-keyword">return</span> item
       }</pre></div></div>
@@ -651,11 +828,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>clear out current commentsList</p>
 
@@ -669,18 +846,18 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>for every comment found, render the comment at the index</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.data.commentList.forEach(<span class="hljs-function">(<span class="hljs-params">comment</span>) =&gt;</span> {
-          target.append(renderComment(comment.comment, comment.index))
+          target.append(renderComment(comment, comment.index))
         })
         target.show()
       } <span class="hljs-keyword">else</span> {</pre></div></div>
@@ -688,11 +865,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>no comments found? Hide the element</p>
 
@@ -705,11 +882,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>we received <code>user-updated</code>, refresh the DNS listing</p>
 
@@ -729,11 +906,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>User blocking/unblocking flows</p>
 
@@ -742,11 +919,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               
             </div>
@@ -788,11 +965,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>General UI Features</p>
 
@@ -801,11 +978,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>Show/hide Loading animation</p>
 
@@ -819,11 +996,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>Show/hide commentsEnable button</p>
 
@@ -838,11 +1015,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-40">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>Show/hide commentsOptions button</p>
 
@@ -857,11 +1034,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>Show/hide comment form</p>
 
@@ -875,11 +1052,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>helper to render a pop up</p>
 
@@ -900,16 +1077,17 @@ triggered by events emitted from the controller</p>
           &lt;button name="close" class="btn btn-primary" &gt;<span class="hljs-subst">${opt.name}</span>&lt;/button&gt;`</span>).click(opt.call)))
       })
       popupEle.show()
+      <span class="hljs-keyword">return</span> popupEle
     }</pre></div></div>
             
         </li>
         
         
-        <li id="section-43">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>hiding the popup</p>
 
@@ -927,11 +1105,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>Spin until the given <code>promise</code> resolved or rejected</p>
 
@@ -952,11 +1130,11 @@ triggered by events emitted from the controller</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>Export the View to the MODULE namespace</p>
 

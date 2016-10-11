@@ -76,6 +76,172 @@
   } <span class="hljs-keyword">else</span> {
     MODULE.log = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{}  <span class="hljs-comment">// noop</span>
   }
+
+
+  <span class="hljs-comment">/*
+ * Javascript Diff Algorithm
+ *  By John Resig (http://ejohn.org/)
+ *  Modified by Chu Alan "sprite"
+ *
+ * Released under the MIT license.
+ *
+ * More Info:
+ *  http://ejohn.org/projects/javascript-diff-algorithm/
+ */</span>
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">escape</span>(<span class="hljs-params">s</span>) </span>{
+    <span class="hljs-keyword">var</span> n = s;
+    n = n.replace(<span class="hljs-regexp">/&amp;/g</span>, <span class="hljs-string">"&amp;amp;"</span>);
+    n = n.replace(<span class="hljs-regexp">/&lt;/g</span>, <span class="hljs-string">"&amp;lt;"</span>);
+    n = n.replace(<span class="hljs-regexp">/&gt;/g</span>, <span class="hljs-string">"&amp;gt;"</span>);
+    n = n.replace(<span class="hljs-regexp">/"/g</span>, <span class="hljs-string">"&amp;quot;"</span>);
+
+    <span class="hljs-keyword">return</span> n;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">diffString</span>(<span class="hljs-params"> o, n </span>) </span>{
+  o = o.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>);
+  n = n.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>);
+
+  <span class="hljs-keyword">var</span> out = diff(o == <span class="hljs-string">""</span> ? [] : o.split(<span class="hljs-regexp">/\s+/</span>), n == <span class="hljs-string">""</span> ? [] : n.split(<span class="hljs-regexp">/\s+/</span>) );
+  <span class="hljs-keyword">var</span> str = <span class="hljs-string">""</span>;
+
+  <span class="hljs-keyword">var</span> oSpace = o.match(<span class="hljs-regexp">/\s+/g</span>);
+  <span class="hljs-keyword">if</span> (oSpace == <span class="hljs-literal">null</span>) {
+    oSpace = [<span class="hljs-string">"\n"</span>];
+  } <span class="hljs-keyword">else</span> {
+    oSpace.push(<span class="hljs-string">"\n"</span>);
+  }
+  <span class="hljs-keyword">var</span> nSpace = n.match(<span class="hljs-regexp">/\s+/g</span>);
+  <span class="hljs-keyword">if</span> (nSpace == <span class="hljs-literal">null</span>) {
+    nSpace = [<span class="hljs-string">"\n"</span>];
+  } <span class="hljs-keyword">else</span> {
+    nSpace.push(<span class="hljs-string">"\n"</span>);
+  }
+
+  <span class="hljs-keyword">if</span> (out.n.length == <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; out.o.length; i++) {
+        str += <span class="hljs-string">'&lt;del&gt;'</span> + <span class="hljs-built_in">escape</span>(out.o[i]) + oSpace[i] + <span class="hljs-string">"&lt;/del&gt;"</span>;
+      }
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">if</span> (out.n[<span class="hljs-number">0</span>].text == <span class="hljs-literal">null</span>) {
+      <span class="hljs-keyword">for</span> (n = <span class="hljs-number">0</span>; n &lt; out.o.length &amp;&amp; out.o[n].text == <span class="hljs-literal">null</span>; n++) {
+        str += <span class="hljs-string">'&lt;del&gt;'</span> + <span class="hljs-built_in">escape</span>(out.o[n]) + oSpace[n] + <span class="hljs-string">"&lt;/del&gt;"</span>;
+      }
+    }
+
+    <span class="hljs-keyword">for</span> ( <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; out.n.length; i++ ) {
+      <span class="hljs-keyword">if</span> (out.n[i].text == <span class="hljs-literal">null</span>) {
+        str += <span class="hljs-string">'&lt;ins&gt;'</span> + <span class="hljs-built_in">escape</span>(out.n[i]) + nSpace[i] + <span class="hljs-string">"&lt;/ins&gt;"</span>;
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">var</span> pre = <span class="hljs-string">""</span>;
+
+        <span class="hljs-keyword">for</span> (n = out.n[i].row + <span class="hljs-number">1</span>; n &lt; out.o.length &amp;&amp; out.o[n].text == <span class="hljs-literal">null</span>; n++ ) {
+          pre += <span class="hljs-string">'&lt;del&gt;'</span> + <span class="hljs-built_in">escape</span>(out.o[n]) + oSpace[n] + <span class="hljs-string">"&lt;/del&gt;"</span>;
+        }
+        str += <span class="hljs-string">" "</span> + out.n[i].text + nSpace[i] + pre;
+      }
+    }
+  }
+  
+  <span class="hljs-keyword">return</span> str;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">randomColor</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-string">"rgb("</span> + (<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">100</span>) + <span class="hljs-string">"%, "</span> + 
+                    (<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">100</span>) + <span class="hljs-string">"%, "</span> + 
+                    (<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">100</span>) + <span class="hljs-string">"%)"</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">diffString2</span>(<span class="hljs-params"> o, n </span>) </span>{
+  o = o.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>);
+  n = n.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>);
+
+  <span class="hljs-keyword">var</span> out = diff(o == <span class="hljs-string">""</span> ? [] : o.split(<span class="hljs-regexp">/\s+/</span>), n == <span class="hljs-string">""</span> ? [] : n.split(<span class="hljs-regexp">/\s+/</span>) );
+
+  <span class="hljs-keyword">var</span> oSpace = o.match(<span class="hljs-regexp">/\s+/g</span>);
+  <span class="hljs-keyword">if</span> (oSpace == <span class="hljs-literal">null</span>) {
+    oSpace = [<span class="hljs-string">"\n"</span>];
+  } <span class="hljs-keyword">else</span> {
+    oSpace.push(<span class="hljs-string">"\n"</span>);
+  }
+  <span class="hljs-keyword">var</span> nSpace = n.match(<span class="hljs-regexp">/\s+/g</span>);
+  <span class="hljs-keyword">if</span> (nSpace == <span class="hljs-literal">null</span>) {
+    nSpace = [<span class="hljs-string">"\n"</span>];
+  } <span class="hljs-keyword">else</span> {
+    nSpace.push(<span class="hljs-string">"\n"</span>);
+  }
+
+  <span class="hljs-keyword">var</span> os = <span class="hljs-string">""</span>;
+  <span class="hljs-keyword">var</span> colors = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>();
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; out.o.length; i++) {
+      colors[i] = randomColor();
+
+      <span class="hljs-keyword">if</span> (out.o[i].text != <span class="hljs-literal">null</span>) {
+          os += <span class="hljs-string">'&lt;span style="background-color: '</span> +colors[i]+ <span class="hljs-string">'"&gt;'</span> + 
+                <span class="hljs-built_in">escape</span>(out.o[i].text) + oSpace[i] + <span class="hljs-string">"&lt;/span&gt;"</span>;
+      } <span class="hljs-keyword">else</span> {
+          os += <span class="hljs-string">"&lt;del&gt;"</span> + <span class="hljs-built_in">escape</span>(out.o[i]) + oSpace[i] + <span class="hljs-string">"&lt;/del&gt;"</span>;
+      }
+  }
+
+  <span class="hljs-keyword">var</span> ns = <span class="hljs-string">""</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; out.n.length; i++) {
+      <span class="hljs-keyword">if</span> (out.n[i].text != <span class="hljs-literal">null</span>) {
+          ns += <span class="hljs-string">'&lt;span style="background-color: '</span> +colors[out.n[i].row]+ <span class="hljs-string">'"&gt;'</span> + 
+                <span class="hljs-built_in">escape</span>(out.n[i].text) + nSpace[i] + <span class="hljs-string">"&lt;/span&gt;"</span>;
+      } <span class="hljs-keyword">else</span> {
+          ns += <span class="hljs-string">"&lt;ins&gt;"</span> + <span class="hljs-built_in">escape</span>(out.n[i]) + nSpace[i] + <span class="hljs-string">"&lt;/ins&gt;"</span>;
+      }
+  }
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">o</span> : os , <span class="hljs-attr">n</span> : ns };
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">diff</span>(<span class="hljs-params"> o, n </span>) </span>{
+  <span class="hljs-keyword">var</span> ns = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Object</span>();
+  <span class="hljs-keyword">var</span> os = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Object</span>();
+  
+  <span class="hljs-keyword">for</span> ( <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; n.length; i++ ) {
+    <span class="hljs-keyword">if</span> ( ns[ n[i] ] == <span class="hljs-literal">null</span> )
+      ns[ n[i] ] = { <span class="hljs-attr">rows</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(), <span class="hljs-attr">o</span>: <span class="hljs-literal">null</span> };
+    ns[ n[i] ].rows.push( i );
+  }
+  
+  <span class="hljs-keyword">for</span> ( <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; o.length; i++ ) {
+    <span class="hljs-keyword">if</span> ( os[ o[i] ] == <span class="hljs-literal">null</span> )
+      os[ o[i] ] = { <span class="hljs-attr">rows</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(), <span class="hljs-attr">n</span>: <span class="hljs-literal">null</span> };
+    os[ o[i] ].rows.push( i );
+  }
+  
+  <span class="hljs-keyword">for</span> ( <span class="hljs-keyword">var</span> i <span class="hljs-keyword">in</span> ns ) {
+    <span class="hljs-keyword">if</span> ( ns[i].rows.length == <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-keyword">typeof</span>(os[i]) != <span class="hljs-string">"undefined"</span> &amp;&amp; os[i].rows.length == <span class="hljs-number">1</span> ) {
+      n[ ns[i].rows[<span class="hljs-number">0</span>] ] = { <span class="hljs-attr">text</span>: n[ ns[i].rows[<span class="hljs-number">0</span>] ], <span class="hljs-attr">row</span>: os[i].rows[<span class="hljs-number">0</span>] };
+      o[ os[i].rows[<span class="hljs-number">0</span>] ] = { <span class="hljs-attr">text</span>: o[ os[i].rows[<span class="hljs-number">0</span>] ], <span class="hljs-attr">row</span>: ns[i].rows[<span class="hljs-number">0</span>] };
+    }
+  }
+  
+  <span class="hljs-keyword">for</span> ( <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; n.length - <span class="hljs-number">1</span>; i++ ) {
+    <span class="hljs-keyword">if</span> ( n[i].text != <span class="hljs-literal">null</span> &amp;&amp; n[i+<span class="hljs-number">1</span>].text == <span class="hljs-literal">null</span> &amp;&amp; n[i].row + <span class="hljs-number">1</span> &lt; o.length &amp;&amp; o[ n[i].row + <span class="hljs-number">1</span> ].text == <span class="hljs-literal">null</span> &amp;&amp; 
+         n[i+<span class="hljs-number">1</span>] == o[ n[i].row + <span class="hljs-number">1</span> ] ) {
+      n[i+<span class="hljs-number">1</span>] = { <span class="hljs-attr">text</span>: n[i+<span class="hljs-number">1</span>], <span class="hljs-attr">row</span>: n[i].row + <span class="hljs-number">1</span> };
+      o[n[i].row+<span class="hljs-number">1</span>] = { <span class="hljs-attr">text</span>: o[n[i].row+<span class="hljs-number">1</span>], <span class="hljs-attr">row</span>: i + <span class="hljs-number">1</span> };
+    }
+  }
+  
+  <span class="hljs-keyword">for</span> ( <span class="hljs-keyword">var</span> i = n.length - <span class="hljs-number">1</span>; i &gt; <span class="hljs-number">0</span>; i-- ) {
+    <span class="hljs-keyword">if</span> ( n[i].text != <span class="hljs-literal">null</span> &amp;&amp; n[i<span class="hljs-number">-1</span>].text == <span class="hljs-literal">null</span> &amp;&amp; n[i].row &gt; <span class="hljs-number">0</span> &amp;&amp; o[ n[i].row - <span class="hljs-number">1</span> ].text == <span class="hljs-literal">null</span> &amp;&amp; 
+         n[i<span class="hljs-number">-1</span>] == o[ n[i].row - <span class="hljs-number">1</span> ] ) {
+      n[i<span class="hljs-number">-1</span>] = { <span class="hljs-attr">text</span>: n[i<span class="hljs-number">-1</span>], <span class="hljs-attr">row</span>: n[i].row - <span class="hljs-number">1</span> };
+      o[n[i].row<span class="hljs-number">-1</span>] = { <span class="hljs-attr">text</span>: o[n[i].row<span class="hljs-number">-1</span>], <span class="hljs-attr">row</span>: i - <span class="hljs-number">1</span> };
+    }
+  }
+  
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">o</span>: o, <span class="hljs-attr">n</span>: n };
+}
+
+MODULE.inlineDiff = diffString
+
+
 })(<span class="hljs-built_in">window</span>.safeComments)</pre></div></div>
             
         </li>

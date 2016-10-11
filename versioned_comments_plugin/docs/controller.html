@@ -454,7 +454,17 @@ by creating the initial appendable data entry.</p>
             
             <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">this</span>.emit(<span class="hljs-string">'comments-updated'</span>)
         })
-    }</pre></div></div>
+    }
+
+    fetchHistory (comment, index) {
+      <span class="hljs-keyword">let</span> versionsCount = comment.versions;
+
+      <span class="hljs-keyword">let</span> readAllPreviousVersions = <span class="hljs-function">(<span class="hljs-params">handleId</span>) =&gt;</span> {
+        <span class="hljs-keyword">let</span> all = []
+
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; versionsCount <span class="hljs-number">-1</span>; i++) {
+          all.push(i)
+        }</pre></div></div>
             
         </li>
         
@@ -464,6 +474,136 @@ by creating the initial appendable data entry.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>fetch all the items in parallel, one per version</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.all(</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>read the comment per version</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          all.map(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-built_in">window</span>.safeStructuredData.readData(<span class="hljs-keyword">this</span>._authToken, handleId, v)
+              .then(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-keyword">new</span> Buffer(data).toString()))
+        ))
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._autoRelease(</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>get data handle for position</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-built_in">window</span>.safeAppendableData.getDataIdAt(
+              <span class="hljs-keyword">this</span>._authToken, <span class="hljs-keyword">this</span>._currentPostHandleId, index),
+        (address) =&gt; <span class="hljs-keyword">this</span>._autoRelease(</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>exchange the address for a structured data handle</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">window</span>.safeStructuredData.getHandle(<span class="hljs-keyword">this</span>._authToken, address),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>read all the versions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          readAllPreviousVersions,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>release structured data handl</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          (hId) =&gt; <span class="hljs-built_in">window</span>.safeStructuredData.dropHandle(<span class="hljs-keyword">this</span>._authToken, hId)),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>release data handle</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        (dataIdHandle) =&gt; <span class="hljs-built_in">window</span>.safeDataId.dropHandle(<span class="hljs-keyword">this</span>._authToken, dataIdHandle))
+      .then(<span class="hljs-function"><span class="hljs-params">history</span> =&gt;</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>then safe them on the original comment</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        comment.history = history
+        <span class="hljs-keyword">return</span> comment
+      })
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>comment activities</p>
 <p>Fetch all comments from the network</p>
@@ -475,11 +615,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>start by clearing the list</p>
 
@@ -501,11 +641,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>fetch all the items in parallel, one at each index</p>
 
@@ -517,11 +657,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>for each item found, append them to the commentsList</p>
 
@@ -529,7 +669,9 @@ by creating the initial appendable data entry.</p>
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">this</span>._data.commentList.push({
               <span class="hljs-attr">index</span>: index,
-              <span class="hljs-attr">comment</span>: c
+              <span class="hljs-attr">comment</span>: c.comment,
+              <span class="hljs-attr">isOwner</span>: c.isOwner,
+              <span class="hljs-attr">versions</span>: c.dataVersionLength
             })
           })))
       }</pre></div></div>
@@ -537,11 +679,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>learn how many items there are in our list</p>
 
@@ -557,11 +699,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>fetch the actual appendableData</p>
 
@@ -577,11 +719,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>tying it all together</p>
 
@@ -593,11 +735,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>first fetch the listing itself</p>
 
@@ -608,11 +750,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>learn about the count</p>
 
@@ -623,11 +765,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>then fetch each item</p>
 
@@ -638,11 +780,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>once we have all comments, sort them</p>
 
@@ -653,11 +795,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>and emit the events, even if something failed</p>
 
@@ -673,11 +815,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>put it all in motion:</p>
 
@@ -688,11 +830,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>get handle for appendable data</p>
 
@@ -703,11 +845,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>fetch the comments with that handle</p>
 
@@ -718,11 +860,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>release teh appendable data handle</p>
 
@@ -734,11 +876,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-40">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>Posting a new comment</p>
 
@@ -750,11 +892,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>convert the input into data SAFEnet understands</p>
 
@@ -771,11 +913,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>and off it goes</p>
 
@@ -786,26 +928,26 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-43">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>get handle for to be created comment</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">window</span>.safeStructuredData.create(<span class="hljs-keyword">this</span>._authToken, name, <span class="hljs-number">500</span>, payload),</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">window</span>.safeStructuredData.create(<span class="hljs-keyword">this</span>._authToken, name, <span class="hljs-number">501</span>, payload),</pre></div></div>
             
         </li>
         
         
-        <li id="section-44">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p>with that handle</p>
 
@@ -816,11 +958,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>save the data then</p>
 
@@ -831,11 +973,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>replace the structured Data handle for a dataID handle</p>
 
@@ -846,11 +988,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>append that handle to the appendable data</p>
 
@@ -861,11 +1003,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>release the dataId handle</p>
 
@@ -877,11 +1019,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-49">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>release the structured data handle</p>
 
@@ -892,11 +1034,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>once done, refresh the comments listing</p>
 
@@ -906,16 +1048,149 @@ by creating the initial appendable data entry.</p>
         .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
           <span class="hljs-built_in">window</span>.alert(<span class="hljs-string">''</span>);
         });
+    }
+
+    updateComment (index, original, newText) {
+      MODULE.log(<span class="hljs-string">`updating comment @<span class="hljs-subst">${index}</span> by <span class="hljs-subst">${original.name}</span> : <span class="hljs-subst">${newText}</span>`</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>convert the input into data SAFEnet understands</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">const</span> payload = <span class="hljs-keyword">new</span> Buffer(<span class="hljs-built_in">JSON</span>.stringify({
+        <span class="hljs-attr">name</span>: original.name,
+        <span class="hljs-attr">comment</span>: newText,
+        <span class="hljs-attr">time</span>: original.time,  <span class="hljs-comment">// we keep the original time so the order stays in tact</span>
+        editedTime: (<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()).getTime()
+      })).toString(<span class="hljs-string">'base64'</span>)
+
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._autoRelease(</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-60">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-60">&#182;</a>
+              </div>
+              <p>get data handle for position</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-built_in">window</span>.safeAppendableData.getDataIdAt(
+                <span class="hljs-keyword">this</span>._authToken, <span class="hljs-keyword">this</span>._currentPostHandleId, index),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-61">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-61">&#182;</a>
+              </div>
+              <p>read data at position</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          (address) =&gt; <span class="hljs-keyword">this</span>._autoRelease(</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-62">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-62">&#182;</a>
+              </div>
+              <p>get dataHandle for id</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              <span class="hljs-built_in">window</span>.safeStructuredData.getHandle(<span class="hljs-keyword">this</span>._authToken, address),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-63">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-63">&#182;</a>
+              </div>
+              <p>and push a new version of the comment</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              (handleId) =&gt; <span class="hljs-built_in">window</span>.safeStructuredData.updateData(<span class="hljs-keyword">this</span>._authToken, handleId, payload)
+                  .then(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> <span class="hljs-built_in">window</span>.safeStructuredData.post(<span class="hljs-keyword">this</span>._authToken, handleId)),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-64">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-64">&#182;</a>
+              </div>
+              <p>release structured data handle</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              (dataIdHandle) =&gt; <span class="hljs-built_in">window</span>.safeStructuredData.dropHandle(<span class="hljs-keyword">this</span>._authToken, dataIdHandle)),</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-65">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-65">&#182;</a>
+              </div>
+              <p>release data handle</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          (dataIdHandle) =&gt; <span class="hljs-built_in">window</span>.safeDataId.dropHandle(<span class="hljs-keyword">this</span>._authToken, dataIdHandle))</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-66">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-66">&#182;</a>
+              </div>
+              <p>refresh the comments</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.fetchComments())
     }</pre></div></div>
             
         </li>
         
         
-        <li id="section-51">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>Delete a comment at the given index</p>
 
@@ -927,11 +1202,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <p>prepare the removable of a specific index</p>
 
@@ -943,11 +1218,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <p>send that off</p>
 
@@ -959,11 +1234,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <p>clear our local cache</p>
 
@@ -974,11 +1249,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <p>and refresh all comments</p>
 
@@ -990,11 +1265,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-72">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-72">&#182;</a>
               </div>
               <p>user blocking management</p>
 
@@ -1006,11 +1281,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-73">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <p>get appendable data signed key at index</p>
 
@@ -1033,11 +1308,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-58">
+        <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
               <p>get a serialiased key</p>
 
@@ -1068,11 +1343,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-59">
+        <li id="section-75">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
               <p>release signing key</p>
 
@@ -1093,11 +1368,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-60">
+        <li id="section-76">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-76">&#182;</a>
               </div>
               <p>Internals</p>
 
@@ -1106,11 +1381,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-61">
+        <li id="section-77">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
               <p>figure out the location the information is to be stored</p>
 
@@ -1126,11 +1401,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-78">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-78">&#182;</a>
               </div>
               <p>if we are running from localhost, put the app into developer mode</p>
 
@@ -1150,11 +1425,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-63">
+        <li id="section-79">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-79">&#182;</a>
               </div>
               <p>Helper function for a typical use case:</p>
 <ol>
@@ -1166,13 +1441,23 @@ by creating the initial appendable data entry.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    _autoRelease (promise, fn, release) {
+
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._fullPayloadAutoRelease(
+          promise,
+          (payload) =&gt; fn(payload.handleId), <span class="hljs-comment">// fetch the handleId from the payload</span>
+          release
+        )
+    }
+
+    _fullPayloadAutoRelease(promise, fn, release) {
       <span class="hljs-keyword">return</span> promise
-        .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> res.__parsedResponseBody__ ? res.__parsedResponseBody__.handleId : res)
-        .then(<span class="hljs-function"><span class="hljs-params">handleId</span> =&gt;</span> fn(handleId)
-          .then(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> release(handleId).then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> r),
-                (e) =&gt; release(handleId).then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">Promise</span>.reject(e)
+        .then(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> res.__parsedResponseBody__ || res)
+        .then( <span class="hljs-function">(<span class="hljs-params">payload</span>) =&gt;</span> fn(payload)
+          .then(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> release(payload.handleId).then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> r),
+                (e) =&gt; release(payload.handleId).then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">Promise</span>.reject(e)
           ))
         )
+
     }
 
     _fetchBlockeUsersData () {
@@ -1181,11 +1466,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-80">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-80">&#182;</a>
               </div>
               <p>get dataHandle</p>
 
@@ -1197,11 +1482,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-81">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-81">&#182;</a>
               </div>
               <p>replace dataHandle With structuredDataHandle</p>
 
@@ -1212,11 +1497,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-82">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-82">&#182;</a>
               </div>
               <p>release dataHandle</p>
 
@@ -1229,11 +1514,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-83">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-83">&#182;</a>
               </div>
               <p>keep the structured data handle around for later reuse</p>
 
@@ -1244,11 +1529,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-68">
+        <li id="section-84">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-84">&#182;</a>
               </div>
               <p>and read the data with it</p>
 
@@ -1263,11 +1548,11 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-69">
+        <li id="section-85">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-69">&#182;</a>
+                <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
               <p>serialise the key then call fn</p>
 
@@ -1282,28 +1567,28 @@ by creating the initial appendable data entry.</p>
         </li>
         
         
-        <li id="section-70">
+        <li id="section-86">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-70">&#182;</a>
+                <a class="pilcrow" href="#section-86">&#182;</a>
               </div>
               <p>given a specific address, get a handle, read it, release the handle
 and return the read Data</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    _readAndRelease (address) {
-      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._autoRelease(</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    _readCommentAndRelease (address) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._fullPayloadAutoRelease(</pre></div></div>
             
         </li>
         
         
-        <li id="section-71">
+        <li id="section-87">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-71">&#182;</a>
+                <a class="pilcrow" href="#section-87">&#182;</a>
               </div>
               <p>get dataHandle for id</p>
 
@@ -1314,26 +1599,30 @@ and return the read Data</p>
         </li>
         
         
-        <li id="section-72">
+        <li id="section-88">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-72">&#182;</a>
+                <a class="pilcrow" href="#section-88">&#182;</a>
               </div>
               <p>read structured data from dataHandle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        (handleId) =&gt; <span class="hljs-built_in">window</span>.safeStructuredData.readData(<span class="hljs-keyword">this</span>._authToken, handleId),</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        (payload) =&gt; <span class="hljs-built_in">window</span>.safeStructuredData.readData(<span class="hljs-keyword">this</span>._authToken, payload.handleId)
+          .then( <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+            payload.comment = <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-keyword">new</span> Buffer(data).toString())
+            <span class="hljs-keyword">return</span> payload
+          }),</pre></div></div>
             
         </li>
         
         
-        <li id="section-73">
+        <li id="section-89">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-89">&#182;</a>
               </div>
               <p>release datahandle</p>
 
@@ -1346,11 +1635,11 @@ and return the read Data</p>
         </li>
         
         
-        <li id="section-74">
+        <li id="section-90">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-74">&#182;</a>
+                <a class="pilcrow" href="#section-90">&#182;</a>
               </div>
               <p>fetch the comment at `index</p>
 
@@ -1362,11 +1651,11 @@ and return the read Data</p>
         </li>
         
         
-        <li id="section-75">
+        <li id="section-91">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-75">&#182;</a>
+                <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
               <p>get data handle for position</p>
 
@@ -1378,57 +1667,42 @@ and return the read Data</p>
         </li>
         
         
-        <li id="section-76">
+        <li id="section-92">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-76">&#182;</a>
+                <a class="pilcrow" href="#section-92">&#182;</a>
               </div>
               <p>read data at position</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          (dataid) =&gt; <span class="hljs-keyword">this</span>._readAndRelease(dataid),</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          (dataid) =&gt; <span class="hljs-keyword">this</span>._readCommentAndRelease(dataid),</pre></div></div>
             
         </li>
         
         
-        <li id="section-77">
+        <li id="section-93">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-77">&#182;</a>
+                <a class="pilcrow" href="#section-93">&#182;</a>
               </div>
               <p>release data handle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          (dataIdHandle) =&gt; <span class="hljs-built_in">window</span>.safeDataId.dropHandle(<span class="hljs-keyword">this</span>._authToken, dataIdHandle))</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-78">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-78">&#182;</a>
-              </div>
-              <p>convert the given data to JSON</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        .then(<span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> <span class="hljs-built_in">JSON</span>.parse(<span class="hljs-keyword">new</span> Buffer(data).toString()))
+            <div class="content"><div class='highlight'><pre>          (dataIdHandle) =&gt; <span class="hljs-built_in">window</span>.safeDataId.dropHandle(<span class="hljs-keyword">this</span>._authToken, dataIdHandle))
     }</pre></div></div>
             
         </li>
         
         
-        <li id="section-79">
+        <li id="section-94">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-79">&#182;</a>
+                <a class="pilcrow" href="#section-94">&#182;</a>
               </div>
               <p>we like our comments sorted by time</p>
 
@@ -1443,11 +1717,11 @@ and return the read Data</p>
         </li>
         
         
-        <li id="section-80">
+        <li id="section-95">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-80">&#182;</a>
+                <a class="pilcrow" href="#section-95">&#182;</a>
               </div>
               <p>refresh the blocked users structure</p>
 
@@ -1467,11 +1741,11 @@ and return the read Data</p>
         </li>
         
         
-        <li id="section-81">
+        <li id="section-96">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-81">&#182;</a>
+                <a class="pilcrow" href="#section-96">&#182;</a>
               </div>
               <p>let’s block a user</p>
 
@@ -1484,11 +1758,11 @@ and return the read Data</p>
         </li>
         
         
-        <li id="section-82">
+        <li id="section-97">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-82">&#182;</a>
+                <a class="pilcrow" href="#section-97">&#182;</a>
               </div>
               <p>we already have a list of blocked users
 update the block</p>
@@ -1512,11 +1786,11 @@ update the block</p>
         </li>
         
         
-        <li id="section-83">
+        <li id="section-98">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-83">&#182;</a>
+                <a class="pilcrow" href="#section-98">&#182;</a>
               </div>
               <p>This is the first time a user is blocked, created
 the block structure to keep track of the users blocked</p>
@@ -1545,11 +1819,11 @@ the block structure to keep track of the users blocked</p>
         </li>
         
         
-        <li id="section-84">
+        <li id="section-99">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-84">&#182;</a>
+                <a class="pilcrow" href="#section-99">&#182;</a>
               </div>
               <p>fetch the public names of the user</p>
 
@@ -1557,16 +1831,16 @@ the block structure to keep track of the users blocked</p>
             
             <div class="content"><div class='highlight'><pre>    _getDns () {
       MODULE.log(<span class="hljs-string">'Fetching DNS records'</span>)
-      <span class="hljs-keyword">return</span> <span class="hljs-built_in">window</span>.safeDNS.getDns(<span class="hljs-keyword">this</span>._authToken)</pre></div></div>
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">window</span>.safeDNS.listLongNames(<span class="hljs-keyword">this</span>._authToken)</pre></div></div>
             
         </li>
         
         
-        <li id="section-85">
+        <li id="section-100">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-85">&#182;</a>
+                <a class="pilcrow" href="#section-100">&#182;</a>
               </div>
               <p>convert</p>
 
@@ -1578,11 +1852,11 @@ the block structure to keep track of the users blocked</p>
         </li>
         
         
-        <li id="section-86">
+        <li id="section-101">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-86">&#182;</a>
+                <a class="pilcrow" href="#section-101">&#182;</a>
               </div>
               <p>store dnsData on the user for later reuse</p>
 
@@ -1594,11 +1868,11 @@ the block structure to keep track of the users blocked</p>
         </li>
         
         
-        <li id="section-87">
+        <li id="section-102">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-87">&#182;</a>
+                <a class="pilcrow" href="#section-102">&#182;</a>
               </div>
               <p>As the admin, we should also read the blocked user structure
 but do that once we are done with this cycle</p>
@@ -1611,11 +1885,11 @@ but do that once we are done with this cycle</p>
         </li>
         
         
-        <li id="section-88">
+        <li id="section-103">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-88">&#182;</a>
+                <a class="pilcrow" href="#section-103">&#182;</a>
               </div>
               <p>and emit an event so the UI can update</p>
 
@@ -1633,11 +1907,11 @@ but do that once we are done with this cycle</p>
         </li>
         
         
-        <li id="section-89">
+        <li id="section-104">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-89">&#182;</a>
+                <a class="pilcrow" href="#section-104">&#182;</a>
               </div>
               <p>starting up, we need to authorise the app</p>
 
@@ -1650,11 +1924,11 @@ but do that once we are done with this cycle</p>
         </li>
         
         
-        <li id="section-90">
+        <li id="section-105">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-90">&#182;</a>
+                <a class="pilcrow" href="#section-105">&#182;</a>
               </div>
               <p>convert tokeb</p>
 
@@ -1674,11 +1948,11 @@ but do that once we are done with this cycle</p>
         </li>
         
         
-        <li id="section-91">
+        <li id="section-106">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-91">&#182;</a>
+                <a class="pilcrow" href="#section-106">&#182;</a>
               </div>
               <p>keep token for later reus`e</p>
 
@@ -1691,11 +1965,11 @@ but do that once we are done with this cycle</p>
         </li>
         
         
-        <li id="section-92">
+        <li id="section-107">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-92">&#182;</a>
+                <a class="pilcrow" href="#section-107">&#182;</a>
               </div>
               <p>then refresh the DNS</p>
 
@@ -1707,11 +1981,11 @@ but do that once we are done with this cycle</p>
         </li>
         
         
-        <li id="section-93">
+        <li id="section-108">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-93">&#182;</a>
+                <a class="pilcrow" href="#section-108">&#182;</a>
               </div>
               <p>something went terribly wrong,
 remove the auth token</p>
@@ -1729,11 +2003,11 @@ remove the auth token</p>
         </li>
         
         
-        <li id="section-94">
+        <li id="section-109">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-94">&#182;</a>
+                <a class="pilcrow" href="#section-109">&#182;</a>
               </div>
               <p>Expose the Controller to the global MODULE</p>
 
