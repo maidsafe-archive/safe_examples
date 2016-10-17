@@ -5,6 +5,9 @@ import Peer from 'simple-peer';
 import logo from './logo.svg';
 import './App.css';
 
+// FIXME: make this only in dev
+require('safe-js/dist/polyfill')
+
 // const appInfo = )
 //
 // auth = fetch("/auth", {method: 'POST', , body: appInfo}).then(console.log.bind(console)).catch(console.warn.bind(this))
@@ -27,7 +30,7 @@ function apiRequest(method, url, token, body) {
 
 function parseJsonResponse(resp) {
   console.log(resp)
-  if (resp.json) return resp.json()
+  if (resp.__parsedResponseBody__) return resp.__parsedResponseBody__
   return resp.body().then((content) => JSON.parse(content))
 }
 
@@ -143,23 +146,24 @@ class PeerView extends Component {
 
     peer.on('signal', (d) => {
       // try to automatically establish connection
-      const data = {payload: d, targetId: myNewId}
-      apiRequest("POST",
-          '/structured-data/' + targetId,
-          this.props.token, JSON.stringify(data))
+      const data = new Buffer(JSON.stringify({payload: d, targetId: myNewId}))
+      safeStructuredData.create(this.props.token, targetId, 500, data)
+        .then(parseJsonResponse)
+        .then((res) => safeStructuredData.put(this.props.token, res.handleId))
+        .then((res) => safeStructuredData.dropHandle(this.props.token, res.handleId))
+
       if (initiator) {
         let poller = window.setInterval( ()=> {
-          apiRequest("GET",
-              '/structured-data/handle/' + myNewId,
-              this.props.token).then((resp) => {
+          safeStructuredData.getHandle(this.props.token, myNewId)
+            .then((resp) => {
+                console.log(resp)
                 if (resp.status !== 200) return
                 window.clearInterval(poller);
 
                 let handle = resp.headers.get("Handle-Id")
                 console.log('handle', handle)
-                return apiRequest('GET',
-                  '/structured-data/' + handle,
-                  this.props.token).then(parseJsonResponse).then((resp) => {
+                return safeStructuredData.readData(this.props.token, handle)
+                  .then(parseJsonResponse).then((resp) => {
                     console.log(resp)
                     peer.signal(resp.payload)
                   })
@@ -243,40 +247,32 @@ class Room extends Component {
 
   componentWillMount() {
     if (!this.state.token) {
-      apiRequest('POST', '/auth', null, JSON.stringify({
-          "app": {
-            "name": "SAFE Signaling Demo",
-            id: APP_ID,
-            "version": "0.6",
-            "vendor": "MaidSafe Ltd."},
-          "permissions" : ["LOW_LEVEL_API"]})
+      window.safeAuth.authorise({
+          "name": "SAFE Signaling Demo",
+          id: APP_ID,
+          "version": "0.7",
+          "vendor": "MaidSafe Ltd.",
+          "permissions" : ["LOW_LEVEL_API"]}, APP_ID
         ).then(parseJsonResponse).then( (auth) => {
-          return apiRequest('GET',
-              '/structured-data/handle/' + APP_ID + "-" + this.props.room,
-                auth.token).then((resp) => {
-                  // we are connecting to someone, who knows us
-                  if (resp.status !== 200) {
-                    return this.setState({"peerPayload": false,
-                                          'token': auth.token})
-                  }
+          return safeStructuredData.getHandle(auth.token, APP_ID + "-" + this.props.room)
+                    .then((resp) => {
 
-                  let handleId = resp.headers.get("Handle-Id")
+                  // we are connecting to someone, who knows us
+                  let handleId = resp.handleId
                   console.log("handleId", handleId)
                   // so let's read what they want us to do
-                  return apiRequest('GET',
-                    '/structured-data/' + handleId + '/',
-                    auth.token
-                  ).then((resp) => (resp.status === 200)
-                    ? parseJsonResponse(resp).then((payload) => {
+                  return safeStructuredData(auth.token, handleId)
+                      .then((payload) => {
                         console.log("peerPayload", payload)
                         this.setState({"peerPayload": payload,
                                        'token': auth.token})
-                    })
-                    // we need to initiate
-                    : this.setState({"peerPayload": false,
-                                   'token': auth.token})
+                    }
                   )
-                })
+                }).catch(()=>
+                  // we need to initiate
+                  this.setState({"peerPayload": false,
+                                 'token': auth.token})
+                  )
       }).catch(console.warn.bind(console))
 
     }
