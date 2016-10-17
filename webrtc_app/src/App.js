@@ -304,8 +304,7 @@ class App extends Component {
       "room": location.hash.length > 1 ? location.hash.slice(1) : null
     }
   }
-  selectRoom(pr, e, evt) {
-    evt.preventDefault()
+  selectRoom() {
     this.setState({"room": this.refs['room'].value})
     return false
   }
@@ -341,14 +340,12 @@ class App extends Component {
           <h2>Welcome to the SAFE Signaling Demo</h2>
         </div>
         <div className="room-wrap">
-          <form className="room-select" onSubmit={this.selectRoom.bind(this)}>
-            <label>
-              Room: #<input ref='room' required={true} minLength={5} />
-            </label>
-            <button onClick={this.selectRoom.bind(this)}>
-              connect
-            </button>
-          </form>
+          <label>
+            Room: #<input ref='room' required={true} minLength={5} />
+          </label>
+          <button onClick={(x) => this.selectRoom()}>
+            connect
+          </button>
         </div>
       </div>
     );
