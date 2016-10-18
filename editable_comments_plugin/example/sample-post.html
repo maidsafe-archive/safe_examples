@@ -3,11 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Tutorial Blog</title>
-    <!-- External dependencies -->
-    <link type="text/css" rel="stylesheet" href="../bootstrap-v3.3.7.min.css"/>
     <!-- Comment plugin resources -->
     <link type="text/css" rel="stylesheet" href="./style.css"/>
-    <link type="text/css" rel="stylesheet" href="../comments-tutorial.css"/>
 </head>
 <body>
     <header>SAFE Blog</header>
@@ -32,10 +29,9 @@
         </div>
         <div id="comments"></div>
     </div>
-    <script type="application/javascript" src="../jquery-3.1.1.min.js"></script>
-    <script type="application/javascript" src="../comments-tutorial.js"></script>
     <script>
-        commentsTutorial.loadComments();
+    window.__COMMENTS_ID = "#comments"
     </script>
+    <script type="application/javascript" id="comments-loader" src="../comments/main.js"></script>
 </body>
 </html>

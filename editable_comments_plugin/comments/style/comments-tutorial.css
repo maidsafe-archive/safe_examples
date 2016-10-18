@@ -7,7 +7,7 @@
 	margin-top: 24px;
 }
 
-.comment-block .comment-enable, .comment-block .comments {
+.comment-block .comment-enable, .comment-block .comment-input, .comment-block .comments {
   display: none;
 }
 
@@ -39,6 +39,11 @@
 
 .media .media-heading {
   text-transform: capitalize;
+}
+
+.media .media-heading .versions {
+  cursor: pointer;
+  margin-right: 0.5em;
 }
 
 .media .media-heading small {
@@ -131,4 +136,29 @@
 }
 .popup .popup-container .foot button {
   margin-left: 12px;
+}
+
+.popup .actions {
+  display: inline-block;
+  float: right;
+  font-size: 0.75em;
+}
+.popup .actions label {
+  margin-right: 5px;
+} 
+
+.popup .actions button {
+  line-height: 1.25em;
+}
+
+.popup .history {
+  margin: 0 5px;
+}
+
+.popup .history del {
+  color: #a94442;
+}
+
+.popup .history ins {
+  color: #3c763d;
 }
