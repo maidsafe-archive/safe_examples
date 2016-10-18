@@ -57,6 +57,9 @@
 
     // Show Popup with Blocked Users
     showBlockedUsers () {
+      if (!this.controller.hasBlockedUsers()) {
+        return;
+      }
       const prepareTemplate = () => {
         let template = '<ul class="list-group">'
         Object.keys(this.data.blockedUsers).forEach(user => {
@@ -84,12 +87,37 @@
     // Fired when the comment form is submitted via click
     addComment () {
       var commentEle = this.$('#_commentText');
-      var comment = commentEle.val()
+      var comment = commentEle.val().trim()
       var name = this.$('#_dnsList').val()
       if (!!name && !!comment) {
         this._spinUntil(this.controller.postComment(comment, name))
         commentEle.val('');
       }
+    }
+
+    // show the pop up allowing the owner to change their
+    // own comments
+    editComment (comment, index) {
+      this._showPopup('Edit Comment', `
+        <form role="form" id="_editCommentForm">
+          <div class="form-group">
+            <textarea id="_editCommentText" class="form-control" rows="4" autoFocus>${comment.comment.comment}</textarea>
+          </div>
+        </form>
+        `, [
+        { name: 'Cancel', call: () => this._hidePopup() },
+        { name: 'Save new version', call: () => this._saveNewCommentVersion(comment.comment, index) }
+      ])
+    }
+
+    _saveNewCommentVersion (payload, index) {
+      let newContent = this.$('#_editCommentText').val().trim()
+      this._hidePopup()
+      if (newContent === payload.comment) {
+        // nothing has been changed. ignore
+        return
+      }
+      this._spinUntil(this.controller.updateComment(index, payload, newContent))
     }
 
     // Delete the comment at a specific index
@@ -185,9 +213,7 @@
         // all cool, disable the enable button
         this._toggleEnableCommentBtn(false)
 
-        if (this.controller.hasBlockedUsers()) {
-          this._toggleCommentOpts(true);
-        }
+        this._toggleCommentOpts(this.controller.hasBlockedUsers());
 
         // render the comments and the comment box
         this._renderComments()
@@ -195,6 +221,81 @@
          this._toggleCommentsInput(true)
         }
       }
+    }
+
+    _showCommentsHistory (comment) {
+      let length = comment.history.length
+      let current = comment.comment.comment
+      let curIdx = 0
+      let popup
+
+      let setIndex = (newIdx) => {
+        // show right item
+        popup.find(".historyItem").hide()
+        popup.find('#historyItem-' + newIdx).show()
+        
+        // update buttons
+        popup.find('.prev').attr('disabled', newIdx <= 0)
+        popup.find('.next').attr('disabled', newIdx >= length)
+        curIdx = newIdx
+      }
+
+      let updateDiffToggle = (showDiff) => {
+        if (showDiff) {
+          popup.find('.diff').show()
+          popup.find('.raw').hide()
+        } else {
+          popup.find('.raw').show()
+          popup.find('.diff').hide()
+        }
+      }
+
+      let template = `<div class="history">`
+
+      let renderComment = (entry, index) => {
+        template += `
+          <div class="historyItem" id="historyItem-${index}">
+            <h4 class="media-heading">edit ${(new Date(entry.editedTime || entry.time)).toLocaleString()} <small>version ${index + 1} / ${length +1}</small></h4>
+            <div class="raw">
+              ${entry.comment}
+            </div>
+            <div class="diff">
+              ${MODULE.inlineDiff(entry.comment, current)}
+            </div>
+          </div>
+        `
+      }
+
+      comment.history.forEach(renderComment)
+      renderComment(comment.comment, length)
+      template += "</div>"
+
+      popup = this._showPopup(`Comment History
+          <div class="actions">
+             <input type="checkbox" id="diffToggle" name="diffToggle" checked> Show as Diff</label> <button class="prev">←</button> <button class="next">→</button> <label for="diffToggle">
+          </div>
+        `, template, [
+        { name: 'close', call: () => this._hidePopup() }
+      ])
+
+      popup.find('.prev').click( () => setIndex(curIdx - 1) )
+      popup.find('.next').click( () => setIndex(curIdx + 1) )
+      popup.find('#diffToggle').change( () => updateDiffToggle(popup.find('#diffToggle:checked').length > 0))
+
+      setIndex(length - 1) // we startup with the last item
+      updateDiffToggle(true)
+    }
+
+    showCommentHistory (comment, index) {
+      if (comment.history) {
+        // have been fetch already
+        this._showCommentsHistory(comment)
+      }
+
+      this._spinUntil(this.controller.fetchHistory(comment, index)).then( () => {
+        this._showCommentsHistory(comment)
+      })
+
     }
 
     _renderComments () {
@@ -212,28 +313,42 @@
         let item = $(`
         <div class="media">
           <div class="media-body">
-            <h4 class="media-heading">${comment.name}
-              <small>${(new Date(comment.time)).toLocaleString()}</small>
+            <h4 class="media-heading">
+              <span class="name">${comment.comment.name}</span> 
+              <small><span class="versions"></span> ${(new Date(comment.comment.time)).toLocaleString()}</small>
             </h4>
-            ${comment.comment}
+            ${comment.comment.comment}
+            <div class="media-options"></div>
           </div>
         </div>`)
 
+        if (comment.versions > 1) {
+          let version = item.find('.versions')
+            version.attr('title', 'Last edited: ' + (new Date(comment.comment.editedTime)).toLocaleString())
+            version.html(`✎ ${comment.versions}`)
+            version.click(() => this.showCommentHistory(comment, index))
+        }
+
+        let $actionMenu = item.find('.media-options')
+
+        if (comment.isOwner) {
+          $actionMenu.append($(
+            `<button class="btn btn-xs" type="button">Edit</button>`
+            ).click(() => this.editComment(comment, index)))
+        }
+
         // admins have extra actions they can do on the item
         if (this.controller.isAdmin()) {
-          let $adminMenu = $('<div class="media-options"></div>')
-          MODULE.log($adminMenu)
 
-          $adminMenu.append($(
+          $actionMenu.append($(
             `<button class="btn btn-danger btn-xs" type="button">Delete</button>`
             ).click(() => this.deleteComment(comment, index)))
 
-          if (!isBlockedUser(comment.name)) {
-            $adminMenu.append($(
+          if (!isBlockedUser(comment.comment.name)) {
+            $actionMenu.append($(
               `<button class="btn btn-warning btn-xs" type="button" >Block</button>`
-            ).click(() => this.blockUser(comment.name, index)))
+            ).click(() => this.blockUser(comment.comment.name, index)))
           }
-          item.append($adminMenu);
         }
         return item
       }
@@ -245,7 +360,7 @@
       if (this.data.commentList.length) {
         // for every comment found, render the comment at the index
         this.data.commentList.forEach((comment) => {
-          target.append(renderComment(comment.comment, comment.index))
+          target.append(renderComment(comment, comment.index))
         })
         target.show()
       } else {
@@ -273,16 +388,18 @@
     //
     _selectUnBlockUser () {
       const selected = this.$('input[name=blockedUsers]:checked').val()
-      this._hidePopup();
       if (!selected) {
         return
       }
-
+      this._hidePopup();
       return this._spinUntil(this.controller.unblockUser(selected))
     }
 
     _setUserNameForAnonymous (index) {
-      const userName = this.$('#_blockUserName').val()
+      const userName = this.$('#_blockUserName').val().trim()
+      if(!userName) {
+        return;
+      }
       this._hidePopup()
       if (this.data.blockedUsers && this.data.blockedUsers.hasOwnProperty(userName)) {
         return window.alert('User Name already exist')
@@ -295,12 +412,12 @@
       <div class="form-group row">
         <div class="col-lg-12">
           <div class="col-lg-12">
-            <input type="text" class="form-control" id="_blockUserName" placeholder="Enter Reference Name">
+            <input type="text" class="form-control" id="_blockUserName" placeholder="Enter Reference Name" autoFocus>
           </div>
         </div>
       </div>`
       this._showPopup('Anonymous User Reference Name', template, [
-          { name: 'Cancel', call: this._hidePopup() },
+          { name: 'Cancel', call: () => this._hidePopup() },
           { name: 'Block', call: () => this._setUserNameForAnonymous(index) }
       ])
     }
@@ -341,6 +458,7 @@
 
       popupContainer.find('.head').html(title)
       popupContainer.find('.content').html(template)
+      footer.html('');
       foot.forEach(opt => {
         if (!opt.name) {
           return
@@ -349,6 +467,7 @@
           <button name="close" class="btn btn-primary" >${opt.name}</button>`).click(opt.call)))
       })
       popupEle.show()
+      return popupEle
     }
 
     // hiding the popup

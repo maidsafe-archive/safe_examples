@@ -83,7 +83,7 @@
         return true
       }
 
-      let currentDns = this._hostName.replace(/(^\w+\.|.safenet$)/g, '')
+      let currentDns = this._hostName.split('.').slice(-1)[0]
       if (!this._data.user.dns) {
         return
       }
@@ -217,7 +217,7 @@
           // save the data then
           .then(() => this._autoRelease(
             // replace the structured Data handle for a dataID handle
-            window.safeImmutableData.closeWriter(this._authToken, writerHandle, this._symmetricCipherOptsHandle),
+            window.safeImmutableData.closeWriter(this._authToken, writerHandle),
             // append that handle to the appendable data
             (dataIdHandle) => window.safeAppendableData.append(this._authToken, this._currentPostHandleId, dataIdHandle),
             // release the dataId handle
@@ -239,12 +239,11 @@
     deleteComment (index) {
       // prepare the removable of a specific index
       return window.safeAppendableData.removeAt(this._authToken, this._currentPostHandleId, index)
-        .then((res) =>
-          // send that off
-          window.safeAppendableData.post(this._authToken, this._currentPostHandleId))
+        .then(() => window.safeAppendableData.post(this._authToken, this._currentPostHandleId))
         .then(() =>
-          // clear our local cache
+          // clear deleted data
           window.safeAppendableData.clearAll(this._authToken, this._currentPostHandleId, true))
+        .then(() => window.safeAppendableData.post(this._authToken, this._currentPostHandleId))
         // and refresh all comments
         .then(() => this.fetchComments())
     }
@@ -289,6 +288,8 @@
               )
           }
           )
+          .then(() => this.fetchComments())
+          .then(data => this.emit('comments-updated'))
         ),
         // release signing key
         (signKeyHandle) => window.safeSignKey.dropHandle(this._authToken, signKeyHandle)

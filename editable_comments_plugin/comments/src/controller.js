@@ -83,7 +83,7 @@
         return true
       }
 
-      let currentDns = this._hostName.replace(/(^\w+\.|.safenet$)/g, '')
+      let currentDns = this._hostName.split('.').slice(-1)[0];
       if (!this._data.user.dns) {
         return
       }
@@ -268,7 +268,7 @@
         // once done, refresh the comments listing
         .then(() => this.fetchComments())
         .catch(err => {
-          window.alert('');
+          window.alert('Could not post a comment');
         });
     }
 
@@ -315,6 +315,7 @@
         .then(() =>
           // clear our local cache
           window.safeAppendableData.clearAll(this._authToken, this._currentPostHandleId, true))
+        .then(() => window.safeAppendableData.post(this._authToken, this._currentPostHandleId))
         // and refresh all comments
         .then(() => this.fetchComments())
     }
@@ -359,6 +360,8 @@
               )
           }
           )
+          .then(() => this.fetchComments())
+          .then(data => this.emit('comments-updated'))
         ),
         // release signing key
         (signKeyHandle) => window.safeSignKey.dropHandle(this._authToken, signKeyHandle)
