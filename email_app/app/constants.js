@@ -5,8 +5,8 @@ export const CONSTANTS = {
   SERVER_URL: 'http://localhost:8100',
   ROOT_PATH: 'APP',
   TAG_TYPE: {
-    DEFAULT: 501,
-    VERSIONED: 500
+    DEFAULT: 500,
+    VERSIONED: 501
   },
   APPENDABLE_DATA_FILTER_TYPE: {
     WHITE_LIST: 'WHITE_LIST',
