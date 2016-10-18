@@ -1,8 +1,7 @@
 import ACTION_TYPES from './actionTypes';
 import * as base64 from 'urlsafe-base64';
-import { CONSTANTS } from '../constants';
 
-export const getStructuredDataIdHandle = (token, name) => ({
+export const getStructuredDataIdHandle = (token, name, typeTag) => ({
   type: ACTION_TYPES.GET_STRUCTURED_DATA_ID_HANDLE,
   payload: {
     request: {
@@ -12,7 +11,7 @@ export const getStructuredDataIdHandle = (token, name) => ({
         'Authorization': token
       },
       data: {
-        typeTag: CONSTANTS.TAG_TYPE.DEFAULT,
+        typeTag,
         name
       }
     }

@@ -27,8 +27,6 @@ export const fetchStructuredData = (token, handleId) => ({
       url: `/structured-data/${handleId}`,
       headers: {
         'Authorization': token,
-        'Tag-Type': CONSTANTS.TAG_TYPE.DEFAULT,
-        Encryption: CONSTANTS.ENCRYPTION.SYMMETRIC,
         'Content-Type': 'text/plain'
       }
     }
@@ -41,7 +39,6 @@ export const fetchStructuredDataHandle = (token, dataIdHandle) => ({
     request: {
       url: `/structured-data/handle/${dataIdHandle}`,
       headers: {
-        'Tag-Type': CONSTANTS.TAG_TYPE.DEFAULT,
         'Authorization': token
       }
     }

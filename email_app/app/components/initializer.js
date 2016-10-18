@@ -59,7 +59,8 @@ export default class Initializer extends Component {
 
   getStructuredDataIdHandle(name) {
     const { token, getStructuredDataIdHandle } = this.props;
-    getStructuredDataIdHandle(token, name)
+    
+    getStructuredDataIdHandle(token, name, CONSTANTS.TAG_TYPE.DEFAULT)
       .then((res) => {
         if (res.error) {
           return showDialog('Get Structure Data Handler Error', res.error.message);

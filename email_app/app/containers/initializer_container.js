@@ -23,7 +23,7 @@ const mapDispatchToProps = dispatch => {
     writeConfigFile: (token, data) => (dispatch(writeConfigFile(token, data))),
     getCipherOptsHandle: (token, encType, keyHandle) => (dispatch(getCipherOptsHandle(token, encType, keyHandle))),
     deleteCipherOptsHandle: (token, handleId) => (dispatch(deleteCipherOptsHandle(token, handleId))),
-    getStructuredDataIdHandle: (token, name) => (dispatch(getStructuredDataIdHandle(token, name))),
+    getStructuredDataIdHandle: (token, name, typeTag) => (dispatch(getStructuredDataIdHandle(token, name, typeTag))),
     createStructuredData: (token, name, data) => (dispatch(createStructuredData(token, name, data))),
     fetchStructuredData: (token, handleId) => (dispatch(fetchStructuredData(token, handleId))),
     fetchStructuredDataHandle: (token, dataIdHandle) => (dispatch(fetchStructuredDataHandle(token, dataIdHandle))),
