@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Peer from 'simple-peer'
-import { APP_ID } from '../store'
+import { publishData, readData } from '../store'
 
 
 class PeerView extends Component {
@@ -48,17 +48,19 @@ class PeerView extends Component {
       "connectionState": "connecting"
     })
 
-    // we are also not yet in a ready state
-    if (!props.stream || !props.token) return
+    console.log("trying", props)
+    // we need both to start up
+    if (!props.stream || !props.authorised) return
 
     // FIXME: this should move into the store
+
 
     const initiator = !!!props.peerPayload
     const peer = new Peer({ initiator: initiator,
                           stream: props.stream,
                           trickle: false });
-    const targetId = initiator ? APP_ID + "-" + props.room :  props.peerPayload.targetId;
-    const myNewId =  APP_ID + "-" + this.props.room + "-" + (Math.random())
+    const targetId = initiator ? props.room :  props.peerPayload.targetId;
+    const myNewId =  this.props.room + "-" + (Math.random())
 
     this.peer = peer;
     console.log("mounting", initiator, targetId, props)
@@ -70,30 +72,16 @@ class PeerView extends Component {
 
     peer.on('signal', (d) => {
       // try to automatically establish connection
-      const data = new Buffer(JSON.stringify({payload: d, targetId: myNewId}))
-      safeStructuredData.create(this.props.token, targetId, 500, data)
-        .then(parseJsonResponse)
-        .then((res) => safeStructuredData.put(this.props.token, res.handleId))
-        .then((res) => safeStructuredData.dropHandle(this.props.token, res.handleId))
+      publishData(targetId, {payload: d, targetId: myNewId})
+        .catch(console.log.bind(console))
 
       if (initiator) {
-        let poller = window.setInterval( ()=> {
-          safeStructuredData.getHandle(this.props.token, myNewId)
-            .then((resp) => {
-                console.log(resp)
-                if (resp.status !== 200) return
-                window.clearInterval(poller);
-
-                let handle = resp.headers.get("Handle-Id")
-                console.log('handle', handle)
-                return safeStructuredData.readData(this.props.token, handle)
-                  .then(parseJsonResponse).then((resp) => {
-                    console.log(resp)
-                    peer.signal(resp.payload)
-                  })
-              })
-              // .catch(console.warn.bind(console))
-        }, 1000) // we poll once a second
+        let poller = window.setInterval(() => {
+          readData(myNewId).then((data) => {
+            window.clearInterval(poller)
+            peer.signal(data.payload)
+          })
+        }, 2000) // we poll once every 2 seconds
       }
     })
     peer.on('error', (err) => {

@@ -4,38 +4,7 @@ import webrtc from 'webrtc-adapter';
 import Peer from 'simple-peer';
 import logo from './logo.svg';
 import Room from './components/Room';
-import VideoBlock from './components/VideoBlock';
-import { APP_ID } from './store';
 import './App.css';
-
-
-// FIXME: make this only in dev
-require('safe-js/dist/polyfill')
-
-// const appInfo = )
-//
-// auth = fetch("/auth", {method: 'POST', , body: appInfo}).then(console.log.bind(console)).catch(console.warn.bind(this))
-//
-
-
-function apiRequest(method, url, token, body) {
-  const headers = { "Content-Type" : "application/json"}
-  if (token){
-    headers['Authorization'] = "Bearer " + token
-  }
-  return fetch(url, {method: method, headers: headers, body: body}
-    ).then((x) => {
-      // for debugging purposes
-      console.log("response", x)
-      return x
-    }).catch(console.error.bind(console))
-}
-
-function parseJsonResponse(resp) {
-  console.log(resp)
-  if (resp.__parsedResponseBody__) return resp.__parsedResponseBody__
-  return resp.body().then((content) => JSON.parse(content))
-}
 
 
 class App extends Component {
