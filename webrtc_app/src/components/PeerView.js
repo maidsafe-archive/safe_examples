@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import Peer from 'simple-peer'
 import { publishData, readData } from '../store'
 
-
 class PeerView extends Component {
-  constructor() {
+  constructor () {
     super()
     this.state = {
       connectionString: '',
@@ -14,56 +13,55 @@ class PeerView extends Component {
       peerVideo: null
     }
   }
-  sendDraft() {
+  sendDraft () {
     let msg = this.refs['draft'].value
     this.peer.send(msg)
-    this.addMsg({type: "me", "msg": msg})
-    this.refs['draft'].value = ""
+    this.addMsg({type: 'me', 'msg': msg})
+    this.refs['draft'].value = ''
     return false
   }
 
-  submitResponse (){
-    var val = JSON.parse(window.atob(this.refs['answer'].value));
+  submitResponse () {
+    var val = JSON.parse(window.atob(this.refs['answer'].value))
     this.peer.signal(val)
   }
 
   addMsg (msg) {
     msg.tstamp = new Date()
     this.state.messages.unshift(msg)
-    this.setState({"messages": this.state.messages})
+    this.setState({'messages': this.state.messages})
   }
 
-  componentWillReceiveProps(newProps){
+  componentWillReceiveProps (newProps) {
     this.setUpPeer(newProps)
   }
 
-  componentWillMount() {
+  componentWillMount () {
     this.setUpPeer(this.props)
   }
 
-  setUpPeer(props){
+  setUpPeer (props) {
     // we've already started setup
-    if (this.peer) return;
+    if (this.peer) return
     this.setState({
-      "connectionState": "connecting"
+      'connectionState': 'connecting'
     })
 
-    console.log("trying", props)
+    console.log('trying', props)
     // we need both to start up
     if (!props.stream || !props.authorised) return
 
     // FIXME: this should move into the store
 
-
-    const initiator = !!!props.peerPayload
+    const initiator = !props.peerPayload
     const peer = new Peer({ initiator: initiator,
                           stream: props.stream,
-                          trickle: false });
-    const targetId = initiator ? props.room :  props.peerPayload.targetId;
-    const myNewId =  this.props.room + "-" + (Math.random())
+                          trickle: false })
+    const targetId = initiator ? props.room : props.peerPayload.targetId
+    const myNewId = this.props.room + '-' + (Math.random())
 
-    this.peer = peer;
-    console.log("mounting", initiator, targetId, props)
+    this.peer = peer
+    console.log('mounting', initiator, targetId, props)
 
     if (!initiator) {
       // let's connect to the other peer
@@ -85,57 +83,57 @@ class PeerView extends Component {
       }
     })
     peer.on('error', (err) => {
-      this.addMsg({type: "error", "msg": '' + err})
+      this.addMsg({type: 'error', 'msg': '' + err})
       console.log('error', err)
     })
 
     peer.on('connect', () => {
-      this.setState({"connectionState": "connected"});
-      this.addMsg({type: "system", "msg": 'connection established'})
+      this.setState({'connectionState': 'connected'})
+      this.addMsg({type: 'system', 'msg': 'connection established'})
     })
 
     peer.on('stream', (stream) => {
-      this.addMsg({type: "system", "msg": 'video established'})
-      this.setState({"peerVideo": window.URL.createObjectURL(stream)})
+      this.addMsg({type: 'system', 'msg': 'video established'})
+      this.setState({'peerVideo': window.URL.createObjectURL(stream)})
     })
 
     peer.on('data', (data) => {
       // incoming message
       console.log('data: ' + data)
-      this.addMsg({type: "peer", "msg": data.toString()})
+      this.addMsg({type: 'peer', 'msg': data.toString()})
     })
   }
-  render() {
+  render () {
     if (this.state.connectionState === 'connected') {
-      return (<div className="peerview">
-      <div className="chat">
-        <form onSubmit={this.sendDraft.bind(this)}>
-          <input type="text" ref="draft"
-          /><button  type="submit">send</button>
-        </form>
-        <ul>
-          {this.state.messages.map(
-            (m) => <li className={m.type} title={m.tstamp.toISOString()}>{m.msg}</li>)}
-        </ul>
-      </div>
-      <video className="peer" autoPlay={true}
-          src={this.state.peerVideo}></video>
-      </div>);
+      return (<div className='peerview'>
+        <div className='chat'>
+          <form onSubmit={this.sendDraft.bind(this)}>
+            <input type='text' ref='draft'
+            /><button type='submit'>send</button>
+          </form>
+          <ul>
+            {this.state.messages.map(
+              (m) => <li className={m.type} title={m.tstamp.toISOString()}>{m.msg}</li>)}
+          </ul>
+        </div>
+        <video className='peer' autoPlay
+          src={this.state.peerVideo} />
+      </div>)
     }
-    if (this.state.connectionPayload.type === "offer") {
+    if (this.state.connectionPayload.type === 'offer') {
       return <div>
         <h3>Waiting</h3>
         <p>Please tell the other party to go the following link</p>
-        <p><a target="noopener" href={"/#" + window.btoa(JSON.stringify(this.state.connectionPayload))}>copy me</a></p>
+        <p><a target='noopener' href={'/#' + window.btoa(JSON.stringify(this.state.connectionPayload))}>copy me</a></p>
         <p>
           And copy-paste their response here:
         </p>
         <form onSubmit={this.submitResponse.bind(this)}>
-          <textarea ref="answer"></textarea>
-          <button type="submit">send</button>
+          <textarea ref='answer' />
+          <button type='submit'>send</button>
         </form>
       </div>
-    } else if (this.state.connectionPayload.type === "answer") {
+    } else if (this.state.connectionPayload.type === 'answer') {
       return <div>
         <h3>Waiting</h3>
         <p>Please tell the other party to paste this into their field</p>
@@ -143,7 +141,7 @@ class PeerView extends Component {
         </textarea>
       </div>
     }
-    return (<div>{this.state.connectionState}</div>);
+    return (<div>{this.state.connectionState}</div>)
   }
 }
 export default PeerView

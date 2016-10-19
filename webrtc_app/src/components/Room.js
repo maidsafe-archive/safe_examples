@@ -4,7 +4,7 @@ import VideoBlock from './VideoBlock'
 import { authorise, readData } from '../store'
 
 class Room extends Component {
-  constructor() {
+  constructor () {
     super()
     this.state = {
       'authorised': false,
@@ -13,35 +13,32 @@ class Room extends Component {
     }
   }
 
-  componentWillMount() {
-    
+  componentWillMount () {
     authorise().then(
       // use the base64 encoded version of the room
       () => readData(this.props.room)
-        .then( (payload) => {
+        .then((payload) => {
           this.setState({'peerPayload': payload, 'authorised': true})
-        }).catch( (err) => {
+        }).catch((err) => {
           console.log(err)
           this.setState({'peerPayload': false, 'authorised': true})
         })
     ).catch(console.warn.bind(console))
   }
 
-  render() {
+  render () {
     if (!this.state.authorised) {
       return <h1>Please authorise the app with SAFE Launcher</h1>
     }
     return (<div>
-      <VideoBlock onStream={(s) => this.setState({"stream": s})}/>
+      <VideoBlock onStream={(s) => this.setState({'stream': s})} />
       <PeerView
         stream={this.state.stream}
         room={this.props.room}
         authorised={this.state.authorised}
-        peerPayload={this.state.peerPayload}/>
+        peerPayload={this.state.peerPayload} />
     </div>)
   }
 }
-
-
 
 export default Room
