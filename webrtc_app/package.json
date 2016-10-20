@@ -8,7 +8,7 @@
     "express": "^4.14.0",
     "express-rawbody": "^1.0.2",
     "react-scripts": "0.4.1",
-    "safe-js": "^0.1.5"
+    "safe-js": "^0.2.3"
   },
   "dependencies": {
     "react": "^15.3.1",
