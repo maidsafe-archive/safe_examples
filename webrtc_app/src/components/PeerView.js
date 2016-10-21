@@ -107,10 +107,9 @@ class PeerView extends Component {
     if (this.state.connectionState === 'connected') {
       return (<div className='peerview'>
         <div className='chat'>
-          <form onSubmit={this.sendDraft.bind(this)}>
-            <input type='text' ref='draft'
-            /><button type='submit'>send</button>
-          </form>
+          <input type='text' ref='draft'
+          />
+          <button onClick={this.sendDraft.bind(this)}>send</button>
           <ul>
             {this.state.messages.map(
               (m) => <li className={m.type} title={m.tstamp.toISOString()}>{m.msg}</li>)}
