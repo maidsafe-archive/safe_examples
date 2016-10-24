@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Peer from 'simple-peer'
 import { publishData, readData } from '../store'
+import CONFIG from '../config.json'
 
 class PeerView extends Component {
   constructor () {
@@ -56,6 +57,9 @@ class PeerView extends Component {
     const initiator = !props.peerPayload
     const peer = new Peer({ initiator: initiator,
                           stream: props.stream,
+                          config : {
+                            iceServers: CONFIG.iceServers
+                          },
                           trickle: false })
     const targetId = initiator ? props.room : props.peerPayload.targetId
     const myNewId = this.props.room + '-' + (Math.random())
