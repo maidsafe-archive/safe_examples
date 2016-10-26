@@ -4,7 +4,7 @@ import keys from 'lodash.keys'
 import './App.css'
 
 import { EDITOR_THEME } from './config.js'
-import { authorise, refreshFileIndex } from './store.js'
+import { authorise, getFileIndex, saveFile } from './store.js'
 
 
 require("../node_modules/codemirror/lib/codemirror.css")
@@ -33,7 +33,9 @@ Some **bold** and _italic_ text
 
 > A quote...`
     }
+
     this.updateCode = this.updateCode.bind(this)
+    this.saveFile = this.saveFile.bind(this)
 
   }
 
@@ -41,6 +43,14 @@ Some **bold** and _italic_ text
     if (this.props.isNewFile) {
       this.setState({'loading': false})
     }
+  }
+
+  saveFile() {
+    this.setState({'loading': true})
+    saveFile(this.props.filename, this.state.code).then(() => {
+      this.setState({'loading': false})
+      this.props.onSave()
+    })
   }
 
   updateCode(newCode) {
@@ -58,7 +68,7 @@ Some **bold** and _italic_ text
           options={this.editorOpts}
           onChange={this.updateCode} />
         <div>
-          <button>cancel</button> <button>{this.props.isNewFile ? 'Create File' : 'Save new version'}</button>
+          <button>cancel</button> <button onClick={this.saveFile}>{this.props.isNewFile ? 'Create File' : 'Save new version'}</button>
         </div>
       </div>
     )
@@ -68,7 +78,6 @@ Some **bold** and _italic_ text
 class FileSelector extends Component {
 
   newFile() {
-    console.log(this.refs.filename)
     let filename = this.refs.filename.value.trim()
     if (!filename) return
     this.props.onSelectFile(filename)
@@ -105,7 +114,7 @@ class App extends Component {
   componentWillMount() {
     authorise().then(() => {
       this.setState({'authorised': true})
-      return refreshFileIndex().then(files => {
+      return getFileIndex().then(files => {
         console.log("loaded files", files)
         this.setState({'files': files})
       })
@@ -117,7 +126,12 @@ class App extends Component {
     let sub = <div className="info"><p>Please authorise the app in Launcher.</p></div>
     if (this.state.authorised) {
       if (this.state.selectedFile) {
-        sub = <ManagedEditor filename={this.state.selectedFile} isNewFile={!this.state.files[this.state.selectedFile]} />
+        sub = <ManagedEditor
+          filename={this.state.selectedFile}
+          onSave={ () => {
+            getFileIndex().then(files => this.setState({'files': files}))
+          }}
+          isNewFile={!this.state.files[this.state.selectedFile]} />
       } else {
         sub = <FileSelector files={keys(this.state.files)} onSelectFile={(f) => this.setState({selectedFile: f})} />
       }

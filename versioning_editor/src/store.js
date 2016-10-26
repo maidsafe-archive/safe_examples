@@ -14,7 +14,7 @@ const INDEX_FILE_NAME = btoa(`${APP_ID}+index`)
 let ACCESS_TOKEN
 let SYMETRIC_CYPHER_HANDLE
 let INDEX_HANDLE
-let FILE_INDEX = {}
+let FILE_INDEX
 
 function _refreshCypherHandle(){
   return safeCipherOpts.getHandle(ACCESS_TOKEN,
@@ -62,14 +62,44 @@ function _putFileIndex () {
     SYMETRIC_CYPHER_HANDLE)
 }
 
-export function refreshFileIndex () {
+export function saveFile(filename, data) {
+  let payload = new Buffer(JSON.stringify({
+    ts: (new Date()).getTime(),
+    content: data
+  })).toString('base64')
+
+  if (FILE_INDEX[filename]) {
+    // this was an edit, add new version
+    console.log("existing")
+  } else {
+    // file is being created for the first time
+    return safeStructuredData.create(ACCESS_TOKEN,
+        `${APP_ID}-${btoa(filename)}`, 501,
+        payload, SYMETRIC_CYPHER_HANDLE)
+      .then(extractHandle)
+      // save the structure
+      .then(handle => safeStructuredData.put(ACCESS_TOKEN, handle)
+        // fetch a permanent reference
+        .then(() => safeStructuredData.getDataIdHandle(ACCESS_TOKEN, handle))
+        // add the reference to the file index
+        .then((dataHandleId) => {
+          FILE_INDEX[filename] = dataHandleId
+          return _putFileIndex()
+        })
+      )
+  }
+}
+
+export function getFileIndex () {
+  if (FILE_INDEX) return Promise.resolved(FILE_INDEX)
+
   return safeDataId.getStructuredDataHandle(ACCESS_TOKEN, INDEX_FILE_NAME, 500)
     .then(extractHandle) 
     .then(dataHandle => {
       return safeStructuredData.getHandle(ACCESS_TOKEN, dataHandle)
         // or create!
         .catch((e) => {
-          console.error(e)
+          FILE_INDEX = {}
           return safeStructuredData.create(
               ACCESS_TOKEN, INDEX_FILE_NAME, 500,
               new Buffer(JSON.stringify({})).toString('base64'),
@@ -83,7 +113,7 @@ export function refreshFileIndex () {
         })
         .then(extractHandle)
         // then clean up the dataHandle
-        .then(sdHandle => safeDataId.dropHandle(dataHandle).then(() => sdHandle))
+        // .then(sdHandle => safeDataId.dropHandle(dataHandle).then(() => sdHandle))
         .then(sdHandle => {
           INDEX_HANDLE = sdHandle
           return sdHandle
@@ -91,8 +121,9 @@ export function refreshFileIndex () {
     }).then(sdHandle => 
       // try to read
       safeStructuredData.readData(ACCESS_TOKEN, sdHandle)
+        .then(resp => resp.json())
         .then(payload => {
-          FILE_INDEX = JSON.parse(atob(payload))
+          FILE_INDEX = payload
         })
     ).then(() => FILE_INDEX)
 }
