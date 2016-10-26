@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Editor from 'react-md-editor'
+import keys from 'lodash.keys'
 import './App.css'
 
 import { EDITOR_THEME } from './config.js'
@@ -13,7 +14,7 @@ require("../node_modules/react-md-editor/dist/react-md-editor.css")
 
 class ManagedEditor extends Component {
 
-  constructor() {
+  constructor(props) {
     super()
 
     this.editorOpts = {
@@ -21,6 +22,7 @@ class ManagedEditor extends Component {
     }
 
     this.state = {
+      loading: true,
       code: `# React Markdown Editor
 
 * A list
@@ -35,6 +37,12 @@ Some **bold** and _italic_ text
 
   }
 
+  componentWillMount() {
+    if (this.props.isNewFile) {
+      this.setState({'loading': false})
+    }
+  }
+
   updateCode(newCode) {
     this.setState({
         code: newCode
@@ -44,11 +52,14 @@ Some **bold** and _italic_ text
   render() {
     return (
       <div>
-        <h1>Editing <em>{this.props.filename}</em></h1>
+        <h1>Editing <em>{this.props.filename}</em>{this.props.isNewFile ? "*" : ""}</h1>
         <Editor
           value={this.state.code}
           options={this.editorOpts}
           onChange={this.updateCode} />
+        <div>
+          <button>cancel</button> <button>{this.props.isNewFile ? 'Create File' : 'Save new version'}</button>
+        </div>
       </div>
     )
   }
@@ -64,11 +75,15 @@ class FileSelector extends Component {
   }
 
   render() {
-    return <div>
+    let files = <p><em>no files yet</em></p>
+    if (this.props.files.length) {
+      files = <ul>{this.props.files.map((f) => <li onClick={() => this.onSelectFile(f)}>{f}</li>)}</ul>
+
+    }
+
+    return <div className="fileSelector">
       <h1>Select the file you want to edit</h1>
-      <ul>
-        <li></li>
-      </ul>
+      {files}
 
       <div><input ref="filename" placeholder="new filename here" /> <button onClick={this.newFile.bind(this)}>+ new File</button></div>
     </div>
@@ -83,7 +98,7 @@ class App extends Component {
     this.state = {
       'authorised': false,
       'selectedFile': null,
-      'files': null
+      'files': {}
     }
   }
 
@@ -91,6 +106,7 @@ class App extends Component {
     authorise().then(() => {
       this.setState({'authorised': true})
       return refreshFileIndex().then(files => {
+        console.log("loaded files", files)
         this.setState({'files': files})
       })
     })
@@ -101,9 +117,9 @@ class App extends Component {
     let sub = <div className="info"><p>Please authorise the app in Launcher.</p></div>
     if (this.state.authorised) {
       if (this.state.selectedFile) {
-        sub = <ManagedEditor filename={this.state.selectedFile} />
+        sub = <ManagedEditor filename={this.state.selectedFile} isNewFile={!this.state.files[this.state.selectedFile]} />
       } else {
-        sub = <FileSelector onSelectFile={(f) => this.setState({selectedFile: f})} />
+        sub = <FileSelector files={keys(this.state.files)} onSelectFile={(f) => this.setState({selectedFile: f})} />
       }
     }
     return (

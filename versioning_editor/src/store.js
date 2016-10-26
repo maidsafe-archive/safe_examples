@@ -92,7 +92,7 @@ export function refreshFileIndex () {
       // try to read
       safeStructuredData.readData(ACCESS_TOKEN, sdHandle)
         .then(payload => {
-          FILE_INDEX = payload
+          FILE_INDEX = JSON.parse(atob(payload))
         })
     ).then(() => FILE_INDEX)
 }
