@@ -1,12 +1,17 @@
 
 .App-header {
   text-align: center;
-  background-color: #222;
-  height: 50px;
+  background-color: #5592d7;
+  border-top: 3px solid #62C79A;
   padding: 20px;
   color: white;
 }
 
+.info {
+	padding: 2em 2em;
+	border-left: 3px solid #62C79A;
+	margin: 3em 20vw;
+}
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }

@@ -1,13 +1,9 @@
-import React, { Component } from 'react';
-import Editor from 'react-md-editor';
-import './App.css';
+import React, { Component } from 'react'
+import Editor from 'react-md-editor'
+import './App.css'
 
-// CONFIGURATION
-
-// Theme for the editor
-// try 'elegant' or 'material'
-// see all: https://codemirror.net/demo/theme.html
-const EDITOR_THEME = 'mdn-like'; 
+import { EDITOR_THEME } from './config.js'
+import { authorise } from './store.js'
 
 
 require("../node_modules/codemirror/lib/codemirror.css")
@@ -15,7 +11,7 @@ require('../node_modules/codemirror/theme/'+ EDITOR_THEME + '.css')
 require("../node_modules/react-md-editor/dist/react-md-editor.css")
 
 
-class App extends Component {
+class ManagedEditor extends Component {
 
   constructor() {
     super()
@@ -47,16 +43,43 @@ Some **bold** and _italic_ text
 
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <h2>Welcome to SAFE example Editor</h2>
-        </div>
         <Editor
           value={this.state.code}
           options={this.editorOpts}
           onChange={this.updateCode} />
+    )
+  }
+}
+
+class App extends Component {
+
+  constructor() {
+    super()
+    this.state = {
+      'authorised': false
+    }
+  }
+
+  componentWillMount() {
+    authorise().then(() => {
+      this.setState({'authorised': true})
+    })
+  }
+
+  render() {
+
+    let sub = <div className="info"><p>Please authorise the app in Launcher.</p></div>
+    if (this.state.authorised){
+      sub = <ManagedEditor />
+    }
+    return (
+      <div className="App">
+        <div className="App-header">
+          <h2>Welcome to SAFE example Editor</h2>
+        </div>
+        {sub}
       </div>
-    );
+    )
   }
 }
 

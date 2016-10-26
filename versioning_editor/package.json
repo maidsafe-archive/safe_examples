@@ -8,7 +8,8 @@
   "dependencies": {
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
-    "react-md-editor": "^0.2.2"
+    "react-md-editor": "^0.2.2",
+    "safe-js": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
