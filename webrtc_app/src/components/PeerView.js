@@ -15,7 +15,9 @@ class PeerView extends Component {
     }
   }
   sendDraft () {
-    let msg = this.refs['draft'].value
+    let msg = this.refs['draft'].value.trim()
+    if (!msg) return
+
     this.peer.send(msg)
     this.addMsg({type: 'me', 'msg': msg})
     this.refs['draft'].value = ''
@@ -111,7 +113,7 @@ class PeerView extends Component {
     if (this.state.connectionState === 'connected') {
       return (<div className='peerview'>
         <div className='chat'>
-          <input type='text' ref='draft'
+          <input type='text' ref='draft' onKeyDown={(e) => e.nativeEvent.keyIdentifier === 'Enter' ? this.sendDraft() : ''}
           />
           <button onClick={this.sendDraft.bind(this)}>send</button>
           <ul>

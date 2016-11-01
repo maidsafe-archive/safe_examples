@@ -16,7 +16,11 @@ class App extends Component {
     }
   }
   selectRoom () {
-    this.setState({'room': this.refs['room'].value})
+    const roomVal = this.refs['room'].value.trim()
+    if (roomVal.length < 5) return
+
+    this.setState({'room': roomVal})
+    document.location.hash = roomVal
     return false
   }
   render () {
@@ -52,7 +56,7 @@ class App extends Component {
         </div>
         <div className='room-wrap'>
           <label>
-            Room: #<input ref='room' required minLength={5} />
+            Room: #<input ref='room' onKeyDown={(e) => e.nativeEvent.keyIdentifier === 'Enter' ? this.selectRoom() : ''} required minLength={5} />
           </label>
           <button onClick={(x) => this.selectRoom()}>
             connect
