@@ -1,7 +1,8 @@
 /* global btoa, safeAuth, safeStructuredData, safeDataId */
 
-// this is only file directly interacting with SAFE
+import { version } from '../package.json'
 
+// this is only file directly interacting with SAFE
 if (process.env.NODE_ENV !== 'production') {
   require('safe-js/dist/polyfill')
 }
@@ -17,7 +18,7 @@ export function authorise () {
   return safeAuth.authorise({
     'name': 'SAFE Signaling Demo',
     'id': APP_ID,
-    'version': '0.7',
+    'version': version,
     'vendor': 'MaidSafe Ltd.',
     'permissions': ['LOW_LEVEL_API']
   },
