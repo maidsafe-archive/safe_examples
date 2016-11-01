@@ -11,6 +11,7 @@
     "safe-js": "^0.2.3"
   },
   "dependencies": {
+    "easypass": "^1.0.0",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
     "simple-peer": "^6.0.7",

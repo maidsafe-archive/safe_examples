@@ -2,21 +2,29 @@
 
 import React, { Component } from 'react'
 // eslint-disable-next-line
-import webrtc from 'webrtc-adapter';
+import webrtc from 'webrtc-adapter'
 import Peer from 'simple-peer'
 import logo from './logo.svg'
 import Room from './components/Room'
+import { generate } from 'easypass'
 import './App.css'
+
+function roomNameGenerator() {
+  const seperators = ['-', '.', '@', '_', 'x', '+', '*']
+  return generate([3,4,5,6,7][Math.floor(Math.random()* 5)]) + seperators[Math.floor(Math.random()* seperators.length)] + generate([3,4,5,6,7][Math.floor(Math.random()* 5)])
+
+}
 
 class App extends Component {
   constructor () {
     super()
     this.state = {
-      'room': location.hash.length > 1 ? location.hash.slice(1) : null
+      'room': location.hash.length > 1 ? location.hash.slice(1) : null,
+      'randomRoom': roomNameGenerator()
     }
   }
   selectRoom () {
-    const roomVal = this.refs['room'].value.trim()
+    const roomVal = this.refs['room'].value.trim() || this.state.randomRoom
     if (roomVal.length < 5) return
 
     this.setState({'room': roomVal})
@@ -56,7 +64,7 @@ class App extends Component {
         </div>
         <div className='room-wrap'>
           <label>
-            Room: #<input ref='room' onKeyDown={(e) => e.nativeEvent.keyIdentifier === 'Enter' ? this.selectRoom() : ''} required minLength={5} />
+            Room: #<input placeholder={this.state.randomRoom} ref='room' onKeyDown={(e) => e.nativeEvent.keyIdentifier === 'Enter' ? this.selectRoom() : ''} required minLength={5} />
           </label>
           <button onClick={(x) => this.selectRoom()}>
             connect
