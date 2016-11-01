@@ -23,7 +23,7 @@ export function authorise () {
   },
       APP_ID)
     .then(res => res.__parsedResponseBody__ || res)
-    .then(auth => auth.token === APP_ID ? safeAuth.getAuthToken(APP_ID) : auth.token)
+    .then(auth => auth.token === APP_ID ? safeAuth.getAuthToken(window.location.host) : auth.token)
     .then(token => {
       if (!token) {
         alert("Authentication failed")
