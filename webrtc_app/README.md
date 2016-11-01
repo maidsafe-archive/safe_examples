@@ -1,4 +1,4 @@
-# SAFE Network Signaling Example (using WebRTC)
+# SAFE Network Signalling Example (using WebRTC)
 
 ![](./src/logo.svg)
 
@@ -16,11 +16,7 @@ And start the development server by running
 npm run start
 ```
 
-This should open a browser window with the app starting up. Otherwise redirect your browser to `http://localhost:3000/`. The development server expects a SAFE Launcher to be accessible under `http://localhost:9999`. If that is not the case you can start the mock-launcher, by executing the following in another shell:
-
-```bash
-npm run mock-launcher
-```
+This should open a browser window with the app starting up. Otherwise redirect your browser to `http://localhost:3000/`. 
 
 ## Usage
 

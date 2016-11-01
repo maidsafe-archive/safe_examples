@@ -37,7 +37,7 @@ class App extends Component {
         <div className='App'>
           <div className='Room-header'>
             <img src={logo} className='App-logo' alt='logo' />
-            <h2>SAFE Signaling Demo <a href={'/#' + this.state.room}>#{this.state.room}</a></h2>
+            <h2>SAFE Signalling Demo <a href={'/#' + this.state.room}>#{this.state.room}</a></h2>
           </div>
           <Room room={this.state.room} />
         </div>
@@ -48,7 +48,7 @@ class App extends Component {
       <div className='App'>
         <div className='App-header'>
           <img src={logo} className='App-logo' alt='logo' />
-          <h2>Welcome to the SAFE Signaling Demo</h2>
+          <h2>Welcome to the SAFE Signalling Demo</h2>
         </div>
         <div className='room-wrap'>
           <label>
