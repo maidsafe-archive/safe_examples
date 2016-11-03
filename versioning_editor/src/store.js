@@ -43,7 +43,7 @@ function _refreshConfig() {
         `{"user_prefix": "${_createRandomUserPrefix()}" }`)
     .catch(err => err.errorCode === -505 ? '' : console.error(err)) // ignore file already exists
     .then(safeNFS.getFile(ACCESS_TOKEN, FILE_NAME)
-      .then(resp => resp.json ? resp.json() : resp.body().then(JSON.parse))
+      .then(resp => resp.json ? resp.json() : resp.body)
       .then(config => {
         USER_PREFIX = config.user_prefix
       })  
@@ -87,6 +87,7 @@ function _putFileIndex () {
     INDEX_HANDLE,
     new Buffer(JSON.stringify(FILE_INDEX)).toString('base64'),
     SYMETRIC_CYPHER_HANDLE)
+  .then(() => safeStructuredData.post(ACCESS_TOKEN, INDEX_HANDLE))
 }
 
 export function saveFile(filename, data) {
@@ -120,7 +121,7 @@ export function saveFile(filename, data) {
 }
 
 export function getFileIndex () {
-  if (FILE_INDEX) return Promise.resolved(FILE_INDEX)
+  if (FILE_INDEX) return Promise.resolve(FILE_INDEX)
   const INDEX_FILE_NAME = btoa(`${USER_PREFIX}#index`)
 
   return safeDataId.getStructuredDataHandle(ACCESS_TOKEN, INDEX_FILE_NAME, 500)
@@ -134,7 +135,7 @@ export function getFileIndex () {
         INDEX_HANDLE = sdHandle
         // let's try to read
         return safeStructuredData.readData(ACCESS_TOKEN, sdHandle, '')
-          .then(resp => resp.json ? resp.json() : resp.body())
+          .then(resp => resp.json ? resp.json() : JSON.parse(new Buffer(resp).toString()))
       },            
       (e) => {
         console.error(e)
