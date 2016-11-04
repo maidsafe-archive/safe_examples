@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.App-header {
+  text-align: center;
+  background-color: #5592d7;
+  border-top: 3px solid #62C79A;
+  padding: 20px;
+  color: white;
+}
+
+.info {
+  padding: 2em 2em;
+  border-left: 3px solid #62C79A;
+  margin: 3em 20vw;
+}
+
+.fileSelector {
+  width: 80vw;
+  margin: 0 auto;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
