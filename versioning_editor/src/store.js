@@ -51,14 +51,19 @@ const _refreshConfig = () => {
     });
 };
 
+// legacy style fallback
+const extractHandle = (res) => res.hasOwnProperty('handleId') ? res.handleId : res.__parsedResponseBody__.handleId;
+
 const getSDHandle = (filename) => {
   let dataIdHandle = null;
   return safeDataId.getStructuredDataHandle(ACCESS_TOKEN, btoa(`${USER_PREFIX}:${filename}`), 501)
-    .then(res => (dataIdHandle = res.handleId))
+    .then(extractHandle)
+    .then(handleId => (dataIdHandle = handleId))
     .then(() => safeStructuredData.getHandle(ACCESS_TOKEN, dataIdHandle))
-    .then(res => {
+    .then(extractHandle)
+    .then(handleId => {
       safeDataId.dropHandle(ACCESS_TOKEN, dataIdHandle);
-      return res.handleId;
+      return handleId;
     })
 };
 
@@ -97,9 +102,6 @@ export const authorise = () => {
       }
     );
 };
-
-// legacy style fallback
-const extractHandle = (res) => res.handleId || res.__parsedResponseBody__.handleId
 
 const _putFileIndex = () => {
   return safeStructuredData.updateData(ACCESS_TOKEN,
@@ -164,10 +166,16 @@ export const getFileIndex = () => {
           FILE_INDEX = {};
           return safeStructuredData.create(ACCESS_TOKEN, INDEX_FILE_NAME, 500,
             new Buffer(JSON.stringify({})).toString('base64'), SYMETRIC_CYPHER_HANDLE)
-            .then(extractHandle)
-            .then(handle => safeStructuredData.put(ACCESS_TOKEN, handle)
+            .then(res => {
+              return extractHandle(res);
+            })
+            .then(handle => {
+              return (INDEX_HANDLE = handle);
+            })
+            .then(() => safeStructuredData.put(ACCESS_TOKEN, INDEX_HANDLE)
             // don't forget to clean up that handle
-              .then(() => safeStructuredData.dropHandle(handle)))
+            //   .then(() => safeStructuredData.dropHandle(handle))
+            )
             // and return empty data as payload
             .then(() => {
               return {}
@@ -202,11 +210,11 @@ export const getSDVersions = (filename) => {
   return getSDHandle(filename)
     .then(handleId => (sdHandleId = handleId))
     .then(() => safeStructuredData.getMetadata(ACCESS_TOKEN, sdHandleId))
-    .then(res => res.version)
+    .then(res => res.__parsedResponseBody__.version)
     .then(sdVersion => {
       const iterator = [];
-      for (let i = 0; i < sdVersion; i++) {
-        iterator.push(i + 1);
+      for (let i = 0; i <= sdVersion; i++) {
+        iterator.push(i);
       }
       return Promise.all(iterator.map(version => safeStructuredData.readData(ACCESS_TOKEN, sdHandleId, version)))
         .then(data => (sdVersions = data));

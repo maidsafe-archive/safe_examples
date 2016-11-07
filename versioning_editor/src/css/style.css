@@ -131,6 +131,9 @@ body {
   display: inline-block;
   float: left;
 }
+.version-diff .diff-h .diff-h-sec.button-only {
+  margin: 3px 0;
+}
 .version-diff .diff-h .diff-h-sec .dif-nav {
   padding: 3px;
   display: inline-block;

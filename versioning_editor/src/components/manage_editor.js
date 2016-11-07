@@ -29,7 +29,8 @@ Some **bold** and _italic_ text
 > A quote...`,
       versions: [],
       compA: -1,
-      compB: -1
+      compB: -1,
+      showComp: false
     };
 
     this.updateCode = this.updateCode.bind(this);
@@ -55,13 +56,16 @@ Some **bold** and _italic_ text
     if (!this.state.code.trim()) {
       return;
     }
-    if(JSON.parse((this.state.versions.slice(-1)[0]).toString()).content === this.state.code.trim()) {
+    if (this.state.versions.length !== 0 &&
+      JSON.parse((this.state.versions.slice(-1)[0]).toString()).content === this.state.code.trim()) {
       return;
     }
-    saveFile(this.props.filename, this.state.code).then(() => {
-      this.setState({ 'loading': false });
-      this.props.onSave();
-    })
+    saveFile(this.props.filename, this.state.code)
+      .then(() => {
+        this.setState({ 'loading': false });
+        this.props.onSave();
+      })
+      .then(() => this.getVersions())
   }
 
   updateCode(newCode) {
@@ -76,6 +80,9 @@ Some **bold** and _italic_ text
   }
 
   setDiff(select, version) {
+    if (!this.state.showComp) {
+      this.setState({ compA: this.state.versions.length - 1 });
+    }
     if (select === 'A') {
       return this.setState({ compA: parseInt(version, 10) });
     }
@@ -95,43 +102,48 @@ Some **bold** and _italic_ text
             onChange={this.updateCode}/>
           <div className="editor-opts">
             <button className="btn" onClick={this.props.goBack}>Cancel</button>
-            <button className="btn pr-btn" onClick={this.saveFile}>{this.props.isNewFile ? 'Create File' : 'Save new version'}</button>
+            <button className="btn pr-btn"
+                    onClick={this.saveFile}>{this.props.isNewFile ? 'Create File' : 'Save new version'}</button>
             <button className="btn pr-btn" onClick={() => downloadFile(this.props.filename)}>Download</button>
           </div>
         </div>
         <div className="cnt-2">
           <div className="version-diff">
             <div className="diff-h">
-              <div className="diff-h-sec">
-                <div className="dif-nav">
-                  <button onClick={() => this.setDiff('A', (() => {
-                    if (this.state.compA <= 0) return 0;
-                    return --this.state.compA;
-                  })())}>&lt;</button>
-                  <button onClick={() => this.setDiff('A', (() => {
-                    if (this.state.compA === (this.state.versions.length - 1)) return this.state.compA;
-                    return ++this.state.compA;
-                  })())}>&gt;</button>
-                </div>
-                <select name="diffA"
-                        value={this.state.compA}
-                        onChange={e => this.setDiff('A', event.target.value)}>
-                  <option value="-1">Select A</option>
-                  {
-                    this.state.versions.map((version, i) => {
-                      return <option value={i}>version {i}</option>
-                    })
-                  }
-                </select>
-              </div>
+              {
+                this.state.showComp ? (
+                  <div className="diff-h-sec">
+                    <div className="dif-nav">
+                      <button onClick={() => this.setDiff('A', (() => {
+                        if (this.state.compA <= 0) return 0;
+                        return --this.state.compA;
+                      })())}>&lt;</button>
+                      <button onClick={() => this.setDiff('A', (() => {
+                        if (this.state.compA === (this.state.versions.length - 1)) return this.state.compA;
+                        return ++this.state.compA;
+                      })())}>&gt;</button>
+                    </div>
+                    <select name="diffA"
+                            value={this.state.compA}
+                            onChange={e => this.setDiff('A', event.target.value)}>
+                      <option value="-1">Version A</option>
+                      {
+                        this.state.versions.map((version, i) => {
+                          return <option value={i}>Version {i}</option>
+                        })
+                      }
+                    </select>
+                  </div>
+                ) : ''
+              }
               <div className="diff-h-sec">
                 <select name="diffB"
                         value={this.state.compB}
                         onChange={e => this.setDiff('B', event.target.value)}>
-                  <option value="-1">Select B</option>
+                  <option value="-1">Version{this.state.showComp ? ' B' : ''}</option>
                   {
                     this.state.versions.map((version, i) => {
-                      return <option value={i}>version {i}</option>;
+                      return <option value={i}>Version {i}</option>;
                     })
                   }
                 </select>
@@ -146,8 +158,11 @@ Some **bold** and _italic_ text
                   })())}>&gt;</button>
                 </div>
               </div>
-              <div className="diff-h-sec">
-                <button className="btn pr-btn" onClick={() => this.getVersions()}>Refresh</button>
+              <div className="diff-h-sec button-only">
+                <button
+                  className="btn pr-btn"
+                  onClick={() => this.setState({ showComp: !this.state.showComp })}
+                >{this.state.showComp ? 'Hide comparison' : 'Compare across versions' }</button>
               </div>
             </div>
           </div>
