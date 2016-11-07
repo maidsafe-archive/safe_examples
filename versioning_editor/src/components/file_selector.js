@@ -11,17 +11,27 @@ export default class FileSelector extends Component {
   render() {
     let files = <p><em>no files yet</em></p>;
     if (this.props.files.length) {
-      files = <ul>{this.props.files.map((f) => <li onClick={() => this.onSelectFile(f)}>{f}</li>)}</ul>;
-
+      files = (
+        <ul className="file-ls">
+          {this.props.files.map((f) => {
+            let fileName = f;
+            if (f.split('.').slice(-1)[0] !== 'md') {
+              fileName += '.md';
+            }
+            return <li onClick={() => this.props.onSelectFile(f)}><span className="icn">{fileName[0]}</span>{fileName}</li>;
+          })}
+        </ul>
+      );
     }
 
     return (
       <div className="fileSelector">
-        <h1>Select the file you want to edit</h1>
+        <h3 className="headers-2">Select the file you want to edit</h3>
         {files}
 
-        <div><input ref="filename" placeholder="new filename here"/>
-          <button onClick={this.newFile.bind(this)}>+ new File</button>
+        <div className="create-new">
+          <input ref="filename" placeholder="Create new file"/>
+          <button className="btn pr-btn" onClick={this.newFile.bind(this)}>Create</button>
         </div>
       </div>
     );
