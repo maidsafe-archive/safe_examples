@@ -15,6 +15,9 @@ let INDEX_HANDLE;
 let FILE_INDEX;
 let USER_PREFIX;
 
+// legacy style fallback
+const extractHandle = (res) => res.hasOwnProperty('handleId') ? res.handleId : res.__parsedResponseBody__.handleId;
+
 const _createRandomUserPrefix = () => {
   let randomString = '';
   for (var i = 0; i < 10; i++) {
@@ -28,7 +31,7 @@ const _refreshCypherHandle = () => {
   return safeCipherOpts.getHandle(ACCESS_TOKEN,
     window.safeCipherOpts.getEncryptionTypes().SYMMETRIC)
     .then(res => {
-        SYMETRIC_CYPHER_HANDLE = res.hasOwnProperty('handleId') ? res.handleId : res.__parsedResponseBody__.handleId;
+        SYMETRIC_CYPHER_HANDLE = extractHandle(res);
         return SYMETRIC_CYPHER_HANDLE;
       }
     );
@@ -41,18 +44,11 @@ const _refreshConfig = () => {
     // try to create instead then
     FILE_NAME,
     JSON.stringify({ 'user_prefix': _createRandomUserPrefix() }))
-    .catch(err => err) // ignore file already exists
+    .catch(err => err.errorCode === -505 ? '' : console.error(err)) // ignore file already exists
     .then(() => safeNFS.getFile(ACCESS_TOKEN, FILE_NAME))
-    .then(resp => {
-      return resp.json ? resp.json() : resp.body;
-    })
-    .then(config => {
-      USER_PREFIX = config.user_prefix
-    });
+    .then(resp => resp.json ? resp.json() : resp.body)
+    .then(config => (USER_PREFIX = config.user_prefix));
 };
-
-// legacy style fallback
-const extractHandle = (res) => res.hasOwnProperty('handleId') ? res.handleId : res.__parsedResponseBody__.handleId;
 
 const getSDHandle = (filename) => {
   let dataIdHandle = null;
@@ -157,24 +153,18 @@ export const getFileIndex = () => {
           INDEX_HANDLE = sdHandle;
           // let's try to read
           return safeStructuredData.readData(ACCESS_TOKEN, sdHandle, '')
-            .then(resp => {
-              return resp.json ? resp.json() : JSON.parse(new Buffer(resp).toString());
-            })
+            .then(resp => resp.json ? resp.json() : JSON.parse(new Buffer(resp).toString()))
         },
         (e) => {
           console.error(e);
           FILE_INDEX = {};
           return safeStructuredData.create(ACCESS_TOKEN, INDEX_FILE_NAME, 500,
             new Buffer(JSON.stringify({})).toString('base64'), SYMETRIC_CYPHER_HANDLE)
-            .then(res => {
-              return extractHandle(res);
-            })
-            .then(handle => {
-              return (INDEX_HANDLE = handle);
-            })
+            .then(extractHandle)
+            .then(handle => (INDEX_HANDLE = handle))
             .then(() => safeStructuredData.put(ACCESS_TOKEN, INDEX_HANDLE)
-            // don't forget to clean up that handle
-            //   .then(() => safeStructuredData.dropHandle(handle))
+              // don't forget to clean up that handle
+              //   .then(() => safeStructuredData.dropHandle(handle))
             )
             // and return empty data as payload
             .then(() => {
@@ -193,19 +183,7 @@ export const readFile = (filename, version) => {
     .then(handleId => safeStructuredData.readData(ACCESS_TOKEN, handleId, version));
 };
 
-export const downloadFile = (filename) => {
-  return readFile(filename)
-    .then(res => {
-      const content = JSON.parse(res.toString()).content;
-      const a = document.createElement('a');
-      a.download = filename + '.md';
-      a.href = "data:text/markdown;charset=utf8;base64," + new Buffer(content).toString('base64');
-      a.click();
-    });
-};
-
 export const getSDVersions = (filename) => {
-  let sdVersions = null;
   let sdHandleId = null;
   return getSDHandle(filename)
     .then(handleId => (sdHandleId = handleId))
@@ -216,9 +194,6 @@ export const getSDVersions = (filename) => {
       for (let i = 0; i <= sdVersion; i++) {
         iterator.push(i);
       }
-      return Promise.all(iterator.map(version => safeStructuredData.readData(ACCESS_TOKEN, sdHandleId, version)))
-        .then(data => (sdVersions = data));
-    })
-    .then(() => sdVersions);
-
+      return Promise.all(iterator.map(version => safeStructuredData.readData(ACCESS_TOKEN, sdHandleId, version)));
+    });
 };
