@@ -86,7 +86,7 @@ my-app/
     favicon.ico
   src/
     App.css
-    App.js
+    app.js
     App.test.js
     index.css
     index.js
@@ -401,13 +401,13 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 ```
 
-Import required React Bootstrap components within ```src/App.js``` file or your custom component files:
+Import required React Bootstrap components within ```src/app.js``` file or your custom component files:
 
 ```js
 import { Navbar, Jumbotron, Button } from 'react-bootstrap';
 ```
 
-Now you are ready to use the imported React Bootstrap components within your component hierarchy defined in the render method. Here is an example [`App.js`](https://gist.githubusercontent.com/gaearon/85d8c067f6af1e56277c82d19fd4da7b/raw/6158dd991b67284e9fc8d70b9d973efe87659d72/App.js) redone using React Bootstrap.
+Now you are ready to use the imported React Bootstrap components within your component hierarchy defined in the render method. Here is an example [`app.js`](https://gist.githubusercontent.com/gaearon/85d8c067f6af1e56277c82d19fd4da7b/raw/6158dd991b67284e9fc8d70b9d973efe87659d72/app.js) redone using React Bootstrap.
 
 ## Adding Flow
 
@@ -646,7 +646,7 @@ Jest will look for test files with any of the following popular naming conventio
 
 The `.test.js` / `.spec.js` files (or the `__tests__` folders) can be located at any depth under the `src` top level folder.
 
-We recommend to put the test files (or `__tests__` folders) next to the code they are testing so that relative imports appear shorter. For example, if `App.test.js` and `App.js` are in the same folder, the test just needs to `import App from './App'` instead of a long relative path. Colocation also helps find tests more quickly in larger projects.
+We recommend to put the test files (or `__tests__` folders) next to the code they are testing so that relative imports appear shorter. For example, if `App.test.js` and `app.js` are in the same folder, the test just needs to `import App from './App'` instead of a long relative path. Colocation also helps find tests more quickly in larger projects.
 
 ### Command Line Interface
 
