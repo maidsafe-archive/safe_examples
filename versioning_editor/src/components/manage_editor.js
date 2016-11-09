@@ -49,7 +49,6 @@ Some **bold** and _italic_ text
   }
 
   saveFile() {
-    this.setState({ 'loading': true });
     if (!this.state.code.trim()) {
       return Promise.reject('Empty content');
     }
@@ -57,7 +56,8 @@ Some **bold** and _italic_ text
       JSON.parse((this.state.versions.slice(-1)[0]).toString()).content === this.state.code.trim()) {
       return Promise.reject('No change made');
     }
-    saveFile(this.props.filename, this.state.code)
+    this.setState({ 'loading': true });
+    return saveFile(this.props.filename, this.state.code)
       .then(() => {
         this.setState({ 'loading': false });
         this.props.onSave();
@@ -77,9 +77,10 @@ Some **bold** and _italic_ text
   }
 
   download() {
+    const content = JSON.parse(this.state.versions.slice(-1)[0]).content;
     const a = document.createElement('a');
     a.download = this.props.filename + '.md';
-    a.href = "data:text/markdown;charset=utf8;base64," + new Buffer(this.state.code).toString('base64');
+    a.href = "data:text/markdown;charset=utf8;base64," + new Buffer(content).toString('base64');
     a.click();
   }
 
