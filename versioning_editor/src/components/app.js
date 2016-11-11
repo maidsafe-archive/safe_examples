@@ -16,6 +16,10 @@ export default class App extends Component {
     }
   }
 
+  componentDidMount() {
+    document.title = 'SAFE Editor Example';
+  }
+
   componentWillMount() {
     authorise().then(() => {
       this.setState({ 'authorised': true });
@@ -45,7 +49,7 @@ export default class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <h2>Welcome to SAFE example Editor</h2>
+          <h2>SAFE Editor Example</h2>
         </div>
         {sub}
       </div>

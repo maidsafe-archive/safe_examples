@@ -79,7 +79,7 @@ export const authorise = () => {
       'id': APP_ID,
       'version': APP_VERSION,
       'vendor': 'MaidSafe Ltd.',
-      'permissions': ['LOW_LEVEL_API', 'SAFE_DRIVE_ACCESS']
+      'permissions': ['LOW_LEVEL_API']
     },
     APP_ID)
     .then(res => res.__parsedResponseBody__ || res) // legacy style fallback
