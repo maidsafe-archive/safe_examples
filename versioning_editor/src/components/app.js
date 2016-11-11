@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import keys from 'lodash.keys'
+import Spinner from './spinner';
 import { authorise, getFileIndex } from '../store';
 
 import FileSelector from './file_selector';
@@ -12,8 +13,10 @@ export default class App extends Component {
     this.state = {
       'authorised': false,
       'selectedFile': null,
-      'files': {}
-    }
+      'files': {},
+      loading: false
+    };
+    this.toggleSpinner = this.toggleSpinner.bind(this);
   }
 
   componentDidMount() {
@@ -23,11 +26,17 @@ export default class App extends Component {
   componentWillMount() {
     authorise().then(() => {
       this.setState({ 'authorised': true });
+      this.toggleSpinner(); // set spinner
       return getFileIndex().then(files => {
         console.log("loaded files", files);
         this.setState({ 'files': files });
+        this.toggleSpinner(); // remove spinner
       })
     })
+  }
+
+  toggleSpinner() {
+    this.setState({ loading: !this.state.loading });
   }
 
   render() {
@@ -41,9 +50,14 @@ export default class App extends Component {
             getFileIndex().then(files => this.setState({ 'files': files }))
           }}
           isNewFile={!this.state.files[this.state.selectedFile]}
-          goBack={() => this.setState({ selectedFile: null })}/>
+          goBack={() => this.setState({ selectedFile: null })}
+          toggleSpinner={this.toggleSpinner}
+        />
       } else {
-        sub = <FileSelector files={keys(this.state.files)} onSelectFile={(f) => this.setState({ selectedFile: f })}/>
+        sub = <FileSelector
+          files={keys(this.state.files)}
+          onSelectFile={(f) => this.setState({ selectedFile: f })}
+        />
       }
     }
     return (
@@ -52,6 +66,7 @@ export default class App extends Component {
           <h2>SAFE Editor Example</h2>
         </div>
         {sub}
+        <Spinner show={this.state.loading} />
       </div>
     );
   }

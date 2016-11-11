@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 
 export default class FileSelector extends Component {
 
-  newFile() {
+  newFile(e) {
+    e.preventDefault();
     let filename = this.refs.filename.value.trim();
     if (!filename) return;
     this.props.onSelectFile(filename);
@@ -30,8 +31,10 @@ export default class FileSelector extends Component {
         {files}
 
         <div className="create-new">
-          <input ref="filename" placeholder="Create new file"/>
-          <button className="btn pr-btn" onClick={this.newFile.bind(this)}>Create</button>
+          <form>
+            <input ref="filename" placeholder="Create new file"/>
+            <button className="btn pr-btn" type="submit" onClick={this.newFile.bind(this)}>Create</button>
+          </form>
         </div>
       </div>
     );
