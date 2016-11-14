@@ -33,6 +33,7 @@ Some **bold** and _italic_ text
     this.saveFile = this.saveFile.bind(this);
     this.getVersions = this.getVersions.bind(this);
     this.download = this.download.bind(this);
+    this.isContentUpdated = this.isContentUpdated.bind(this);
   }
 
   componentWillMount() {
@@ -48,12 +49,16 @@ Some **bold** and _italic_ text
       .then(() => this.getVersions());
   }
 
+  isContentUpdated() {
+    return !(this.state.versions.length !== 0 &&
+      JSON.parse((this.state.versions.slice(-1)[0]).toString()).content.trim() === this.state.code.trim())
+  }
+
   saveFile() {
     if (!this.state.code.trim()) {
       return Promise.reject('Empty content');
     }
-    if (this.state.versions.length !== 0 &&
-      JSON.parse((this.state.versions.slice(-1)[0]).toString()).content.trim() === this.state.code.trim()) {
+    if (!this.isContentUpdated()) {
       return Promise.reject('No change made');
     }
     this.props.toggleSpinner(); // set spinner
@@ -100,6 +105,7 @@ Some **bold** and _italic_ text
           <div className="editor-opts">
             <button className="btn" onClick={this.props.goBack}>Cancel</button>
             <button className="btn pr-btn"
+                    disabled={(!this.props.isNewFile && !this.isContentUpdated()) ? 'disabled' : ''}
                     onClick={this.saveFile}>{this.props.isNewFile ? 'Create File' : 'Save new version'}</button>
             {this.props.isNewFile ? '' : <button className="btn pr-btn" onClick={() => this.download()}>Download</button>}
           </div>
