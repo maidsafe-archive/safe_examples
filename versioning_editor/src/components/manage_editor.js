@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Editor from 'react-md-editor';
 import VersionDiff from './version_diff';
-import { EDITOR_THEME } from '../config';
+import { EDITOR_THEME, APP_NAME } from '../config';
 import '../../node_modules/codemirror/lib/codemirror.css';
 import '../../node_modules/react-md-editor/dist/react-md-editor.css';
 require(`../../node_modules/codemirror/theme/${EDITOR_THEME}.css`);
@@ -17,7 +17,7 @@ export default class ManagedEditor extends Component {
     };
 
     this.state = {
-      code: `# React Markdown Editor
+      code: `# ${APP_NAME}
 
 * A list
 * with
