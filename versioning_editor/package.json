@@ -1,0 +1,23 @@
+{
+  "name": "safe_markdown_editor",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "lodash.keys": "^4.2.0",
+    "react-scripts": "0.7.0"
+  },
+  "dependencies": {
+    "open-sans-fontface": "^1.4.0",
+    "react": "^15.3.2",
+    "react-diff": "0.0.7",
+    "react-dom": "^15.3.2",
+    "react-md-editor": "^0.2.2",
+    "safe-js": "^0.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
