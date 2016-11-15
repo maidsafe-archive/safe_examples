@@ -22,7 +22,7 @@ const _createRandomUserPrefix = () => {
   let randomString = '';
   for (var i = 0; i < 10; i++) {
     // and ten random ascii chars
-    randomString += String.fromCharCode(Math.floor(Math.random(100)));
+    randomString += String.fromCharCode(Math.floor(Math.random(100) * 100));
   }
   return btoa(`${APP_ID}@${APP_VERSION}#${(new Date()).getTime()}-${randomString}`);
 };
@@ -43,10 +43,10 @@ const _refreshConfig = () => {
   return safeNFS.createFile(ACCESS_TOKEN,
     // try to create instead then
     FILE_NAME,
-    JSON.stringify({ 'user_prefix': _createRandomUserPrefix() }))
+    JSON.stringify({ 'user_prefix': _createRandomUserPrefix() }), 'application/json')
     .catch(err => err.errorCode === -505 ? '' : console.error(err)) // ignore file already exists
     .then(() => safeNFS.getFile(ACCESS_TOKEN, FILE_NAME))
-    .then(resp => resp.json ? resp.json() : resp.body)
+    .then(resp => resp.json ? resp.json() : JSON.parse(resp.toString()))
     .then(config => (USER_PREFIX = config.user_prefix));
 };
 
@@ -79,7 +79,7 @@ export const authorise = () => {
       'id': APP_ID,
       'version': APP_VERSION,
       'vendor': 'MaidSafe Ltd.',
-      'permissions': ['LOW_LEVEL_API', 'SAFE_DRIVE_ACCESS']
+      'permissions': ['LOW_LEVEL_API']
     },
     APP_ID)
     .then(res => res.__parsedResponseBody__ || res) // legacy style fallback
@@ -188,7 +188,7 @@ export const getSDVersions = (filename) => {
   return getSDHandle(filename)
     .then(handleId => (sdHandleId = handleId))
     .then(() => safeStructuredData.getMetadata(ACCESS_TOKEN, sdHandleId))
-    .then(res => res.__parsedResponseBody__.version)
+    .then(res => res.hasOwnProperty('version') ? res.version : res.__parsedResponseBody__.version)
     .then(sdVersion => {
       const iterator = [];
       for (let i = 0; i <= sdVersion; i++) {

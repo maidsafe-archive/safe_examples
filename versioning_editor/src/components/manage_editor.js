@@ -17,7 +17,6 @@ export default class ManagedEditor extends Component {
     };
 
     this.state = {
-      loading: true,
       code: `# React Markdown Editor
 
 * A list
@@ -34,32 +33,38 @@ Some **bold** and _italic_ text
     this.saveFile = this.saveFile.bind(this);
     this.getVersions = this.getVersions.bind(this);
     this.download = this.download.bind(this);
+    this.isContentUpdated = this.isContentUpdated.bind(this);
   }
 
   componentWillMount() {
     if (this.props.isNewFile) {
-      this.setState({ 'loading': false })
-    } else {
-      return readFile(this.props.filename)
-        .then(res => {
-          this.setState({ code: JSON.parse(res.toString()).content });
-        })
-        .then(() => this.getVersions());
+      return Promise.resolve(true);
     }
+    this.props.toggleSpinner(); // set spinner
+    return readFile(this.props.filename)
+      .then(res => {
+        this.setState({ code: JSON.parse(res.toString()).content });
+        this.props.toggleSpinner(); // remove spinner
+      })
+      .then(() => this.getVersions());
+  }
+
+  isContentUpdated() {
+    return !(this.state.versions.length !== 0 &&
+      JSON.parse((this.state.versions.slice(-1)[0]).toString()).content.trim() === this.state.code.trim())
   }
 
   saveFile() {
     if (!this.state.code.trim()) {
       return Promise.reject('Empty content');
     }
-    if (this.state.versions.length !== 0 &&
-      JSON.parse((this.state.versions.slice(-1)[0]).toString()).content === this.state.code.trim()) {
+    if (!this.isContentUpdated()) {
       return Promise.reject('No change made');
     }
-    this.setState({ 'loading': true });
+    this.props.toggleSpinner(); // set spinner
     return saveFile(this.props.filename, this.state.code)
       .then(() => {
-        this.setState({ 'loading': false });
+        this.props.toggleSpinner(); // remove spinner
         this.props.onSave();
       })
       .then(() => this.getVersions())
@@ -72,8 +77,12 @@ Some **bold** and _italic_ text
   }
 
   getVersions() {
+    this.props.toggleSpinner(); // set spinner
     return getSDVersions(this.props.filename)
-      .then(res => this.setState({ versions: res }));
+      .then(res => {
+        this.props.toggleSpinner(); // remove spinner
+        this.setState({ versions: res })
+      });
   }
 
   download() {
@@ -96,6 +105,7 @@ Some **bold** and _italic_ text
           <div className="editor-opts">
             <button className="btn" onClick={this.props.goBack}>Cancel</button>
             <button className="btn pr-btn"
+                    disabled={(!this.props.isNewFile && !this.isContentUpdated()) ? 'disabled' : ''}
                     onClick={this.saveFile}>{this.props.isNewFile ? 'Create File' : 'Save new version'}</button>
             {this.props.isNewFile ? '' : <button className="btn pr-btn" onClick={() => this.download()}>Download</button>}
           </div>

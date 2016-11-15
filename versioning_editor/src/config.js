@@ -7,7 +7,7 @@
 export const EDITOR_THEME = 'mdn-like';
 
 // GLOBAL CONSTANTS
-export const APP_NAME = "Example Editor";
-export const APP_VERSION = '0.2';
+export const APP_NAME = "SAFE Editor Example";
+export const APP_VERSION = '0.1';
 export const APP_ID = 'net.maidsafe.examples.versioning-editor';
 
