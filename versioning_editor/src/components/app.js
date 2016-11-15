@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import keys from 'lodash.keys'
 import Spinner from './spinner';
 import { authorise, getFileIndex } from '../store';
+import { APP_NAME } from '../config';
 
 import FileSelector from './file_selector';
 import ManagedEditor from './manage_editor';
@@ -20,7 +21,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    document.title = 'SAFE Editor Example';
+    document.title = APP_NAME;
   }
 
   componentWillMount() {
@@ -63,7 +64,7 @@ export default class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <h2>SAFE Editor Example</h2>
+          <h2>{APP_NAME}</h2>
         </div>
         {sub}
         <Spinner show={this.state.loading} />
