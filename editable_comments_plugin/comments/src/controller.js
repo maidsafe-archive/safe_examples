@@ -15,6 +15,10 @@
     }
     return text
   }
+
+  function extractHandle(res) {
+    return res.hasOwnProperty('handleId') ? res.handleId : res.__parsedResponseBody__.handleId;
+  }
   //
   // The Controller holds the data and is the bridge to interact with
   // SAFE.
@@ -61,7 +65,7 @@
     // Once all is linked up, this is called to start up the connection
     // to save
     init () {
-      this._authToken = window.safeAuth.getAuthToken(this._LOCAL_STORAGE_TOKEN_KEY)
+      // this._authToken = window.safeAuth.getAuthToken(this._LOCAL_STORAGE_TOKEN_KEY)
       // check if we have a local auth token
       return (this._authToken
           // if so, skip ahead to load DNS
@@ -107,7 +111,7 @@
       // create appendable dataHandleId for location
       return window.safeAppendableData.create(this._authToken, this._getLocation(), false)
         // remap handleID
-        .then((res) => res.__parsedResponseBody__.handleId)
+        .then(extractHandle)
         .then((handleId) =>
           // now put the handleID, this actually creates the appendableData
           window.safeAppendableData.put(this._authToken, handleId)
@@ -193,7 +197,7 @@
         MODULE.log('Fetch appendable data length')
         return window.safeAppendableData.getMetadata(
               this._authToken, this._currentPostHandleId)
-          .then((res) => res.__parsedResponseBody__.dataLength)
+          .then((res) => res.hasOwnProperty('dataLength') ? res.dataLength : res.__parsedResponseBody__.dataLength)
       }
 
       // fetch the actual appendableData
@@ -201,7 +205,7 @@
         MODULE.log('Fetch appendable data')
         return window.safeAppendableData.getHandle(
               this._authToken, dataHandleId)
-          .then((res) => { this._currentPostHandleId = res.__parsedResponseBody__.handleId })
+          .then((res) => { this._currentPostHandleId = extractHandle(res) })
       }
 
       // tying it all together
@@ -397,7 +401,7 @@
       return window.safeCipherOpts.getHandle(
           this._authToken,
           window.safeCipherOpts.getEncryptionTypes().SYMMETRIC)
-        .then(res => { this._symmetricCipherOptsHandle = res.__parsedResponseBody__.handleId })
+        .then(res => { this._symmetricCipherOptsHandle = extractHandle(res) })
     }
 
     //
@@ -435,7 +439,7 @@
           (dataHandle) => window.safeStructuredData.getHandle(this._authToken, dataHandle),
           // release dataHandle
           (dataHandle) => window.safeDataId.dropHandle(this._authToken, dataHandle))
-        .then(res => res.__parsedResponseBody__.handleId)
+        .then(extractHandle)
         .then(handleId => {
           // keep the structured data handle around for later reuse
           this._blockedUserStructureDataHandle = handleId
@@ -530,7 +534,7 @@
                   this._getLocation() + '_blocked_users', 500,
                   new Buffer(JSON.stringify(this._data.blockedUsers)).toString('base64'),
                   this._symmetricCipherOptsHandle)
-                .then(res => { this._blockedUserStructureDataHandle = res.__parsedResponseBody__.handleId })
+                .then(res => { this._blockedUserStructureDataHandle = extractHandle(res) })
                 .then(res => window.safeStructuredData.put(
                       this._authToken,
                       this._blockedUserStructureDataHandle)
@@ -546,7 +550,6 @@
       MODULE.log('Fetching DNS records')
       return window.safeDNS.listLongNames(this._authToken)
         // convert
-        .then((res) => res.__parsedResponseBody__)
         .then((dnsData) => {
           // store dnsData on the user for later reuse
           this._data.user.dns = dnsData
@@ -572,7 +575,7 @@
         // convert tokeb
         .then((res) => {
           if (typeof res === 'object') {
-            return res.__parsedResponseBody__.token
+            return res.hasOwnProperty('token') ? res.token : res.__parsedResponseBody__.token
           }
           return res;
         })
@@ -582,7 +585,7 @@
           }
           // keep token for later reus`e
           this._authToken = token
-          window.safeAuth.setAuthToken(this._LOCAL_STORAGE_TOKEN_KEY, token)
+          // window.safeAuth.setAuthToken(this._LOCAL_STORAGE_TOKEN_KEY, token)
         })
         // then refresh the DNS
         .then(() => this._getDns())
