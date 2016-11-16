@@ -35,13 +35,14 @@
             <span class="url"><a href=""
                 ng-click="openExternal('safe://' + service.name + '.' + service.longName + '.safenet')">
                 safe://<b>{{ service.name }}</b>{{ '.' + service.longName }}</a></span>
-            <span class="path">/public/{{service.homeDir}}</span>
+            <span ng-if="service.homeDir" class="path">/public/{{service.homeDir}}</span>
+            <span ng-if="!service.homeDir" class="path error">Home Directory Not Found</span>
           </div>
           <div class="ms-list-1-i-act-lt">
             <a href="" class="danger" ng-click="deleteService(service.name)">DELETE</a>
           </div>
           <div class="ms-list-1-i-act">
-            <a ui-sref="serviceExplorer({serviceName: service.name, servicePath: 'public/' + service.homeDir})">Edit Files</a>
+            <a ng-if="service.homeDir" ui-sref="serviceExplorer({serviceName: service.name, servicePath: 'public/' + service.homeDir })">Edit Files</a>
             <a ui-sref="managePublicData({serviceName: service.name, remap: true, folderPath: 'public'})">Remap DNS</a>
             <!-- <a href="" ng-click="openLink(service.name, service.longName)">Visit Site</a> -->
           </div>

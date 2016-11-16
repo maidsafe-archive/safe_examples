@@ -28,19 +28,14 @@ window.maidsafeDemo.controller('ServiceCtrl', [ '$scope', '$state', '$rootScope'
         $rootScope.$loader.show($msg.MAP_SERVICE_WITH_HOME_DIR);
         serviceList.forEach(function(service, index) {
           safe.getHomeDir(longName, service, function(err, homeDir) {
-            if (err) {
-              console.error(err);
-              $rootScope.$loader.hide();
-              return $rootScope.prompt.show('Get Services', 'Failed to map service to \'HOME DIRECTORY\'',
-              function() {}, {
-                title: 'Reason',
-                ctx: err.data.description
-              });
+            var homeDirPath = null;
+            if (!err) {
+              homeDirPath = homeDir.info.name;
             }
             if (index === (serviceList.length - 1)) {
               $rootScope.$loader.hide();
             }
-            addServices(longName, service, homeDir.info.name);
+            addServices(longName, service, homeDirPath);
           });
         });
       };
