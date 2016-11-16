@@ -1,5 +1,8 @@
 # MaidSafe Demo App Change Log
 
+##[0.6.2]
+- Can remap service if service home directory got corrupted
+
 ##[0.6.1]
 - Reverse DNS specifier updated in package.json
 - Updated service links on UI to `safe://` scheme
