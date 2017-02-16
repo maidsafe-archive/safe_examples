@@ -17,7 +17,7 @@ Install with [yarn](https://github.com/yarnpkg/yarn) for faster and safer instal
 yarn install
 ```
 
-Manually build `safe_app_nodejs` dependency from `app/node_modules/safe-app`
+Manually build [safe_app_nodejs](https://github.com/maidsafe/safe_app_nodejs) dependency from `app/node_modules/safe-app`
 
 ## Run
 
