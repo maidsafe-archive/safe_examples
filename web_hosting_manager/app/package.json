@@ -1,0 +1,19 @@
+{
+  "name": "safe_hosting_manager",
+  "productName": "SAFE Hosting Manager",
+  "version": "0.1.0",
+  "description": "Application to manage web hosting in SAFE Network",
+  "identifier": "net.maidsafe.safehostingmanager",
+  "main": "./main.js",
+  "author": {
+    "name": "MaidSafe",
+    "email": "dev@maidsafe.net",
+    "url": "https://maidsafe.net"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "keytar": "^3.0.2",
+    "safe-app": "git+https://github.com/maidsafe/safe_app_nodejs.git"
+  }
+}
