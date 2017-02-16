@@ -1,0 +1,15 @@
+.ant-card-body {
+  font-size: 14px;
+}
+
+.ant-collapse-header, .ant-collapse-content-box {
+  text-align: left;
+}
+
+.ant-popover-inner-content {
+  font-size: 14px;
+}
+
+.ant-popover-arrow {
+  margin-left: -5px !important;
+}
