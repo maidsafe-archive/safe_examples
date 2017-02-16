@@ -17,6 +17,8 @@ Install with [yarn](https://github.com/yarnpkg/yarn) for faster and safer instal
 yarn install
 ```
 
+Manually build `safe_app_nodejs` dependency from `app/node_modules/safe_app_nodejs`
+
 ## Run
 
 Run these two commands __simultaneously__ in different console tabs.
@@ -54,6 +56,13 @@ For SASS mixin
 
 
 ## Packaging
+
+Based on the platform configure `build.asarUnpack` option in package.json
+```
+osx : "*.dylib"
+linux : "*.so"
+windows: "*.dll"
+```
 
 To package apps for the local platform:
 
