@@ -263,7 +263,7 @@ export default class Auth extends Component {
         return (
           <Row key={ `serviceName-${i}`}>
             <Col md={{ span: 8 }} lg={{ span: 8 }}>
-              <a href={`safe://${serviceName}.${publicId}`}>{serviceName}</a>
+              <a href={`safe://${serviceName}.${publicId}/index.html`}>{serviceName}</a>
             </Col>
             <Col md={{ span: 10 }} lg={{ span: 10 }}>
               <Link
@@ -272,14 +272,14 @@ export default class Auth extends Component {
                 {servicePath}
               </Link>
             </Col>
-            {/*<Col md={{ span: 6 }} lg={{ span: 6 }}>*/}
-            {/*<Button onClick={() => this.showRemapModal(serviceName, publicId)}>*/}
-            {/*{I18n.t('label.remap')}*/}
-            {/*</Button>*/}
-            {/*</Col>*/}
-            {/*<Col md={{ span: 3 }} lg={{ span: 3 }}>*/}
-            {/*/!*<Button>{I18n.t('label.delete')}</Button>*!/*/}
-            {/*</Col>*/}
+            <Col md={{ span: 3 }} lg={{ span: 3 }}>
+            <Button onClick={() => this.showRemapModal(serviceName, publicId)}>
+            {I18n.t('label.remap')}
+            </Button>
+            </Col>
+            <Col md={{ span: 3 }} lg={{ span: 3 }}>
+            <Button onClick={() => { this.props.deleteService(publicId, serviceName); }}>{I18n.t('label.delete')}</Button>
+            </Col>
           </Row>
         );
       });
