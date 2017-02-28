@@ -17,15 +17,51 @@
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./app/main.development",
     "postinstall": "concurrently \"install-app-deps\" \"node node_modules/fbjs-scripts/node/check-dev-engines.js package.json\"",
     "dev": "npm run hot-server -- --start-hot",
-    "package": "npm run build && electron-forge package",
-    "package-win": "npm run build && build --win --x64",
-    "package-linux": "npm run build && build --linux",
-    "package-all": "npm run build && build -mwl",
+    "package": "npm run build && ./node_modules/.bin/electron-forge package",
     "cleanup": "mop -v",
     "rebuild": "cd app && npm rebuild --runtime=electron --target=1.4.12 --disturl=https://atom.io/download/atom-shell --build-from-source && cd .."
   },
   "config": {
     "forge": "./forge.config.js"
+  },
+  "build": {
+    "appId": "net.maidsafe.demo.app.webhost",
+    "category": "public.app-category.tools",
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "asarUnpack": "*.dylib",
+    "files": [
+      "dist/",
+      "node_modules/",
+      "app.html",
+      "main.js",
+      "main.js.map",
+      "package.json"
+    ],
+    "win": {
+      "target": "dir"
+    },
+    "linux": {
+      "target": "dir"
+    },
+    "protocols": [{
+      "name": "safehostingmanager",
+      "role": "Viewer",
+      "schemes": ["safe-bmv0lm1hawrzywzllnnhzmvob3n0aw5nbwfuywdlcg"]
+    }]
   },
   "directories": {
     "buildResources": "resources"

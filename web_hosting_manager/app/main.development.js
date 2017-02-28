@@ -43,7 +43,9 @@ const installExtensions = async () => {
 };
 
 const shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-  console.log('commandLine :: ', commandLine, workingDirectory);
+  if (commandLine.length >= 2 && commandLine[1]) {
+    sendResponse(commandLine[1]);
+  }
 
   // Someone tried to run a second instance, we should focus our window
   if (mainWindow) {
