@@ -27,7 +27,7 @@ public class AppConfig {
         return structuredDataName;
     }
 
-    public void setSstructuredDataName(String structuredDataName) {
+    public void setStructuredDataName(String structuredDataName) {
         this.structuredDataName = structuredDataName;
     }
     

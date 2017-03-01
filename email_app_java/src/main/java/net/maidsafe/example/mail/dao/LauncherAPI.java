@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -35,6 +36,7 @@ import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okio.ByteString;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -65,6 +67,7 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
         executor = Executors.newFixedThreadPool(5);
         inboxMessages = new ArrayList<>();
         savedMessages = new ArrayList<>();
+        savedMessagesDataIdList = new ArrayList<>();
         HttpUrl url = HttpUrl.parse(END_POINT);
         retrofit = new Retrofit.Builder().baseUrl(url)
                 .addConverterFactory(JacksonConverterFactory.create())
@@ -78,10 +81,10 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
         }
         return instance;
     }
-    
+
     /**
-     * Send authorisation request to SAFE Launcher On Successful authorisation
-     * hold the auth token in memory
+     * Send authorisation request to SAFE Launcher On Success the auth token is
+     * obtained
      */
     @Override
     public Future<Result<Boolean>> authorise() {
@@ -103,9 +106,9 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
     }
 
     /**
-     * Load application configuration from App's root directory Application
-     * configuration will be a JSON file Fetch the appendable and structured
-     * data handles
+     * Load application configuration from App's root directory. From the config
+     * file the ID and the DataId for the StructuredData containing the list of
+     * DataIds of saved messages can be obtained.
      */
     @Override
     public Future<Result<Boolean>> loadAppConfig() {
@@ -114,9 +117,13 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 FileResponse file;
                 String structuredDataName;
                 long tempId;
+
+                // Symmetric Cipher opt handle
+                symmetricCipherOptsHandle = api.getSymmetricCipherOptHandle(authToken).execute().body().getHandleId();
+
                 Response<ResponseBody> res = api.getConfigFile(authToken).execute();
                 if (!res.isSuccessful()) {
-                    return new Result(false, res.code() + " - " + res.message());
+                    return new Result(true, true);
                 }
                 Headers headers = res.headers();
                 file = new FileResponse(headers.get("Content-Type"), headers.get("Metadata"), res.body().bytes());
@@ -124,8 +131,6 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 appConfig = new Gson().fromJson(new String(file.getContent()), AppConfig.class);
                 // Fetch handles
                 structuredDataName = appConfig.getStructuredDataName();
-                // Symmetric Cipher opt handle
-                symmetricCipherOptsHandle = api.getSymmetricCipherOptHandle(authToken).execute().body().getHandleId();
                 // SD Handle                
                 tempId = api.getDataId(authToken, new StructuredDataDataId(structuredDataName, UNVERSIONED_SD_TAG)).execute().body().getHandleId();
                 structuredDataHandle = api.getStructuredDataHandle(authToken, tempId).execute().body().getHandleId();
@@ -134,7 +139,7 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 savedMessages = this.fetchSavedMessages().get().getData();
                 return new Result<Boolean>(true, true);
             } catch (Exception e) {
-                return new Result<Boolean>(false, e.getMessage());
+                return new Result<Boolean>(false, e.toString());
             }
         });
     }
@@ -150,9 +155,18 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
     }
 
     /**
-     * Creates the appendable data for the ID Create the appendable and
-     * structured data and get the handles Creates the AppConfig file for the
-     * application to bootstrap
+     * Invoked to create the ID in the network. An AppendableData is created in
+     * the network with name derived from the ID provided by the user. A
+     *
+     * StructuredData with random ID is created for storing the DataId list of
+     * the saved messages.
+     *
+     * The data in the SD is stored after Symmetric Encryption
+     *
+     * When the application starts the ID and the StructuredData name is stored
+     * is fetched from a config file in the application's root directory Once
+     * the AppendableData and StructuredData are created the AppConfig is stored
+     * as a JSON file (config file)
      *
      * @param id
      * @return
@@ -166,11 +180,17 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 StructuredDataCreateRequest sdCreateReq;
                 AppendableDataCreateRequest adCreateReq;
                 long appendableDataHandle;
+                byte[] randomSDName;
+                // Generate random SD name 
+                randomSDName = new byte[32];
+                new Random().nextBytes(randomSDName);
+                structuredDataName = Base64.getEncoder().encodeToString(randomSDName);
+                // Hash ID 
                 appendableDataName = getBase64Name(id);
-                structuredDataName = getBase64Name("config-" + id);
+                // Prepare config file data
                 appConfig = new AppConfig();
                 appConfig.setId(id);
-                appConfig.setSstructuredDataName(structuredDataName);
+                appConfig.setStructuredDataName(structuredDataName);
                 // Create AD
                 adCreateReq = new AppendableDataCreateRequest(appendableDataName, true);
                 Response<HandleIdResponse> res = api.createAppendabledData(authToken, adCreateReq).execute();
@@ -178,22 +198,27 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                     return new Result<>(false, "Id not available. " + res.message());
                 }
                 appendableDataHandle = res.body().getHandleId();
+                // Invoke PUT endpoint for creating AD
                 api.saveAppendableData(authToken, appendableDataHandle).execute();
-                // Create SD for saved messages                      
+                // Create SD for saved messages bby passing symmetric cipher opts handle                     
                 sdCreateReq = new StructuredDataCreateRequest(appConfig.getStructuredDataName(), UNVERSIONED_SD_TAG, symmetricCipherOptsHandle, Base64.getEncoder().encodeToString("[]".getBytes()));
                 structuredDataHandle = api.createStructuredData(authToken, sdCreateReq).execute().body().getHandleId();
                 api.saveStructuredData(authToken, structuredDataHandle).execute();
                 // Create config file
                 api.createConfigFile(authToken, appConfig).execute();
-                return new Result<Boolean>(true, true);
+                return new Result<>(true, true);
             } catch (Exception e) {
-                return new Result<>(false, e.getMessage());
+                return new Result<>(false, e.toString());
             }
         });
     }
 
     /**
-     * Fetch the appendable data from the network
+     * Fetch messages from the user's inbox (AppendableData) Get AppendableData
+     * from the network and get the size of data available. Iterate and get
+     * DataId at every index based on the available size. From the DataId, read
+     * the immutable data from the network Deserialise the JSON to Message
+     * object and add the inboxMessages list
      *
      * @return
      */
@@ -206,12 +231,14 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
             Message msg;
             String appendableDataName;
             try {
+                // Fetch private AD from network
                 appendableDataName = getBase64Name(appConfig.getId());
                 long tempId = api.getDataId(authToken, new AppendableDataDataId(appendableDataName, true)).execute().body().getHandleId();
                 long appendableDataHandle = api.getAppendableDataHandle(authToken, tempId).execute().body().getHandleId();
+                // Get length of data in the AD
                 long dataLength = api.getAppendableDataMetadata(authToken, appendableDataHandle).execute().body().getDataLength();
                 inboxMessages.clear();
-
+                // Read immutable data using ID reader for every DataId based on the index from the appendable data
                 for (int i = 0; i < dataLength; i++) {
                     tempDataIdHandle = api.getDataFromAppendableData(authToken, appendableDataHandle, i).execute().body().getHandleId();
                     tempReaderHandle = api.getImmutableDataReader(authToken, tempDataIdHandle).execute().body().getHandleId();
@@ -225,11 +252,17 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 }
                 return new Result<List<Message>>(true, inboxMessages);
             } catch (Exception e) {
-                return new Result<List<Message>>(true, e.getMessage());
+                return new Result<List<Message>>(true, e.toString());
             }
         });
     }
 
+    /**
+     * Get saved messages from StructuredData Read SD and get the DataId list
+     * for fetching the saved messages Iterate and read each message
+     *
+     * @return
+     */
     @Override
     public Future<Result<List<Message>>> fetchSavedMessages() {
         return executor.submit(() -> {
@@ -257,23 +290,39 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 }
                 return new Result<List<Message>>(true, savedMessages);
             } catch (Exception e) {
-                return new Result<List<Message>>(false, e.getMessage());
+                return new Result<List<Message>>(false, e.toString());
             }
         });
     }
 
+    /**
+     * Invoked to send a message The recipient's appendable data is fetched and
+     * the encrypt key is obtained The message is written to the network as
+     * ImmutableData and encrypted using the receiver's encrypt key (Asymmetric
+     * encryption)
+     * The DataId of the ImmutableData is added to the receiver's appendable data    
+     * 
+     * @param message
+     * @return
+     */
     @Override
     public Future<Result<Boolean>> sendMessage(Message message) {
         return executor.submit(() -> {
             RequestBody req;
             String toName;
+            long toDataId;
             long toAppendableData;
-            long dataIdForMessage;
+            long dataIdForMessage;           
 
-            String appendableDataName = getBase64Name(appConfig.getId());
-            long dataIdHandle = api.getDataId(authToken, new AppendableDataDataId(appendableDataName, true)).execute().body().getHandleId();
-            long appendableDataHandle = api.getAppendableDataHandle(authToken, dataIdHandle).execute().body().getHandleId();
-            long encryptKeyHandle = api.getEncryptKey(authToken, appendableDataHandle).execute().body().getHandleId();
+            toName = getBase64Name(message.getTo());
+            toDataId = api.getDataId(authToken, new AppendableDataDataId(toName, true)).execute().body().getHandleId();
+            Response<AppendableDataMetadata> res = api.getAppendableDataHandle(authToken, toDataId).execute();
+            if (!res.isSuccessful()) {
+                return new Result<Boolean>(false, "Failed to get appendable data for recepient");
+            }
+            toAppendableData = res.body().getHandleId();
+            
+            long encryptKeyHandle = api.getEncryptKey(authToken, toAppendableData).execute().body().getHandleId();
             long cipherHandle = api.getAsymmetricCipherOptHandle(authToken, encryptKeyHandle).execute().body().getHandleId();
             long writerHandle = api.getImmutableDataWritter(authToken).execute().body().getHandleId();
             req = RequestBody.create(MediaType.parse("application/octet-stream"), new Gson().toJson(message).getBytes());
@@ -281,13 +330,6 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 return new Result<Boolean>(false, "Failed to send the message.");
             }
             dataIdForMessage = api.closeImmutableData(authToken, writerHandle, cipherHandle).execute().body().getHandleId();
-            toName = getBase64Name(message.getTo());
-            toAppendableData = api.getDataId(authToken, new AppendableDataDataId(toName, true)).execute().body().getHandleId();
-            Response<AppendableDataMetadata> res = api.getAppendableDataHandle(authToken, toAppendableData).execute();
-            if (!res.isSuccessful()) {
-                return new Result<Boolean>(false, "Failed to get appendable data for recepient");
-            }
-            toAppendableData = res.body().getHandleId();
             if (api.appendToAppendableData(authToken, toAppendableData, dataIdForMessage).execute().code() != 200) {
                 return new Result<Boolean>(false, "Failed to send the message.");
             }
@@ -296,14 +338,23 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
             api.dropEncryptKey(authToken, encryptKeyHandle).execute();
             api.dropCipherOptHandle(authToken, cipherHandle).execute();
             api.dropImmutableDataWriter(authToken, writerHandle).execute();
-            api.dropDataId(authToken, dataIdHandle).execute();
             api.dropDataId(authToken, dataIdForMessage).execute();
-            api.dropAppendableDataHandle(authToken, toAppendableData);
-            api.dropAppendableDataHandle(authToken, appendableDataHandle);
+            api.dropDataId(authToken, toDataId).execute();
+            api.dropAppendableDataHandle(authToken, toAppendableData);            
             return new Result<Boolean>(true, true);
         });
     }
 
+    /**
+     * Save the message from inbox to the Structured Data
+     * Fetch the DataId of the message from the appendable data
+     * Read the message and save it as symmetric encrypted ImmutableData
+     * The DataId of the ImmutableData is serialised and stored in the SD
+     * The message is also removed from the AppendableData
+     * 
+     * @param message
+     * @return 
+     */
     @Override
     public Future<Result<Boolean>> saveMessage(Message message) {
         return executor.submit(() -> {
@@ -314,6 +365,17 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 long dataIdHandle = api.getDataId(authToken, new AppendableDataDataId(appendableDataName, true)).execute().body().getHandleId();
                 long appendableDataHandle = api.getAppendableDataHandle(authToken, dataIdHandle).execute().body().getHandleId();
                 long msgDataId = api.getDataFromAppendableData(authToken, appendableDataHandle, message.getIndex()).execute().body().getHandleId();
+                // read msg from ImmtableData                
+                long readerHandle = api.getImmutableDataReader(authToken, msgDataId).execute().body().getHandleId();
+                api.dropDataId(authToken, msgDataId).execute();
+                byte[] msg = api.readImmutableData(authToken, readerHandle).execute().body().bytes();
+                api.dropImmutableDataReader(authToken, readerHandle).execute();
+                long writerHandle = api.getImmutableDataWritter(authToken).execute().body().getHandleId();
+                RequestBody req = RequestBody.create(MediaType.parse("application/octet-stream"), msg);
+                api.writeImmutableData(authToken, writerHandle, req).execute();
+                msgDataId = api.closeImmutableData(authToken, writerHandle, symmetricCipherOptsHandle).execute().body().getHandleId();
+                api.dropImmutableDataWriter(authToken, writerHandle).execute();
+                // Write new Id
                 String serialisedDataId = Base64.getEncoder().encodeToString(api.serialiseDataId(authToken, msgDataId).execute().body().bytes());
                 savedMessagesDataIdList.add(serialisedDataId);
                 api.dropAppendableDataHandle(authToken, appendableDataHandle).execute();
@@ -328,7 +390,7 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 savedMessages.add(message);
                 return new Result<Boolean>(true, true);
             } catch (Exception e) {
-                return new Result<Boolean>(false, e.getMessage());
+                return new Result<Boolean>(false, e.toString());
             }
         });
     }
@@ -354,12 +416,20 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
         return savedMessages;
     }
 
+    /**
+     * Invoked to hash the name and convert to a base64 string base64 string
+     * represents - byte[32]
+     *
+     * @param name
+     * @return String
+     * @throws Exception
+     */
     private String getBase64Name(String name) throws Exception {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(name.getBytes());
         return Base64.getEncoder().encodeToString(messageDigest.digest());
     }
-    
+
     private boolean deleteFromAppendableData(Message msg) throws Exception {
         String appendableDataName = getBase64Name(appConfig.getId());
         long dataIdHandle = api.getDataId(authToken, new AppendableDataDataId(appendableDataName, true)).execute().body().getHandleId();
