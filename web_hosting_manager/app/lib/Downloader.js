@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { getPath } from './temp';
 import { shell } from 'electron';
-import { safe, typetag } from './api';
+import { safe, typetag, accessContainers } from './api';
 import { parseConatinerPath } from './utils';
 
 export default class Downloader {
@@ -17,13 +17,7 @@ export default class Downloader {
     const tokens = this.path.split('/');
     const filePath = path.join(getPath(), tokens.pop());
 
-    return safe.auth.canAccessContainer('_public')
-      .then((hasAccess) => {
-        if (!hasAccess) {
-          return Promise.reject(new Error('No access to _public container'));
-        }
-      })
-      .then(() => safe.auth.getAccessContainerInfo('_public'))
+    return safe.auth.getAccessContainerInfo(accessContainers.public)
       .then((mdata) => mdata.get(containerPath.dir))
       .then((val) => {
         console.log(val);

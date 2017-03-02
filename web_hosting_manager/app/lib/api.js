@@ -38,6 +38,11 @@ const APP_INFO = {
   }
 };
 
+export const accessContainers = {
+  public: '_public',
+  publicNames: '_publicNames'
+};
+
 export const typetag = 1500;
 
 let publicIds = {};
@@ -80,17 +85,27 @@ export const connect = () => {
 };
 
 export const fetchAccessInfo = () => {
-  return safe.auth.refreshContainerAccess();
+  return safe.auth.refreshContainerAccess()
+    .then(() => safe.auth.canAccessContainer(accessContainers.public))
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        return Promise.reject(new Error(`No access to ${accessContainers.public} container`));
+      }
+    })
+    .then(() => safe.auth.canAccessContainer(accessContainers.publicNames))
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        return Promise.reject(new Error(`No access to ${accessContainers.publicNames} container`));
+      }
+    })
+    .catch((e) => {
+      keytar.deletePassword(SERVICE, ACCOUNT);
+      return Promise.reject(e);
+    });
 };
 
 export const fetchPublicNames = () => {
-  return safe.auth.canAccessContainer('_publicNames')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _publicNames container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_publicNames'))
+  return safe.auth.getAccessContainerInfo(accessContainers.publicNames)
     .then((mdata) => mdata.getKeys())
     .then((keys) => keys.len()
       .then((len) => {
@@ -111,13 +126,7 @@ export const fetchServices = () => {
   const publicNamesKeys = Object.getOwnPropertyNames(publicIds);
   return Promise.all(publicNamesKeys.map((publicId) => {
     const services = {};
-    return safe.auth.canAccessContainer('_publicNames')
-      .then((hasAccess) => {
-        if (!hasAccess) {
-          return Promise.reject(new Error('No access to _publicNames container'));
-        }
-      })
-      .then(() => safe.auth.getAccessContainerInfo('_publicNames'))
+    return safe.auth.getAccessContainerInfo(accessContainers.publicNames)
       .then((mdata) => mdata.getEntries())
       // get publicName mdata
       .then((entries) => entries.get(publicId))
@@ -175,13 +184,7 @@ export const createPublicId = (publicId) => {
         .then(() => mdata.getNameAndTag())
     })
     .then((data) => (publicIdName = data.name))
-    .then(() => safe.auth.canAccessContainer('_publicNames'))
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _public container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_publicNames'))
+    .then(() => safe.auth.getAccessContainerInfo(accessContainers.publicNames))
     .then((mdata) => mdata.getEntries()
       .then((entries) => entries.mutate()
         .then((mut) => mut.insert(publicId, publicIdName)
@@ -199,13 +202,7 @@ export const createService = (publicId, service, container) => {
     return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Container path' })));
   }
 
-  return safe.auth.canAccessContainer('_publicNames')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _publicNames container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_publicNames'))
+  return safe.auth.getAccessContainerInfo(accessContainers.publicNames)
     .then((mdata) => mdata.getEntries())
     .then((entries) => entries.get(publicId))
     .then((val) => safe.mutableData.newPublic(val.buf, typetag))
@@ -215,17 +212,20 @@ export const createService = (publicId, service, container) => {
           .then(() => publicIdMData.applyEntriesMutation(mut)))));
 };
 
+export const deleteService = (publicId, service) => {
+  return safe.mutableData.newPublic(hashString(publicId), typetag)
+    .then((mdata) => mdata.getEntries()
+      .then((entries) => entries.get(service)
+        .then((val) => entries.mutate()
+          .then((mut) => mut.remove(service, val.version + 1)
+            .then(() => mdata.applyEntriesMutation(mut))))));
+};
+
 export const createContainer = (path) => {
   return safe.mutableData.newRandomPublic(typetag)
     .then((mdata) => mdata.quickSetup({})
       .then(() => mdata.getNameAndTag()))
-    .then((data) => safe.auth.canAccessContainer('_public')
-      .then((hasAccess) => {
-        if (!hasAccess) {
-          return Promise.reject(new Error('No access to _publicNames container'));
-        }
-      })
-      .then(() => safe.auth.getAccessContainerInfo('_public'))
+    .then((data) => safe.auth.getAccessContainerInfo(accessContainers.public)
       .then((mdata) => mdata.getEntries()
         .then((entries) => entries.mutate()
           .then((mut) => mut.insert(path, data.name)
@@ -235,13 +235,7 @@ export const createContainer = (path) => {
 
 export const getPublicContainers = () => {
   const publicKeys = [];
-  return safe.auth.canAccessContainer('_public')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _public container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_public'))
+  return safe.auth.getAccessContainerInfo(accessContainers.public)
     .then((mdata) => mdata.getKeys())
     .then((keys) => {
       return keys.len()
@@ -258,7 +252,6 @@ export const getPublicContainers = () => {
 };
 
 export const deleteItem = (nwPath) => {
-  let version = 0;
   let dirName = nwPath;
   let fileName = null;
   if (path.extname(nwPath)) {
@@ -266,65 +259,50 @@ export const deleteItem = (nwPath) => {
     fileName = path.basename(nwPath);
   }
 
-  return safe.auth.canAccessContainer('_public')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _public container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_public'))
-    .then((mdata) => mdata.getVersion()
-      .then((v) => (version = parseInt(v, 10)))
-      .then(() => {
+  return safe.auth.getAccessContainerInfo(accessContainers.public)
+    .then((mdata) => mdata.getEntries()
+      .then((entries) => {
         if (fileName) {
-          let dirVer = 0;
-          return mdata.getEntries()
-            .then((entries) => entries.get(dirName)
-              .then((val) => safe.mutableData.newPublic(val.buf, typetag)
-                .then((dirMdata) => dirMdata.getVersion()
-                  .then((ver) => (dirVer = ver))
+          return entries.get(dirName)
+            .then((val) => {
+              return safe.mutableData.newPublic(val.buf, typetag)
+                .then((dirMdata) => dirMdata.getEntries()
                   .then(() => dirMdata.getEntries()
-                    .then((dirEntries) => dirEntries.mutate()
-                      .then((mut) => mut.remove(fileName, dirVer)
-                        .then(() => dirMdata.applyEntriesMutation(mut))))))));
+                    .then((dirEntries) => dirEntries.get(fileName)
+                      .then((val) => dirEntries.mutate()
+                        .then((mut) => mut.remove(fileName, val.version + 1)
+                          .then(() => dirMdata.applyEntriesMutation(mut)))))))
+            });
+        } else {
+          return entries.get(nwPath)
+            .then((val) => entries.mutate()
+              .then((mut) => mut.remove(nwPath, val.version + 1)
+                .then(() => mdata.applyEntriesMutation(mut))));
         }
-        return mdata.getEntries()
-          .then((entries) => entries.mutate()
-            .then((mut) => mut.remove(nwPath, version)
-              .then(() => mdata.applyEntriesMutation(mut))));
       }));
 };
 
 export const remapService = (service, publicId, container) => {
-  let version = 0;
-  return safe.auth.canAccessContainer('_publicNames')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _public container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_publicNames'))
+  let containerName = null;
+  return safe.auth.getAccessContainerInfo(accessContainers.public)
+    .then((mdata) => mdata.getEntries())
+    .then((entries) => entries.get(container))
+    .then((val) => (containerName = val.buf))
+    .then(() => safe.auth.getAccessContainerInfo(accessContainers.publicNames))
     .then((mdata) => mdata.getEntries())
     .then((entries) => entries.get(publicId))
     .then((val) => safe.mutableData.newPublic(val.buf, typetag))
-    .then((publicIdMData) => publicIdMData.getVersion()
-      .then((v) => (version = parseInt(v, 10)))
+    .then((publicIdMData) => publicIdMData.getEntries()
       .then(() => publicIdMData.getEntries()
-        .then((entries) => entries.mutate()
-          .then((mut) => mut.update(service, container, version)
-            .then(() => publicIdMData.applyEntriesMutation(mut))))))
-    .then(() => (publicIds[publicId][service] = container));
+        .then((entries) => entries.get(service)
+          .then((val) => entries.mutate()
+            .then((mut) => mut.update(service, containerName, val.version + 1)
+              .then(() => publicIdMData.applyEntriesMutation(mut)))))));
 };
 
 export const getContainer = (path) => {
   let result = [];
-  return safe.auth.canAccessContainer('_public')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _public container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_public'))
+  return safe.auth.getAccessContainerInfo(accessContainers.public)
     .then((mdata) => {
       return mdata.getKeys()
         .then((keys) => keys.forEach((key) => {
@@ -337,11 +315,26 @@ export const getContainer = (path) => {
     })
     .then((entries) => entries.get(path))
     .then((val) => safe.mutableData.newPublic(val.buf, typetag))
-    .then((mdata) => mdata.getKeys()
-      .then((keys) => keys.forEach((key) => {
-        key = key.toString();
-        result.unshift({ isFile: true, name: key.replace(path + '/', '') });
-      })))
+    .then((mdata) => {
+      const files = [];
+      const nfs = mdata.emulateAs('NFS');
+      return mdata.getEntries()
+        .then((entries) => entries.forEach((key, val) => {
+          console.log('key', key.toString(), val);
+          files.unshift(key.toString());
+        }))
+        .then(() => {
+          return Promise.all(files.map((file) => {
+            console.log('file', file)
+            return nfs.fetch(file)
+              .then((f) => safe.immutableData.fetch(f.dataMapName))
+              .then((i) => i.read())
+              .then((co) => {
+                result.unshift({ isFile: true, name: file, size: co.length });
+              });
+          }));
+        });
+    })
     .then(() => result);
 };
 
@@ -365,13 +358,7 @@ export const cancelDownload = () => {
 
 const getContainerName = (mdataName) => {
   let res = null;
-  return safe.auth.canAccessContainer('_public')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error('No access to _public container'));
-      }
-    })
-    .then(() => safe.auth.getAccessContainerInfo('_public'))
+  return safe.auth.getAccessContainerInfo(accessContainers.public)
     .then((mdata) => mdata.getEntries()
       .then((entries) => entries.forEach((key, val) => {
         if (val.buf.equals(mdataName.buf)) {
