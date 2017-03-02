@@ -59,6 +59,19 @@ export default class FileExplorer extends Component {
     }
   }
 
+  bytesToSize(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes === 0) {
+      return `0 ${sizes[0]}`;
+    }
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+    if (i === 0) {
+      return `${bytes} ${sizes[i]}`;
+    }
+    const resultStr = (bytes / Math.pow(1024, i)).toFixed(1);
+    return `${resultStr} ${sizes[i]}`;
+  };
+
   open(onlyFile) {
     remote.dialog.showOpenDialog({
       title: I18n.t(onlyFile ? 'label.selectFile' : 'label.selectDirectory'),
@@ -112,12 +125,12 @@ export default class FileExplorer extends Component {
             <Col md={{span: 15}} lg={{span: 15}} style={{ textAlign: 'left', marginLeft: '20px' }}>
               <p onClick={() => { this.handleListItemClick(data); }}>{ data.name }</p>
             </Col>
-            {/*<Col md={{span: 4}} lg={{span: 4}}>*/}
-            {/*Size*/}
-            {/*</Col>*/}
-            {/*<Col md={{span: 3}} lg={{span: 3}} onClick={() => { this.handleDelete(data); }}>*/}
-            {/*Delete*/}
-            {/*</Col>*/}
+            <Col md={{span: 4}} lg={{span: 4}}>
+              { data.size ? this.bytesToSize(data.size) : '' }
+            </Col>
+            <Col md={{span: 3}} lg={{span: 3}} onClick={() => { this.handleDelete(data); }}>
+              Delete
+            </Col>
           </div>
         </Row>
       );

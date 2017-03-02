@@ -42,24 +42,6 @@ const installExtensions = async () => {
   }
 };
 
-const shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-  console.log('commandLine :: ', commandLine);
-
-  // Someone tried to run a second instance, we should focus our window
-  if (myWindow) {
-    if (myWindow.isMinimized()) myWindow.restore();
-    myWindow.focus();
-  }
-});
-
-if (shouldQuit) {
-  app.quit();
-}
-
-// app.on('open-url', function (e, url) {
-//   console.log('open url', url);
-// });
-
 app.on('ready', async () => {
   await installExtensions();
 
@@ -80,9 +62,24 @@ app.on('ready', async () => {
     mainWindow = null;
   });
 
-  mainWindow.openDevTools();
+  const shouldQuit = app.makeSingleInstance(function(commandLine) {
+    if (commandLine.length >= 2 && commandLine[1]) {
+      sendResponse(commandLine[1]);
+    }
+
+    // Someone tried to run a second instance, we should focus our window
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
+  if (shouldQuit) {
+    app.quit();
+  }
+
   if (process.env.NODE_ENV === 'development') {
-    // mainWindow.openDevTools();
+    mainWindow.openDevTools();
     mainWindow.webContents.on('context-menu', (e, props) => {
       const { x, y } = props;
 
@@ -101,14 +98,6 @@ app.on('ready', async () => {
       submenu: [{
         label: 'About',
         selector: 'orderFrontStandardAboutPanel:'
-      }, {
-        type: 'separator'
-      }, {
-        label: '&Mock Auth Response',
-        accelerator: 'Command+M',
-        click() {
-          // mockAuthResponse(true);
-        }
       }, {
         type: 'separator'
       }, {
@@ -238,18 +227,6 @@ app.on('ready', async () => {
         accelerator: 'Ctrl+D',
         click() {
           clearAccessData();
-        }
-      }, {
-        label: '&Mock Auth Response',
-        accelerator: 'Ctrl+M',
-        click() {
-          // mockAuthResponse(true);
-        }
-      }, {
-        label: '&Mock Auth Failure',
-        accelerator: 'Ctrl+F',
-        click() {
-          // mockAuthResponse();
         }
       }, {
         label: '&Close',
