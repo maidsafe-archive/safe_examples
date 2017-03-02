@@ -32,6 +32,7 @@ app/node_modules
 
 # App packaged
 release
+out
 app/main.js
 app/main.js.map
 app/bundle.js

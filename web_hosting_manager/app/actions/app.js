@@ -12,6 +12,7 @@ export const ON_AUTH_FAILURE = 'ON_AUTH_FAILURE';
 
 export const CREATE_PUBLIC_ID = 'CREATE_PUBLIC_ID';
 export const CREATE_SERVICE = 'CREATE_SERVICE';
+export const DELETE_SERVICE = 'DELETE_SERVICE';
 export const REMAP_SERVICE = 'REMAP_SERVICE';
 export const CREATE_CONTAINER_AND_SERVICE = 'CREATE_CONTAINER_AND_SERVICE';
 export const FETCH_ACCESS_INFO = 'FETCH_ACCESS_INFO';
@@ -95,7 +96,7 @@ export const createPublicId = (publicId: string) => {
 
 export const createContainerAndService = (publicId: string, service: string,
                                           conatinerName: string, parentConatiner: string) => {
-  const path = `${parentConatiner}/${conatinerName}`;
+  const path = `${parentConatiner}/${publicId}/${conatinerName}`;
   return {
     type: CREATE_CONTAINER_AND_SERVICE,
     payload: api.createContainer(path)
@@ -113,6 +114,14 @@ export const createService = (publicId: string, service: string, containerPath: 
   return {
     type: CREATE_SERVICE,
     payload: api.createService(publicId, service, containerPath)
+  };
+};
+
+export const deleteService = (publicId: string, service: string) => {
+  return {
+    type: DELETE_SERVICE,
+    payload: api.deleteService(publicId, service)
+      .then(() => api.fetchServices())
   };
 };
 
@@ -134,6 +143,7 @@ export const remapService = (service: string, publicId: string, containerPath: s
   return {
     type: REMAP_SERVICE,
     payload: api.remapService(service, publicId, containerPath)
+      .then(() => api.fetchServices())
   };
 };
 

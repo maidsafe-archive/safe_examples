@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { I18n } from 'react-redux-i18n';
-import { safe, typetag, createContainer } from './api';
+import { safe, typetag, createContainer, accessContainers } from './api';
 import { strToPtrBuf, randomStr, parseConatinerPath } from './utils';
 
 class Task {
@@ -43,13 +43,7 @@ export class FileUploadTask extends Task {
     }
     const containerPath = parseConatinerPath(this.networkPath);
 
-    return safe.auth.canAccessContainer('_public')
-      .then((hasAccess) => {
-        if (!hasAccess) {
-          return Promise.reject(new Error('No access to _public container'));
-        }
-      })
-      .then(() => safe.auth.getAccessContainerInfo('_public'))
+    return safe.auth.getAccessContainerInfo(accessContainers.public)
       .then((mdata) => mdata.get(containerPath.dir))
       .then((val) => safe.mutableData.newPublic(val.buf, typetag))
       .then((mdata) => {
