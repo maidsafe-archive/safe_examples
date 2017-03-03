@@ -13,9 +13,9 @@ Setup maven as [instructed](https://maven.apache.org/install.html).
 
 ## Running the application
 
-`mvn package` command will generate the jar file in the `target` folder.
+- `mvn exec:java -Dexec.mainClass="net.maidsafe.example.mail.MainApp"`, will start the application.
 
-Open the jar from commandline or by double clicking to start the application
+- `mvn package` command will generate the jar file in the `target` folder.
 
 ## Netbeans support
 

@@ -1,12 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.maidsafe.example.mail.util;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -26,10 +19,6 @@ public abstract class ServiceHandler<T> {
         this.resutToWaitFor = resultToWaitFor;
     }
     
-    public ServiceHandler(CompletableFuture<Result<T>> resultToWaitFor) {
-        this.resutToWaitFor = resultToWaitFor;
-    }
-
     public void start() {
         new Service<Void>() {
 
@@ -38,7 +27,7 @@ public abstract class ServiceHandler<T> {
                 return new Task<Void>() {
 
                     @Override
-                    protected Void call() throws Exception {
+                    protected Void call() throws Exception {                        
                         Result<T> result = resutToWaitFor.get();
                         Platform.runLater(() -> {                            
                             onResult(result);
