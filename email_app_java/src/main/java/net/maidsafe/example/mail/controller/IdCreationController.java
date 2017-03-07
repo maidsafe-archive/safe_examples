@@ -2,7 +2,7 @@ package net.maidsafe.example.mail.controller;
 
 import net.maidsafe.example.mail.dao.IMessagingDao;
 import net.maidsafe.example.mail.dao.LauncherAPI;
-import net.maidsafe.example.mail.modal.Result;
+import net.maidsafe.example.mail.model.Result;
 import net.maidsafe.example.mail.util.ServiceHandler;
 
 /**

@@ -2,8 +2,8 @@ package net.maidsafe.example.mail.dao;
 
 import java.util.List;
 import java.util.concurrent.Future;
-import net.maidsafe.example.mail.modal.Message;
-import net.maidsafe.example.mail.modal.Result;
+import net.maidsafe.example.mail.model.Message;
+import net.maidsafe.example.mail.model.Result;
 
 /**
  *
