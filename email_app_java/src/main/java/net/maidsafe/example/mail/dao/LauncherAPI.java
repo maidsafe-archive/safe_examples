@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +32,6 @@ import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import okio.ByteString;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -245,6 +245,7 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                     api.dropDataId(authToken, tempDataIdHandle).execute();
                     api.dropImmutableDataReader(authToken, tempReaderHandle).execute();
                 }
+                inboxMessages.sort(Comparator.comparing(Message::getTime).reversed());
                 return new Result<List<Message>>(true, inboxMessages);
             } catch (Exception e) {
                 return new Result<List<Message>>(true, e.toString());
@@ -283,6 +284,7 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                     api.dropImmutableDataReader(authToken, tempReaderHandle).execute();
                     i++;
                 }
+                savedMessages.sort(Comparator.comparing(Message::getTime).reversed());
                 return new Result<List<Message>>(true, savedMessages);
             } catch (Exception e) {
                 return new Result<List<Message>>(false, e.toString());
@@ -383,6 +385,7 @@ public class LauncherAPI implements IMessagingDao, Cloneable {
                 deleteFromAppendableData(message);
                 message.setIndex(savedMessages.size());
                 savedMessages.add(message);
+                savedMessages.sort(Comparator.comparing(Message::getTime).reversed());
                 return new Result<Boolean>(true, true);
             } catch (Exception e) {
                 return new Result<Boolean>(false, e.toString());
