@@ -28,7 +28,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import net.maidsafe.example.mail.controller.AppController;
-import net.maidsafe.example.mail.modal.Message;
+import net.maidsafe.example.mail.model.Message;
 
 /**
  *
