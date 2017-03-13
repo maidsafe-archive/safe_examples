@@ -1,115 +1,57 @@
 import ACTION_TYPES from './actionTypes';
 import { CONSTANTS } from '../constants';
 
-export const createStructuredData = (token, name, data, cipherHandle) => ({
+export const createStructuredData = (name, data, cipherHandle) => ({
   type: ACTION_TYPES.CREATE_STRUCTURED_DATA,
-  payload: {
-    request: {
-      method: 'post',
-      url: '/structured-data',
-      headers: {
-        'Authorization': token
-      },
-      data: {
-        name,
-        typeTag: CONSTANTS.TAG_TYPE.DEFAULT,
-        cipherOpts: cipherHandle,
-        data: new Buffer(JSON.stringify(data)).toString('base64')
-      }
-    }
+  name,
+  typeTag: CONSTANTS.TAG_TYPE.DEFAULT,
+  cipherOpts: cipherHandle,
+  data
+  // data: new Buffer(JSON.stringify(data)).toString('base64')
   }
 });
 
-export const fetchStructuredData = (token, handleId) => ({
+export const fetchStructuredData = (handleId) => ({
   type: ACTION_TYPES.FETCH_STRUCTURED_DATA,
-  payload: {
-    request: {
-      url: `/structured-data/${handleId}`,
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'text/plain'
-      }
-    }
-  }
+  handleId
 });
 
-export const fetchStructuredDataHandle = (token, dataIdHandle) => ({
+export const fetchStructuredDataHandle = (dataIdHandle) => ({
   type: ACTION_TYPES.FETCH_STRUCTURE_DATA_HANDLE,
-  payload: {
-    request: {
-      url: `/structured-data/handle/${dataIdHandle}`,
-      headers: {
-        'Authorization': token
-      }
-    }
+  dataIdHandle
   }
 });
 
-export const fetchStructuredDataIdHandle = (token, handleId) => ({
+export const fetchStructuredDataIdHandle = (handleId) => ({
   type: ACTION_TYPES.FETCH_STRUCTURE_DATA_ID_HANDLE,
-  payload: {
-    request: {
-      url: `/structured-data/data-id/${handleId}`,
-      headers: {
-        'Authorization': token
-      }
-    }
+  handleId
   }
 });
 
-export const updateStructuredData = (token, handleId, data, cipherOpts) => ({
+export const updateStructuredData = (handleId, data, cipherOpts) => ({
   type: ACTION_TYPES.UPDATE_STRUCTURED_DATA,
-  payload: {
-    request: {
-      method: 'patch',
-      url: `/structured-data/${handleId}`,
-      headers: {
-        'Authorization': token
-      },
-      data: {
-        cipherOpts,
-        data: new Buffer(JSON.stringify(data)).toString('base64')
-      }
-    }
+  handleId
+  cipherOpts,
+  data
+        // data: new Buffer(JSON.stringify(data)).toString('base64')
   }
 });
 
-export const dropStructuredDataHandle = (token, handleId) => ({
+export const dropStructuredDataHandle = (handleId) => ({
   type: ACTION_TYPES.DROP_STRUCTURED_DATA_HANDLE,
-  payload: {
-    request: {
-      method: 'delete',
-      url: `/structured-data/handle/${handleId}`,
-      headers: {
-        'Authorization': token
-      }
-    }
+  handleId
   }
 });
 
-export const postStructuredData = (token, handleId) => ({
+export const postStructuredData = (handleId) => ({
   type: ACTION_TYPES.POST_STRUCTURED_DATA,
-  payload: {
-    request: {
-      method: 'post',
-      url: `/structured-data/${handleId}`,
-      headers: {
-        'Authorization': token
-      }
-    }
+  handleId
   }
 });
 
-export const putStructuredData = (token, handleId) => ({
+export const putStructuredData = (handleId) => ({
   type: ACTION_TYPES.PUT_STRUCTURED_DATA,
-  payload: {
-    request: {
-      method: 'put',
-      url: `/structured-data/${handleId}`,
-      headers: {
-        'Authorization': token
-      }
-    }
+  handleId
   }
 });
 

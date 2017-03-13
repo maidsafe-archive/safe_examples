@@ -8,13 +8,7 @@ export const setInitializerTask = (task) => ({
 export const authoriseApplication = (data) => {
   return {
     type: ACTION_TYPES.AUTHORISE_APP,
-    payload: {
-      request: {
-        method: 'post',
-        url: '/auth',
-        data: data
-      }
-    }
+    data
   };
 };
 
