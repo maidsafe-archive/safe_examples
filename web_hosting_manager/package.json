@@ -43,7 +43,6 @@
       ]
     },
     "asar": false,
-    "node-gyp-rebuild": true,
     "files": [
       "dist/",
       "node_modules/",
