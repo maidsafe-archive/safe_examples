@@ -5,7 +5,7 @@ export const createImmutableDataWriterHandle = () => ({
 });
 
 export const getImmutableDataReadHandle = (handleId) => ({
-  type: ACTION_TYPES.GET_IMMUT_READ_HANDLE
+  type: ACTION_TYPES.GET_IMMUT_READ_HANDLE,
   handleId
 });
 

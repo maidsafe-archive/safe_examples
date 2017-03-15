@@ -2,8 +2,6 @@ import pkg from '../package.json';
 
 export const CONSTANTS = {
   LOCAL_AUTH_DATA_KEY: 'local_auth_data_key',
-  SERVER_URL: 'http://localhost:8100',
-  ROOT_PATH: 'APP',
   TAG_TYPE: {
     DEFAULT: 500,
     VERSIONED: 501
@@ -42,11 +40,7 @@ export const MESSAGES = {
 };
 
 export const AUTH_PAYLOAD = {
-  app: {
-    name: pkg.productName,
-    vendor: pkg.author.name,
-    version: pkg.version,
-    id: pkg.identifier
-  },
-  permissions: ['LOW_LEVEL_API']
+  id: pkg.identifier,
+  name: pkg.productName,
+  vendor: pkg.vendor
 };

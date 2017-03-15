@@ -8,6 +8,11 @@ require("babel-polyfill");
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
+
+const sendResponse = (success) => {
+  mainWindow.webContents.send('auth-response', success ? success : '');
+};
+
 const isDevMode = process.execPath.match(/[\\/]electron/);
 
 // if (isDevMode) enableLiveReload({strategy: 'react-hmr'});
@@ -40,7 +45,28 @@ const createWindow = async () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+
+
+app.on('ready', async () => {
+  await createWindow();
+
+  const shouldQuit = app.makeSingleInstance(function(commandLine) {
+    if (commandLine.length >= 2 && commandLine[1]) {
+      sendResponse(commandLine[1]);
+    }
+
+    // Someone tried to run a second instance, we should focus our window
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
+  if (shouldQuit) {
+    app.quit();
+  }
+});
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -61,3 +87,7 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+app.on('open-url', function (e, url) {
+  sendResponse(url);
+});

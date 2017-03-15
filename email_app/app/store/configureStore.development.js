@@ -1,14 +1,12 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
-import axios from 'axios';
-import axiosMiddleware from 'redux-axios-middleware';
 import { hashHistory } from 'react-router';
 import { routerMiddleware, push } from 'react-router-redux';
 import rootReducer from '../reducers';
 import { CONSTANTS } from '../constants';
+import promiseMiddleware from 'redux-promise-middleware';
 
-// import * as counterActions from '../actions/counter';
 
 const actionCreators = {
   // ...counterActions,
@@ -22,12 +20,11 @@ const logger = createLogger({
 
 const router = routerMiddleware(hashHistory);
 
-const client = axios.create({
-  baseURL: CONSTANTS.SERVER_URL
-});
 
 const enhancer = compose(
-  applyMiddleware(thunk, router, logger, axiosMiddleware(client)),
+  applyMiddleware(thunk, router, logger, promiseMiddleware({
+    promiseTypeSuffixes: ['LOADING', 'SUCCESS', 'ERROR']
+  })),
   window.devToolsExtension ?
     window.devToolsExtension({ actionCreators }) :
     noop => noop

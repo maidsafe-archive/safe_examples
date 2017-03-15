@@ -30,23 +30,25 @@ export default class Initializer extends Component {
 
   componentDidMount() {
     const { authoriseApplication, setInitializerTask } = this.props;
-    authoriseApplication(AUTH_PAYLOAD)
-      .then(() => {
+    authoriseApplication(AUTH_PAYLOAD, {"_publicNames" : ["Insert"]})
+      .then((app) => {
+        console.log(app);
         setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
         return this.getConfiguration();
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err)
         return showDialog('Authorisation Error', MESSAGES.AUTHORISATION_ERROR);
       });
   }
 
   getConfiguration() {
-    const { token, getConfigFile, setInitializerTask } = this.props;
-    if (!token) {
-      throw new Error('Application token not found.');
+    const { client, getConfigFile, setInitializerTask } = this.props;
+    if (!client) {
+      throw new Error('Application client not found.');
     }
 
-    getConfigFile(token)
+    getConfigFile(client)
       .then(res => {
         if (res.error) {
           setInitializerTask(MESSAGES.INITIALIZE.CREATE_CORE_STRUCTURE);
@@ -58,9 +60,9 @@ export default class Initializer extends Component {
   }
 
   getStructuredDataIdHandle(name) {
-    const { token, getStructuredDataIdHandle } = this.props;
+    const { client, getStructuredDataIdHandle } = this.props;
     
-    getStructuredDataIdHandle(token, name, CONSTANTS.TAG_TYPE.DEFAULT)
+    getStructuredDataIdHandle(client, name, CONSTANTS.TAG_TYPE.DEFAULT)
       .then((res) => {
         if (res.error) {
           return showDialog('Get Structure Data Handler Error', res.error.message);
@@ -70,8 +72,8 @@ export default class Initializer extends Component {
   }
 
   getStructuredDataHandle(handleId) {
-    const { token, fetchStructuredDataHandle } = this.props;
-    fetchStructuredDataHandle(token, handleId)
+    const { client, fetchStructuredDataHandle } = this.props;
+    fetchStructuredDataHandle(client, handleId)
       .then(res => {
         if (res.error) {
           return showDialog('Get Structure Data Handler Error', res.error.message);
@@ -81,8 +83,8 @@ export default class Initializer extends Component {
   }
 
   fetchStructuredData(handleId) {
-    const { token, fetchStructuredData } = this.props;
-    fetchStructuredData(token, handleId)
+    const { client, fetchStructuredData } = this.props;
+    fetchStructuredData(client, handleId)
       .then(res => {
         if (res.error) {
           return showDialog('Get Structure Data Error', res.error.message);
@@ -96,7 +98,7 @@ export default class Initializer extends Component {
   }
 
   createStructuredData() {
-    const { token, createStructuredData, putStructuredData, getCipherOptsHandle, deleteCipherOptsHandle, dropStructuredDataHandle, setInitializerTask } = this.props;
+    const { client, createStructuredData, putStructuredData, getCipherOptsHandle, deleteCipherOptsHandle, dropStructuredDataHandle, setInitializerTask } = this.props;
     this.createCoreCount++;
     const structuredDataId = generateStructredDataId();
     const data = {
@@ -106,7 +108,7 @@ export default class Initializer extends Component {
     };
 
     const deleteCipherHandle = (handleId) => {
-      deleteCipherOptsHandle(token, handleId)
+      deleteCipherOptsHandle(client, handleId)
         .then((res) => {
           if (res.error) {
             return showDialog('Delete Cipher Opts Handle Error', res.error.message);
@@ -116,7 +118,7 @@ export default class Initializer extends Component {
     };
 
     const put = (handleId) => {
-      putStructuredData(token, handleId)
+      putStructuredData(client, handleId)
         .then((res) => {
           if (res.error) {
             return showDialog('Put Structure Data Error', res.error.message);
@@ -126,7 +128,7 @@ export default class Initializer extends Component {
     };
 
     const create = (cipherOptsHandle) => {
-      createStructuredData(token, structuredDataId, data, cipherOptsHandle)
+      createStructuredData(client, structuredDataId, data, cipherOptsHandle)
         .then((res) => {
           if (res.error) {
             if (this.createCoreCount > 5) {
@@ -141,7 +143,7 @@ export default class Initializer extends Component {
     };
 
     const getCipherHandle = () => {
-      getCipherOptsHandle(token, CONSTANTS.ENCRYPTION.SYMMETRIC)
+      getCipherOptsHandle(client, CONSTANTS.ENCRYPTION.SYMMETRIC)
         .then((res) => {
           if (res.error) {
             return showDialog('Get Cipher Opts Handle Error', res.error.message);
@@ -154,8 +156,8 @@ export default class Initializer extends Component {
   }
 
   writeConfigFile(structuredDataId) {
-    const { token, writeConfigFile } = this.props;
-    writeConfigFile(token, structuredDataId)
+    const { client, writeConfigFile } = this.props;
+    writeConfigFile(client, structuredDataId)
       .then((res) => {
         if (res.error) {
           return showDialog('Write Configuration File Error', res.error.message);

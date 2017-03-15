@@ -48,35 +48,34 @@ export const removeFromAppendableData = (handleId, index) => {
 
 export const appendAppendableData = (handleId, dataIdHandle) => ({
   type: ACTION_TYPES.APPEND_APPENDABLE_DATA,
-    handleId,
-    dataIdHa
-  }
+  handleId,
+  dataIdHa
 });
 
 export const clearDeletedData = (handleId) => ({
   type: ACTION_TYPES.CLEAR_DELETE_DATA,
-    handleId
+  handleId
 });
 
 export const getAppendableDataLength = (handleId) => ({
   type: ACTION_TYPES.GET_APPENDABLE_DATA_LENGTH,
-    handleId
+  handleId
 });
 
 export const dropAppendableDataHandle = (handleId) => ({
   type: ACTION_TYPES.DROP_APPENDABLE_DATA_HANDLE,
-    handleId
+  handleId
 });
 
 
 export const postAppendableData = (handleId) => ({
   type: ACTION_TYPES.POST_APPENDABLE_DATA,
-    handleId
+  handleId
 });
 
 export const putAppendableData = (handleId) => ({
   type: ACTION_TYPES.PUT_APPENDABLE_DATA,
-    handleId
+  handleId
 });
 
 export const setAppendableDataId = (id) => ({

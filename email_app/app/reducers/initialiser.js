@@ -2,7 +2,7 @@ import ACTION_TYPES from '../actions/actionTypes';
 import { MESSAGES } from '../constants';
 
 const initialState = {
-  token: '',
+  client: '',
   tasks: [],
   config: null,
   coreData: {
@@ -24,7 +24,7 @@ const initializer = (state = initialState, action) => {
       break;
     }
     case `${ACTION_TYPES.AUTHORISE_APP}_SUCCESS`:
-      return { ...state, token: `Bearer ${action.payload.data.token}` };
+      return { ...state, client: action.payload };
       break;
     case ACTION_TYPES.SET_INITIALIZER_TASK:
       const tasks = state.tasks.slice();

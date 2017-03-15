@@ -8,7 +8,7 @@ import { getCipherOptsHandle, deleteCipherOptsHandle } from '../actions/cipher-o
 
 const mapStateToProps = state => {
   return {
-    token: state.initializer.token,
+    client: state.initializer.client,
     tasks: state.initializer.tasks,
     config: state.initializer.config,
     coreData: state.initializer.coreData
@@ -19,16 +19,16 @@ const mapDispatchToProps = dispatch => {
   return {
     setInitializerTask: task => (dispatch(setInitializerTask(task))),
     authoriseApplication: payload => (dispatch(authoriseApplication(payload))),
-    getConfigFile: (token) => (dispatch(getConfigFile(token))),
-    writeConfigFile: (token, data) => (dispatch(writeConfigFile(token, data))),
-    getCipherOptsHandle: (token, encType, keyHandle) => (dispatch(getCipherOptsHandle(token, encType, keyHandle))),
-    deleteCipherOptsHandle: (token, handleId) => (dispatch(deleteCipherOptsHandle(token, handleId))),
-    getStructuredDataIdHandle: (token, name, typeTag) => (dispatch(getStructuredDataIdHandle(token, name, typeTag))),
-    createStructuredData: (token, name, data) => (dispatch(createStructuredData(token, name, data))),
-    fetchStructuredData: (token, handleId) => (dispatch(fetchStructuredData(token, handleId))),
-    fetchStructuredDataHandle: (token, dataIdHandle) => (dispatch(fetchStructuredDataHandle(token, dataIdHandle))),
-    putStructuredData: (token, handleId) => (dispatch(putStructuredData(token, handleId))),
-    dropStructuredDataHandle: (token, handleId) => (dispatch(dropStructuredDataHandle(token, handleId)))
+    getConfigFile: (client) => (dispatch(getConfigFile(client))),
+    writeConfigFile: (client, data) => (dispatch(writeConfigFile(client, data))),
+    getCipherOptsHandle: (client, encType, keyHandle) => (dispatch(getCipherOptsHandle(client, encType, keyHandle))),
+    deleteCipherOptsHandle: (client, handleId) => (dispatch(deleteCipherOptsHandle(client, handleId))),
+    getStructuredDataIdHandle: (client, name, typeTag) => (dispatch(getStructuredDataIdHandle(client, name, typeTag))),
+    createStructuredData: (client, name, data) => (dispatch(createStructuredData(client, name, data))),
+    fetchStructuredData: (client, handleId) => (dispatch(fetchStructuredData(client, handleId))),
+    fetchStructuredDataHandle: (client, dataIdHandle) => (dispatch(fetchStructuredDataHandle(client, dataIdHandle))),
+    putStructuredData: (client, handleId) => (dispatch(putStructuredData(client, handleId))),
+    dropStructuredDataHandle: (client, handleId) => (dispatch(dropStructuredDataHandle(client, handleId)))
   };
 };
 
