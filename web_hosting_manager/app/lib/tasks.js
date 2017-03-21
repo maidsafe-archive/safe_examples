@@ -1,31 +1,23 @@
 import fs from 'fs';
 import { I18n } from 'react-redux-i18n';
-import { safe, typetag, createContainer, accessContainers } from './api';
-import { strToPtrBuf, randomStr, parseConatinerPath } from './utils';
+import { safe, typetag, accessContainers } from './api';
+
+const parseContainerPath = (targetPath) => {
+  if (!targetPath) {
+    return null;
+  }
+  const split = targetPath.split('/');
+  return {
+    target: split.slice(0, 3).join('/'),
+    file: targetPath.split('/').slice(4).join('/')
+  };
+};
 
 class Task {
 
   execute(callback) {
     const error = new Error(I18n.t('messages.notImplemented'));
     callback(error);
-  }
-}
-
-export class DirCreationTask extends Task {
-
-  constructor(dirPath) {
-    super();
-    this.dirPath = dirPath;
-  }
-
-  execute(callback) {
-    createContainer(this.dirPath)
-      .then((res) => callback(null, {
-        isFile: false,
-        isCompleted: true,
-        size: 0
-      }))
-      .catch(callback);
   }
 }
 
@@ -41,10 +33,10 @@ export class FileUploadTask extends Task {
     if (!safe) {
       return callback(new Error('App not registered'));
     }
-    const containerPath = parseConatinerPath(this.networkPath);
+    const containerPath = parseContainerPath(this.networkPath);
 
     return safe.auth.getAccessContainerInfo(accessContainers.public)
-      .then((mdata) => mdata.get(containerPath.dir))
+      .then((mdata) => mdata.get(containerPath.target))
       .then((val) => safe.mutableData.newPublic(val.buf, typetag))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');

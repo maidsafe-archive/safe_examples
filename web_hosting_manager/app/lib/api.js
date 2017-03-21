@@ -303,34 +303,40 @@ export const remapService = (service, publicId, container) => {
 export const getContainer = (path) => {
   let result = [];
   return safe.auth.getAccessContainerInfo(accessContainers.public)
-    .then((mdata) => {
-      return mdata.getKeys()
-        .then((keys) => keys.forEach((key) => {
-          key = key.toString();
-          if (key.indexOf(path + '/') !== -1 && key !== path) {
-            result.unshift({ isFile: false, name: key.replace(path + '/', '') });
-          }
-        }))
-        .then(() => mdata.getEntries());
-    })
-    .then((entries) => entries.get(path))
+    .then((mdata) => mdata.getEntries())
+    .then((entries) => entries.get(path.split('/').slice(0, 3).join('/')))
     .then((val) => safe.mutableData.newPublic(val.buf, typetag))
     .then((mdata) => {
       const files = [];
       const nfs = mdata.emulateAs('NFS');
       return mdata.getEntries()
-        .then((entries) => entries.forEach((key, val) => {
-          console.log('key', key.toString(), val);
-          files.unshift(key.toString());
+        .then((entries) => entries.forEach((key) => {
+          let keyStr = key.toString();
+          const rootName = path.split('/').slice(3).join('/');
+          if (rootName && (keyStr.indexOf(rootName) !== 0)) {
+            return
+          }
+          let keyStrTrimmed = keyStr;
+          if (rootName.length > 0) {
+            keyStrTrimmed = keyStr.substr(rootName.length + 1);
+          }
+          if (keyStrTrimmed.split('/').length > 1) {
+            const dirName = keyStrTrimmed.split('/')[0];
+            if (result.filter((files) => files.name === dirName).length === 0) {
+              return result.unshift({ isFile: false, name: dirName });
+            }
+            return;
+          }
+          files.unshift(keyStr);
         }))
         .then(() => {
           return Promise.all(files.map((file) => {
-            console.log('file', file)
             return nfs.fetch(file)
               .then((f) => safe.immutableData.fetch(f.dataMapName))
               .then((i) => i.read())
               .then((co) => {
-                result.unshift({ isFile: true, name: file, size: co.length });
+                const dirName = path.split('/').slice(3).join('/');
+                result.unshift({ isFile: true, name: dirName ? file.substr(dirName.length + 1) : file, size: co.length });
               });
           }));
         });
