@@ -31,11 +31,11 @@ body {
 
 .auth-wrapper .ant-card {
   width: 50%;
-  box-shadow: 0 1px 18px rgba(0,0,0,0.26)
+  box-shadow: 0 1px 18px rgba(0, 0, 0, 0.26)
 }
 
 .auth-wrapper .ant-card:hover {
-  box-shadow: 0 1px 18px rgba(0,0,0,0.26)
+  box-shadow: 0 1px 18px rgba(0, 0, 0, 0.26)
 }
 
 .auth-wrapper .ant-card .ant-card-head {
@@ -43,6 +43,7 @@ body {
   background-color: #5592d7;
   color: white;
 }
+
 .auth-wrapper .ant-card .ant-card-head .ant-card-head-title {
   font-size: 18px;
 }
@@ -73,7 +74,7 @@ body {
 .wrapper {
   position: fixed;
   top: 0;
-  left:0;
+  left: 0;
   height: 100%;
   width: 100%;
 }
@@ -86,7 +87,7 @@ body {
 
 nav {
   position: fixed;
-  top:0;
+  top: 0;
   left: 0;
   right: 0;
   height: 50px;
@@ -158,6 +159,12 @@ nav {
   border-color: #5592d7;
 }
 
+.create-service .create-service-b {
+  width: 60%;
+  margin: auto;
+  margin-top: 80px;
+}
+
 .create-service .create-service-input {
   margin-bottom: 40px;
 }
@@ -200,7 +207,7 @@ nav {
 
 .split-cntr-divider {
   position: absolute;
-  width:  40px;
+  width: 40px;
   left: 50%;
   margin-left: -20px;
   display: flex;
@@ -386,10 +393,10 @@ nav {
   font-size: 14px;
 }
 
-
 .custom-btn-grp .ant-select {
   width: 70%;
 }
+
 .custom-btn-grp .ant-select .ant-select-selection {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -401,11 +408,11 @@ nav {
   border-bottom-left-radius: 0;
   border-left-width: 0.5px;
 }
+
 .custom-btn-grp button.lg {
   padding-top: 6px;
   padding-bottom: 6px;
 }
-
 
 /* Network status */
 .nw-status {
@@ -447,7 +454,7 @@ nav {
   padding: 0 8px;
   bottom: -4px;
   right: 100%;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.26);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.26);
   border-radius: 3px;
   overflow: hidden;
   margin-right: 8px;
