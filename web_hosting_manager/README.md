@@ -7,17 +7,20 @@
 First, clone the repo via git:
 
 ```bash
-git clone https://github.com/maidsafe/safe_examples && cd safe_examples/web_hosting_manager
+$ git clone https://github.com/maidsafe/safe_examples && cd safe_examples/web_hosting_manager
 ```
 
-And then install dependencies.
-Install with [yarn](https://github.com/yarnpkg/yarn) for faster and safer installation
+And then install Node.js dependencies.
 
 ```bash
-yarn install
+$ npm i
 ```
 
-Manually build [safe_app_nodejs](https://github.com/maidsafe/safe_app_nodejs) dependency from `app/node_modules/safe-app`
+Finally, rebuild the native modules
+
+```bash
+$ npm run rebuild
+```
 
 ## Run
 
@@ -34,35 +37,7 @@ or run two servers with one command
 $ npm run dev
 ```
 
-## CSS Modules
-
-This boilerplate out of the box is configured to use [css-modules](https://github.com/css-modules/css-modules) and SASS.
-
-All `.scss` file extensions will use css-modules unless it has `.global.scss`.
-
-If you need global styles, stylesheets with `.global.scss` will not go through the
-css-modules loader. e.g. `app.global.scss`
-
-If you want to import global css libraries (like `bootstrap`), you can just write the following code in `.global.scss`:
-
-```css
-@import "~bootstrap/dist/css/bootstrap.css";
-```
-
-For SASS mixin
-```css
-@import "~bootstrap/dist/css/bootstrap.css";
-```
-
-
 ## Packaging
-
-Based on the platform configure `build.asarUnpack` option in package.json
-```
-osx : "*.dylib"
-linux : "*.so"
-windows: "*.dll"
-```
 
 To package apps for the local platform:
 
@@ -71,6 +46,10 @@ $ npm run package
 ```
 
 To package apps for all platforms:
+
+```bash
+$ npm run package-all
+```
 
 To package apps with options:
 
@@ -87,17 +66,18 @@ $ npm run build
 $ npm start
 ```
 
-To run End-to-End Test
+# License
 
-```bash
-$ npm run build
-$ npm run test-e2e
-```
+Licensed under either of
 
-#### Module Structure
+* the MaidSafe.net Commercial License, version 1.0 or later ([LICENSE](LICENSE))
+* the General Public License (GPL), version 3 ([COPYING](COPYING) or http://www.gnu.org/licenses/gpl-3.0.en.html)
 
-This boilerplate uses a [two package.json structure](https://github.com/electron-userland/electron-builder#two-packagejson-structure).
+at your option.
 
-1. If the module is native to a platform or otherwise should be included with the published package (i.e. bcrypt, openbci), it should be listed under `dependencies` in `./app/package.json`.
-2. If a module is `import`ed by another module, include it in `dependencies` in `./package.json`.   See [this ESLint rule](https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md).
-3. Otherwise, modules used for building, testing and debugging should be included in `devDependencies` in `./package.json`.
+# Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the
+work by you, as defined in the MaidSafe Contributor Agreement, version 1.1 ([CONTRIBUTOR]
+(CONTRIBUTOR)), shall be dual licensed as above, and you agree to be bound by the terms of the
+MaidSafe Contributor Agreement, version 1.1.
