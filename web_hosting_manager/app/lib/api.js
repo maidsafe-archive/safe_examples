@@ -309,8 +309,8 @@ export const getContainer = (path) => {
     .then((mdata) => {
       const files = [];
       const nfs = mdata.emulateAs('NFS');
-      return mdata.getEntries()
-        .then((entries) => entries.forEach((key) => {
+      return mdata.getKeys()
+        .then((keys) => keys.forEach((key) => {
           let keyStr = key.toString();
           const rootName = path.split('/').slice(3).join('/');
           if (rootName && (keyStr.indexOf(rootName) !== 0)) {
