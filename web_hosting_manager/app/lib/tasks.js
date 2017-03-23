@@ -1,3 +1,4 @@
+import path from 'path';
 import fs from 'fs';
 import { I18n } from 'react-redux-i18n';
 import { safe, typetag, accessContainers } from './api';
@@ -9,7 +10,7 @@ const parseContainerPath = (targetPath) => {
   const split = targetPath.split('/');
   return {
     target: split.slice(0, 3).join('/'),
-    file: targetPath.split('/').slice(4).join('/')
+    file: targetPath.split('/').slice(4).join('/') || path.basename(targetPath)
   };
 };
 
