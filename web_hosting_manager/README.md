@@ -1,5 +1,8 @@
 # SAFE Hosting Manager
 
+#### Prerequisites
+> SAFE Hosting Manager uses **[keytar](https://www.npmjs.com/package/keytar)** module as its dependency. Please install the prerequisites mentioned [here](https://www.npmjs.com/package/keytar#installing) based on the platform.
+
 ## Install
 
 * **Note: requires a node version 6.5.0 and an npm version 3.10.3**
