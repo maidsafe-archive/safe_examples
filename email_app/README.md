@@ -20,17 +20,18 @@ $ cd your-project-name && npm install
 
 ## Run
 
-Run this two commands __simultaneously__ in different console tabs.
-
 ```bash
-$ npm run hot-server
-$ npm run start-hot
+$ npm start
 ```
 
-or run two servers with one command
+This starts the app in development mode with hot-reloading.
+
+### Faking Authentication
+
+If you don't have authenticator set up and want to run the test with randomly generated testing credentials, run it as:
 
 ```bash
-$ npm run dev
+$ NODE_ENV=development SAFE_FAKE_AUTH=1 npm start
 ```
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
