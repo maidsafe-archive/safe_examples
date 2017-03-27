@@ -19,16 +19,17 @@ export default class Initializer extends Component {
   constructor() {
     super();
     this.createCoreCount = 0;
-    this.getConfiguration = this.getConfiguration.bind(this);
   }
 
   componentDidMount() {
     const { authoriseApplication, setInitializerTask } = this.props;
     authoriseApplication(AUTH_PAYLOAD, {"_publicNames" : ["Insert"]})
-      .then((app) => {
-        console.log(app);
+      .then((res) => {
+        const app = res.value;
         setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
-        return app.auth.refreshContainerAccess().then(() => this.getConfiguration)
+        return app.auth.refreshContainerAccess()
+            .then(() => this.props.refreshConfig(app))
+            // .then(() => setInitializerTask(MESSAGES.))
       })
       .catch((err) => {
         console.error(err)
@@ -36,21 +37,6 @@ export default class Initializer extends Component {
       });
   }
 
-  getConfiguration() {
-    const { client, getConfigFile, setInitializerTask } = this.props;
-    if (!client) {
-      throw new Error('Application client not found.');
-    }
-
-    getConfigFile(client)
-      .then(res => {
-        if (res.error) {
-          setInitializerTask(MESSAGES.INITIALIZE.CREATE_CORE_STRUCTURE);
-          return this.createStructuredData();
-        }
-        setInitializerTask(MESSAGES.INITIALIZE.FETCH_CORE_STRUCTURE);
-      });
-  }
 
   render() {
     const { tasks } = this.props;

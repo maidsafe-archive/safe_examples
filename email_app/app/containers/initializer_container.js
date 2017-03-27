@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Initializer from '../components/initializer';
-import { setInitializerTask, authoriseApplication } from '../actions/initializer_actions';
+import { setInitializerTask, authoriseApplication, refreshConfig } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
   return {
@@ -15,6 +15,7 @@ const mapDispatchToProps = dispatch => {
   return {
     setInitializerTask: task => (dispatch(setInitializerTask(task))),
     authoriseApplication: payload => (dispatch(authoriseApplication(payload))),
+    refreshConfig: mdata => (dispatch(refreshConfig(mdata)))
   };
 };
 

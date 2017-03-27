@@ -41,11 +41,16 @@ export const authoriseApplication = (appData, permissions) => {
   };
 };
 
-export const pushToInbox = (data) => ({
-  type: ACTION_TYPES.PUSH_TO_INBOX,
-  data
-});
+export const refreshConfig = (app) => {
+  const accounts = {};
+  return {
+    type: ACTION_TYPES.REFRESH_EMAIL,
+    payload: app.auth.getHomeContainer()
+      .then((mdata) => mdata.getEntries()
+        .then((entries) => entries.forEach((name, valV) => {
+          accounts[name.toString()] = valV
+        }))
+        .then(() => accounts))
+  }};
 
-export const clearInbox = _ => ({
-  type: ACTION_TYPES.CLEAR_INBOX
-});
+
