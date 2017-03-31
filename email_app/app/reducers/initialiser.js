@@ -4,7 +4,7 @@ import { MESSAGES } from '../constants';
 const initialState = {
   client: '',
   tasks: [],
-  account: null,
+  accounts: null,
   config: null,
   coreData: {
     id: '',
@@ -18,7 +18,13 @@ const initialState = {
 
 const initializer = (state = initialState, action) => {
   switch (action.type) {
-    case ACTION_TYPES.AUTHORISE_APP: {
+    case ACTION_TYPES.SET_INITIALIZER_TASK: {
+      const tasks = state.tasks.slice();
+      tasks.push(action.task);
+      return { ...state, tasks };
+      break;
+    }
+    case `${ACTION_TYPES.AUTHORISE_APP}_LOADING`: {
       const tasks = state.tasks.slice();
       tasks.push(MESSAGES.INITIALIZE.AUTHORISE_APP);
       return { ...state, tasks };
@@ -27,15 +33,17 @@ const initializer = (state = initialState, action) => {
     case `${ACTION_TYPES.AUTHORISE_APP}_SUCCESS`:
       return { ...state, client: action.payload };
       break;
-    case ACTION_TYPES.SET_INITIALIZER_TASK:
+    case `${ACTION_TYPES.GET_CONFIG}_LOADING`: {
       const tasks = state.tasks.slice();
-      tasks.push(action.task);
+      tasks.push(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
       return { ...state, tasks };
       break;
-    case `${ACTION_TYPES.GET_CONFIG_FILE}_SUCCESS`:
-      return { ...state, config: action.payload.data };
+    }
+    case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
+      return { ...state, accounts: action.payload };
       break;
-    case `${ACTION_TYPES.REFRESH_EMAILS}_SUCCESS`:
+    case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
+      console.log("refresh email success", action, state);
       return { ...state, accounts: action.payload.data };
       break;
     case ACTION_TYPES.PUSH_TO_INBOX: {

@@ -2,10 +2,6 @@ import pkg from '../package.json';
 
 export const CONSTANTS = {
   LOCAL_AUTH_DATA_KEY: 'local_auth_data_key',
-  TAG_TYPE: {
-    DEFAULT: 500,
-    VERSIONED: 501
-  },
   APPENDABLE_DATA_FILTER_TYPE: {
     WHITE_LIST: 'WHITE_LIST',
     BLACK_LIST: 'BLACK_LIST'
@@ -36,7 +32,8 @@ export const MESSAGES = {
   },
   EMAIL_ALREADY_TAKEN: 'Email already taken. Please try again',
   EMAIL_TOO_LONG: 'EMAIL is too long',
-  AUTHORISATION_ERROR: 'Failed to authorise with launcher'
+  AUTHORISATION_ERROR: 'Failed to authorise',
+  CHECK_CONFIGURATION_ERROR: 'Failed to retrieve configuration'
 };
 
 export const AUTH_PAYLOAD = {

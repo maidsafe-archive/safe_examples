@@ -21,15 +21,16 @@ export default class CreateAccount extends Component {
 
   handleCreateAccount(e) {
     e.preventDefault();
+    const { createAccount, createAccountError } = this.props;
     const emailId = this.emailId.value;
     if (!emailId.trim()) {
       return;
     }
     if (emailId.length > CONSTANTS.NEW_EMAIL_SIZE) {
-      return this.props.setCreateAccountError(new Error(MESSAGES.EMAIL_TOO_LONG));
+      return createAccountError(new Error(MESSAGES.EMAIL_TOO_LONG));
     }
-    this.props.setCreateAccountProcessing();
-    return this.createAppendableData(emailId);
+    return createAccount(emailId)
+        .then(() => this.context.router.push('/home'));
   }
 
   render() {

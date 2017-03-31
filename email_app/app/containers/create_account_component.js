@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import CreateAccount from '../components/create_account';
+import { createAccount, createAccountError } from '../actions/create_account_actions';
 
 const mapStateToProps = state => {
   return {
@@ -14,8 +15,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setCreateAccountError: error => (dispatch(setCreateAccountError(error))),
-    setCreateAccountProcessing: () => (dispatch(setCreateAccountProcessing())),
+    createAccountError: error => (dispatch(createAccountError(error))),
+    createAccount: () => (dispatch(createAccount())),
   };
 };
 

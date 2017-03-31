@@ -18,23 +18,36 @@ export default class Initializer extends Component {
 
   constructor() {
     super();
-    this.createCoreCount = 0;
+    this.checkConfiguration = this.checkConfiguration.bind(this);
   }
 
   componentDidMount() {
-    const { authoriseApplication, setInitializerTask } = this.props;
-    authoriseApplication(AUTH_PAYLOAD, {"_publicNames" : ["Insert"]})
-      .then((res) => {
-        const app = res.value;
-        setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
-        return app.auth.refreshContainerAccess()
-            .then(() => this.props.refreshConfig(app))
-            // .then(() => setInitializerTask(MESSAGES.))
-      })
+    this.props.authoriseApplication(AUTH_PAYLOAD, {"_publicNames" : ["Insert"]})
+      .then((_) => this.checkConfiguration())
       .catch((err) => {
         console.error(err)
         return showDialog('Authorisation Error', MESSAGES.AUTHORISATION_ERROR);
       });
+  }
+
+  checkConfiguration() {
+    const { client, refreshConfig } = this.props;
+    if (!client) {
+      throw new Error('Application client not found.');
+    }
+
+    return refreshConfig(client)
+        .then((_) => {
+          if (Object.keys(this.props.accounts).length > 0) {
+            return this.context.router.push('/home');
+          } else {
+            return this.context.router.push('/create_account');
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          return showDialog('Error fetching configuration', MESSAGES.CHECK_CONFIGURATION_ERROR);
+        });
   }
 
 
