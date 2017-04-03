@@ -2,17 +2,14 @@ import pkg from '../package.json';
 
 export const CONSTANTS = {
   LOCAL_AUTH_DATA_KEY: 'local_auth_data_key',
-  APPENDABLE_DATA_FILTER_TYPE: {
-    WHITE_LIST: 'WHITE_LIST',
-    BLACK_LIST: 'BLACK_LIST'
-  },
+  INBOX_TAG_TYPE: 15003,
   ENCRYPTION: {
     PLAIN: 'PLAIN',
     SYMMETRIC: 'SYMMETRIC',
     ASYMMETRIC: 'ASYMMETRIC'
   },
   TOTAL_INBOX_SIZE: 100,
-  NEW_EMAIL_SIZE: 100,
+  EMAIL_ID_MAX_LENGTH: 100,
   HOME_TABS: {
     INBOX: 'INBOX',
     OUTBOX: 'OUTBOX',
@@ -30,8 +27,8 @@ export const MESSAGES = {
     CREATE_CORE_STRUCTURE: 'Creating Core Structure',
     WRITE_CONFIG_FILE: 'Creating new configuration',
   },
-  EMAIL_ALREADY_TAKEN: 'Email already taken. Please try again',
-  EMAIL_TOO_LONG: 'EMAIL is too long',
+  EMAIL_ALREADY_TAKEN: 'Email ID already taken. Please try again',
+  EMAIL_ID_TOO_LONG: 'Email ID is too long',
   AUTHORISATION_ERROR: 'Failed to authorise',
   CHECK_CONFIGURATION_ERROR: 'Failed to retrieve configuration'
 };

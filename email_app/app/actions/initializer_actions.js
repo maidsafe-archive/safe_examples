@@ -20,7 +20,6 @@ export const receiveResponse = (uri) => {
     payload: fromAuthURI(uri)
       .then((app) =>  authResolver ? authResolver(app) : app)
   }
-
 };
 
 export const authoriseApplication = (appInfo, permissions, opts) => {
@@ -43,25 +42,23 @@ export const authoriseApplication = (appInfo, permissions, opts) => {
   };
 };
 
-export const refreshConfig = (app) => {
+export const refreshConfig = () => {
 
-  return function (dispatch) {
+  return function (dispatch, getState) {
     dispatch({
       type: ACTION_TYPES.GET_CONFIG,
       payload: authPromise()
     });
 
     let accounts = {};
+    let app = getState().initializer.app;
     return app.auth.refreshContainerAccess()
         .then(() => app.auth.getHomeContainer())
         .then((mdata) => mdata.getEntries()
           .then((entries) => entries.forEach((name, valV) => {
               accounts[name.toString()] = valV.buf.toString();
             })
-            .then(() => {
-//              accounts = {myid: "asasasa"};
-              return authResolver(accounts);
-            })
+            .then(() => authResolver(accounts))
           )
         ).catch(authRejecter);
   };

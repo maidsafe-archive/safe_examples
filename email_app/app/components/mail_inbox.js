@@ -25,10 +25,11 @@ export default class MailInbox extends Component {
   }
 
   fetchMails() {
-    const { clearInbox, setMailProcessing } = this.props;
-    clearInbox();
-    setMailProcessing();
-    return this.getAppendableDataIdHandle();
+    const { clearInbox, setMailProcessing, accounts } = this.props;
+    console.log("ACC:", accounts);
+//    clearInbox();
+//    setMailProcessing();
+//    return this.getAppendableDataIdHandle();
   }
 
   refresh(e) {

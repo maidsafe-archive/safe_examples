@@ -31,12 +31,12 @@ export default class Initializer extends Component {
   }
 
   checkConfiguration() {
-    const { client, refreshConfig } = this.props;
-    if (!client) {
+    const { app, refreshConfig } = this.props;
+    if (!app) {
       throw new Error('Application client not found.');
     }
 
-    return refreshConfig(client)
+    return refreshConfig()
         .then((_) => {
           if (Object.keys(this.props.accounts).length > 0) {
             return this.context.router.push('/home');

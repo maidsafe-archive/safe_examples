@@ -1,15 +1,15 @@
 import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
-import { setMailProcessing, clearMailProcessing } from '../actions/mail_actions';
+import { setMailProcessing, clearMailProcessing, setActiveMail, clearInbox } from '../actions/mail_actions';
 
 const mapStateToProps = state => {
   return {
-    coreData: state.initializer.coreData,
-    rootSDHandle: state.initializer.rootSDHandle,
-    inboxSize: state.initializer.inboxSize,
     processing: state.mail.processing,
     error: state.mail.error,
-    token: state.initializer.token
+    coreData: state.initializer.coreData,
+    inboxSize: state.initializer.inboxSize,
+    app: state.initializer.app,
+    accounts: state.initializer.accounts
   };
 };
 
@@ -17,7 +17,7 @@ const mapDispatchToProps = dispatch => {
   return {
     setMailProcessing: () => (dispatch(setMailProcessing())),
     clearMailProcessing: () => (dispatch(clearMailProcessing())),
-    pushToInbox: data => (dispatch(pushToInbox(data))),
+    setActiveMail: data => (dispatch(setActiveMail(data))),
     clearInbox: _ => (dispatch(clearInbox())),
   };
 };

@@ -4,7 +4,7 @@ import { setInitializerTask, authoriseApplication, refreshConfig } from '../acti
 
 const mapStateToProps = state => {
   return {
-    client: state.initializer.client,
+    app: state.initializer.app,
     accounts: state.initializer.accounts,
     tasks: state.initializer.tasks,
     config: state.initializer.config,
@@ -17,7 +17,7 @@ const mapDispatchToProps = dispatch => {
     setInitializerTask: task => (dispatch(setInitializerTask(task))),
     authoriseApplication: (appInfo, permissions, opts) =>
                     (dispatch(authoriseApplication(appInfo, permissions, opts))),
-    refreshConfig: mdata => (dispatch(refreshConfig(mdata)))
+    refreshConfig: () => (dispatch(refreshConfig()))
   };
 };
 

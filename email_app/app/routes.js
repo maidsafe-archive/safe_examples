@@ -5,7 +5,7 @@ import InitializerPage from './containers/initializer_container';
 import HomePage from './containers/home_container';
 import InboxPage from './containers/mail_inbox_container';
 import SavedPage from './containers/mail_saved_container';
-import CreateAccountPage from './containers/create_account_component';
+import CreateAccountPage from './containers/create_account_container';
 import ComposeMailPage from './containers/compose_mail_container';
 
 let router = () => {

@@ -2,9 +2,9 @@ import ACTION_TYPES from '../actions/actionTypes';
 import { MESSAGES } from '../constants';
 
 const initialState = {
-  client: '',
+  app: '',
   tasks: [],
-  accounts: null,
+  accounts: [],
   config: null,
   coreData: {
     id: '',
@@ -12,8 +12,7 @@ const initialState = {
     saved: [],
     outbox: []
   },
-  inboxSize: 0,
-  rootSDHandle: 0
+  inboxSize: 0
 };
 
 const initializer = (state = initialState, action) => {
@@ -31,7 +30,7 @@ const initializer = (state = initialState, action) => {
       break;
     }
     case `${ACTION_TYPES.AUTHORISE_APP}_SUCCESS`:
-      return { ...state, client: action.payload };
+      return { ...state, app: action.payload };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`: {
       const tasks = state.tasks.slice();
@@ -42,8 +41,7 @@ const initializer = (state = initialState, action) => {
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
       return { ...state, accounts: action.payload };
       break;
-    case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
-      console.log("refresh email success", action, state);
+/*    case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
       return { ...state, accounts: action.payload.data };
       break;
     case ACTION_TYPES.PUSH_TO_INBOX: {
@@ -67,7 +65,7 @@ const initializer = (state = initialState, action) => {
           inbox: []
         }
       };
-    }
+    }*/
     default:
       return state;
       break;
