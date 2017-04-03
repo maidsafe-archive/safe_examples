@@ -4,11 +4,11 @@ import { setMailProcessing } from '../actions/mail_actions';
 
 const mapStateToProps = state => {
   return {
-    token: state.initializer.token,
-    rootSDHandle: state.initializer.rootSDHandle,
     coreData: state.initializer.coreData,
     processing: state.mail.processing,
-    error: state.mail.error
+    error: state.mail.error,
+    app: state.initializer.app,
+    accounts: state.initializer.accounts
   };
 };
 

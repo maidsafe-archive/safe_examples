@@ -4,11 +4,6 @@ import { createAccount, createAccountError } from '../actions/create_account_act
 
 const mapStateToProps = state => {
   return {
-    token: state.initializer.token,
-    rootSDHandle: state.initializer.rootSDHandle,
-    coreData: state.initializer.coreData,
-    authorised: state.createAccount.authorised,
-    processing: state.createAccount.processing,
     error: state.createAccount.error
   };
 };
@@ -16,7 +11,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     createAccountError: error => (dispatch(createAccountError(error))),
-    createAccount: () => (dispatch(createAccount())),
+    createAccount: emailId => (dispatch(createAccount(emailId))),
   };
 };
 

@@ -4,8 +4,6 @@ import { MESSAGES, CONSTANTS } from '../constants';
 
 export default class CreateAccount extends Component {
   static propTypes = {
-    authorised: PropTypes.bool.isRequired,
-    processing: PropTypes.bool.isRequired,
   };
 
   static contextTypes = {
@@ -15,7 +13,6 @@ export default class CreateAccount extends Component {
   constructor() {
     super();
     this.errMrg = null;
-    this.appendableDataHandle = 0;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
   }
 
@@ -26,8 +23,8 @@ export default class CreateAccount extends Component {
     if (!emailId.trim()) {
       return;
     }
-    if (emailId.length > CONSTANTS.NEW_EMAIL_SIZE) {
-      return createAccountError(new Error(MESSAGES.EMAIL_TOO_LONG));
+    if (emailId.length > CONSTANTS.EMAIL_ID_MAX_LENGTH) {
+      return createAccountError(new Error(MESSAGES.EMAIL_ID_TOO_LONG));
     }
     return createAccount(emailId)
         .then(() => this.context.router.push('/home'));
@@ -45,7 +42,7 @@ export default class CreateAccount extends Component {
               <div className="inp-grp">
                 <input type="text" name="emailId" id="emailId" ref={c => {this.emailId = c;}} autoFocus="autoFocus" required="required" />
                 <label htmlFor="emailId">Email ID</label>
-                <div className="alert">Email Id must be less than {CONSTANTS.NEW_EMAIL_SIZE} characters. (This is just a restriction in this tutorial)</div>
+                <div className="alert">Email Id must be less than {CONSTANTS.EMAIL_ID_MAX_LENGTH} characters. (This is just a restriction in this tutorial)</div>
               </div>
               <div className="inp-btn-cnt">
                 <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary" disabled={processing}>Create</button>
