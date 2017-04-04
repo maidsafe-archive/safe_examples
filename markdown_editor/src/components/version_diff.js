@@ -121,8 +121,8 @@ export default class VersionDiff extends Component {
         <div className="version-diff-cnt">
           {
             (this.state.compA !== -1 && this.state.compB !== -1) ? <Diff
-              inputA={JSON.parse(this.props.versions[this.state.compA].toString()).content}
-              inputB={JSON.parse(this.props.versions[this.state.compB].toString()).content}
+              inputA={this.props.versions[this.state.compA].content}
+              inputB={this.props.versions[this.state.compB].content}
               type="chars"/> : ''
           }
         </div>
