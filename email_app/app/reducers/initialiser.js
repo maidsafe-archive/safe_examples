@@ -41,6 +41,12 @@ const initializer = (state = initialState, action) => {
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
       return { ...state, accounts: action.payload };
       break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
+      return { ...state,
+        accounts: [ ...state.accounts, action.payload ],
+        coreData: { ...state.coreData, id: action.payload.id }
+      };
+      break;
 /*    case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
       return { ...state, accounts: action.payload.data };
       break;

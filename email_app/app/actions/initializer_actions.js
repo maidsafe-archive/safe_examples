@@ -63,3 +63,19 @@ export const refreshConfig = () => {
         ).catch(authRejecter);
   };
 };
+
+export const storeNewAccount = (account) => {
+
+  return function (dispatch, getState) {
+    dispatch({
+      type: ACTION_TYPES.STORE_NEW_ACCOUNT,
+      payload: authPromise()
+    });
+
+    let app = getState().initializer.app;
+    // FIXME: store private key for encryption in app's container mapped to emailId
+    // FIXME: map this address to emailId in publicNames
+    return app.auth.refreshContainerAccess()
+        .then(() => authResolver(account));
+  };
+};

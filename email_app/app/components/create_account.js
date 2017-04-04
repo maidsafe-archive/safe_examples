@@ -14,6 +14,14 @@ export default class CreateAccount extends Component {
     super();
     this.errMrg = null;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
+    this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
+  }
+
+  storeCreatedAccount() {
+    const { newAccount, storeNewAccount, createAccountError } = this.props;
+    return storeNewAccount(newAccount)
+        .then(() => this.context.router.push('/home'))
+        .catch(createAccountError);
   }
 
   handleCreateAccount(e) {
@@ -27,7 +35,7 @@ export default class CreateAccount extends Component {
       return createAccountError(new Error(MESSAGES.EMAIL_ID_TOO_LONG));
     }
     return createAccount(emailId)
-        .then(() => this.context.router.push('/home'));
+        .then(this.storeCreatedAccount);
   }
 
   render() {

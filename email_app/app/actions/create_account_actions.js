@@ -15,13 +15,10 @@ export const createAccount = (emailId) => {
       payload: accountPromise
     });
 
-    // FIXME: store private key for encryption in app's container mapped to emailId
-
     let app = getState().initializer.app;
     return app.mutableData.newRandomPublic(CONSTANTS.INBOX_TAG_TYPE)
         .then((md) => md.quickSetup({}))
-        // FIXME: map this address to emailId in publicNames
-        .then((md) => accountResolver(md))
+        .then((md) => accountResolver({id: emailId, md_inbox: md}))
         .catch(accountRejecter);
   };
 };
