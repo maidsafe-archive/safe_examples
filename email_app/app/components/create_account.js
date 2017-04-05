@@ -31,12 +31,15 @@ export default class CreateAccount extends Component {
     if (!emailId.trim()) {
       return;
     }
+
     if (emailId.length > CONSTANTS.EMAIL_ID_MAX_LENGTH) {
       return createAccountError(new Error(MESSAGES.EMAIL_ID_TOO_LONG));
     }
+
     return createAccount(emailId)
-        .then(this.storeCreatedAccount);
-  }
+        .then(this.storeCreatedAccount)
+        .catch(createAccountError);
+  };
 
   render() {
     const { processing, error } = this.props;

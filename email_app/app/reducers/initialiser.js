@@ -47,10 +47,19 @@ const initializer = (state = initialState, action) => {
         coreData: { ...state.coreData, id: action.payload.id }
       };
       break;
-/*    case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
-      return { ...state, accounts: action.payload.data };
+    case `${ACTION_TYPES.REFRESH_EMAIL}_LOADING`:
+      return { ...state,
+        coreData: { ...state.coreData, inbox: [] },
+        inboxSize: 0
+      };
       break;
-    case ACTION_TYPES.PUSH_TO_INBOX: {
+    case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
+      return { ...state,
+        coreData: { ...state.coreData, inbox: action.payload },
+        inboxSize: action.payload.length
+      };
+      break;
+/*    case ACTION_TYPES.PUSH_TO_INBOX: {
       const inbox = state.coreData.inbox.slice();
       inbox.push(action.data);
 
@@ -63,14 +72,6 @@ const initializer = (state = initialState, action) => {
       };
       break;
     }
-    case ACTION_TYPES.CLEAR_INBOX: {
-      return {
-        ...state,
-        coreData: {
-          ...state.coreData,
-          inbox: []
-        }
-      };
     }*/
     default:
       return state;
