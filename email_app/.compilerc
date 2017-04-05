@@ -26,5 +26,8 @@
         ]
       }
     }
+  },
+  "text/less": {
+    "dumpLineNumbers": "comments"
   }
 }
