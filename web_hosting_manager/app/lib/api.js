@@ -81,7 +81,11 @@ export const connect = () => {
     return Promise.reject(new Error('Improper auth data'));
   }
   return safeApp.fromAuthURI(APP_INFO.data, authInfo.data)
-    .then((app) => (safe = app));
+    .then((app) => (safe = app))
+    .catch((e) => {
+      keytar.deletePassword(SERVICE, ACCOUNT);
+      return Promise.reject(e);
+    });
 };
 
 export const fetchAccessInfo = () => {
