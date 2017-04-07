@@ -2,7 +2,13 @@ import pkg from '../package.json';
 
 export const CONSTANTS = {
   LOCAL_AUTH_DATA_KEY: 'local_auth_data_key',
-  INBOX_TAG_TYPE: 15003,
+  TAG_TYPE_DNS: 15001,
+  TAG_TYPE_INBOX: 15003,
+  SERVICE_NAME_POSTFIX: "@email",
+  MD_KEY_EMAIL_INBOX: "email_inbox",
+  MD_KEY_EMAIL_ID: "email_id",
+  MD_KEY_EMAIL_ENC_SECRET_KEY: "__email_enc_sk",
+  MD_KEY_EMAIL_ENC_PUBLIC_KEY: "__email_enc_pk",
   ENCRYPTION: {
     PLAIN: 'PLAIN',
     SYMMETRIC: 'SYMMETRIC',

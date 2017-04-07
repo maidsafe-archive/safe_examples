@@ -1,19 +1,13 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import MailList from './mail_list';
-import * as base64 from 'urlsafe-base64';
-import { showError, hashEmailId } from '../utils/app_utils';
+import { showError } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
 
 export default class MailInbox extends Component {
   constructor() {
     super();
-    this.appendableDataHandle = 0;
-    this.dataLength = 0;
-    this.currentIndex = 0;
-    this.refresh = this.refresh.bind(this);
     this.fetchMails = this.fetchMails.bind(this);
     this.fetchMail = this.fetchMail.bind(this);
-    this.refresh = this.refresh.bind(this);
   }
 
   componentDidMount() {
@@ -24,21 +18,20 @@ export default class MailInbox extends Component {
 
   }
 
-  fetchMails() {
-    const { refreshEmail, accounts } = this.props;
-    console.log("maIL INBOX:", accounts);
-    return refreshEmail(accounts[0])
-        .then(() => console.log("YEAH"))
-        .catch(() => console.log("ACA ES EL ERROR"));
-  }
-
-  refresh(e) {
+  fetchMails(e) {
     if (e) {
       e.preventDefault();
     }
-    this.currentIndex = 0;
-    this.dataLength = 0;
-    this.fetchMails();
+
+    const { refreshEmail, accounts } = this.props;
+    // TODO: Eventually the app can allow to choose which email account,
+    //       it now supports only one.
+    let chosenAccount = accounts;
+    refreshEmail(chosenAccount)
+        .catch((error) => {
+          console.error(err);
+          showError('Fetching emails failed: ', error);
+        });
   }
 
   render() {
@@ -49,7 +42,7 @@ export default class MailInbox extends Component {
             Inbox Space Used: <span className="highlight">{this.props.inboxSize}KB of {CONSTANTS.TOTAL_INBOX_SIZE}KB  </span>
           </div>
           <div className="options text-right">
-            <button className="mdl-button mdl-js-button mdl-button--icon" title="Fetch appendable data" onClick={this.refresh}>
+            <button className="mdl-button mdl-js-button mdl-button--icon" title="Fetch appendable data" onClick={this.fetchMails}>
               <i className="material-icons">refresh</i>
             </button>
           </div>

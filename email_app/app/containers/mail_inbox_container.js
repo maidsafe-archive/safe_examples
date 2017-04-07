@@ -17,8 +17,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     refreshEmail: (account) => (dispatch(refreshEmail(account))),
-    clearMailProcessing: () => (dispatch(clearMailProcessing())),
-    setActiveMail: data => (dispatch(setActiveMail(data)))
+    clearMailProcessing: () => (dispatch(clearMailProcessing()))
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(MailInbox);

@@ -1,6 +1,8 @@
 import { initializeApp, fromAuthURI } from 'safe-app';
 
 import ACTION_TYPES from './actionTypes';
+import { CONSTANTS } from '../constants';
+import { hashPublicId } from '../utils/app_utils';
 
 var actionResolver;
 var actionRejecter;
@@ -34,7 +36,7 @@ export const authoriseApplication = (appInfo, permissions, opts) => {
       .then((app) =>
         process.env.SAFE_FAKE_AUTH
           ? app.auth.loginForTest(permissions, opts)
-              .then(app => actionResolver(app))
+              .then(actionResolver)
           : app.auth.genAuthUri(permissions, opts)
               .then(resp => app.auth.openUri(resp.uri))
       ).catch(actionRejecter);
@@ -50,32 +52,51 @@ export const refreshConfig = () => {
       payload: actionPromise()
     });
 
-    let accounts = {};
+    let account = {};
     let app = getState().initializer.app;
     return app.auth.refreshContainerAccess()
-        .then(() => app.auth.getHomeContainer())
-        .then((mdata) => mdata.getEntries()
-          .then((entries) => entries.forEach((name, valV) => {
-              accounts[name.toString()] = valV.buf.toString();
-            })
-            .then(() => actionResolver(accounts))
-          )
-        ).catch(actionRejecter);
+//        .then(() => app.auth.getHomeContainer())
+        .then(() => app.mutableData.newPublic(hashPublicId('home_container'), 15004)) //FIXME: use home container instead
+        .then((md) => md.get(CONSTANTS.MD_KEY_EMAIL_INBOX)
+          .then((value) => app.mutableData.fromSerial(value.buf))
+          .then((inbox_md) => account.inbox_md = inbox_md)
+          .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ID))
+          .then((value) => account.id = value.buf.toString())
+          .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY))
+          .then((value) => account.enc_sk = value.buf.toString())
+        ).then((_) => {
+          console.log("GET ACCOUNT:", account);
+          return actionResolver(account)
+        })
+        .catch(actionRejecter);
   };
 };
 
 export const storeNewAccount = (account) => {
 
-  return function (dispatch) {
+  return function (dispatch, getState) {
     dispatch({
       type: ACTION_TYPES.STORE_NEW_ACCOUNT,
       payload: actionPromise()
     });
 
-    // FIXME: store private key for encryption in app's container mapped to emailId
-    // FIXME: map this address to emailId in publicNames
-    return account.md_inbox.getNameAndTag()
-        .then((res) => actionResolver(account))
+    let app = getState().initializer.app;
+//    return app.auth.getHomeContainer()
+    return app.mutableData.newPublic(hashPublicId('home_container'), 15004) // FIXME: use home container instead
+        .then((md) => md.quickSetup())
+        .then((md) => account.inbox_md.serialise()
+          .then((serialised_md) => md.getEntries()
+            .then((entries) => entries.mutate()
+              .then((mut) => mut.insert(CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_md)
+                .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ID, account.id))
+                // FIXME: store private key (encrypted) for encryption of emails
+                .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY, 'enc_sk'))
+                .then(() => md.applyEntriesMutation(mut))
+              ))))
+        .then(() => {
+          console.log("NEW ACCOUNT STORED:", account)
+          return actionResolver(account)
+        })
         .catch(actionRejecter);
   };
 };
@@ -87,18 +108,18 @@ export const refreshEmail = (account) => {
       type: ACTION_TYPES.REFRESH_EMAIL,
       payload: actionPromise()
     });
-    console.log("REFRESHING EMAIL", account);
-    let testemail = [
-      {
-        time: 1491341458652,
-        from: "me",
-        subject: "test",
-        body: "test body",
-      }
-    ];
 
-    return account.md_inbox.getNameAndTag()
-        .then((res) => actionResolver(testemail))
+    console.log("REFRESHING EMAIL", account);
+    let emails = [];
+    return account.inbox_md.getEntries()
+        .then((entries) => entries.forEach((key, value) => {
+            if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
+              let email = JSON.parse(value.buf.toString());
+              // FIXME: decrypt the email
+              emails.push(email);
+            }
+          }).then(() => actionResolver(emails))
+        )
         .catch(actionRejecter);
   };
 };

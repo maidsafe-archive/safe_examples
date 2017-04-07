@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { hashEmailId } from '../utils/app_utils';
 import { MESSAGES, CONSTANTS } from '../constants';
 
 export default class CreateAccount extends Component {

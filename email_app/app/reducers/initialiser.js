@@ -39,11 +39,14 @@ const initializer = (state = initialState, action) => {
       break;
     }
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
-      return { ...state, accounts: action.payload };
+      return { ...state,
+        accounts: action.payload,
+        coreData: { ...state.coreData, id: action.payload.id }
+      };
       break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
       return { ...state,
-        accounts: [ ...state.accounts, action.payload ],
+        accounts: action.payload,
         coreData: { ...state.coreData, id: action.payload.id }
       };
       break;

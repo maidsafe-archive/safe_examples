@@ -22,11 +22,13 @@ export default class Initializer extends Component {
   }
 
   componentDidMount() {
-    this.props.authoriseApplication(AUTH_PAYLOAD, {"_publicNames" : ["Insert"]})
+    let appPermissions = {_publicNames : ['Read', 'Insert']};
+    let options = {own_container: true};
+    this.props.authoriseApplication(AUTH_PAYLOAD, appPermissions, options)
       .then((_) => this.checkConfiguration())
       .catch((err) => {
         console.error(err)
-        return showDialog('Authorisation Error', MESSAGES.AUTHORISATION_ERROR);
+        showDialog('Authorisation Error', MESSAGES.AUTHORISATION_ERROR);
       });
   }
 
@@ -36,7 +38,7 @@ export default class Initializer extends Component {
       throw new Error('Application client not found.');
     }
 
-    return refreshConfig()
+    refreshConfig()
         .then((_) => {
           if (Object.keys(this.props.accounts).length > 0) {
             return this.context.router.push('/home');
@@ -46,7 +48,7 @@ export default class Initializer extends Component {
         })
         .catch((err) => {
           console.error(err)
-          return showDialog('Error fetching configuration', MESSAGES.CHECK_CONFIGURATION_ERROR);
+          showDialog('Error fetching configuration', MESSAGES.CHECK_CONFIGURATION_ERROR);
         });
   }
 

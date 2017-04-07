@@ -28,6 +28,10 @@ export const hashEmailId = emailId => {
   return crypto.createHash('sha256').update(emailId).digest('base64');
 };
 
+export const hashPublicId = publicId => {
+  return crypto.createHash('sha256').update(publicId).digest();
+};
+
 export const showError = (title, errMsg) => {
   remote.dialog.showMessageBox({
     type: 'error',

@@ -14,7 +14,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setMailProcessing: () => (dispatch(setMailProcessing())),
+    //setMailProcessing: () => (dispatch(setMailProcessing())),
   };
 };
 

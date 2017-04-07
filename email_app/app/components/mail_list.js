@@ -1,8 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { remote } from 'electron';
-import * as base64 from 'urlsafe-base64';
 import dateformat from 'dateformat';
-import { showError, showSuccess, hashEmailId } from '../utils/app_utils';
+import { showError, showSuccess } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
 
 export default class MailList extends Component {
@@ -12,7 +11,6 @@ export default class MailList extends Component {
 
   constructor() {
     super();
-    this.appendableHandlerId = null;
     this.listColors = {};
     this.activeIndex = null;
     this.activeType = null;
@@ -26,7 +24,7 @@ export default class MailList extends Component {
 
     switch (this.activeType) {
       case CONSTANTS.HOME_TABS.INBOX: {
-        return this.props.inbox.refresh();
+        return this.props.inbox.fetchMails();
       }
       case CONSTANTS.HOME_TABS.SAVED: {
         router.push('/home');
@@ -37,28 +35,30 @@ export default class MailList extends Component {
 
   handleDelete(e) {
     e.preventDefault();
+    this.activeIndex = parseInt(e.target.dataset.index);
   }
 
   handleSave(e) {
     e.preventDefault();
+    this.activeIndex = parseInt(e.target.dataset.index);
   }
 
   render() {
     const self = this;
-    const { processing, coreData, error, inbox, outbox, saved } = this.props;
+    const { processing, coreData, error, inboxSize, inbox, saved } = this.props;
     let container = null;
 
     if (processing) {
       container = <li className="mdl-card">Loading...</li>
     } else if (Object.keys(error).length > 0) {
-      container = <li className="error">Error in fetching mails!</li>
+      container = <li className="error">Error in fetching emails!</li>
     } else {
       if (inbox) {
         this.activeType = CONSTANTS.HOME_TABS.INBOX;
         container = (
           <div>
             {
-              coreData.inbox.length === 0 ? <li className="mdl-card" title="No data in appendable data">Inbox empty</li> : coreData.inbox.map((mail, i) => {
+              inboxSize === 0 ? <li className="mdl-card" title="No data in appendable data">Inbox empty</li> : coreData.inbox.map((mail, i) => {
                 if (!self.listColors.hasOwnProperty(mail.from)) {
                   self.listColors[mail.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
                 }
