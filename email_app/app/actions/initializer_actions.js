@@ -110,13 +110,13 @@ export const refreshEmail = (account) => {
     });
 
     console.log("REFRESHING EMAIL", account);
-    let emails = [];
+    let emails = {};
     return account.inbox_md.getEntries()
         .then((entries) => entries.forEach((key, value) => {
             if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
               let email = JSON.parse(value.buf.toString());
               // FIXME: decrypt the email
-              emails.push(email);
+              emails[key.toString()] = email;
             }
           }).then(() => actionResolver(emails))
         )

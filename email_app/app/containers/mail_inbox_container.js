@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
-import { refreshInbox, clearMailProcessing, setActiveMail } from '../actions/mail_actions';
+import { refreshInbox, clearMailProcessing, deleteEmail } from '../actions/mail_actions';
 import { refreshEmail } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
@@ -17,6 +17,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     refreshEmail: (account) => (dispatch(refreshEmail(account))),
+    deleteEmail: (account, key) => (dispatch(deleteEmail(account, key))),
     clearMailProcessing: () => (dispatch(clearMailProcessing()))
   };
 };

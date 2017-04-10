@@ -7,15 +7,10 @@ export default class MailInbox extends Component {
   constructor() {
     super();
     this.fetchMails = this.fetchMails.bind(this);
-    this.fetchMail = this.fetchMail.bind(this);
   }
 
   componentDidMount() {
     this.fetchMails();
-  }
-
-  fetchMail(id) {
-
   }
 
   fetchMails(e) {

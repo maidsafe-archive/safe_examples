@@ -35,12 +35,27 @@ export default class MailList extends Component {
 
   handleDelete(e) {
     e.preventDefault();
-    this.activeIndex = parseInt(e.target.dataset.index);
+    const { accounts, processing, coreData, error, deleteEmail, refreshEmail } = this.props;
+    // TODO: Eventually the app can allow to choose which email account,
+    //       it now supports only one.
+    let chosenAccount = accounts;
+    this.activeIndex = e.target.dataset.index;
+    console.log("DELETE:", this.activeIndex);
+    deleteEmail(chosenAccount, this.activeIndex)
+        .catch((error) => {
+          console.error(err);
+          showError('Failed trying to delete email: ', error);
+        })
+        .then(() => refreshEmail(chosenAccount))
+        .catch((error) => {
+          console.error(error);
+          showError('Fetching emails failed: ', error);
+        });
   }
 
   handleSave(e) {
     e.preventDefault();
-    this.activeIndex = parseInt(e.target.dataset.index);
+    this.activeIndex = e.target.dataset.index;
   }
 
   render() {
@@ -58,12 +73,13 @@ export default class MailList extends Component {
         container = (
           <div>
             {
-              inboxSize === 0 ? <li className="mdl-card" title="No data in appendable data">Inbox empty</li> : coreData.inbox.map((mail, i) => {
+              inboxSize === 0 ? <li className="mdl-card" title="No data in appendable data">Inbox empty</li> : Object.keys(coreData.inbox).map((key) => {
+                let mail = coreData.inbox[key];
                 if (!self.listColors.hasOwnProperty(mail.from)) {
                   self.listColors[mail.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
                 }
                 return (
-                  <li className="mdl-card" key={i}>
+                  <li className="mdl-card" key={key}>
                     <div className="icon">
                       <span className={self.listColors[mail.from]}>{mail.from[0]}</span>
                     </div>
@@ -75,10 +91,10 @@ export default class MailList extends Component {
                     </div>
                     <div className="opt">
                       <div className="opt-i">
-                        <button className="mdl-button mdl-js-button mdl-button--icon" name="add" onClick={this.handleSave}><i className="material-icons" data-index={i}>save</i></button>
+                        <button className="mdl-button mdl-js-button mdl-button--icon" name="add" onClick={this.handleSave}><i className="material-icons" data-index={key}>save</i></button>
                       </div>
                       <div className="opt-i">
-                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={i}>delete</i></button>
+                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={key}>delete</i></button>
                       </div>
                     </div>
                   </li>

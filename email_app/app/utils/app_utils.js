@@ -24,10 +24,6 @@ export const checkAuthorised = (nextState, replace, callback) => {
   callback();
 };
 
-export const hashEmailId = emailId => {
-  return crypto.createHash('sha256').update(emailId).digest('base64');
-};
-
 export const hashPublicId = publicId => {
   return crypto.createHash('sha256').update(publicId).digest();
 };

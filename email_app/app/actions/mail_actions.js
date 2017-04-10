@@ -41,14 +41,36 @@ export const sendEmail = (email, to) => {
       const encryptedEmail = JSON.stringify(email);
       let app = getState().initializer.app;
 
+      // FIXME: this will changed to be the ImmutableData address where the email is stored
+      let content_addr = crypto.randomBytes(32).toString('hex');
+
       return app.mutableData.newPublic(address, CONSTANTS.TAG_TYPE_DNS)
           .then((md) => md.get(serviceName))
           .then((service) => app.mutableData.fromSerial(service.buf))
           .then((inbox_md) => inbox_md.getEntries()
             .then((entries) => entries.mutate())
-            .then((mut) => mut.insert('email_3', encryptedEmail)
-              .then(() => inbox_md.applyEntriesMutation(mut)) //FIXME: this fails due to dependency with bug MAID-2047
+            .then((mut) => mut.insert(content_addr, encryptedEmail)
+              .then(() => inbox_md.applyEntriesMutation(mut))
             ))
+          .then(() => dispatch(clearMailProcessing))
+          .then(() => actionResolver())
+          .catch(actionRejecter);
+    };
+};
+
+export const deleteEmail = (account, key) => {
+
+    return function (dispatch, getState) {
+      dispatch({
+        type: ACTION_TYPES.MAIL_PROCESSING,
+        payload: actionPromise()
+      });
+
+      return account.inbox_md.getEntries()
+          .then((entries) => entries.mutate())
+          .then((mut) => mut.remove(key, 1)
+            .then(() => account.inbox_md.applyEntriesMutation(mut))
+          )
           .then(() => dispatch(clearMailProcessing))
           .then(() => actionResolver())
           .catch(actionRejecter);

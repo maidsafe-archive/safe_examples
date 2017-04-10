@@ -35,22 +35,20 @@ const createInbox = (app) => {
   let inbox_md;
   let permSet;
 
-  // FIXME: allow insert to others
   return app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_INBOX)
     .then((md) => md.quickSetup(base_inbox))
     .then((md) => inbox_md = md)
-    //FIXME: the code below depends on bug MAID-2047
-/*    .then(() => app.mutableData.newPermissionSet())
+    .then(() => app.mutableData.newPermissionSet())
     .then((pmSet) => permSet = pmSet)
     .then(() => permSet.setAllow('Insert'))
     .then(() => inbox_md.setUserPermissions(null, permSet, 1))
-    .then(() => inbox_md);*/
+    .then(() => inbox_md);
 }
 
 const addEmailService = (app, services, serviceName, inbox_serialised) => {
   console.log("ADD EMAIL SERVICE")
 
-  return app.mutableData.fromSerial(services)
+  return app.mutableData.newPublic(services, CONSTANTS.TAG_TYPE_DNS)
     .then((services_md) => services_md.getEntries()
       .then((entries) => entries.mutate())
       .then((mut) => mut.insert(serviceName, inbox_serialised)
@@ -65,10 +63,10 @@ const createPublicIdAndEmailService = (app, pub_names_md, address, publicId,
 
   return app.mutableData.newPublic(address, CONSTANTS.TAG_TYPE_DNS)
       .then((md) => md.quickSetup({[serviceName]: inbox_serialised})
-        .then((md) => md.serialise())
-        .then((services_serial) => pub_names_md.getEntries()
+        .then((md) => md.getNameAndTag())
+        .then((services) => pub_names_md.getEntries()
           .then((entries) => entries.mutate())
-          .then((mut) => mut.insert(publicId, services_serial)
+          .then((mut) => mut.insert(publicId, services.name)
             .then(() => pub_names_md.applyEntriesMutation(mut))
           ))
       )
