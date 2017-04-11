@@ -10,28 +10,9 @@ const actionPromise = new Promise((resolve, reject) => {
 });
 
 const createInbox = (app) => {
-  let testemail = [
-    {
-      time: 1491341458652,
-      from: "her",
-      subject: "test",
-      body: "test body",
-    },
-    {
-      time: 1491341458752,
-      from: "him",
-      subject: "test2",
-      body: "test body 2",
-    }
-  ];
-
   let base_inbox = {
-    [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: 'enc_pk', //FIXME: store public key for encrpytion
-    email_1: JSON.stringify(testemail[0]),
-    email_2: JSON.stringify(testemail[1])
+    [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: 'enc_pk', //FIXME: store public key for encrpytion here
   };
-  console.log("BASE INBOX:", base_inbox);
-
   let inbox_md;
   let permSet;
 
@@ -41,6 +22,20 @@ const createInbox = (app) => {
     .then(() => app.mutableData.newPermissionSet())
     .then((pmSet) => permSet = pmSet)
     .then(() => permSet.setAllow('Insert'))
+    .then(() => permSet.setAllow('Delete')) //FIXME: this shouldn't be needed
+    .then(() => inbox_md.setUserPermissions(null, permSet, 1))
+    .then(() => inbox_md);
+}
+
+const createArchive = (app) => {
+  let inbox_md;
+  let permSet;
+  return app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE)
+    .then((md) => md.quickSetup())
+    .then((md) => inbox_md = md)
+    .then(() => app.mutableData.newPermissionSet())
+    .then((pmSet) => permSet = pmSet)
+    .then(() => permSet.setAllow('Insert')) //FIXME: this shouldn't be needed
     .then(() => inbox_md.setUserPermissions(null, permSet, 1))
     .then(() => inbox_md);
 }
@@ -88,10 +83,13 @@ export const createAccount = (emailId) => {
 
     let newAccount = {};
     let inbox_serialised;
+    let inbox;
     let app = getState().initializer.app;
 
     return createInbox(app)
-        .then((md) => newAccount = {id: emailId, inbox_md: md})
+        .then((md) => inbox = md)
+        .then(() => createArchive(app))
+        .then((md) => newAccount = {id: emailId, inbox_md: inbox, archive_md: md})
         .then(() => newAccount.inbox_md.serialise())
         .then((md_serialised) => inbox_serialised = md_serialised)
         .then(() => app.auth.getAccessContainerInfo('_publicNames'))

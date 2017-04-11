@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { remote } from 'electron';
-import { CONSTANTS, AUTH_PAYLOAD, MESSAGES } from '../constants';
+import { CONSTANTS, AUTH_STATUS, AUTH_PAYLOAD, MESSAGES } from '../constants';
 
 const showDialog = (title, message) => {
   remote.dialog.showMessageBox({
@@ -33,9 +33,12 @@ export default class Initializer extends Component {
   }
 
   checkConfiguration() {
-    const { app, refreshConfig } = this.props;
+    const { auth_status, app, refreshConfig } = this.props;
     if (!app) {
-      throw new Error('Application client not found.');
+      if (auth_status !== AUTH_STATUS.AUTHORISING) {
+        throw new Error('Authorisation failed.');
+      }
+      return;
     }
 
     refreshConfig()
@@ -52,8 +55,8 @@ export default class Initializer extends Component {
         });
   }
 
-
   render() {
+    //FIXME: check configuration when authorisation is in progress
     const { tasks } = this.props;
 
     return (

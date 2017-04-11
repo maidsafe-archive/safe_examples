@@ -3,7 +3,9 @@ import Home from '../components/home';
 
 const mapStateToProps = state => {
   return {
-    coreData: state.initializer.coreData
+    coreData: state.initializer.coreData,
+    inboxSize: state.initializer.inboxSize,
+    savedSize: state.initializer.savedSize
   };
 };
 

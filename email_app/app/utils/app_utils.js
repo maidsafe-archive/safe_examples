@@ -10,18 +10,10 @@ export const getAuthData = () => {
   return authData;
 };
 
-export const setAuthData = (authData) => {
+export const saveAuthData = (authData) => {
   return window.localStorage.setItem(CONSTANTS.LOCAL_AUTH_DATA_KEY,
     window.JSON.stringify(authData)
   );
-};
-
-export const checkAuthorised = (nextState, replace, callback) => {
-  let authData = getAuthData();
-  if (!authData) {
-    replace('/create_account');
-  }
-  callback();
 };
 
 export const hashPublicId = publicId => {

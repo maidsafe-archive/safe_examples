@@ -4,8 +4,11 @@ export const CONSTANTS = {
   LOCAL_AUTH_DATA_KEY: 'local_auth_data_key',
   TAG_TYPE_DNS: 15001,
   TAG_TYPE_INBOX: 15003,
+  TAG_TYPE_EMAIL: 15004,
+  TAG_TYPE_EMAIL_ARCHIVE: 15005,
   SERVICE_NAME_POSTFIX: "@email",
   MD_KEY_EMAIL_INBOX: "email_inbox",
+  MD_KEY_EMAIL_ARCHIVE: "email_archive",
   MD_KEY_EMAIL_ID: "email_id",
   MD_KEY_EMAIL_ENC_SECRET_KEY: "__email_enc_sk",
   MD_KEY_EMAIL_ENC_PUBLIC_KEY: "__email_enc_pk",
@@ -18,12 +21,17 @@ export const CONSTANTS = {
   EMAIL_ID_MAX_LENGTH: 100,
   HOME_TABS: {
     INBOX: 'INBOX',
-    OUTBOX: 'OUTBOX',
     SAVED: 'SAVED'
   },
   MAIL_CONTENT_LIMIT: 150,
   DATE_FORMAT: 'h:MM-mmm dd'
 };
+
+export const AUTH_STATUS = {
+  AUTHORISING: 'AUTHORISING',
+  AUTHORISATION_FAILED: 'AUTHORISATION_FAILED',
+  AUTHORISED: 'AUTHORISED'
+}
 
 export const MESSAGES = {
   INITIALIZE: {

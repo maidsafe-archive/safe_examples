@@ -14,10 +14,7 @@ export default class Home extends Component {
 
   render() {
     const { router } = this.context;
-    const { coreData } = this.props;
-    const inboxLength = coreData.inbox.length;
-    const savedLength = coreData.saved.length;
-    const outboxLength = coreData.outbox.length;
+    const { coreData, inboxSize, savedSize } = this.props;
     return (
       <div className="home">
         <div className="home-b">
@@ -40,7 +37,7 @@ export default class Home extends Component {
                     <i className="material-icons">email</i>
                     <span>Inbox</span>
                   </span>
-                  <span className="mdl-list__item-secondary-action">{inboxLength === 0 ? '' : `${inboxLength}`}</span>
+                  <span className="mdl-list__item-secondary-action">{inboxSize === 0 ? '' : `${inboxSize}`}</span>
                 </div>
               </IndexLink>
               <Link className="home-nav-link" activeClassName="active" to="/saved">
@@ -49,7 +46,7 @@ export default class Home extends Component {
                     <i className="material-icons">drafts</i>
                     <span>Saved</span>
                   </span>
-                  <span className="mdl-list__item-secondary-action">{savedLength === 0 ? '' : `${savedLength}`}</span>
+                  <span className="mdl-list__item-secondary-action">{savedSize === 0 ? '' : `${savedSize}`}</span>
                 </div>
               </Link>
              </div>

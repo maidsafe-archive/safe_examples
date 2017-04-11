@@ -12,7 +12,6 @@ export default class MailList extends Component {
   constructor() {
     super();
     this.listColors = {};
-    this.activeIndex = null;
     this.activeType = null;
     this.goBack = this.goBack.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
@@ -39,9 +38,7 @@ export default class MailList extends Component {
     // TODO: Eventually the app can allow to choose which email account,
     //       it now supports only one.
     let chosenAccount = accounts;
-    this.activeIndex = e.target.dataset.index;
-    console.log("DELETE:", this.activeIndex);
-    deleteEmail(chosenAccount, this.activeIndex)
+    deleteEmail(chosenAccount, e.target.dataset.index)
         .catch((error) => {
           console.error(err);
           showError('Failed trying to delete email: ', error);
@@ -55,12 +52,25 @@ export default class MailList extends Component {
 
   handleSave(e) {
     e.preventDefault();
-    this.activeIndex = e.target.dataset.index;
+    const { accounts, processing, coreData, error, archiveEmail, refreshEmail } = this.props;
+    // TODO: Eventually the app can allow to choose which email account,
+    //       it now supports only one.
+    let chosenAccount = accounts;
+    archiveEmail(chosenAccount, e.target.dataset.index)
+        .catch((error) => {
+          console.error(err);
+          showError('Failed trying to archive email: ', error);
+        })
+        .then(() => refreshEmail(chosenAccount))
+        .catch((error) => {
+          console.error(error);
+          showError('Fetching emails failed: ', error);
+        });
   }
 
   render() {
     const self = this;
-    const { processing, coreData, error, inboxSize, inbox, saved } = this.props;
+    const { processing, coreData, error, inboxSize, inbox, savedSize, saved } = this.props;
     let container = null;
 
     if (processing) {
@@ -109,7 +119,8 @@ export default class MailList extends Component {
         container = (
           <div>
             {
-              coreData.saved.length === 0 ? <li className="mdl-card">Saved empty</li> : coreData.saved.map((mail, i) => {
+              savedSize === 0 ? <li className="mdl-card">Saved empty</li> : Object.keys(coreData.saved).map((key) => {
+                let mail = coreData.saved[key];
                 if (!mail) {
                   return;
                 }
@@ -117,7 +128,7 @@ export default class MailList extends Component {
                   self.listColors[mail.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
                 }
                  return (
-                  <li className="mdl-card" key={i}>
+                  <li className="mdl-card" key={key}>
                     <div className="icon">
                       <span className={this.listColors[mail.from]}>{mail.from[0]}</span>
                     </div>
@@ -129,7 +140,7 @@ export default class MailList extends Component {
                     </div>
                     <div className="opt">
                       <div className="opt-i">
-                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={i}>delete</i></button>
+                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={key}>delete</i></button>
                       </div>
                     </div>
                   </li>

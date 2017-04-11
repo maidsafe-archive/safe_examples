@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import MailSaved from '../components/mail_saved';
-import { setMailProcessing } from '../actions/mail_actions';
+import { deleteEmail } from '../actions/mail_actions';
+import { refreshEmail } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
   return {
@@ -14,7 +15,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    //setMailProcessing: () => (dispatch(setMailProcessing())),
+    refreshEmail: (account) => (dispatch(refreshEmail(account))),
+    deleteEmail: (account, key) => (dispatch(deleteEmail(account, key)))
   };
 };
 
