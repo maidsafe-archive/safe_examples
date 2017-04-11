@@ -323,7 +323,9 @@ export default class Auth extends Component {
       <div>
         <Nav title={I18n.t('label.home')} />
         <div className="wrapper custom-card">
-          { ele }
+          <div className="home-overflow">
+            { ele }
+          </div>
         </div>
         { this.publicIdModal() }
         { this.remapModal() }

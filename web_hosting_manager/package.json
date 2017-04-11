@@ -42,7 +42,7 @@
         }
       ]
     },
-    "asarUnpack": "*.dylib",
+    "asar": false,
     "files": [
       "dist/",
       "node_modules/",

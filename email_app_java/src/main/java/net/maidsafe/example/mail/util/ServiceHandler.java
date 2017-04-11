@@ -4,7 +4,7 @@ import java.util.concurrent.Future;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import net.maidsafe.example.mail.modal.Result;
+import net.maidsafe.example.mail.model.Result;
 
 /**
  * Blocking operations are threaded and once the result is obtained the

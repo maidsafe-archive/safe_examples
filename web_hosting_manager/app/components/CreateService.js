@@ -121,7 +121,7 @@ export default class CreateService extends Component {
       <div>
         <Nav title={I18n.t('messages.createService')} back={this.props.router.goBack}></Nav>
         <div className="wrapper custom-card create-service">
-          <Card>
+          <Card className="create-service-b">
             <div className="create-service-input">
               <Input size="large" ref="serviceName" addonBefore="safe://" addonAfter={`.${this.props.params.publicId}`}
                      placeholder={I18n.t('messages.serviceNamePlaceholder')}

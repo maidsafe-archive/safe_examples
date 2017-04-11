@@ -51,16 +51,7 @@ const _refreshConfig = () => {
 };
 
 const getSDHandle = (filename) => {
-  let dataIdHandle = null;
-  return safeDataId.getStructuredDataHandle(ACCESS_TOKEN, btoa(`${USER_PREFIX}:${filename}`), 501)
-    .then(extractHandle)
-    .then(handleId => (dataIdHandle = handleId))
-    .then(() => safeStructuredData.getHandle(ACCESS_TOKEN, dataIdHandle))
-    .then(extractHandle)
-    .then(handleId => {
-      safeDataId.dropHandle(ACCESS_TOKEN, dataIdHandle);
-      return handleId;
-    })
+  return Promise.resolve(FILE_INDEX[filename]);
 };
 
 const updateFile = (filename, payload) => {
