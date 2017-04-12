@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="./less/main.less" />
 </head>
 <body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 0" >
-  <div id="App"></div>
+  <div id="root"></div>
 </body>
 
 <script type="text/jsx">
@@ -21,7 +21,7 @@ import {AppContainer} from 'react-hot-loader';
 
 const render = () => {
   const App = require('./app').default;
-  ReactDOM.render(<AppContainer><App /></AppContainer>, document.getElementById('App'));
+  ReactDOM.render(<AppContainer><App /></AppContainer>, document.getElementById('root'));
 }
 
 render();

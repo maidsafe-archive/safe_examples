@@ -1,5 +1,4 @@
 import { initializeApp, fromAuthURI } from 'safe-app';
-const electron = require('electron');
 
 import ACTION_TYPES from './actionTypes';
 import { CONSTANTS } from '../constants';
@@ -49,18 +48,9 @@ export const authoriseApplication = (appInfo, permissions, opts) => {
           }*/
           return app.auth.genAuthUri(permissions, opts)
             .then((resp) => app.auth.openUri(resp.uri))
-            .then(() => electron.ipcRenderer.on('auth-response', (event, response) => {
-                console.log("AUTH RESPONSE RECEIVED");
-                if (response) {
-                  dispatch(receiveResponse(response));
-                } else {
-                  return actionRejecter(new Error('Authorisation failed'));
-                }
-              })
-            )
             .then(() => setTimeout(() => {
               return actionRejecter(new Error('Authorisation failed due to a time out'));
-            }, 5000));
+            }, 60000));
         }
       })
       .catch(actionRejecter);

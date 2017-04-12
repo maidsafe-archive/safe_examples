@@ -9,9 +9,9 @@ const actionPromise = new Promise((resolve, reject) => {
   actionRejecter = reject;
 });
 
-const createInbox = (app) => {
+const createInbox = (app, enc_pk) => {
   let base_inbox = {
-    [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: 'enc_pk', //FIXME: store public key for encrpytion here
+    [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: enc_pk
   };
   let inbox_md;
   let permSet;
@@ -85,8 +85,9 @@ export const createAccount = (emailId) => {
     let inbox_serialised;
     let inbox;
     let app = getState().initializer.app;
+    let enc_pk = 'enc_pk'; //FIXME: store public key for encrpytion here
 
-    return createInbox(app)
+    return createInbox(app, enc_pk)
         .then((md) => inbox = md)
         .then(() => createArchive(app))
         .then((md) => newAccount = {id: emailId, inbox_md: inbox, archive_md: md})

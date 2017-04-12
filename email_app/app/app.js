@@ -13,6 +13,7 @@ const history = syncHistoryWithStore(hashHistory, store);
 
 
 const listenForAuthReponse = (event, response) => {
+  console.log("AUTH RESPONSE RECEIVED");
   // TODO parse response
   if (response) {
     store.dispatch(receiveResponse(response)); // TODO do it concurrently (no to linked dispatch)
