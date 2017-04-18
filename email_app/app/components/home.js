@@ -1,17 +1,10 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link, IndexLink } from 'react-router';
 import className from 'classnames';
 import pkg from '../../package.json';
 
 export default class Home extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
-  static propTypes = {
-
-  };
-
   render() {
     const { router } = this.context;
     const { coreData, inboxSize, savedSize } = this.props;
@@ -59,3 +52,7 @@ export default class Home extends Component {
     );
   }
 }
+
+Home.contextTypes = {
+  router: PropTypes.object.isRequired
+};

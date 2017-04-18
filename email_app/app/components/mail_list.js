@@ -1,14 +1,11 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { remote } from 'electron';
 import dateformat from 'dateformat';
 import { showError, showSuccess } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
 
 export default class MailList extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   constructor() {
     super();
     this.listColors = {};
@@ -158,3 +155,7 @@ export default class MailList extends Component {
     );
   }
 }
+
+MailList.contextTypes = {
+  router: PropTypes.object.isRequired
+};

@@ -1,6 +1,7 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { remote } from 'electron';
-import { CONSTANTS, AUTH_STATUS, AUTH_PAYLOAD, MESSAGES } from '../constants';
+import { CONSTANTS, AUTH_STATUS, APP_INFO, MESSAGES } from '../constants';
 
 const showDialog = (title, message) => {
   remote.dialog.showMessageBox({
@@ -12,19 +13,13 @@ const showDialog = (title, message) => {
 };
 
 export default class Initializer extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   constructor() {
     super();
     this.checkConfiguration = this.checkConfiguration.bind(this);
   }
 
   componentDidMount() {
-    let appPermissions = {_publicNames : ['Read', 'Insert']};
-    let options = {own_container: true};
-    this.props.authoriseApplication(AUTH_PAYLOAD, appPermissions, options)
+    this.props.authoriseApplication(APP_INFO.info, APP_INFO.permissions, APP_INFO.ops)
       .then((_) => this.checkConfiguration())
       .catch((err) => {
         console.error(err)
@@ -75,3 +70,7 @@ export default class Initializer extends Component {
     );
   }
 }
+
+Initializer.contextTypes = {
+  router: PropTypes.object.isRequired
+};

@@ -1,5 +1,5 @@
 import { initializeApp, fromAuthURI } from 'safe-app';
-
+import { shell } from 'electron';
 import ACTION_TYPES from './actionTypes';
 import { CONSTANTS } from '../constants';
 import { hashPublicId, getAuthData, saveAuthData } from '../utils/app_utils';
@@ -48,9 +48,6 @@ export const authoriseApplication = (appInfo, permissions, opts) => {
           }*/
           return app.auth.genAuthUri(permissions, opts)
             .then((resp) => app.auth.openUri(resp.uri))
-            .then(() => setTimeout(() => {
-              return actionRejecter(new Error('Authorisation failed due to a time out'));
-            }, 60000));
         }
       })
       .catch(actionRejecter);
@@ -67,21 +64,26 @@ export const refreshConfig = () => {
 
     let account = {};
     let app = getState().initializer.app;
+
     return app.auth.refreshContainerAccess()
-//        .then(() => app.auth.getHomeContainer())
+        //.then(() => app.auth.getHomeContainer())
         .then(() => app.mutableData.newPublic(hashPublicId('home_container'), 15004)) //FIXME: use home container instead
+        //.then((md) => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_INBOX).then((key) => md.get(key))
         .then((md) => md.get(CONSTANTS.MD_KEY_EMAIL_INBOX)
           .then((value) => app.mutableData.fromSerial(value.buf))
           .then((inbox_md) => account.inbox_md = inbox_md)
+//          .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ARCHIVE).then((key) => md.get(key)))
           .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ARCHIVE))
           .then((value) => app.mutableData.fromSerial(value.buf))
           .then((archive_md) => account.archive_md = archive_md)
+//          .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ID).then((key) => md.get(key)))
           .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ID))
           .then((value) => account.id = value.buf.toString())
+//          .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY).then((key) => md.get(key)))
           .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY))
           .then((value) => account.enc_sk = value.buf.toString())
         ).then((_) => {
-          console.log("GET ACCOUNT:", account);
+          console.log("GOT ACCOUNT:", account);
           return actionResolver(account)
         })
         .catch(actionRejecter);
@@ -103,18 +105,18 @@ export const storeNewAccount = (account) => {
         .then((serial) => serialised_inbox = serial)
         .then(() => account.archive_md.serialise())
         .then((serial) => serialised_archive = serial)
-        //    .then(() => app.auth.getHomeContainer()
+//        .then(() => app.auth.getHomeContainer())
         .then(() => app.mutableData.newPublic(hashPublicId('home_container'), 15004)) // FIXME: use home container instead
-        .then((md) => md.quickSetup()
-          .then((md) => md.getEntries()
-            .then((entries) => entries.mutate()
-              .then((mut) => mut.insert(CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_inbox)
-                .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ARCHIVE, serialised_archive))
-                .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ID, account.id))
-                // FIXME: store private key (encrypted) for encryption of emails
-                .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY, 'enc_sk'))
-                .then(() => md.applyEntriesMutation(mut))
-              ))))
+        .then((md) => {
+          let account_data = {
+            [CONSTANTS.MD_KEY_EMAIL_INBOX]: serialised_inbox,
+            [CONSTANTS.MD_KEY_EMAIL_ARCHIVE]: serialised_archive,
+            [CONSTANTS.MD_KEY_EMAIL_ID]: account.id,
+            [CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY]: 'enc_sk' // FIXME: store private key (encrypted) for encryption of emails
+          }
+
+          return md.quickSetup(account_data)
+        })
         .then(() => {
           console.log("NEW ACCOUNT STORED:", account)
           return actionResolver(account)
@@ -135,33 +137,28 @@ export const refreshEmail = (account) => {
     let app = getState().initializer.app;
 
     return account.inbox_md.getEntries()
-        .then(() => account.inbox_md.getEntries())
         .then((entries) => entries.forEach((key, value) => {
             if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
-              app.mutableData.newPublic(value.buf, 15006) //FIXME: remove it to use immutableData instead
-                .then((email) => email.get("content"))
-//              app.immutableData.fetch(value.buf)
-//                .then((immData) => immData.read())
+              app.immutableData.fetch(value.buf)
+                .then((immData) => immData.read())
                 .then((content) => {
-                  console.log("CONTENT", content)
-                  let email = { [key.toString()]: JSON.parse(content.buf.toString()) }
-//                  let email = { [key.toString()]: JSON.parse(content.toString()) }
+                  console.log("EMAIL CONTENT", content)
+                  let email = { [key.toString()]: JSON.parse(content.toString()) }
                   dispatch({
                     type: ACTION_TYPES.PUSH_TO_INBOX,
                     payload: email
                   });
                 });
-
             }
           })
         )
         .then(() => account.archive_md.getEntries())
         .then((entries) => entries.forEach((key, value) => {
-            console.log("CURRENT ARCHIVE:", key.toString())
-            app.mutableData.newPublic(value.buf, 15006) //FIXME: remove it to use immutableData instead
-              .then((email) => email.get("content"))
+            app.immutableData.fetch(value.buf)
+              .then((immData) => immData.read())
               .then((content) => {
-                let email = { [key.toString()]: JSON.parse(content.buf.toString()) }
+                console.log("ARCHIVE CONTENT", content)
+                let email = { [key.toString()]: JSON.parse(content.toString()) }
                 dispatch({
                   type: ACTION_TYPES.PUSH_TO_ARCHIVE,
                   payload: email

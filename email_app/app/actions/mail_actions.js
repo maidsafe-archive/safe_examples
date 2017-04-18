@@ -9,7 +9,7 @@ const actionPromise = () => new Promise((resolve, reject) => {
   actionResolver = resolve;
   actionRejecter = reject;
 });
-
+/*
 export const refreshInbox = (account) => {
 
     return function (dispatch, getState) {
@@ -24,22 +24,14 @@ export const refreshInbox = (account) => {
           .catch(actionRejecter);
     };
 };
-
+*/
 const storeEmail = (app, email) => {
   const encryptedEmail = JSON.stringify(email); //FIXME: encrypt the content
-  let a;
-  let b;
+
   return app.immutableData.create()
     .then((email) => email.write(encryptedEmail)
       .then(() => email.close())
-      .then((e) => a = e)
-    )
-    .then(() => app.mutableData.newPublic(hashPublicId("emailcontent"), 15006)
-    .then((email) => email.quickSetup({content: encryptedEmail}))
-    .then((email) => email.getNameAndTag())
-    .then((e) => b = e.name)
-    .then(() => b)) //FIXME: just create a immutableData
-
+    );
 }
 
 export const sendEmail = (email, to) => {
@@ -61,8 +53,7 @@ export const sendEmail = (email, to) => {
           .then((md) => md.get(serviceName))
           .then((service) => app.mutableData.fromSerial(service.buf))
           .then((inbox_md) => storeEmail(app, email)
-            .then((email_addr) => inbox_md.getEntries()
-              .then((entries) => entries.mutate())
+            .then((email_addr) => app.mutableData.newMutation()
               .then((mut) => mut.insert(email_addr.buffer.toString('hex'), email_addr)
                 .then(() => inbox_md.applyEntriesMutation(mut))
               )))
@@ -80,19 +71,17 @@ export const archiveEmail = (account, key) => {
         payload: actionPromise()
       });
 
-      return account.inbox_md.getEntries()
-          .then((entries) => entries.get(key)
-            .then((email) => account.archive_md.getEntries()
-              .then((entries) => entries.mutate())
-              .then((mut) => mut.insert(key, email.buf)
-                .then(() => account.archive_md.applyEntriesMutation(mut))
-              )
+      let app = getState().initializer.app;
+      return account.inbox_md.get(key)
+          .then((email) => app.mutableData.newMutation()
+            .then((mut) => mut.insert(key, email.buf)
+              .then(() => account.archive_md.applyEntriesMutation(mut))
             )
-            .then(() => entries.mutate())
-            .then((mut) => mut.remove(key, 1)
-              // FIXME: this depends on a bug in client_libs
-              //.then(() => account.inbox_md.applyEntriesMutation(mut))
-            )
+          )
+          .then(() => app.mutableData.newMutation())
+          .then((mut) => mut.remove(key, 1)
+            // FIXME: this depends on a bug in client_libs
+            .then(() => account.inbox_md.applyEntriesMutation(mut))
           )
           .then(() => dispatch(clearMailProcessing))
           .then(() => actionResolver())
@@ -100,6 +89,7 @@ export const archiveEmail = (account, key) => {
     };
 };
 
+//FIXME: this should also work when deleting from archive
 export const deleteEmail = (account, key) => {
 
     return function (dispatch, getState) {
@@ -108,11 +98,11 @@ export const deleteEmail = (account, key) => {
         payload: actionPromise()
       });
 
-      return account.inbox_md.getEntries()
-          .then((entries) => entries.mutate())
+      let app = getState().initializer.app;
+      return app.mutableData.newMutation()
           .then((mut) => mut.remove(key, 1)
             // FIXME: this depends on a bug in client_libs
-            //.then(() => account.inbox_md.applyEntriesMutation(mut))
+            .then(() => account.inbox_md.applyEntriesMutation(mut))
           )
           .then(() => dispatch(clearMailProcessing))
           .then(() => actionResolver())

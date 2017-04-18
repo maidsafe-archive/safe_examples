@@ -57,7 +57,7 @@ const createPublicIdAndEmailService = (app, pub_names_md, address, publicId,
   console.log("CREATE PUBLIC ID AND EMAIL SERVICE")
 
   return app.mutableData.newPublic(address, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => md.quickSetup({[serviceName]: inbox_serialised})
+      .then((md) => md.quickSetup({ [serviceName]: inbox_serialised })
         .then((md) => md.getNameAndTag())
         .then((services) => pub_names_md.getEntries()
           .then((entries) => entries.mutate())
@@ -93,8 +93,10 @@ export const createAccount = (emailId) => {
         .then((md) => newAccount = {id: emailId, inbox_md: inbox, archive_md: md})
         .then(() => newAccount.inbox_md.serialise())
         .then((md_serialised) => inbox_serialised = md_serialised)
+        .then(() => app.auth.refreshContainerAccess())
         .then(() => app.auth.getAccessContainerInfo('_publicNames'))
-        .then((pub_names_md) => pub_names_md.get(publicId)
+        .then((pub_names_md) => pub_names_md.encryptKey(publicId)
+          .then((encrypted_publicId) => pub_names_md.get(encrypted_publicId))
           .then((services) => {
               // FIXME: for some reason I'm not able to read the _publicNames entries
               console.log("PUBLIC ID EXISTS", services)

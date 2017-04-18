@@ -1,14 +1,8 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { MESSAGES, CONSTANTS } from '../constants';
 
 export default class CreateAccount extends Component {
-  static propTypes = {
-  };
-
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   constructor() {
     super();
     this.errMrg = null;
@@ -65,3 +59,7 @@ export default class CreateAccount extends Component {
     );
   }
 }
+
+CreateAccount.contextTypes = {
+  router: PropTypes.object.isRequired
+};

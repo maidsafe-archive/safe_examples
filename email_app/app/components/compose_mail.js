@@ -1,12 +1,9 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { showError, showSuccess } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
 
 export default class ComposeMail extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   constructor() {
     super();
     this.tempMailContent = null;
@@ -92,3 +89,7 @@ export default class ComposeMail extends Component {
     );
   }
 }
+
+ComposeMail.contextTypes = {
+  router: PropTypes.object.isRequired
+};

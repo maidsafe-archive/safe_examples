@@ -47,8 +47,17 @@ export const MESSAGES = {
   CHECK_CONFIGURATION_ERROR: 'Failed to retrieve configuration'
 };
 
-export const AUTH_PAYLOAD = {
-  id: pkg.identifier,
-  name: pkg.productName,
-  vendor: pkg.vendor
+export const APP_INFO = {
+  info: {
+    id: pkg.identifier,
+    scope: null,
+    name: pkg.productName,
+    vendor: pkg.vendor
+  },
+  opts: {
+    own_container: true
+  },
+  permissions: {
+    _publicNames: ['Read', 'Insert', 'Update', 'Delete', 'ManagePermissions'],
+  }
 };
