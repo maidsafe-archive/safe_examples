@@ -64,6 +64,9 @@ const initializer = (state = initialState, action) => {
     case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
       return state;
       break;
+    case `${ACTION_TYPES.REFRESH_EMAIL}_ERROR`:
+      return state;
+      break;
     case ACTION_TYPES.PUSH_TO_INBOX: {
       let inbox = Object.assign({}, state.coreData.inbox, action.payload);
       return { ...state,

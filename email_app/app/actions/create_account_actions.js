@@ -1,6 +1,6 @@
 import { CONSTANTS } from '../constants';
 import ACTION_TYPES from './actionTypes';
-import { hashPublicId } from '../utils/app_utils';
+import { hashPublicId, genKeyPair } from '../utils/app_utils';
 
 var actionResolver;
 var actionRejecter;
@@ -28,16 +28,16 @@ const createInbox = (app, enc_pk) => {
 }
 
 const createArchive = (app) => {
-  let inbox_md;
+  let archive_md;
   let permSet;
   return app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE)
     .then((md) => md.quickSetup())
-    .then((md) => inbox_md = md)
+    .then((md) => archive_md = md)
     .then(() => app.mutableData.newPermissionSet())
     .then((pmSet) => permSet = pmSet)
     .then(() => permSet.setAllow('Insert')) //FIXME: this shouldn't be needed
-    .then(() => inbox_md.setUserPermissions(null, permSet, 1))
-    .then(() => inbox_md);
+    .then(() => archive_md.setUserPermissions(null, permSet, 1))
+    .then(() => archive_md);
 }
 
 const addEmailService = (app, services, serviceName, inbox_serialised) => {
@@ -85,12 +85,13 @@ export const createAccount = (emailId) => {
     let inbox_serialised;
     let inbox;
     let app = getState().initializer.app;
-    let enc_pk = 'enc_pk'; //FIXME: store public key for encrpytion here
+    let key_pair = genKeyPair();
 
-    return createInbox(app, enc_pk)
+    return createInbox(app, key_pair.publicKey)
         .then((md) => inbox = md)
         .then(() => createArchive(app))
-        .then((md) => newAccount = {id: emailId, inbox_md: inbox, archive_md: md})
+        .then((md) => newAccount = {id: emailId, inbox_md: inbox, archive_md: md,
+                      enc_sk: key_pair.privateKey, enc_pk: key_pair.publicKey})
         .then(() => newAccount.inbox_md.serialise())
         .then((md_serialised) => inbox_serialised = md_serialised)
         .then(() => app.auth.refreshContainerAccess())

@@ -2,7 +2,7 @@ import { initializeApp, fromAuthURI } from 'safe-app';
 import { shell } from 'electron';
 import ACTION_TYPES from './actionTypes';
 import { CONSTANTS } from '../constants';
-import { hashPublicId, getAuthData, saveAuthData } from '../utils/app_utils';
+import { hashPublicId, getAuthData, saveAuthData, decrypt } from '../utils/app_utils';
 
 var actionResolver;
 var actionRejecter;
@@ -82,6 +82,9 @@ export const refreshConfig = () => {
 //          .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY).then((key) => md.get(key)))
           .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY))
           .then((value) => account.enc_sk = value.buf.toString())
+//          .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY).then((key) => md.get(key)))
+          .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY))
+          .then((value) => account.enc_pk = value.buf.toString())
         ).then((_) => {
           console.log("GOT ACCOUNT:", account);
           return actionResolver(account)
@@ -112,7 +115,8 @@ export const storeNewAccount = (account) => {
             [CONSTANTS.MD_KEY_EMAIL_INBOX]: serialised_inbox,
             [CONSTANTS.MD_KEY_EMAIL_ARCHIVE]: serialised_archive,
             [CONSTANTS.MD_KEY_EMAIL_ID]: account.id,
-            [CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY]: 'enc_sk' // FIXME: store private key (encrypted) for encryption of emails
+            [CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY]: account.enc_sk, // FIXME: make sure this is encrypted?
+            [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: account.enc_pk
           }
 
           return md.quickSetup(account_data)
@@ -139,16 +143,23 @@ export const refreshEmail = (account) => {
     return account.inbox_md.getEntries()
         .then((entries) => entries.forEach((key, value) => {
             if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
-              app.immutableData.fetch(value.buf)
+              let entry_key = decrypt(key.toString(), account.enc_sk, account.enc_pk);
+
+              return app.immutableData.fetch(Buffer.from(entry_key, 'hex'))
                 .then((immData) => immData.read())
                 .then((content) => {
-                  console.log("EMAIL CONTENT", content)
-                  let email = { [key.toString()]: JSON.parse(content.toString()) }
+                  let decryptedEmail;
+                  try {
+                    decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
+                  } catch(err) {
+                    return actionRejecter(err);
+                  };
+
                   dispatch({
                     type: ACTION_TYPES.PUSH_TO_INBOX,
-                    payload: email
+                    payload: { [entry_key]: decryptedEmail }
                   });
-                });
+                })
             }
           })
         )
@@ -157,11 +168,16 @@ export const refreshEmail = (account) => {
             app.immutableData.fetch(value.buf)
               .then((immData) => immData.read())
               .then((content) => {
-                console.log("ARCHIVE CONTENT", content)
-                let email = { [key.toString()]: JSON.parse(content.toString()) }
+                let decryptedEmail;
+                try {
+                  decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
+                } catch(err) {
+                  return actionRejecter(err);
+                };
+
                 dispatch({
                   type: ACTION_TYPES.PUSH_TO_ARCHIVE,
-                  payload: email
+                  payload: { [key.toString()]: decryptedEmail }
                 });
               });
           })

@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import * as base64 from 'urlsafe-base64';
 import { remote } from 'electron';
 import { CONSTANTS } from '../constants';
+import sodium from 'libsodium-wrappers';
 
 export const getAuthData = () => {
   let authData = window.JSON.parse(
@@ -29,7 +30,6 @@ export const showError = (title, errMsg) => {
   }, _ => {});
 };
 
-
 export const showSuccess = (title, message) => {
   remote.dialog.showMessageBox({
     type: 'info',
@@ -38,3 +38,16 @@ export const showSuccess = (title, message) => {
     message
   }, _ => {});
 };
+
+export const genKeyPair = () => {
+  let {keyType, privateKey, publicKey} = sodium.crypto_box_keypair('hex');
+  return {privateKey, publicKey};
+}
+
+export const encrypt = (input, pk) => sodium.crypto_box_seal(input, Buffer.from(pk, 'hex'), 'hex');
+
+export const decrypt = (cipherMsg, sk, pk) => sodium.crypto_box_seal_open(
+                              Buffer.from(cipherMsg, 'hex'),
+                              Buffer.from(pk, 'hex'),
+                              Buffer.from(sk, 'hex'),
+                              'text');

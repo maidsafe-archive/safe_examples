@@ -1,7 +1,7 @@
 import ACTION_TYPES from './actionTypes';
 import { refreshEmail } from './initializer_actions';
 import { CONSTANTS } from '../constants';
-import { hashPublicId } from '../utils/app_utils';
+import { hashPublicId, encrypt } from '../utils/app_utils';
 
 var actionResolver;
 var actionRejecter;
@@ -25,8 +25,8 @@ export const refreshInbox = (account) => {
     };
 };
 */
-const storeEmail = (app, email) => {
-  const encryptedEmail = JSON.stringify(email); //FIXME: encrypt the content
+const storeEmail = (app, email, pk) => {
+  const encryptedEmail = encrypt(JSON.stringify(email), pk);
 
   return app.immutableData.create()
     .then((email) => email.write(encryptedEmail)
@@ -52,10 +52,14 @@ export const sendEmail = (email, to) => {
       return app.mutableData.newPublic(address, CONSTANTS.TAG_TYPE_DNS)
           .then((md) => md.get(serviceName))
           .then((service) => app.mutableData.fromSerial(service.buf))
-          .then((inbox_md) => storeEmail(app, email)
-            .then((email_addr) => app.mutableData.newMutation()
-              .then((mut) => mut.insert(email_addr.buffer.toString('hex'), email_addr)
-                .then(() => inbox_md.applyEntriesMutation(mut))
+          .then((inbox_md) => inbox_md.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY)
+            .then((pk) => storeEmail(app, email, pk.buf.toString())
+              .then((email_addr) => app.mutableData.newMutation()
+                .then((mut) => {
+                  let entry = encrypt(email_addr.buffer.toString('hex'), pk.buf.toString());
+                  return mut.insert(entry, entry) //TODO: perhaps we can store additional info in the entry's value
+                    .then(() => inbox_md.applyEntriesMutation(mut))
+                })
               )))
           .then(() => dispatch(clearMailProcessing))
           .then(() => actionResolver())
@@ -81,7 +85,7 @@ export const archiveEmail = (account, key) => {
           .then(() => app.mutableData.newMutation())
           .then((mut) => mut.remove(key, 1)
             // FIXME: this depends on a bug in client_libs
-            .then(() => account.inbox_md.applyEntriesMutation(mut))
+            //.then(() => account.inbox_md.applyEntriesMutation(mut))
           )
           .then(() => dispatch(clearMailProcessing))
           .then(() => actionResolver())
