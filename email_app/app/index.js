@@ -4,6 +4,10 @@ import { app, BrowserWindow } from 'electron';
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
+const sendResponse = (res) => {
+  mainWindow.webContents.send('auth-response', res ? res : '');
+};
+
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -24,6 +28,23 @@ const createWindow = () => {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  const shouldQuit = app.makeSingleInstance(function(commandLine) {
+    if (commandLine.length >= 2 && commandLine[1]) {
+      sendResponse(commandLine[1]);
+    }
+
+    // Someone tried to run a second instance, we should focus our window
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
+  if (shouldQuit) {
+    app.quit();
+  }
+
 };
 
 // This method will be called when Electron has finished
@@ -48,5 +69,6 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+app.on('open-url', function (e, url) {
+  sendResponse(url);
+});

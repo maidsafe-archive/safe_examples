@@ -6,24 +6,18 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import { ipcRenderer as ipc } from 'electron';
 import routes from './routes';
 import configureStore from './store/configureStore';
-import { receiveResponse } from "./actions/initializer_actions";
+import { receiveResponse, onAuthFailure } from "./actions/initializer_actions";
 
 const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 
-
-const listenForAuthReponse = (event, response) => {
-  console.log("AUTH RESPONSE RECEIVED");
-  // TODO parse response
-  if (response) {
+ipc.on('auth-response', (event, response) => {
+  if (response && response.indexOf('safe-') == 0) {
     store.dispatch(receiveResponse(response)); // TODO do it concurrently (no to linked dispatch)
   } else {
-    // store.dispatch(onAuthFailure(new Error('Authorisation failed')));
+    store.dispatch(onAuthFailure(new Error('Authorisation failed')));
   }
-};
-
-ipc.on('auth-response', listenForAuthReponse);
-
+});
 
 export default class App extends React.Component {
   render() {

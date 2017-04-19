@@ -9,7 +9,6 @@ const mapStateToProps = state => {
     app: state.initializer.app,
     accounts: state.initializer.accounts,
     tasks: state.initializer.tasks,
-    config: state.initializer.config,
     coreData: state.initializer.coreData
   };
 };
@@ -17,8 +16,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     setInitializerTask: task => (dispatch(setInitializerTask(task))),
-    authoriseApplication: (appInfo, permissions, opts) =>
-                    (dispatch(authoriseApplication(appInfo, permissions, opts))),
+    authoriseApplication: () => (dispatch(authoriseApplication())),
     refreshConfig: () => (dispatch(refreshConfig())),
     refreshEmail: (account) => (dispatch(refreshEmail(account)))
   };

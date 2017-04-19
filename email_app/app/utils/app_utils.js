@@ -5,6 +5,7 @@ import { CONSTANTS } from '../constants';
 import sodium from 'libsodium-wrappers';
 
 export const getAuthData = () => {
+  clearAuthData(); //FIXME: remove this when authenticator returns a valis response when re-authorising the app
   let authData = window.JSON.parse(
     window.localStorage.getItem(CONSTANTS.LOCAL_AUTH_DATA_KEY)
   );
@@ -15,6 +16,10 @@ export const saveAuthData = (authData) => {
   return window.localStorage.setItem(CONSTANTS.LOCAL_AUTH_DATA_KEY,
     window.JSON.stringify(authData)
   );
+};
+
+export const clearAuthData = () => {
+  window.localStorage.clear();
 };
 
 export const hashPublicId = publicId => {

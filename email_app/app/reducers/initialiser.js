@@ -6,7 +6,6 @@ const initialState = {
   app: null,
   tasks: [],
   accounts: [],
-  config: null,
   coreData: {
     id: '',
     inbox: [],
@@ -25,9 +24,7 @@ const initializer = (state = initialState, action) => {
       break;
     }
     case `${ACTION_TYPES.AUTHORISE_APP}_LOADING`: {
-      const tasks = state.tasks.slice();
-      tasks.push(MESSAGES.INITIALIZE.AUTHORISE_APP);
-      return { ...state, tasks, app: null, auth_status: AUTH_STATUS.AUTHORISING };
+      return { ...state, app: null, auth_status: AUTH_STATUS.AUTHORISING };
       break;
     }
     case `${ACTION_TYPES.AUTHORISE_APP}_SUCCESS`:
@@ -39,7 +36,7 @@ const initializer = (state = initialState, action) => {
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`: {
       const tasks = state.tasks.slice();
       tasks.push(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
-      return { ...state, tasks };
+      return { ...state, tasks, auth_status: AUTH_STATUS.DONE };
       break;
     }
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:

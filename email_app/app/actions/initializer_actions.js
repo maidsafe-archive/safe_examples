@@ -1,8 +1,8 @@
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { shell } from 'electron';
 import ACTION_TYPES from './actionTypes';
-import { CONSTANTS } from '../constants';
-import { hashPublicId, getAuthData, saveAuthData, decrypt } from '../utils/app_utils';
+import { CONSTANTS, APP_INFO } from '../constants';
+import { hashPublicId, getAuthData, saveAuthData, decrypt, clearAuthData } from '../utils/app_utils';
 
 var actionResolver;
 var actionRejecter;
@@ -16,19 +16,30 @@ export const setInitializerTask = (task) => ({
   task
 });
 
-export const receiveResponse = (uri) => {
+export const onAuthFailure = (err) => {
   return {
     type: ACTION_TYPES.AUTHORISE_APP,
-    payload: fromAuthURI(uri)
-      .then((app) => {
-        saveAuthData(uri);
-        return actionResolver(app);
-      })
-      .catch(actionRejecter)
+    payload: actionRejecter(err)
   }
 };
 
-export const authoriseApplication = (appInfo, permissions, opts) => {
+export const receiveResponse = (uri) => {
+  return function (dispatch) {
+    dispatch({
+      type: ACTION_TYPES.AUTHORISE_APP,
+      payload: actionPromise()
+    });
+
+    return fromAuthURI(APP_INFO.info, uri)
+            .then((app) => {
+              saveAuthData(uri);
+              return actionResolver(app);
+            })
+            .catch(actionRejecter)
+  }
+};
+
+export const authoriseApplication = () => {
 
   return function (dispatch) {
     dispatch({
@@ -36,17 +47,27 @@ export const authoriseApplication = (appInfo, permissions, opts) => {
       payload: actionPromise()
     });
 
-    return initializeApp(appInfo)
+    return initializeApp(APP_INFO.info)
       .then((app) => {
         if (process.env.SAFE_FAKE_AUTH) {
-          return app.auth.loginForTest(permissions, opts)
+          return app.auth.loginForTest(APP_INFO.permissions, APP_INFO.ops)
               .then(actionResolver);
         } else {
-/*          let authData = getAuthData();
-          if (authData) {
-            return actionResolver(authData);
-          }*/
-          return app.auth.genAuthUri(permissions, opts)
+          let uri = getAuthData();
+          if (uri) {
+            return fromAuthURI(APP_INFO.info, uri)
+              .then((app) => {
+                return actionResolver(app);
+              }, (err) => {
+                console.warn("Auth URI stored is not valid anymore, it needs to be authorised again: ", err);
+                clearAuthData();
+                return app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.ops)
+                  .then((resp) => app.auth.openUri(resp.uri));
+              })
+              .catch(actionRejecter);
+          }
+
+          return app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.ops)
             .then((resp) => app.auth.openUri(resp.uri))
         }
       })

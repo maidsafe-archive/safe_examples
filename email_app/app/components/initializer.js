@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
-import { CONSTANTS, AUTH_STATUS, APP_INFO, MESSAGES } from '../constants';
+import { CONSTANTS, AUTH_STATUS, MESSAGES } from '../constants';
 
 const showDialog = (title, message) => {
   remote.dialog.showMessageBox({
@@ -16,27 +16,19 @@ export default class Initializer extends Component {
   constructor() {
     super();
     this.checkConfiguration = this.checkConfiguration.bind(this);
+    this.refreshConfig = this.refreshConfig.bind(this);
   }
 
   componentDidMount() {
-    this.props.authoriseApplication(APP_INFO.info, APP_INFO.permissions, APP_INFO.ops)
+    const { setInitializerTask, authoriseApplication } = this.props;
+    setInitializerTask(MESSAGES.INITIALIZE.AUTHORISE_APP);
+
+    authoriseApplication()
       .then((_) => this.checkConfiguration())
-      .catch((err) => {
-        console.error(err)
-        showDialog('Authorisation Error', MESSAGES.AUTHORISATION_ERROR);
-      });
   }
 
-  checkConfiguration() {
-    const { auth_status, app, refreshConfig } = this.props;
-    if (!app) {
-      if (auth_status !== AUTH_STATUS.AUTHORISING) {
-        throw new Error('Authorisation failed.');
-      }
-      return;
-    }
-
-    refreshConfig()
+  refreshConfig() {
+    return this.props.refreshConfig()
         .then((_) => {
           if (Object.keys(this.props.accounts).length > 0) {
             return this.context.router.push('/home');
@@ -50,8 +42,25 @@ export default class Initializer extends Component {
         });
   }
 
+  checkConfiguration() {
+    const { auth_status, app } = this.props;
+    if (!app) {
+      if (auth_status === AUTH_STATUS.AUTHORISATION_FAILED) {
+        throw new Error('Authorisation failed.');
+      }
+      return;
+    }
+
+    return this.refreshConfig();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.auth_status === AUTH_STATUS.AUTHORISED) {
+      this.refreshConfig()
+    }
+  }
+
   render() {
-    //FIXME: check configuration when authorisation is in progress
     const { tasks } = this.props;
 
     return (
