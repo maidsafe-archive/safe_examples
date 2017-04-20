@@ -143,7 +143,12 @@
           "rpm"
         ]
       },
-      "electronPackagerConfig": {},
+      "electronPackagerConfig": {
+        "name": "safe-mail-tutorial",
+        "appBundleId": "net.maidsafe.examples.mailtutorial",
+        "appCategoryType": "public.app-category.tools",
+        "dir": "./"
+      },
       "electronWinstallerConfig": {
         "name": ""
       },
