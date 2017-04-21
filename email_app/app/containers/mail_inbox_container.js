@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
-import { refreshInbox, clearMailProcessing, deleteEmail, archiveEmail } from '../actions/mail_actions';
+import { refreshInbox, clearMailProcessing, deleteEmail, saveEmail } from '../actions/mail_actions';
 import { refreshEmail } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
@@ -20,7 +20,7 @@ const mapDispatchToProps = dispatch => {
     refreshEmail: (account) => (dispatch(refreshEmail(account))),
     deleteEmail: (account, key) => (dispatch(deleteEmail(account, key))),
     clearMailProcessing: () => (dispatch(clearMailProcessing())),
-    archiveEmail: (account, key) => (dispatch(archiveEmail(account, key)))
+    saveEmail: (account, key) => (dispatch(saveEmail(account, key)))
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(MailInbox);

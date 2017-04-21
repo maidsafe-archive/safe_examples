@@ -5,7 +5,7 @@ import { CONSTANTS } from '../constants';
 import sodium from 'libsodium-wrappers';
 
 export const getAuthData = () => {
-  clearAuthData(); //FIXME: remove this when authenticator returns a valis response when re-authorising the app
+  clearAuthData(); //FIXME: remove this when authenticator returns a valid response when re-authorising the app
   let authData = window.JSON.parse(
     window.localStorage.getItem(CONSTANTS.LOCAL_AUTH_DATA_KEY)
   );
@@ -21,6 +21,15 @@ export const saveAuthData = (authData) => {
 export const clearAuthData = () => {
   window.localStorage.clear();
 };
+
+export const genServiceInfo = (emailId) => {
+  // It supports complex email IDs, e.g. 'emailA.myshop', 'emailB.myshop'
+  let toParts = emailId.split('.');
+  const publicId = toParts.pop();
+  const serviceName = toParts.join('.') + CONSTANTS.SERVICE_NAME_POSTFIX;
+  const serviceAddr = hashPublicId(publicId);
+  return {publicId, serviceAddr, serviceName};
+}
 
 export const hashPublicId = publicId => {
   return crypto.createHash('sha256').update(publicId).digest();

@@ -9,6 +9,7 @@ export default class ComposeMail extends Component {
     this.tempMailContent = null;
     this.sendMail = this.sendMail.bind(this);
     this.handleTextLimit = this.handleTextLimit.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
   }
 
   sendMail(e) {

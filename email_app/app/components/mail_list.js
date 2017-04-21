@@ -20,7 +20,7 @@ export default class MailList extends Component {
 
     switch (this.activeType) {
       case CONSTANTS.HOME_TABS.INBOX: {
-        return this.props.inbox.fetchMails();
+        return this.props.refreshEmail();
       }
       case CONSTANTS.HOME_TABS.SAVED: {
         router.push('/home');
@@ -49,14 +49,14 @@ export default class MailList extends Component {
 
   handleSave(e) {
     e.preventDefault();
-    const { accounts, processing, coreData, error, archiveEmail, refreshEmail } = this.props;
+    const { accounts, processing, coreData, error, saveEmail, refreshEmail } = this.props;
     // TODO: Eventually the app can allow to choose which email account,
     //       it now supports only one.
     let chosenAccount = accounts;
-    archiveEmail(chosenAccount, e.target.dataset.index)
+    saveEmail(chosenAccount, e.target.dataset.index)
         .catch((error) => {
           console.error(err);
-          showError('Failed trying to archive email: ', error);
+          showError('Failed trying to save the email: ', error);
         })
         .then(() => refreshEmail(chosenAccount))
         .catch((error) => {
@@ -80,7 +80,7 @@ export default class MailList extends Component {
         container = (
           <div>
             {
-              inboxSize === 0 ? <li className="mdl-card" title="No data in appendable data">Inbox empty</li> : Object.keys(coreData.inbox).map((key) => {
+              inboxSize === 0 ? <li className="mdl-card" title="No data in inbox mutableData">Inbox empty</li> : Object.keys(coreData.inbox).map((key) => {
                 let mail = coreData.inbox[key];
                 if (!self.listColors.hasOwnProperty(mail.from)) {
                   self.listColors[mail.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
