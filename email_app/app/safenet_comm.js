@@ -116,22 +116,13 @@ const createInbox = (app, enc_pk) => {
       .then(() => app.mutableData.newPermissionSet())
       .then((pmSet) => permSet = pmSet)
       .then(() => permSet.setAllow('Insert'))
-      .then(() => permSet.setAllow('Delete')) //FIXME: this shouldn't be needed
       .then(() => inbox_md.setUserPermissions(null, permSet, 1))
       .then(() => inbox_md);
 }
 
 const createArchive = (app) => {
-  let archive_md;
-  let permSet;
   return app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE) //TODO: make it private
-      .then((md) => md.quickSetup())
-      .then((md) => archive_md = md)
-      .then(() => app.mutableData.newPermissionSet())
-      .then((pmSet) => permSet = pmSet)
-      .then(() => permSet.setAllow('Insert')) //FIXME: this shouldn't be needed
-      .then(() => archive_md.setUserPermissions(null, permSet, 1))
-      .then(() => archive_md);
+      .then((md) => md.quickSetup());
 }
 
 const addEmailService = (app, services, serviceName, inbox_serialised) => {
