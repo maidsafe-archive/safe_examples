@@ -1,6 +1,6 @@
 import { CONSTANTS, APP_INFO } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
-import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genKeyPair,
+import { getAuthData, saveAuthData, clearAuthData, hashPublicId, hashBase64, genKeyPair,
                     encrypt, decrypt, genServiceInfo } from './utils/app_utils';
 
 const requestAuth = () => {
@@ -89,9 +89,10 @@ export const writeConfig = (app, account) => {
 export const readEmails = (app, md, account, cb) => {
   return md.getEntries()
       .then((entries) => entries.forEach((key, value) => {
-          if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
-            let entry_key = decrypt(key.toString(), account.enc_sk, account.enc_pk);
-            return app.immutableData.fetch(Buffer.from(entry_key, 'hex'))
+          if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY
+              && value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitaation in safe_core
+            let entry_value = decrypt(value.buf.toString(), account.enc_sk, account.enc_pk);
+            return app.immutableData.fetch(Buffer.from(entry_value, 'hex'))
               .then((immData) => immData.read())
               .then((content) => {
                 let decryptedEmail;
@@ -198,8 +199,8 @@ export const storeEmail = (app, email, to) => {
         .then((pk) => writeEmailContent(app, email, pk.buf.toString())
           .then((email_addr) => app.mutableData.newMutation()
             .then((mut) => {
-              let entry = encrypt(email_addr.buffer.toString('hex'), pk.buf.toString());
-              return mut.insert(entry, entry) //TODO: perhaps we can store additional info in the entry's value
+              let entry_value = encrypt(email_addr.buffer.toString('hex'), pk.buf.toString());
+              return mut.insert(hashBase64(entry_value), entry_value)
                 .then(() => inbox_md.applyEntriesMutation(mut))
             })
           )));
@@ -208,7 +209,6 @@ export const storeEmail = (app, email, to) => {
 export const removeEmail = (app, container, key) => {
   return app.mutableData.newMutation()
       .then((mut) => mut.remove(key, 1)
-        // FIXME: this depends on a bug in client_libs
         .then(() => container.applyEntriesMutation(mut))
       )
 }
@@ -222,7 +222,6 @@ export const archiveEmail = (app, account, key) => {
       )
       .then(() => app.mutableData.newMutation())
       .then((mut) => mut.remove(key, 1)
-        // FIXME: this depends on a bug in client_libs
         .then(() => account.inbox_md.applyEntriesMutation(mut))
       )
 }

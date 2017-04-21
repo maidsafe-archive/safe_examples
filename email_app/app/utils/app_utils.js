@@ -35,6 +35,10 @@ export const hashPublicId = publicId => {
   return crypto.createHash('sha256').update(publicId).digest();
 };
 
+export const hashBase64 = str => {
+  return crypto.createHash('sha256').update(str).digest('base64');
+};
+
 export const showError = (title, errMsg) => {
   remote.dialog.showMessageBox({
     type: 'error',

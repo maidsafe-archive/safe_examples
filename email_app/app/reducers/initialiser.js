@@ -53,7 +53,7 @@ const initializer = (state = initialState, action) => {
       break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_LOADING`:
       return { ...state,
-        coreData: { ...state.coreData, inbox: [] },
+        coreData: { ...state.coreData, inbox: [], saved: [] },
         inboxSize: 0,
         savedSize: 0
       };
