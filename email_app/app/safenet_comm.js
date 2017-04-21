@@ -91,13 +91,12 @@ export const readEmails = (app, md, account, cb) => {
       .then((entries) => entries.forEach((key, value) => {
           if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
             let entry_key = decrypt(key.toString(), account.enc_sk, account.enc_pk);
-
             return app.immutableData.fetch(Buffer.from(entry_key, 'hex'))
               .then((immData) => immData.read())
               .then((content) => {
                 let decryptedEmail;
                 decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
-                cb({ [entry_key]: decryptedEmail });
+                cb({ [key]: decryptedEmail });
               })
           }
         })
@@ -125,7 +124,7 @@ const createInbox = (app, enc_pk) => {
 const createArchive = (app) => {
   let archive_md;
   let permSet;
-  return app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE) //FIXME: make this private
+  return app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE) //TODO: make it private
       .then((md) => md.quickSetup())
       .then((md) => archive_md = md)
       .then(() => app.mutableData.newPermissionSet())
@@ -215,11 +214,11 @@ export const storeEmail = (app, email, to) => {
           )));
 }
 
-export const removeEmail = (app, account, key) => {
+export const removeEmail = (app, container, key) => {
   return app.mutableData.newMutation()
       .then((mut) => mut.remove(key, 1)
         // FIXME: this depends on a bug in client_libs
-        .then(() => account.inbox_md.applyEntriesMutation(mut))
+        .then(() => container.applyEntriesMutation(mut))
       )
 }
 

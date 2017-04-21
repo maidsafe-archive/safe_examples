@@ -11,7 +11,9 @@ export default class MailList extends Component {
     this.listColors = {};
     this.activeType = null;
     this.goBack = this.goBack.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
+    this.handleDeleteFromInbox = this.handleDeleteFromInbox.bind(this);
+    this.handleDeleteSaved = this.handleDeleteSaved.bind(this);
     this.handleSave = this.handleSave.bind(this);
   }
 
@@ -29,27 +31,33 @@ export default class MailList extends Component {
     }
   }
 
-  handleDelete(e) {
-    e.preventDefault();
-    const { accounts, processing, coreData, error, deleteEmail, refreshEmail } = this.props;
-    // TODO: Eventually the app can allow to choose which email account,
-    //       it now supports only one.
-    let chosenAccount = accounts;
-    deleteEmail(chosenAccount, e.target.dataset.index)
+  deleteItem(container, index) {
+    const { accounts, deleteEmail, refreshEmail } = this.props;
+    deleteEmail(container, index)
         .catch((error) => {
           console.error(err);
           showError('Failed trying to delete email: ', error);
         })
-        .then(() => refreshEmail(chosenAccount))
+        .then(() => refreshEmail(accounts))
         .catch((error) => {
           console.error(error);
           showError('Fetching emails failed: ', error);
         });
   }
 
+  handleDeleteFromInbox(e) {
+    e.preventDefault();
+    this.deleteItem(this.props.accounts.inbox_md, e.target.dataset.index)
+  }
+
+  handleDeleteSaved(e) {
+    e.preventDefault();
+    this.deleteItem(this.props.accounts.archive_md, e.target.dataset.index)
+  }
+
   handleSave(e) {
     e.preventDefault();
-    const { accounts, processing, coreData, error, saveEmail, refreshEmail } = this.props;
+    const { accounts, saveEmail, refreshEmail } = this.props;
     // TODO: Eventually the app can allow to choose which email account,
     //       it now supports only one.
     let chosenAccount = accounts;
@@ -101,7 +109,7 @@ export default class MailList extends Component {
                         <button className="mdl-button mdl-js-button mdl-button--icon" name="add" onClick={this.handleSave}><i className="material-icons" data-index={key}>save</i></button>
                       </div>
                       <div className="opt-i">
-                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={key}>delete</i></button>
+                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteFromInbox}><i className="material-icons" data-index={key}>delete</i></button>
                       </div>
                     </div>
                   </li>
@@ -137,7 +145,7 @@ export default class MailList extends Component {
                     </div>
                     <div className="opt">
                       <div className="opt-i">
-                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDelete}><i className="material-icons" data-index={key}>delete</i></button>
+                        <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteSaved}><i className="material-icons" data-index={key}>delete</i></button>
                       </div>
                     </div>
                   </li>

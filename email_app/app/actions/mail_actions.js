@@ -40,8 +40,7 @@ export const saveEmail = (account, key) => {
     };
 };
 
-//FIXME: this should also work when deleting from archive
-export const deleteEmail = (account, key) => {
+export const deleteEmail = (container, key) => {
 
     return function (dispatch, getState) {
       dispatch({
@@ -50,7 +49,7 @@ export const deleteEmail = (account, key) => {
       });
 
       let app = getState().initializer.app;
-      return removeEmail(app, account, key)
+      return removeEmail(app, container, key)
         .then(() => dispatch(clearMailProcessing))
         .then(() => actionResolver())
         .catch(actionRejecter);
