@@ -1,7 +1,23 @@
-import { CONSTANTS, APP_INFO } from './constants';
+import { CONSTANTS } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, hashPublicId, hashBase64, genKeyPair,
                     encrypt, decrypt, genServiceInfo } from './utils/app_utils';
+import pkg from '../package.json';
+
+const APP_INFO = {
+  info: {
+    id: pkg.identifier,
+    scope: null,
+    name: pkg.productName,
+    vendor: pkg.vendor
+  },
+  opts: {
+    own_container: true
+  },
+  permissions: {
+    _publicNames: ['Read', 'Insert', 'Update', 'Delete', 'ManagePermissions'],
+  }
+};
 
 const requestAuth = () => {
   return app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.ops)
@@ -126,28 +142,22 @@ const createArchive = (app) => {
       .then((md) => md.quickSetup());
 }
 
-const addEmailService = (app, services, serviceName, inbox_serialised) => {
+const addEmailService = (app, serviceInfo, inbox_serialised) => {
   console.log("ADD EMAIL SERVICE")
-
-  return app.mutableData.newPublic(services, CONSTANTS.TAG_TYPE_DNS)
-    .then((services_md) => app.mutableData.newMutation()
-      .then((mut) => mut.insert(serviceName, inbox_serialised)
-        .then(() => services_md.applyEntriesMutation(mut))
-      ))
+  return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
+      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised }))
 }
 
 const createPublicIdAndEmailService = (app, pub_names_md, serviceInfo,
                                                           inbox_serialised) => {
   console.log("CREATE PUBLIC ID AND EMAIL SERVICE")
 
-  return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised })
-        .then((md) => md.getNameAndTag())
-        .then((services) => app.mutableData.newMutation()
-          .then((mut) => mut.insert(serviceInfo.publicId, services.name)
-            .then(() => pub_names_md.applyEntriesMutation(mut))
-          ))
-      )
+  return addEmailService(app, serviceInfo, inbox_serialised)
+      .then((md) => md.getNameAndTag())
+      .then((services) => app.mutableData.newMutation()
+        .then((mut) => mut.insert(serviceInfo.publicId, services.name)
+          .then(() => pub_names_md.applyEntriesMutation(mut))
+        ))
 }
 
 export const setupAccount = (app, emailId) => {
@@ -169,7 +179,7 @@ export const setupAccount = (app, emailId) => {
       .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId)
         .then((encrypted_publicId) => pub_names_md.get(encrypted_publicId))
         // FIXME: for some reason I'm not able to read the _publicNames entries
-        .then((services) => addService(app, services, serviceInfo.serviceName, inbox_serialised)
+        .then((services) => addService(app, serviceInfo, inbox_serialised)
           , (err) => {
             if (err.name === 'ERR_NO_SUCH_ENTRY') {
               return createPublicIdAndEmailService(app, pub_names_md,

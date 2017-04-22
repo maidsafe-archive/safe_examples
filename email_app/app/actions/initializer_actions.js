@@ -86,6 +86,64 @@ export const refreshEmail = (account) => {
     });
 
     let app = getState().initializer.app;
+
+    const crypto = require('crypto');
+/*
+{
+  const testXorName = crypto.randomBytes(32);
+   app.mutableData.newPublic(testXorName, 15009)
+    .then((md) => md.quickSetup({key1: "test"})
+    .then((_) => app.mutableData.newMutation()
+      .then((mut) => mut.remove('key1', 1)
+        .then(() => md.applyEntriesMutation(mut))
+        .then(() => console.log("MUTATED"))
+      ))
+    )
+  .then(() => app.mutableData.newPublic(testXorName, 15009))
+  .then((md) => md.getEntries())
+  .then((entries) => entries.forEach((key, value) => {
+      console.log("RETRIEVED", value.toString())
+  }));
+
+}
+*/
+/*
+{
+  const testXorName = crypto.randomBytes(32);
+   app.mutableData.newPrivate(testXorName, 15009)
+    .then((md) => md.quickSetup({key1: "test"})
+    .then((_) => app.mutableData.newMutation()
+      .then((mut) => mut.insert('key2', 'value2')
+        .then(() => md.applyEntriesMutation(mut))
+        .then(() => console.log("MUTATED"))
+      ))
+    )
+  .then(() => app.mutableData.newPrivate(testXorName, 15009))
+  .then((md) => md.getEntries())
+  .then((entries) => md.encryptKey('key1').then((key) => entries.get('key1')))
+  .then((vlue) => {
+      console.log("RETRIEVED", value.buf.toString())
+  });
+
+}
+*/
+/*
+{
+  app.auth.refreshContainerAccess().then(() =>
+      app.auth.getHomeContainer()
+        .then((md) => md.getEntries()
+          .then((entries) => entries.mutate()
+            .then((mut) => mut.insert('key1', 'value1')
+              .then(() => md.applyEntriesMutation(mut))
+            )))
+        .then(() => app.auth.getHomeContainer())
+          .then((md) => md.encryptKey('key1').then((key) => md.get(key)))
+          .then((value) => {
+            console.log("RETRIEVED", value.buf.toString())
+          })
+  );
+}
+*/
     return readEmails(app, account.inbox_md, account,
             (inboxEntry) => {
               dispatch({
