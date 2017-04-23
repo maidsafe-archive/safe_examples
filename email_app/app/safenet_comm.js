@@ -55,25 +55,20 @@ export const connect = (uri) => {
 
 export const readConfig = (app) => {
   let account = {};
+
   return app.auth.refreshContainerAccess()
-      //.then(() => app.auth.getHomeContainer())
-      .then(() => app.mutableData.newPublic(hashPublicId('home_container'), 15004)) //FIXME: use home container instead
-      //.then((md) => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_INBOX).then((key) => md.get(key))
-      .then((md) => md.get(CONSTANTS.MD_KEY_EMAIL_INBOX)
+      .then(() => app.auth.getHomeContainer())
+      .then((md) => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_INBOX).then((key) => md.get(key))
         .then((value) => app.mutableData.fromSerial(value.buf))
         .then((inbox_md) => account.inbox_md = inbox_md)
-        //.then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ARCHIVE).then((key) => md.get(key)))
-        .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ARCHIVE))
+        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ARCHIVE).then((key) => md.get(key)))
         .then((value) => app.mutableData.fromSerial(value.buf))
         .then((archive_md) => account.archive_md = archive_md)
-        //.then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ID).then((key) => md.get(key)))
-        .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ID))
+        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ID).then((key) => md.get(key)))
         .then((value) => account.id = value.buf.toString())
-        //.then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY).then((key) => md.get(key)))
-        .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY))
+        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY).then((key) => md.get(key)))
         .then((value) => account.enc_sk = value.buf.toString())
-        //.then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY).then((key) => md.get(key)))
-        .then(() => md.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY))
+        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY).then((key) => md.get(key)))
         .then((value) => account.enc_pk = value.buf.toString())
       )
       .then(() => account);
@@ -87,18 +82,15 @@ export const writeConfig = (app, account) => {
       .then(() => account.archive_md.serialise())
       .then((serial) => serialised_archive = serial)
       .then(() => app.auth.refreshContainerAccess())
-      //.then(() => app.auth.getHomeContainer())
-      .then(() => app.mutableData.newPublic(hashPublicId('home_container'), 15004)) // FIXME: use home container instead
-      .then((md) => md.quickSetup())
-      .then((md) => md.getEntries()
-        .then((entries) => entries.mutate()
-          .then((mut) => mut.insert(CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_inbox)
-            .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ARCHIVE, serialised_archive))
-            .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ID, account.id))
-            .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY, account.enc_sk))
-            .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY, account.enc_pk))
-            .then(() => md.applyEntriesMutation(mut))
-          )))
+      .then(() => app.auth.getHomeContainer())
+      .then((md) => app.mutableData.newMutation()
+        .then((mut) => mut.insert(CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_inbox)
+          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ARCHIVE, serialised_archive))
+          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ID, account.id))
+          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY, account.enc_sk))
+          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY, account.enc_pk))
+          .then(() => md.applyEntriesMutation(mut))
+        ))
       .then(() => account);
 }
 
@@ -106,7 +98,7 @@ export const readEmails = (app, md, account, cb) => {
   return md.getEntries()
       .then((entries) => entries.forEach((key, value) => {
           if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY
-              && value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitaation in safe_core
+              && value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
             let entry_value = decrypt(value.buf.toString(), account.enc_sk, account.enc_pk);
             return app.immutableData.fetch(Buffer.from(entry_value, 'hex'))
               .then((immData) => immData.read())
@@ -178,7 +170,6 @@ export const setupAccount = (app, emailId) => {
       .then(() => app.auth.getAccessContainerInfo('_publicNames'))
       .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId)
         .then((encrypted_publicId) => pub_names_md.get(encrypted_publicId))
-        // FIXME: for some reason I'm not able to read the _publicNames entries
         .then((services) => addService(app, serviceInfo, inbox_serialised)
           , (err) => {
             if (err.name === 'ERR_NO_SUCH_ENTRY') {

@@ -15,7 +15,6 @@ const showDialog = (title, message) => {
 export default class Initializer extends Component {
   constructor() {
     super();
-    this.checkConfiguration = this.checkConfiguration.bind(this);
     this.refreshConfig = this.refreshConfig.bind(this);
   }
 
@@ -23,40 +22,28 @@ export default class Initializer extends Component {
     const { setInitializerTask, authoriseApplication } = this.props;
     setInitializerTask(MESSAGES.INITIALIZE.AUTHORISE_APP);
 
-    authoriseApplication()
-      .then((_) => this.checkConfiguration())
+    return authoriseApplication();
   }
 
   refreshConfig() {
-    return this.props.refreshConfig()
-        .then((_) => {
+    const { setInitializerTask, refreshConfig } = this.props;
+    setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
+    return refreshConfig()
+        .then(() => {
           if (Object.keys(this.props.accounts).length > 0) {
             return this.context.router.push('/home');
           } else {
             return this.context.router.push('/create_account');
           }
-        })
-        .catch((err) => {
-          console.error(err)
-          showDialog('Error fetching configuration', MESSAGES.CHECK_CONFIGURATION_ERROR);
         });
   }
 
-  checkConfiguration() {
-    const { auth_status, app } = this.props;
-    if (!app) {
-      if (auth_status === AUTH_STATUS.AUTHORISATION_FAILED) {
-        throw new Error('Authorisation failed.');
-      }
-      return;
-    }
-
-    return this.refreshConfig();
-  }
-
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.auth_status === AUTH_STATUS.AUTHORISED) {
-      this.refreshConfig()
+    const { auth_status, app } = this.props;
+    if (auth_status === AUTH_STATUS.AUTHORISATION_FAILED) {
+      showDialog('Authorisation failed', MESSAGES.AUTHORISATION_ERROR);
+    } else if (auth_status === AUTH_STATUS.AUTHORISED) {
+      return this.refreshConfig();
     }
   }
 

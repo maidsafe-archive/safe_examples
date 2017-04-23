@@ -34,9 +34,7 @@ const initializer = (state = initialState, action) => {
       return { ...state, auth_status: AUTH_STATUS.AUTHORISATION_FAILED };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`: {
-      const tasks = state.tasks.slice();
-      tasks.push(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
-      return { ...state, tasks, auth_status: AUTH_STATUS.DONE };
+      return { ...state, auth_status: AUTH_STATUS.DONE };
       break;
     }
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
@@ -44,6 +42,9 @@ const initializer = (state = initialState, action) => {
         accounts: action.payload,
         coreData: { ...state.coreData, id: action.payload.id }
       };
+      break;
+    case `${ACTION_TYPES.GET_CONFIG}_ERROR`:
+      return state;
       break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
       return { ...state,
