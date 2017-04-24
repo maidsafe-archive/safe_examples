@@ -1,5 +1,5 @@
 import ACTION_TYPES from './actionTypes';
-import { storeEmail, removeEmail, archiveEmail } from '../safenet_comm';
+import { storeEmail, removeInboxEmail, removeArchivedEmail, archiveEmail } from '../safenet_comm';
 
 var actionResolver;
 var actionRejecter;
@@ -40,7 +40,7 @@ export const saveEmail = (account, key) => {
     };
 };
 
-export const deleteEmail = (container, key) => {
+export const deleteInboxEmail = (account, key) => {
 
     return function (dispatch, getState) {
       dispatch({
@@ -49,7 +49,23 @@ export const deleteEmail = (container, key) => {
       });
 
       let app = getState().initializer.app;
-      return removeEmail(app, container, key)
+      return removeInboxEmail(app, account, key)
+        .then(() => dispatch(clearMailProcessing))
+        .then(() => actionResolver())
+        .catch(actionRejecter);
+    };
+};
+
+export const deleteSavedEmail = (account, key) => {
+
+    return function (dispatch, getState) {
+      dispatch({
+        type: ACTION_TYPES.MAIL_PROCESSING,
+        payload: actionPromise()
+      });
+
+      let app = getState().initializer.app;
+      return removeArchivedEmail(app, account, key)
         .then(() => dispatch(clearMailProcessing))
         .then(() => actionResolver())
         .catch(actionRejecter);

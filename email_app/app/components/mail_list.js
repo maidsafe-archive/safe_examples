@@ -11,7 +11,7 @@ export default class MailList extends Component {
     this.listColors = {};
     this.activeType = null;
     this.goBack = this.goBack.bind(this);
-    this.deleteItem = this.deleteItem.bind(this);
+    this.refreshEmail = this.refreshEmail.bind(this);
     this.handleDeleteFromInbox = this.handleDeleteFromInbox.bind(this);
     this.handleDeleteSaved = this.handleDeleteSaved.bind(this);
     this.handleSave = this.handleSave.bind(this);
@@ -31,14 +31,8 @@ export default class MailList extends Component {
     }
   }
 
-  deleteItem(container, index) {
-    const { accounts, deleteEmail, refreshEmail } = this.props;
-    deleteEmail(container, index)
-        .catch((error) => {
-          console.error(err);
-          showError('Failed trying to delete email: ', error);
-        })
-        .then(() => refreshEmail(accounts))
+  refreshEmail(account) {
+    this.props.refreshEmail(account)
         .catch((error) => {
           console.error(error);
           showError('Fetching emails failed: ', error);
@@ -47,12 +41,24 @@ export default class MailList extends Component {
 
   handleDeleteFromInbox(e) {
     e.preventDefault();
-    this.deleteItem(this.props.accounts.inbox_md, e.target.dataset.index)
+    const { accounts, deleteInboxEmail, refreshEmail } = this.props;
+    deleteInboxEmail(accounts, e.target.dataset.index)
+        .catch((error) => {
+          console.error(err);
+          showError('Failed trying to delete email from inbox: ', error);
+        })
+        .then(() => this.refreshEmail(accounts))
   }
 
   handleDeleteSaved(e) {
     e.preventDefault();
-    this.deleteItem(this.props.accounts.archive_md, e.target.dataset.index)
+    const { accounts, deleteSavedEmail, refreshEmail } = this.props;
+    deleteSavedEmail(accounts, e.target.dataset.index)
+        .catch((error) => {
+          console.error(err);
+          showError('Failed trying to delete saved email: ', error);
+        })
+        .then(() => this.refreshEmail(accounts))
   }
 
   handleSave(e) {
@@ -66,11 +72,7 @@ export default class MailList extends Component {
           console.error(err);
           showError('Failed trying to save the email: ', error);
         })
-        .then(() => refreshEmail(chosenAccount))
-        .catch((error) => {
-          console.error(error);
-          showError('Fetching emails failed: ', error);
-        });
+        .then(() => this.refreshEmail(chosenAccount))
   }
 
   render() {

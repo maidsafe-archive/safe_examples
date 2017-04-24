@@ -15,7 +15,7 @@ const mapDispatchToProps = dispatch => {
   return {
     sendEmail: (email, to) => (dispatch(sendEmail(email, to))),
     clearMailProcessing: _ => (dispatch(clearMailProcessing())),
-    cancelCompose: _ => dispatch(cancelCompose()),
+    cancelCompose: _ => dispatch(cancelCompose())
   };
 };
 

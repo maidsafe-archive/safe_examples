@@ -1,7 +1,7 @@
 import { CONSTANTS } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
-import { getAuthData, saveAuthData, clearAuthData, hashPublicId, hashBase64, genKeyPair,
-                    encrypt, decrypt, genServiceInfo } from './utils/app_utils';
+import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genRandomEntryKey,
+          genKeyPair, encrypt, decrypt, genServiceInfo } from './utils/app_utils';
 import pkg from '../package.json';
 
 const APP_INFO = {
@@ -95,13 +95,29 @@ export const writeConfig = (app, account) => {
       .then(() => account);
 }
 
-export const readEmails = (app, md, account, cb) => {
-  return md.getEntries()
+export const readInboxEmails = (app, account, cb) => {
+  return account.inbox_md.getEntries()
       .then((entries) => entries.forEach((key, value) => {
           if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY
               && value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
             let entry_value = decrypt(value.buf.toString(), account.enc_sk, account.enc_pk);
             return app.immutableData.fetch(Buffer.from(entry_value, 'hex'))
+              .then((immData) => immData.read())
+              .then((content) => {
+                let decryptedEmail;
+                decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
+                cb({ [key]: decryptedEmail });
+              })
+          }
+        })
+      );
+}
+
+export const readArchivedEmails = (app, account, cb) => {
+  return account.archive_md.getEntries()
+      .then((entries) => entries.forEach((key, value) => {
+          if (value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
+            return app.immutableData.fetch(value.buf)
               .then((immData) => immData.read())
               .then((content) => {
                 let decryptedEmail;
@@ -131,7 +147,7 @@ const createInbox = (app, enc_pk) => {
 }
 
 const createArchive = (app) => {
-  return app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE) //TODO: make it private
+  return app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE)
       .then((md) => md.quickSetup());
 }
 
@@ -199,23 +215,35 @@ export const storeEmail = (app, email, to) => {
           .then((email_addr) => app.mutableData.newMutation()
             .then((mut) => {
               let entry_value = encrypt(email_addr.buffer.toString('hex'), pk.buf.toString());
-              return mut.insert(hashBase64(entry_value), entry_value)
+              let entry_key = genRandomEntryKey();
+              return mut.insert(entry_key, entry_value)
                 .then(() => inbox_md.applyEntriesMutation(mut))
             })
           )));
 }
 
-export const removeEmail = (app, container, key) => {
+export const removeInboxEmail = (app, account, key) => {
   return app.mutableData.newMutation()
       .then((mut) => mut.remove(key, 1)
-        .then(() => container.applyEntriesMutation(mut))
+        .then(() => account.inbox_md.applyEntriesMutation(mut))
+      )
+}
+
+export const removeArchivedEmail = (app, account, key) => {
+  return app.mutableData.newMutation()
+      .then((mut) => account.archive_md.encryptKey(key)
+        .then((encryptedKey) => mut.remove(encryptedKey, 1))
+        .then(() => account.archive_md.applyEntriesMutation(mut))
       )
 }
 
 export const archiveEmail = (app, account, key) => {
+  let new_entry_key = genRandomEntryKey();
   return account.inbox_md.get(key)
-      .then((email) => app.mutableData.newMutation()
-        .then((mut) => mut.insert(key, email.buf)
+      .then((encryptedEmailXorName) => decrypt(encryptedEmailXorName.buf.toString(), account.enc_sk, account.enc_pk))
+      .then((decrytedXorNameHex) => Buffer.from(decrytedXorNameHex, 'hex'))
+      .then((xorName) => app.mutableData.newMutation()
+        .then((mut) => mut.insert(new_entry_key, xorName)
           .then(() => account.archive_md.applyEntriesMutation(mut))
         )
       )
