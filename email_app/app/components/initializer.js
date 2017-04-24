@@ -42,7 +42,7 @@ export default class Initializer extends Component {
     const { auth_status, app } = this.props;
     if (auth_status === AUTH_STATUS.AUTHORISATION_FAILED) {
       showDialog('Authorisation failed', MESSAGES.AUTHORISATION_ERROR);
-    } else if (auth_status === AUTH_STATUS.AUTHORISED) {
+    } else if (app && auth_status === AUTH_STATUS.AUTHORISED) {
       return this.refreshConfig();
     }
   }

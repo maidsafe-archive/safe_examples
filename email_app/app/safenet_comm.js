@@ -15,34 +15,36 @@ const APP_INFO = {
     own_container: true
   },
   permissions: {
-    _publicNames: ['Read', 'Insert', 'Update', 'Delete', 'ManagePermissions'],
+    _publicNames: ['Read', 'Insert', 'Update', 'Delete', 'ManagePermissions']
   }
 };
 
 const requestAuth = () => {
-  return app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.ops)
-    .then((resp) => app.auth.openUri(resp.uri))
+  return initializeApp(APP_INFO.info)
+    .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
+      .then((resp) => app.auth.openUri(resp.uri))
+    );
 }
 
 export const authApp = () => {
-  return initializeApp(APP_INFO.info)
-    .then((app) => {
-      if (process.env.SAFE_FAKE_AUTH) {
-        return app.auth.loginForTest(APP_INFO.permissions, APP_INFO.ops);
-      } else {
-        let uri = getAuthData();
-        if (uri) {
-          return fromAuthURI(APP_INFO.info, uri)
-            .then((app) => app, (err) => {
-              console.warn("Auth URI stored is not valid anymore, it needs to be authorised again: ", err);
-              clearAuthData();
-              return requestAuth();
-            })
-        }
+  if (process.env.SAFE_FAKE_AUTH) {
+    return initializeApp(APP_INFO.info)
+        .then((app) => app.auth.loginForTest(APP_INFO.permissions));
+  } else {
+    let uri = getAuthData();
+    if (uri) {
+      return fromAuthURI(APP_INFO.info, uri)
+        .then((registered_app) => registered_app.auth.refreshContainerAccess()
+          .then(() => registered_app, (err) => {
+            console.warn("Auth URI stored is not valid anymore, app needs to be authorised again: ", err);
+            clearAuthData();
+            return requestAuth();
+          })
+        );
+    }
 
-        return requestAuth();
-      }
-    });
+    return requestAuth();
+  }
 }
 
 export const connect = (uri) => {
@@ -55,7 +57,6 @@ export const connect = (uri) => {
 
 export const readConfig = (app) => {
   let account = {};
-
   return app.auth.refreshContainerAccess()
       .then(() => app.auth.getHomeContainer())
       .then((md) => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_INBOX).then((key) => md.get(key))
@@ -135,15 +136,12 @@ const createArchive = (app) => {
 }
 
 const addEmailService = (app, serviceInfo, inbox_serialised) => {
-  console.log("ADD EMAIL SERVICE")
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
       .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised }))
 }
 
 const createPublicIdAndEmailService = (app, pub_names_md, serviceInfo,
                                                           inbox_serialised) => {
-  console.log("CREATE PUBLIC ID AND EMAIL SERVICE")
-
   return addEmailService(app, serviceInfo, inbox_serialised)
       .then((md) => md.getNameAndTag())
       .then((services) => app.mutableData.newMutation()
