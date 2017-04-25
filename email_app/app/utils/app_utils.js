@@ -39,13 +39,13 @@ export const genRandomEntryKey = () => {
   return crypto.randomBytes(32).toString('hex');
 };
 
-export const showError = (title, errMsg) => {
+export const showError = (title, errMsg, next) => {
   remote.dialog.showMessageBox({
     type: 'error',
     buttons: ['Ok'],
     title,
-    message: errMsg
-  }, _ => {});
+    message: errMsg.toString()
+  }, next ? next : _ => {});
 };
 
 export const showSuccess = (title, message) => {

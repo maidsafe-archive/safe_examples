@@ -5,7 +5,7 @@ import { setInitializerTask, authoriseApplication,
 
 const mapStateToProps = state => {
   return {
-    auth_status: state.initializer.auth_status,
+    app_status: state.initializer.app_status,
     app: state.initializer.app,
     accounts: state.initializer.accounts,
     tasks: state.initializer.tasks,

@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { remote } from 'electron';
-import { CONSTANTS, AUTH_STATUS, MESSAGES } from '../constants';
+import { showError } from '../utils/app_utils';
+import { MESSAGES, APP_STATUS } from '../constants';
 
-const showDialog = (title, message) => {
-  remote.dialog.showMessageBox({
-    type: 'error',
-    buttons: ['Ok'],
-    title,
-    message
-  }, _ => { remote.getCurrentWindow().close(); });
-};
+const showAuthError = _ => showError('Authorisation failed',
+                                        MESSAGES.AUTHORISATION_ERROR,
+                                        _ => { remote.getCurrentWindow().close(); });
 
 export default class Initializer extends Component {
   constructor() {
@@ -29,20 +25,24 @@ export default class Initializer extends Component {
     const { setInitializerTask, refreshConfig } = this.props;
     setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
     return refreshConfig()
-        .then(() => {
+        .then((_) => {
           if (Object.keys(this.props.accounts).length > 0) {
             return this.context.router.push('/home');
-          } else {
-            return this.context.router.push('/create_account');
           }
+          showAuthError();
+        })
+        .catch((_) => {
+          console.log("No email account found");
+          return this.context.router.push('/create_account');
         });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { auth_status, app } = this.props;
-    if (auth_status === AUTH_STATUS.AUTHORISATION_FAILED) {
-      showDialog('Authorisation failed', MESSAGES.AUTHORISATION_ERROR);
-    } else if (app && auth_status === AUTH_STATUS.AUTHORISED) {
+    const { app_status, app } = this.props;
+    if (prevProps.app_status === APP_STATUS.AUTHORISING
+        && app_status === APP_STATUS.AUTHORISATION_FAILED) {
+      showAuthError();
+    } else if (app && app_status === APP_STATUS.AUTHORISED) {
       return this.refreshConfig();
     }
   }

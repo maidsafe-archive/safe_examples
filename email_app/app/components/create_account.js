@@ -13,8 +13,8 @@ export default class CreateAccount extends Component {
   storeCreatedAccount() {
     const { newAccount, storeNewAccount, createAccountError } = this.props;
     return storeNewAccount(newAccount)
-        .then(() => this.context.router.push('/home'))
-        .catch(createAccountError);
+        .then((_) => this.context.router.push('/home'))
+        .catch((e) => createAccountError(new Error(e)));
   }
 
   handleCreateAccount(e) {
@@ -31,7 +31,12 @@ export default class CreateAccount extends Component {
 
     return createAccount(emailId)
         .then(this.storeCreatedAccount)
-        .catch(createAccountError);
+        .catch((err) => {
+          if (err.name === 'ERR_DATA_EXISTS') {
+            return createAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
+          }
+          return createAccountError(err);
+        });
   };
 
   render() {

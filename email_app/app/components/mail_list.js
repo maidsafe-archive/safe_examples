@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { remote } from 'electron';
 import dateformat from 'dateformat';
-import { showError, showSuccess } from '../utils/app_utils';
+import { showError } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
 
 export default class MailList extends Component {
@@ -34,7 +33,7 @@ export default class MailList extends Component {
   refreshEmail(account) {
     this.props.refreshEmail(account)
         .catch((error) => {
-          console.error(error);
+          console.error('Fetching emails failed: ', error);
           showError('Fetching emails failed: ', error);
         });
   }
@@ -44,7 +43,7 @@ export default class MailList extends Component {
     const { accounts, deleteInboxEmail, refreshEmail } = this.props;
     deleteInboxEmail(accounts, e.target.dataset.index)
         .catch((error) => {
-          console.error(err);
+          console.error('Failed trying to delete email from inbox: ', error);
           showError('Failed trying to delete email from inbox: ', error);
         })
         .then(() => this.refreshEmail(accounts))
@@ -55,7 +54,7 @@ export default class MailList extends Component {
     const { accounts, deleteSavedEmail, refreshEmail } = this.props;
     deleteSavedEmail(accounts, e.target.dataset.index)
         .catch((error) => {
-          console.error(err);
+          console.error('Failed trying to delete saved email: ', error);
           showError('Failed trying to delete saved email: ', error);
         })
         .then(() => this.refreshEmail(accounts))
@@ -69,7 +68,7 @@ export default class MailList extends Component {
     let chosenAccount = accounts;
     saveEmail(chosenAccount, e.target.dataset.index)
         .catch((error) => {
-          console.error(err);
+          console.error('Failed trying to save the email: ', error);
           showError('Failed trying to save the email: ', error);
         })
         .then(() => this.refreshEmail(chosenAccount))

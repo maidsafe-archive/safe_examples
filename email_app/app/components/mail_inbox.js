@@ -24,8 +24,8 @@ export default class MailInbox extends Component {
     let chosenAccount = accounts;
     refreshEmail(chosenAccount)
         .catch((error) => {
-          console.error(err);
-          showError('Fetching emails failed: ', error);
+          console.error('Failed fetching emails: ', error);
+          showError('Failed fetching emails: ', error);
         });
   }
 
@@ -37,7 +37,7 @@ export default class MailInbox extends Component {
             Inbox Space Used: <span className="highlight">{this.props.inboxSize}KB of {CONSTANTS.TOTAL_INBOX_SIZE}KB  </span>
           </div>
           <div className="options text-right">
-            <button className="mdl-button mdl-js-button mdl-button--icon" title="Fetch appendable data" onClick={this.fetchMails}>
+            <button className="mdl-button mdl-js-button mdl-button--icon" title="Fetch emails" onClick={this.fetchMails}>
               <i className="material-icons">refresh</i>
             </button>
           </div>
