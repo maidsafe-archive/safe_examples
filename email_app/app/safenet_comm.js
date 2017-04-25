@@ -3,7 +3,6 @@ import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genRandomEntryKey,
           genKeyPair, encrypt, decrypt, genServiceInfo } from './utils/app_utils';
 import pkg from '../package.json';
-import { receiveResponse } from './actions/initializer_actions';
 
 const APP_INFO = {
   info: {
@@ -30,15 +29,16 @@ const requestAuth = () => {
 export const authApp = () => {
   if (process.env.SAFE_FAKE_AUTH) {
     return initializeApp(APP_INFO.info)
-        .then((app) => app.auth.loginForTest(APP_INFO.permissions))
+        .then((app) => app.auth.loginForTest(APP_INFO.permissions));
   }
 
   let uri = getAuthData();
   if (uri) {
     return fromAuthURI(APP_INFO.info, uri)
       .then((registered_app) => registered_app.auth.refreshContainerAccess()
-        .then(() => registered_app, (err) => {
-          console.warn("Auth URI stored is not valid anymore, app needs to be authorised again: ", err);
+        .then(() => registered_app)
+        .catch((err) => {
+          console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
           clearAuthData();
           return requestAuth();
         })

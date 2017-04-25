@@ -5,7 +5,6 @@ import { CONSTANTS } from '../constants';
 import sodium from 'libsodium-wrappers';
 
 export const getAuthData = () => {
-  clearAuthData(); //FIXME: remove this when authenticator returns a valid response when re-authorising the app
   let authData = window.JSON.parse(
     window.localStorage.getItem(CONSTANTS.LOCAL_AUTH_DATA_KEY)
   );

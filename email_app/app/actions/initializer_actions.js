@@ -23,27 +23,17 @@ export const receiveResponse = (uri) => {
   };
 };
 
-var actionResolver;
-var actionRejecter;
-const actionPromise = new Promise((resolve, reject) => {
-  actionResolver = resolve;
-  actionRejecter = reject;
-});
-
 export const authoriseApplication = () => {
   return function (dispatch) {
-    dispatch({
+    return dispatch({
       type: ACTION_TYPES.AUTHORISE_APP,
-      payload: actionPromise
-    });
-
-    if (process.env.SAFE_FAKE_AUTH) {
-      return authApp()
-          .then(actionResolver)
-          .catch(actionRejecter);
-    }
-
-    return authApp();
+      payload: new Promise((resolve, reject) => {
+        authApp()
+          .then(resolve)
+          .catch(reject);
+      })
+    })
+    .catch(_ => {});
   };
 };
 
