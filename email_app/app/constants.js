@@ -37,6 +37,7 @@ export const MESSAGES = {
   },
   EMAIL_ALREADY_TAKEN: 'Email ID already taken. Please try again',
   EMAIL_ID_TOO_LONG: 'Email ID is too long',
+  EMAIL_ID_NOT_FOUND: 'Email ID not found on the network',
   AUTHORISATION_ERROR: 'Failed to authorise',
   CHECK_CONFIGURATION_ERROR: 'Failed to retrieve configuration'
 };

@@ -18,16 +18,19 @@ export const saveAuthData = (authData) => {
 };
 
 export const clearAuthData = () => {
-  window.localStorage.clear();
+  window.localStorage.removeItem(CONSTANTS.LOCAL_AUTH_DATA_KEY);
 };
 
 export const genServiceInfo = (emailId) => {
   // It supports complex email IDs, e.g. 'emailA.myshop', 'emailB.myshop'
-  let toParts = emailId.split('.');
+  let str = emailId.replace(/\.+$/, '');
+  let toParts = str.split('.');
   const publicId = toParts.pop();
-  const serviceName = toParts.join('.') + CONSTANTS.SERVICE_NAME_POSTFIX;
+  const serviceId =  str.slice(0, -1 * (publicId.length+1));
+  emailId = (serviceId.length > 0 ? (serviceId + '.') : '') + publicId;
+  const serviceName = serviceId + CONSTANTS.SERVICE_NAME_POSTFIX;
   const serviceAddr = hashPublicId(publicId);
-  return {publicId, serviceAddr, serviceName};
+  return {emailId, publicId, serviceAddr, serviceName};
 }
 
 export const hashPublicId = publicId => {

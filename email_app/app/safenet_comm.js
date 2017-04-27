@@ -1,4 +1,4 @@
-import { CONSTANTS } from './constants';
+import { CONSTANTS, MESSAGES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genRandomEntryKey,
           genKeyPair, encrypt, decrypt, genServiceInfo } from './utils/app_utils';
@@ -177,7 +177,7 @@ export const setupAccount = (app, emailId) => {
   return createInbox(app, key_pair.publicKey)
       .then((md) => inbox = md)
       .then(() => createArchive(app))
-      .then((md) => newAccount = {id: emailId, inbox_md: inbox, archive_md: md,
+      .then((md) => newAccount = {id: serviceInfo.emailId, inbox_md: inbox, archive_md: md,
                     enc_sk: key_pair.privateKey, enc_pk: key_pair.publicKey})
       .then(() => newAccount.inbox_md.serialise())
       .then((md_serialised) => inbox_serialised = md_serialised)
@@ -210,6 +210,7 @@ export const storeEmail = (app, email, to) => {
   let serviceInfo = genServiceInfo(to);
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
       .then((md) => md.get(serviceInfo.serviceName))
+      .catch((err) => {throw MESSAGES.EMAIL_ID_NOT_FOUND})
       .then((service) => app.mutableData.fromSerial(service.buf))
       .then((inbox_md) => inbox_md.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY)
         .then((pk) => writeEmailContent(app, email, pk.buf.toString())
