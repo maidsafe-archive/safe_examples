@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shankar2105/safe_mail_app.git"
+    "url": "git+https://github.com/maidsafe/safe_examples.git"
   },
   "author": {
     "name": "MaidSafe",
@@ -37,12 +37,12 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shankar2105/safe_mail_app/issues"
+    "url": "https://github.com/maidsafe/safe_examples/issues"
   },
   "keywords": [
     "maidsafe"
   ],
-  "homepage": "https://github.com/shankar2105/safe_mail_app#readme",
+  "homepage": "https://github.com/maidsafe/safe_examples/blob/master/email_app/README.md",
   "devDependencies": {
     "asar": "^0.12.2",
     "babel-core": "^6.14.0",
