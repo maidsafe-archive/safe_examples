@@ -1,19 +1,20 @@
-import React, { Component, PropTypes } from 'react';
-import { hashEmailId } from '../utils/app_utils';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { MESSAGES, CONSTANTS } from '../constants';
 
 export default class CreateAccount extends Component {
-  static propTypes = {
-  };
-
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   constructor() {
     super();
     this.errMrg = null;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
+    this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
+  }
+
+  storeCreatedAccount() {
+    const { newAccount, storeNewAccount, createAccountError } = this.props;
+    return storeNewAccount(newAccount)
+        .then((_) => this.context.router.push('/home'))
+        .catch((e) => createAccountError(new Error(e)));
   }
 
   handleCreateAccount(e) {
@@ -23,12 +24,20 @@ export default class CreateAccount extends Component {
     if (!emailId.trim()) {
       return;
     }
+
     if (emailId.length > CONSTANTS.EMAIL_ID_MAX_LENGTH) {
       return createAccountError(new Error(MESSAGES.EMAIL_ID_TOO_LONG));
     }
+
     return createAccount(emailId)
-        .then(() => this.context.router.push('/home'));
-  }
+        .then(this.storeCreatedAccount)
+        .catch((err) => {
+          if (err.name === 'ERR_DATA_EXISTS') {
+            return createAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
+          }
+          return createAccountError(err);
+        });
+  };
 
   render() {
     const { processing, error } = this.props;
@@ -55,3 +64,7 @@ export default class CreateAccount extends Component {
     );
   }
 }
+
+CreateAccount.contextTypes = {
+  router: PropTypes.object.isRequired
+};

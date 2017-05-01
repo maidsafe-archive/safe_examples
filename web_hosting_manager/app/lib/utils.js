@@ -82,7 +82,7 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback) => {
   let stat;
   let tempPath;
   const taskQueue = callback instanceof TaskQueue ? callback : new TaskQueue(callback);
-  taskQueue.add(new Task.DirCreationTask(`${networkPath}/${path.basename(localPath)}`));
+  const nextDir = `${networkPath}/${path.basename(localPath)}`;
   const contents = fs.readdirSync(localPath);
   for (let i = 0; i < contents.length; i += 1) {
     if (!contents[i]) {
@@ -91,9 +91,9 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback) => {
     tempPath = `${localPath}/${contents[i]}`;
     stat = fs.statSync(tempPath);
     if (stat.isDirectory()) {
-      generateUploadTaskQueue(tempPath, networkPath, taskQueue);
+      generateUploadTaskQueue(tempPath, nextDir, taskQueue);
     } else {
-      taskQueue.add(new Task.FileUploadTask(tempPath, `${networkPath}/${path.basename(localPath)}/${contents[i]}`));
+      taskQueue.add(new Task.FileUploadTask(tempPath, `${nextDir}/${contents[i]}`));
     }
   }
   return taskQueue;
@@ -111,18 +111,6 @@ export const strToPtrBuf = (str) => {
 export const randomStr = () => (
   crypto.randomBytes(50).toString('hex')
 );
-
-export const parseConatinerPath = (targetPath) => {
-  if (!targetPath) {
-    return null;
-  }
-  return {
-    path: targetPath,
-    dir: path.dirname(targetPath),
-    file: path.basename(targetPath),
-    ext: path.extname(targetPath)
-  };
-};
 
 export const parseUrl = (url) => (
   (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url

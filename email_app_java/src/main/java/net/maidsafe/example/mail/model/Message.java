@@ -1,4 +1,4 @@
-package net.maidsafe.example.mail.modal;
+package net.maidsafe.example.mail.model;
 
 import java.util.Date;
 

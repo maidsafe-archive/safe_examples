@@ -1,4 +1,4 @@
-package net.maidsafe.example.mail.modal;
+package net.maidsafe.example.mail.model;
 
 /**
  * The information needed by the application to bootstrap is stored in the config file

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
-import { setMailProcessing, clearMailProcessing, setActiveMail, clearInbox } from '../actions/mail_actions';
+import { refreshInbox, clearMailProcessing, deleteInboxEmail, saveEmail } from '../actions/mail_actions';
+import { refreshEmail } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
   return {
@@ -8,6 +9,7 @@ const mapStateToProps = state => {
     error: state.mail.error,
     coreData: state.initializer.coreData,
     inboxSize: state.initializer.inboxSize,
+    savedSize: state.initializer.savedSize,
     app: state.initializer.app,
     accounts: state.initializer.accounts
   };
@@ -15,10 +17,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setMailProcessing: () => (dispatch(setMailProcessing())),
+    refreshEmail: (account) => (dispatch(refreshEmail(account))),
+    deleteInboxEmail: (account, key) => (dispatch(deleteInboxEmail(account, key))),
     clearMailProcessing: () => (dispatch(clearMailProcessing())),
-    setActiveMail: data => (dispatch(setActiveMail(data))),
-    clearInbox: _ => (dispatch(clearInbox())),
+    saveEmail: (account, key) => (dispatch(saveEmail(account, key)))
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(MailInbox);

@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import ComposeMail from '../components/compose_mail';
-import { cancelCompose, setMailProcessing, clearMailProcessing } from '../actions/mail_actions';
+import { cancelCompose, sendEmail, clearMailProcessing } from '../actions/mail_actions';
 
 const mapStateToProps = state => {
   return {
-    token: state.initializer.token,
+    app: state.initializer.app,
     fromMail: state.initializer.coreData.id,
     error: state.mail.error,
     processing: state.mail.processing
@@ -13,9 +13,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setMailProcessing: _ => (dispatch(setMailProcessing())),
+    sendEmail: (email, to) => (dispatch(sendEmail(email, to))),
     clearMailProcessing: _ => (dispatch(clearMailProcessing())),
-    cancelCompose: _ => dispatch(cancelCompose()),
+    cancelCompose: _ => dispatch(cancelCompose())
   };
 };
 

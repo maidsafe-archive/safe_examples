@@ -1,65 +1,81 @@
-import { initializeApp, fromAuthURI } from 'safe-app';
-
 import ACTION_TYPES from './actionTypes';
-
-var authResolver;
-var authRejecter;
-const authPromise = () => new Promise((resolve, reject) => {
-  authResolver = resolve;
-  authRejecter = reject;
-});
+import { authApp, connect, readConfig, writeConfig,
+                    readInboxEmails, readArchivedEmails } from '../safenet_comm';
 
 export const setInitializerTask = (task) => ({
   type: ACTION_TYPES.SET_INITIALIZER_TASK,
   task
 });
 
-export const receiveResponse = (uri) => {
+export const onAuthFailure = (err) => {
   return {
     type: ACTION_TYPES.AUTHORISE_APP,
-    payload: fromAuthURI(uri)
-      .then((app) =>  authResolver ? authResolver(app) : app)
-  }
+    payload: Promise.reject(err)
+  };
 };
 
-export const authoriseApplication = (appInfo, permissions, opts) => {
-
+export const receiveResponse = (uri) => {
   return function (dispatch) {
-    dispatch({
+    return dispatch({
       type: ACTION_TYPES.AUTHORISE_APP,
-      payload: authPromise()
+      payload: connect(uri)
     });
+  };
+};
 
-    return initializeApp(appInfo)
-      .then((app) =>
-        process.env.SAFE_FAKE_AUTH
-          ? app.auth.loginForTest(permissions, opts)
-              .then(app => authResolver(app))
-          : app.auth.genAuthUri(permissions, opts)
-              .then(resp => app.auth.openUri(resp.uri))
-      ).catch(authRejecter);
-
+export const authoriseApplication = () => {
+  return function (dispatch) {
+    return dispatch({
+      type: ACTION_TYPES.AUTHORISE_APP,
+      payload: new Promise((resolve, reject) => {
+        authApp()
+          .then(resolve)
+          .catch(reject);
+      })
+    })
+    .catch(_ => {});
   };
 };
 
 export const refreshConfig = () => {
-
   return function (dispatch, getState) {
-    dispatch({
-      type: ACTION_TYPES.GET_CONFIG,
-      payload: authPromise()
-    });
-
-    let accounts = {};
     let app = getState().initializer.app;
-    return app.auth.refreshContainerAccess()
-        .then(() => app.auth.getHomeContainer())
-        .then((mdata) => mdata.getEntries()
-          .then((entries) => entries.forEach((name, valV) => {
-              accounts[name.toString()] = valV.buf.toString();
-            })
-            .then(() => authResolver(accounts))
-          )
-        ).catch(authRejecter);
+    return dispatch({
+      type: ACTION_TYPES.GET_CONFIG,
+      payload: readConfig(app)
+    });
+  };
+};
+
+export const storeNewAccount = (account) => {
+  return function (dispatch, getState) {
+    let app = getState().initializer.app;
+    return dispatch({
+      type: ACTION_TYPES.STORE_NEW_ACCOUNT,
+      payload: writeConfig(app, account)
+    });
+  };
+};
+
+export const refreshEmail = (account) => {
+  return function (dispatch, getState) {
+    let app = getState().initializer.app;
+    return dispatch({
+      type: ACTION_TYPES.REFRESH_EMAIL,
+      payload: readInboxEmails(app, account,
+                    (inboxEntry) => {
+                      dispatch({
+                        type: ACTION_TYPES.PUSH_TO_INBOX,
+                        payload: inboxEntry
+                      });
+                })
+                .then(() => readArchivedEmails(app, account,
+                    (archiveEntry) => {
+                      dispatch({
+                        type: ACTION_TYPES.PUSH_TO_ARCHIVE,
+                        payload: archiveEntry
+                      });
+                }))
+    });
   };
 };

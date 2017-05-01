@@ -1,13 +1,14 @@
 import { connect } from 'react-redux';
 import Initializer from '../components/initializer';
-import { setInitializerTask, authoriseApplication, refreshConfig } from '../actions/initializer_actions';
+import { setInitializerTask, authoriseApplication,
+          refreshConfig, refreshEmail } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
   return {
+    app_status: state.initializer.app_status,
     app: state.initializer.app,
     accounts: state.initializer.accounts,
     tasks: state.initializer.tasks,
-    config: state.initializer.config,
     coreData: state.initializer.coreData
   };
 };
@@ -15,9 +16,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     setInitializerTask: task => (dispatch(setInitializerTask(task))),
-    authoriseApplication: (appInfo, permissions, opts) =>
-                    (dispatch(authoriseApplication(appInfo, permissions, opts))),
-    refreshConfig: () => (dispatch(refreshConfig()))
+    authoriseApplication: () => (dispatch(authoriseApplication())),
+    refreshConfig: () => (dispatch(refreshConfig())),
+    refreshEmail: (account) => (dispatch(refreshEmail(account)))
   };
 };
 

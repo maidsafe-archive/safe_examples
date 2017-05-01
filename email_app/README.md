@@ -64,3 +64,9 @@ To package apps with options:
 ```bash
 $ npm run package -- --[option]
 ```
+
+## Application Data Model
+
+The following diagram depicts how the emails are stored in the SAFE network, as well as how the email app stores email accounts information.
+
+![Email App Data Model](./design/EmailApp-DataModel.png)

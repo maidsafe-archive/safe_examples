@@ -1,55 +1,51 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { remote } from 'electron';
-import { CONSTANTS, AUTH_PAYLOAD, MESSAGES } from '../constants';
+import { showError } from '../utils/app_utils';
+import { MESSAGES, APP_STATUS } from '../constants';
 
-const showDialog = (title, message) => {
-  remote.dialog.showMessageBox({
-    type: 'error',
-    buttons: ['Ok'],
-    title,
-    message
-  }, _ => { remote.getCurrentWindow().close(); });
-};
+const showAuthError = _ => showError('Authorisation failed',
+                                        MESSAGES.AUTHORISATION_ERROR,
+                                        _ => { remote.getCurrentWindow().close(); });
 
 export default class Initializer extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   constructor() {
     super();
-    this.checkConfiguration = this.checkConfiguration.bind(this);
+    this.refreshConfig = this.refreshConfig.bind(this);
   }
 
   componentDidMount() {
-    this.props.authoriseApplication(AUTH_PAYLOAD, {"_publicNames" : ["Insert"]})
-      .then((_) => this.checkConfiguration())
-      .catch((err) => {
-        console.error(err)
-        return showDialog('Authorisation Error', MESSAGES.AUTHORISATION_ERROR);
-      });
+    const { setInitializerTask, authoriseApplication } = this.props;
+    setInitializerTask(MESSAGES.INITIALIZE.AUTHORISE_APP);
+
+    return authoriseApplication();
   }
 
-  checkConfiguration() {
-    const { app, refreshConfig } = this.props;
-    if (!app) {
-      throw new Error('Application client not found.');
-    }
-
+  refreshConfig() {
+    const { setInitializerTask, refreshConfig } = this.props;
+    setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
     return refreshConfig()
         .then((_) => {
           if (Object.keys(this.props.accounts).length > 0) {
             return this.context.router.push('/home');
-          } else {
-            return this.context.router.push('/create_account');
           }
+          showAuthError();
         })
-        .catch((err) => {
-          console.error(err)
-          return showDialog('Error fetching configuration', MESSAGES.CHECK_CONFIGURATION_ERROR);
+        .catch((_) => {
+          console.log("No email account found");
+          return this.context.router.push('/create_account');
         });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { app_status, app } = this.props;
+    if (prevProps.app_status === APP_STATUS.AUTHORISING
+        && app_status === APP_STATUS.AUTHORISATION_FAILED) {
+      showAuthError();
+    } else if (app && app_status === APP_STATUS.AUTHORISED) {
+      return this.refreshConfig();
+    }
+  }
 
   render() {
     const { tasks } = this.props;
@@ -70,3 +66,7 @@ export default class Initializer extends Component {
     );
   }
 }
+
+Initializer.contextTypes = {
+  router: PropTypes.object.isRequired
+};
