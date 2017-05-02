@@ -11,8 +11,10 @@ const sendResponse = (res) => {
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    show: false,
+    resizable: false,
+    width: 1024,
+    height: 728
   });
 
   // and load the index.html of the app.
@@ -27,6 +29,11 @@ const createWindow = () => {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.show();
+    mainWindow.focus();
   });
 
   const shouldQuit = app.makeSingleInstance(function(commandLine) {
