@@ -1,7 +1,8 @@
+import { shell } from 'electron';
 import { CONSTANTS, MESSAGES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genRandomEntryKey,
-          genKeyPair, encrypt, decrypt, genServiceInfo } from './utils/app_utils';
+         genKeyPair, encrypt, decrypt, genServiceInfo, deserialiseArray, parseUrl } from './utils/app_utils';
 import pkg from '../package.json';
 
 const APP_INFO = {
@@ -14,6 +15,9 @@ const APP_INFO = {
   opts: {
     own_container: true
   },
+  containers: {
+    publicNames: '_publicNames'
+  },
   permissions: {
     _publicNames: ['Read', 'Insert', 'Update']
   }
@@ -22,7 +26,10 @@ const APP_INFO = {
 const requestAuth = () => {
   return initializeApp(APP_INFO.info)
     .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
-      .then((resp) => app.auth.openUri(resp.uri))
+      .then((resp) => {
+        shell.openExternal(parseUrl(resp.uri));
+        return null;
+      })
     );
 }
 
@@ -37,29 +44,29 @@ export const authApp = () => {
     return fromAuthURI(APP_INFO.info, uri)
       .then((registered_app) => registered_app.auth.refreshContainerAccess()
         .then(() => registered_app)
-        .catch((err) => {
-          console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
-          clearAuthData();
-          return requestAuth();
-        })
-      );
+      )
+      .catch((err) => {
+        console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
+        clearAuthData();
+        return requestAuth();
+      });
   }
 
   return requestAuth();
 }
 
 export const connect = (uri) => {
+  let registered_app;
   return fromAuthURI(APP_INFO.info, uri)
-          .then((app) => {
-            saveAuthData(uri);
-            return app;
-          });
+          .then((app) => registered_app = app)
+          .then(() => saveAuthData(uri))
+          .then(() => registered_app.auth.refreshContainerAccess())
+          .then(() => registered_app);
 }
 
 export const readConfig = (app) => {
   let account = {};
-  return app.auth.refreshContainerAccess()
-      .then(() => app.auth.getHomeContainer())
+  return app.auth.getHomeContainer()
       .then((md) => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_INBOX).then((key) => md.get(key))
         .then((value) => app.mutableData.fromSerial(value.buf))
         .then((inbox_md) => account.inbox_md = inbox_md)
@@ -83,7 +90,6 @@ export const writeConfig = (app, account) => {
       .then((serial) => serialised_inbox = serial)
       .then(() => account.archive_md.serialise())
       .then((serial) => serialised_archive = serial)
-      .then(() => app.auth.refreshContainerAccess())
       .then(() => app.auth.getHomeContainer())
       .then((md) => app.mutableData.newMutation()
         .then((mut) => mut.insert(CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_inbox)
@@ -102,7 +108,7 @@ export const readInboxEmails = (app, account, cb) => {
           if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY
               && value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
             let entry_value = decrypt(value.buf.toString(), account.enc_sk, account.enc_pk);
-            return app.immutableData.fetch(Buffer.from(entry_value, 'hex'))
+            return app.immutableData.fetch(deserialiseArray(entry_value))
               .then((immData) => immData.read())
               .then((content) => {
                 let decryptedEmail;
@@ -117,8 +123,9 @@ export const readInboxEmails = (app, account, cb) => {
 export const readArchivedEmails = (app, account, cb) => {
   return account.archive_md.getEntries()
       .then((entries) => entries.forEach((key, value) => {
-          if (value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-            return app.immutableData.fetch(value.buf)
+        let emailAddr = value.buf.toString();
+          if (emailAddr.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
+            return app.immutableData.fetch(deserialiseArray(emailAddr))
               .then((immData) => immData.read())
               .then((content) => {
                 let decryptedEmail;
@@ -181,8 +188,7 @@ export const setupAccount = (app, emailId) => {
                     enc_sk: key_pair.privateKey, enc_pk: key_pair.publicKey})
       .then(() => newAccount.inbox_md.serialise())
       .then((md_serialised) => inbox_serialised = md_serialised)
-      .then(() => app.auth.refreshContainerAccess())
-      .then(() => app.auth.getAccessContainerInfo('_publicNames'))
+      .then(() => app.auth.getAccessContainerInfo(APP_INFO.containers.publicNames))
       .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId)
         .then((encrypted_publicId) => pub_names_md.get(encrypted_publicId))
         .then((services) => addService(app, serviceInfo, inbox_serialised)
@@ -216,8 +222,8 @@ export const storeEmail = (app, email, to) => {
         .then((pk) => writeEmailContent(app, email, pk.buf.toString())
           .then((email_addr) => app.mutableData.newMutation()
             .then((mut) => {
-              let entry_value = encrypt(email_addr.buffer.toString('hex'), pk.buf.toString());
               let entry_key = genRandomEntryKey();
+              let entry_value = encrypt(email_addr.toString(), pk.buf.toString());
               return mut.insert(entry_key, entry_value)
                 .then(() => inbox_md.applyEntriesMutation(mut))
             })
@@ -243,7 +249,6 @@ export const archiveEmail = (app, account, key) => {
   let new_entry_key = genRandomEntryKey();
   return account.inbox_md.get(key)
       .then((encryptedEmailXorName) => decrypt(encryptedEmailXorName.buf.toString(), account.enc_sk, account.enc_pk))
-      .then((decrytedXorNameHex) => Buffer.from(decrytedXorNameHex, 'hex'))
       .then((xorName) => app.mutableData.newMutation()
         .then((mut) => mut.insert(new_entry_key, xorName)
           .then(() => account.archive_md.applyEntriesMutation(mut))
