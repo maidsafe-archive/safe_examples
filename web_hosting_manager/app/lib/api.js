@@ -174,7 +174,7 @@ export const createPublicId = (publicId) => {
         .then(() => permissionSet.setAllow('Update'))
         .then(() => permissionSet.setAllow('Delete'))
         .then(() => permissionSet.setAllow('ManagePermissions'))
-        .then(() => safe.auth.getPubSignKey())
+        .then(() => safe.crypto.getAppPubSignKey())
         .then((signKey) => (pubSignKey = signKey))
         .then(() => safe.mutableData.newPermissions())
         .then((perm) => (permissions = perm))
