@@ -11,8 +11,7 @@
     "react": "^15.3.2",
     "react-diff": "0.0.7",
     "react-dom": "^15.3.2",
-    "react-md-editor": "^0.2.2",
-    "safe-js": "^0.2.4"
+    "react-md-editor": "^0.2.2"
   },
   "scripts": {
     "start": "react-scripts start",

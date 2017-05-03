@@ -6,7 +6,7 @@ import '../../node_modules/codemirror/lib/codemirror.css';
 import '../../node_modules/react-md-editor/dist/react-md-editor.css';
 require(`../../node_modules/codemirror/theme/${EDITOR_THEME}.css`);
 
-import { saveFile, readFile, getSDVersions } from '../store';
+import { saveFile, readFile, getFileVersions } from '../store';
 
 export default class ManagedEditor extends Component {
 
@@ -18,13 +18,10 @@ export default class ManagedEditor extends Component {
 
     this.state = {
       code: `# ${APP_NAME}
-
 * A list
 * with
 * some items
-
 Some **bold** and _italic_ text
-
 > A quote...`,
       versions: []
     };
@@ -43,7 +40,7 @@ Some **bold** and _italic_ text
     this.props.toggleSpinner(); // set spinner
     return readFile(this.props.filename)
       .then(res => {
-        this.setState({ code: JSON.parse(res.toString()).content });
+        this.setState({ code: res.slice(-1)[0].content });
         this.props.toggleSpinner(); // remove spinner
       })
       .then(() => this.getVersions());
@@ -51,7 +48,7 @@ Some **bold** and _italic_ text
 
   isContentUpdated() {
     return !(this.state.versions.length !== 0 &&
-      JSON.parse((this.state.versions.slice(-1)[0]).toString()).content.trim() === this.state.code.trim())
+    this.state.versions.slice(-1)[0].content.trim() === this.state.code.trim())
   }
 
   saveFile() {
@@ -78,7 +75,7 @@ Some **bold** and _italic_ text
 
   getVersions() {
     this.props.toggleSpinner(); // set spinner
-    return getSDVersions(this.props.filename)
+    return getFileVersions(this.props.filename)
       .then(res => {
         this.props.toggleSpinner(); // remove spinner
         this.setState({ versions: res })
@@ -86,7 +83,7 @@ Some **bold** and _italic_ text
   }
 
   download() {
-    const content = JSON.parse(this.state.versions.slice(-1)[0]).content;
+    const content = this.state.versions.slice(-1)[0].content;
     const a = document.createElement('a');
     a.download = this.props.filename + '.md';
     a.href = "data:text/markdown;charset=utf8;base64," + new Buffer(content).toString('base64');
