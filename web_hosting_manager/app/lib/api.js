@@ -6,7 +6,7 @@ import Downloader from './Downloader';
 import { I18n } from 'react-redux-i18n';
 import safeApp from 'safe-app';
 import pkg from '../package.json';
-import { hashString, strToPtrBuf, parseUrl } from './utils';
+import { parseUrl } from './utils';
 
 const SERVICE = 'WEB_HOST_MANAGER';
 const ACCOUNT = 'SAFE_USER';
@@ -43,7 +43,7 @@ export const accessContainers = {
   publicNames: '_publicNames'
 };
 
-export const typetag = 1500;
+export const typetag = 15001;
 
 let publicIds = {};
 let uploader;
@@ -159,10 +159,10 @@ export const createPublicId = (publicId) => {
     const err = new Error(I18n.t('messages.cannotBeEmpty', { name: 'Public Id' }));
     return Promise.reject(err);
   }
-  let hashedPubId = hashString(publicId);
   let publicIdName = null;
 
-  return safe.mutableData.newPublic(hashedPubId, typetag)
+  return safe.crypto.sha3Hash(publicId)
+    .then((hashVal) => safe.mutableData.newPublic(hashVal, typetag))
     .then((mdata) => {
       let permissionSet = null;
       let permissions = null;
@@ -213,7 +213,8 @@ export const createService = (publicId, service, container) => {
 };
 
 export const deleteService = (publicId, service) => {
-  return safe.mutableData.newPublic(hashString(publicId), typetag)
+  return safe.crypto.sha3Hash(publicId)
+    .then((hashVal) => safe.mutableData.newPublic(hashVal, typetag))
     .then((mdata) => mdata.getEntries()
       .then((entries) => entries.get(service)
         .then((val) => entries.mutate()

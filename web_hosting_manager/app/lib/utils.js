@@ -99,10 +99,6 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback) => {
   return taskQueue;
 };
 
-export const hashString = (str) => (
-  crypto.createHash('sha256').update(str).digest()
-);
-
 export const strToPtrBuf = (str) => {
   const buf = new Buffer(str);
   return { ptr: buf, len: buf.length };
