@@ -121,7 +121,7 @@ const _createMdata = () => {
         .then(() => window.safeMutableDataPermissionsSet.setAllow(ACCESS_TOKEN, permSetHandle, 'Update'))
         .then(() => window.safeMutableDataPermissionsSet.setAllow(ACCESS_TOKEN, permSetHandle, 'Delete'))
         .then(() => window.safeMutableDataPermissionsSet.setAllow(ACCESS_TOKEN, permSetHandle, 'ManagePermissions'))
-        .then(() => window.crypto.getAppPubSignKey(ACCESS_TOKEN))
+        .then(() => window.safeCrypto.getAppPubSignKey(ACCESS_TOKEN))
         .then((signKey) => (pubSignKeyHandle = signKey))
         .then(() => window.safeMutableData.newPermissions(ACCESS_TOKEN))
         .then((perm) => (permHandle = perm))
