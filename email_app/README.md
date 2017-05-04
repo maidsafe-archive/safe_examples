@@ -1,14 +1,16 @@
 # Safe Mail Tutorial Application
 
-The tutorial app show cases how to use the low level API from launcher to
-build a simple email application.
+The tutorial app show cases how to use the low level API from `safe_app_nodejs`
+library to build a simple email application.
 
-Demonstrates the usage of
- - Private AppendableData
- - StructuredData
+Demonstrates the usage of:
+ - Private MutableData
+ - Public MutableData
  - Immutable data
+ - App's home container
+ - `_publicNames` and services containers
 
-Requires [safe_launcher](https://github.com/maidsafe/safe_launcher) version 0.9.1
+Please refer to the [Application Data Model](#application-data-model) section below for additional details.
 
 ## Install
 

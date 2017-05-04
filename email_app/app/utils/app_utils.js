@@ -59,6 +59,15 @@ export const showSuccess = (title, message) => {
   }, _ => {});
 };
 
+export const parseUrl = (url) => (
+  (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
+);
+
+export const deserialiseArray = (str) => {
+  let arrItems = str.split(',');
+  return Uint8Array.from(arrItems);
+}
+
 export const genKeyPair = () => {
   let {keyType, privateKey, publicKey} = sodium.crypto_box_keypair('hex');
   return {privateKey, publicKey};
