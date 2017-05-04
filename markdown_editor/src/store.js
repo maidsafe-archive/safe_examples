@@ -1,6 +1,5 @@
 /* global btoa, safeAuth, safeNFS safeCipherOpts, safeStructuredData, safeDataId */
-import crypto from 'crypto';
-import { APP_ID, APP_INFO, CONTAINERS, TYPE_TAG } from './config.js';
+import { APP_INFO, APP_INFO_OPTS, CONTAINERS } from './config.js';
 
 const requiredWindowObj = [
   'safeApp',
@@ -19,12 +18,13 @@ requiredWindowObj.forEach((obj) => {
   }
 });
 
-const INDEX_FILE_NAME = crypto.createHash('sha256').update(`${window.location.host}-${APP_ID}`).digest('hex');
 const RES_URI_KEY = 'SAFE_RES_URI';
+const FILE_INDEX_KEY = 'FILE_INDEX';
 
 // global access state
 let ACCESS_TOKEN;
 let FILE_INDEX;
+let HOME_CONTAINER_HANDLE;
 
 /**
  * Save response URI to local storage
@@ -76,6 +76,15 @@ const _prepareFile = (oldData, newData) => {
   return new Buffer(JSON.stringify(oldData));
 };
 
+const _getHomeContainer = () => {
+  if (HOME_CONTAINER_HANDLE) {
+    return Promise.resolve(HOME_CONTAINER_HANDLE);
+  }
+  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+    .then((mdata) => (HOME_CONTAINER_HANDLE = mdata))
+    .then(() => HOME_CONTAINER_HANDLE);
+};
+
 /**
  * Connect to safe network with response URI from Authenticator
  * @param token
@@ -98,45 +107,6 @@ const _fetchAccessInfo = () => {
         throw new Error('Cannot access PUBLIC Container');
       }
       return true;
-    });
-};
-
-/**
- * Creates the core mutable data (private) for the application.
- * This holds `FILE_INDEX` key which act as the index for files stored.
- * This mutable data has permission to - Insert, Update, Delete, ManagePermissions.
- * @private
- */
-const _createMdata = () => {
-  FILE_INDEX = {};
-  return window.safeMutableData.newRandomPrivate(ACCESS_TOKEN, TYPE_TAG)
-    .then((mdata) => {
-      let permSetHandle = null;
-      let pubSignKeyHandle = null;
-      let permHandle = null;
-
-      return window.safeMutableData.newPermissionSet(ACCESS_TOKEN)
-        .then((permSet) => (permSetHandle = permSet))
-        .then(() => window.safeMutableDataPermissionsSet.setAllow(ACCESS_TOKEN, permSetHandle, 'Insert'))
-        .then(() => window.safeMutableDataPermissionsSet.setAllow(ACCESS_TOKEN, permSetHandle, 'Update'))
-        .then(() => window.safeMutableDataPermissionsSet.setAllow(ACCESS_TOKEN, permSetHandle, 'Delete'))
-        .then(() => window.safeMutableDataPermissionsSet.setAllow(ACCESS_TOKEN, permSetHandle, 'ManagePermissions'))
-        .then(() => window.safeCrypto.getAppPubSignKey(ACCESS_TOKEN))
-        .then((signKey) => (pubSignKeyHandle = signKey))
-        .then(() => window.safeMutableData.newPermissions(ACCESS_TOKEN))
-        .then((perm) => (permHandle = perm))
-        .then(() => window.safeMutableDataPermissions.insertPermissionsSet(ACCESS_TOKEN, permHandle, pubSignKeyHandle, permSetHandle))
-        .then(() => window.safeMutableData.newEntries(ACCESS_TOKEN))
-        .then((entriesHandle) => window.safeMutableDataEntries.insert(ACCESS_TOKEN, entriesHandle, 'FILE_INDEX', _getBufferedFileIndex())
-          .then(() => window.safeMutableData.put(ACCESS_TOKEN, mdata, permHandle, entriesHandle)))
-        .then(() => window.safeMutableData.serialise(ACCESS_TOKEN, mdata));
-    })
-    .then((serialisedData) => {
-      return window.safeApp.getContainer(ACCESS_TOKEN, '_public')
-        .then((mdata) => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
-          .then((entries) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entries)
-            .then((mut) => window.safeMutableDataMutation.insert(ACCESS_TOKEN, mut, INDEX_FILE_NAME, serialisedData)
-              .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut)))));
     });
 };
 
@@ -168,10 +138,7 @@ const _getFile = (mdata, filename) => {
  * @private
  */
 const _updateFile = (filename, payload) => {
-  return window.safeApp.getContainer(ACCESS_TOKEN, '_public')
-    .then((mdata) => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata))
-    .then((entries) => window.safeMutableDataEntries.get(ACCESS_TOKEN, entries, INDEX_FILE_NAME))
-    .then((value) => window.safeMutableData.fromSerial(ACCESS_TOKEN, value.buf))
+  return _getHomeContainer()
     .then((mdata) => {
       return _getFile(mdata, filename)
         .then((files) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
@@ -186,14 +153,11 @@ const _updateFile = (filename, payload) => {
  * @param version
  */
 export const readFile = (filename, version) => {
-  return window.safeApp.getContainer(ACCESS_TOKEN, '_public')
-    .then((mdata) => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata))
-    .then((entries) => window.safeMutableDataEntries.get(ACCESS_TOKEN, entries, INDEX_FILE_NAME)
-      .then((value) => window.safeMutableData.fromSerial(ACCESS_TOKEN, value.buf)
-        .then((mdata) => _getFile(mdata, filename))
-        .then((file) => {
-          return version ? file.data[version] : file.data
-        })));
+  return _getHomeContainer()
+    .then((mdata) => _getFile(mdata, filename))
+    .then((file) => {
+      return version ? file.data[version] : file.data
+    });
 };
 
 /**
@@ -207,22 +171,19 @@ export const saveFile = (filename, data) => {
     console.log("existing");
     return _updateFile(filename, data);
   } else {
-    return window.safeApp.getContainer(ACCESS_TOKEN, '_public')
-      .then((publicMdHandle) => window.safeMutableData.getEntries(ACCESS_TOKEN, publicMdHandle))
-      .then((entHandle) => window.safeMutableDataEntries.get(ACCESS_TOKEN, entHandle, INDEX_FILE_NAME))
-      .then((value) => window.safeMutableData.fromSerial(ACCESS_TOKEN, value.buf)
-        .then((mdata) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
-          .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile([], data))
-            .then((file) => window.safeNfs.insert(ACCESS_TOKEN, nfs, file, filename)))
-          .then(() => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
-            .then((entriesHandle) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, 'FILE_INDEX')
-              .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
-              .then((val) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle)
-                .then((mut) => {
-                  FILE_INDEX[filename] = 1;
-                  return window.safeMutableDataMutation.update(ACCESS_TOKEN, mut, 'FILE_INDEX', _getBufferedFileIndex(), (parseInt(val.version, 10) + 1))
-                    .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut));
-                }))))));
+    return _getHomeContainer()
+      .then((mdata) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
+        .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile([], data))
+          .then((file) => window.safeNfs.insert(ACCESS_TOKEN, nfs, file, filename)))
+        .then(() => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
+          .then((entriesHandle) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
+            .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
+            .then((val) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle)
+              .then((mut) => {
+                FILE_INDEX[filename] = 1;
+                return window.safeMutableDataMutation.update(ACCESS_TOKEN, mut, FILE_INDEX_KEY, _getBufferedFileIndex(), (parseInt(val.version, 10) + 1))
+                  .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut));
+              })))));
   }
 };
 
@@ -235,28 +196,29 @@ export const getFileVersions = (filename) => {
 };
 
 /**
- * Get index of files or create the core mutable data
- * @return {Promise.<T>}
+ * Get index of files or prepare home container
+ * @return {Promise}
  */
 export const getFileIndex = () => {
   if (FILE_INDEX) return Promise.resolve(FILE_INDEX);
 
-  return window.safeApp.getContainer(ACCESS_TOKEN, '_public')
-    .then((mdata) => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata))
-    .then((entries) => window.safeMutableDataEntries.get(ACCESS_TOKEN, entries, INDEX_FILE_NAME))
-    .then((value) => window.safeMutableData.fromSerial(ACCESS_TOKEN, value.buf)
-      .then((mdata) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, 'FILE_INDEX')
-        .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key)))
+  return _getHomeContainer()
+    .then((mdata) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
+      .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
       .then((fileIndex) => {
         FILE_INDEX = JSON.parse(fileIndex.buf.toString());
         return FILE_INDEX;
       })
-      .catch(console.error)
-    )
-    .catch(() => {
-      console.warn('Creating new record');
-      return _createMdata();
-    });
+      .catch(() => {
+        FILE_INDEX = {};
+        console.warn('Preparing Home container');
+
+        // FIXME: check for exact error condition.
+        return window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
+          .then((entriesHandle) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle))
+          .then((mut) => window.safeMutableDataMutation.insert(ACCESS_TOKEN, mut, FILE_INDEX_KEY, _getBufferedFileIndex())
+            .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut)));
+      }));
 };
 
 /**
@@ -274,7 +236,7 @@ export const authorise = () => {
       if (responseUri) {
         return _connectAuthorised(token, responseUri);
       }
-      return window.safeApp.authorise(token, CONTAINERS)
+      return window.safeApp.authorise(token, CONTAINERS, APP_INFO_OPTS)
         .then((resUri) => {
           _saveResponseUri(resUri);
           return _connectAuthorised(token, resUri);
