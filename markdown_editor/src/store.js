@@ -24,7 +24,6 @@ const FILE_INDEX_KEY = 'FILE_INDEX';
 // global access state
 let ACCESS_TOKEN;
 let FILE_INDEX;
-let HOME_CONTAINER_HANDLE;
 
 /**
  * Save response URI to local storage
@@ -76,15 +75,6 @@ const _prepareFile = (oldData, newData) => {
   return new Buffer(JSON.stringify(oldData));
 };
 
-const _getHomeContainer = () => {
-  if (HOME_CONTAINER_HANDLE) {
-    return Promise.resolve(HOME_CONTAINER_HANDLE);
-  }
-  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
-    .then((mdata) => (HOME_CONTAINER_HANDLE = mdata))
-    .then(() => HOME_CONTAINER_HANDLE);
-};
-
 /**
  * Connect to safe network with response URI from Authenticator
  * @param token
@@ -96,19 +86,6 @@ const _connectAuthorised = (token, resUri) => {
     .then((token) => (ACCESS_TOKEN = token));
 };
 
-/**
- * Check permission for granted access containers
- * @private
- */
-const _fetchAccessInfo = () => {
-  return window.safeApp.canAccessContainer(ACCESS_TOKEN, '_public')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        throw new Error('Cannot access PUBLIC Container');
-      }
-      return true;
-    });
-};
 
 /**
  * Read file
@@ -138,7 +115,7 @@ const _getFile = (mdata, filename) => {
  * @private
  */
 const _updateFile = (filename, payload) => {
-  return _getHomeContainer()
+  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
     .then((mdata) => {
       return _getFile(mdata, filename)
         .then((files) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
@@ -153,7 +130,7 @@ const _updateFile = (filename, payload) => {
  * @param version
  */
 export const readFile = (filename, version) => {
-  return _getHomeContainer()
+  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
     .then((mdata) => _getFile(mdata, filename))
     .then((file) => {
       return version ? file.data[version] : file.data
@@ -171,7 +148,7 @@ export const saveFile = (filename, data) => {
     console.log("existing");
     return _updateFile(filename, data);
   } else {
-    return _getHomeContainer()
+    return window.safeApp.getHomeContainer(ACCESS_TOKEN)
       .then((mdata) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
         .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile([], data))
           .then((file) => window.safeNfs.insert(ACCESS_TOKEN, nfs, file, filename)))
@@ -202,7 +179,7 @@ export const getFileVersions = (filename) => {
 export const getFileIndex = () => {
   if (FILE_INDEX) return Promise.resolve(FILE_INDEX);
 
-  return _getHomeContainer()
+  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
     .then((mdata) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
       .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
       .then((fileIndex) => {
@@ -241,6 +218,5 @@ export const authorise = () => {
           _saveResponseUri(resUri);
           return _connectAuthorised(token, resUri);
         });
-    })
-    .then(() => _fetchAccessInfo());
+    });
 };

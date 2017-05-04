@@ -42,7 +42,7 @@ export default class App extends Component {
 
   render() {
 
-    let sub = <div className="info"><p>Please authorise the app in Launcher.</p></div>;
+    let sub = <div className="info"><p>Please authorise the app in Authenticator.</p></div>;
     if (this.state.authorised) {
       if (this.state.selectedFile) {
         sub = <ManagedEditor
