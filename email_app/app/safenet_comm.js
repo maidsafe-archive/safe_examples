@@ -68,19 +68,26 @@ export const readConfig = (app) => {
   let account = {};
   return app.auth.getHomeContainer()
       .then((md) => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_INBOX).then((key) => md.get(key))
-        .then((value) => app.mutableData.fromSerial(value.buf))
+        .then((value) => md.decrypt(value.buf).then((decrypted) => app.mutableData.fromSerial(decrypted)))
         .then((inbox_md) => account.inbox_md = inbox_md)
         .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ARCHIVE).then((key) => md.get(key)))
-        .then((value) => app.mutableData.fromSerial(value.buf))
+        .then((value) => md.decrypt(value.buf).then((decrypted) => app.mutableData.fromSerial(decrypted)))
         .then((archive_md) => account.archive_md = archive_md)
         .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ID).then((key) => md.get(key)))
-        .then((value) => account.id = value.buf.toString())
+        .then((value) => md.decrypt(value.buf).then((decrypted) => account.id = decrypted.toString()))
         .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY).then((key) => md.get(key)))
-        .then((value) => account.enc_sk = value.buf.toString())
+        .then((value) => md.decrypt(value.buf).then((decrypted) => account.enc_sk = decrypted.toString()))
         .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY).then((key) => md.get(key)))
-        .then((value) => account.enc_pk = value.buf.toString())
+        .then((value) => md.decrypt(value.buf).then((decrypted) => account.enc_pk = decrypted.toString()))
       )
       .then(() => account);
+}
+
+const insertEncrypted = (md, mut, key, value) => {
+  return md.encryptKey(key)
+      .then((encrypted_key) => md.encryptValue(value)
+        .then((encrypted_value) => mut.insert(encrypted_key, encrypted_value))
+      );
 }
 
 export const writeConfig = (app, account) => {
@@ -92,29 +99,34 @@ export const writeConfig = (app, account) => {
       .then((serial) => serialised_archive = serial)
       .then(() => app.auth.getHomeContainer())
       .then((md) => app.mutableData.newMutation()
-        .then((mut) => mut.insert(CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_inbox)
-          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ARCHIVE, serialised_archive))
-          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ID, account.id))
-          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY, account.enc_sk))
-          .then(() => mut.insert(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY, account.enc_pk))
+        .then((mut) => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_inbox)
+          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ARCHIVE, serialised_archive))
+          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ID, account.id))
+          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY, account.enc_sk))
+          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY, account.enc_pk))
           .then(() => md.applyEntriesMutation(mut))
         ))
       .then(() => account);
 }
 
+const decryptEmail = (app, account, key, value, cb) => {
+  if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
+    let entry_value = decrypt(value, account.enc_sk, account.enc_pk);
+    return app.immutableData.fetch(deserialiseArray(entry_value))
+      .then((immData) => immData.read())
+      .then((content) => {
+        let decryptedEmail;
+        decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
+        cb({ [key]: decryptedEmail });
+      });
+  }
+}
+
 export const readInboxEmails = (app, account, cb) => {
   return account.inbox_md.getEntries()
       .then((entries) => entries.forEach((key, value) => {
-          if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY
-              && value.buf.toString().length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-            let entry_value = decrypt(value.buf.toString(), account.enc_sk, account.enc_pk);
-            return app.immutableData.fetch(deserialiseArray(entry_value))
-              .then((immData) => immData.read())
-              .then((content) => {
-                let decryptedEmail;
-                decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
-                cb({ [key]: decryptedEmail });
-              })
+          if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
+            return decryptEmail(app, account, key, value.buf.toString(), cb);
           }
         })
       );
@@ -123,16 +135,7 @@ export const readInboxEmails = (app, account, cb) => {
 export const readArchivedEmails = (app, account, cb) => {
   return account.archive_md.getEntries()
       .then((entries) => entries.forEach((key, value) => {
-        let emailAddr = value.buf.toString();
-          if (emailAddr.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-            return app.immutableData.fetch(deserialiseArray(emailAddr))
-              .then((immData) => immData.read())
-              .then((content) => {
-                let decryptedEmail;
-                decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
-                cb({ [key]: decryptedEmail });
-              })
-          }
+          return decryptEmail(app, account, key, value.buf.toString(), cb);
         })
       );
 }
@@ -230,27 +233,18 @@ export const storeEmail = (app, email, to) => {
           )));
 }
 
-export const removeInboxEmail = (app, account, key) => {
+export const removeEmail = (app, container, key) => {
   return app.mutableData.newMutation()
       .then((mut) => mut.remove(key, 1)
-        .then(() => account.inbox_md.applyEntriesMutation(mut))
-      )
-}
-
-export const removeArchivedEmail = (app, account, key) => {
-  return app.mutableData.newMutation()
-      .then((mut) => account.archive_md.encryptKey(key)
-        .then((encryptedKey) => mut.remove(encryptedKey, 1))
-        .then(() => account.archive_md.applyEntriesMutation(mut))
+        .then(() => container.applyEntriesMutation(mut))
       )
 }
 
 export const archiveEmail = (app, account, key) => {
   let new_entry_key = genRandomEntryKey();
   return account.inbox_md.get(key)
-      .then((encryptedEmailXorName) => decrypt(encryptedEmailXorName.buf.toString(), account.enc_sk, account.enc_pk))
       .then((xorName) => app.mutableData.newMutation()
-        .then((mut) => mut.insert(new_entry_key, xorName)
+        .then((mut) => mut.insert(new_entry_key, xorName.buf)
           .then(() => account.archive_md.applyEntriesMutation(mut))
         )
       )

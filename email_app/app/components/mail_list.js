@@ -40,8 +40,8 @@ export default class MailList extends Component {
 
   handleDeleteFromInbox(e) {
     e.preventDefault();
-    const { accounts, deleteInboxEmail, refreshEmail } = this.props;
-    deleteInboxEmail(accounts, e.target.dataset.index)
+    const { accounts, deleteEmail, refreshEmail } = this.props;
+    deleteEmail(accounts.inbox_md, e.target.dataset.index)
         .catch((error) => {
           console.error('Failed trying to delete email from inbox: ', error);
           showError('Failed trying to delete email from inbox: ', error);
@@ -51,8 +51,8 @@ export default class MailList extends Component {
 
   handleDeleteSaved(e) {
     e.preventDefault();
-    const { accounts, deleteSavedEmail, refreshEmail } = this.props;
-    deleteSavedEmail(accounts, e.target.dataset.index)
+    const { accounts, deleteEmail, refreshEmail } = this.props;
+    deleteEmail(accounts.archive_md, e.target.dataset.index)
         .catch((error) => {
           console.error('Failed trying to delete saved email: ', error);
           showError('Failed trying to delete saved email: ', error);
