@@ -192,9 +192,8 @@ export const setupAccount = (app, emailId) => {
       .then(() => newAccount.inbox_md.serialise())
       .then((md_serialised) => inbox_serialised = md_serialised)
       .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
-      .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId)
-        .then((encrypted_publicId) => pub_names_md.get(encrypted_publicId))
-        .then((services) => addService(app, serviceInfo, inbox_serialised)
+      .then((pub_names_md) => pub_names_md.get(serviceInfo.publicId)
+        .then((services) => addEmailService(app, serviceInfo, inbox_serialised)
           , (err) => {
             if (err.name === 'ERR_NO_SUCH_ENTRY') {
               return createPublicIdAndEmailService(app, pub_names_md,
