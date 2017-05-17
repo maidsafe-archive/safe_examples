@@ -191,7 +191,7 @@ export const setupAccount = (app, emailId) => {
                     enc_sk: key_pair.privateKey, enc_pk: key_pair.publicKey})
       .then(() => newAccount.inbox_md.serialise())
       .then((md_serialised) => inbox_serialised = md_serialised)
-      .then(() => app.auth.getAccessContainerInfo(APP_INFO.containers.publicNames))
+      .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
       .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId)
         .then((encrypted_publicId) => pub_names_md.get(encrypted_publicId))
         .then((services) => addService(app, serviceInfo, inbox_serialised)
