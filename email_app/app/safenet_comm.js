@@ -42,7 +42,7 @@ export const authApp = () => {
   let uri = getAuthData();
   if (uri) {
     return fromAuthURI(APP_INFO.info, uri)
-      .then((registered_app) => registered_app.auth.refreshContainerAccess()
+      .then((registered_app) => registered_app.auth.refreshContainersPermissions()
         .then(() => registered_app)
       )
       .catch((err) => {
@@ -60,7 +60,7 @@ export const connect = (uri) => {
   return fromAuthURI(APP_INFO.info, uri)
           .then((app) => registered_app = app)
           .then(() => saveAuthData(uri))
-          .then(() => registered_app.auth.refreshContainerAccess())
+          .then(() => registered_app.auth.refreshContainersPermissions())
           .then(() => registered_app);
 }
 
