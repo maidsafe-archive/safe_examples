@@ -85,7 +85,7 @@ export const connect = () => {
 };
 
 export const fetchAccessInfo = () => {
-  return safe.auth.refreshContainerAccess()
+  return safe.auth.refreshContainersPermissions()
     .then(() => safe.auth.canAccessContainer(accessContainers.public))
     .then((hasAccess) => {
       if (!hasAccess) {
@@ -105,20 +105,30 @@ export const fetchAccessInfo = () => {
 };
 
 export const fetchPublicNames = () => {
-  return safe.auth.getAccessContainerInfo(accessContainers.publicNames)
-    .then((mdata) => mdata.getKeys())
-    .then((keys) => keys.len()
-      .then((len) => {
-        if (len === 0) {
-          console.log('No public Ids found');
-          return;
-        }
-        return keys.forEach(function (key) {
-          if (!publicIds[key] || typeof publicIds[key] !== 'object') {
-            publicIds[key.toString()] = {};
+  return safe.auth.getContainer(accessContainers.publicNames)
+    .then((mdata) => mdata.getKeys()
+      .then((keys) => keys.len()
+        .then((len) => {
+          if (len === 0) {
+            console.log('No public Ids found');
+            return;
           }
-        })
-      }))
+          const encPublicIds = [];
+          return keys.forEach(function (key) {
+            encPublicIds.push(key);
+          })
+            .then(() => {
+              return Promise.all(encPublicIds.map((pubId) => {
+                return mdata.decrypt(pubId)
+                  .then((decKey) => {
+                    const decPubId = decKey.toString()
+                    if (!publicIds[decPubId] || typeof publicIds[decPubId] !== 'object') {
+                      publicIds[decPubId] = {};
+                    }
+                  })
+              }));
+            })
+        })))
     .then(() => publicIds);
 };
 
@@ -126,14 +136,20 @@ export const fetchServices = () => {
   const publicNamesKeys = Object.getOwnPropertyNames(publicIds);
   return Promise.all(publicNamesKeys.map((publicId) => {
     const services = {};
-    return safe.auth.getAccessContainerInfo(accessContainers.publicNames)
-      .then((mdata) => mdata.getEntries())
+    return safe.auth.getContainer(accessContainers.publicNames)
+      .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
       // get publicName mdata
-      .then((entries) => entries.get(publicId))
-      .then((value) => safe.mutableData.newPublic(value.buf, typetag))
+      // .then((entries) => entries.get(publicId))
+      .then((decVal) => {
+        return safe.mutableData.newPublic(decVal, typetag)
+      })
       // get services
       .then((mut) => mut.getEntries()
-        .then((entries) => entries.forEach((key, val, version) => {
+        .then((entries) => entries.forEach((key, val) => {
+          const service = key.toString();
+          if (service.indexOf('@email') !== -1) {
+            return;
+          }
           services[key.toString()] = val;
         })))
       .then(() => {
@@ -148,10 +164,6 @@ export const fetchServices = () => {
       .catch(Promise.reject);
   })).then(() => publicIds);
 };
-
-// export const fetchServiceContents = () => {
-//   return mock(true);
-// };
 
 export const createPublicId = (publicId) => {
   publicId = publicId.trim();
@@ -184,10 +196,12 @@ export const createPublicId = (publicId) => {
         .then(() => mdata.getNameAndTag())
     })
     .then((data) => (publicIdName = data.name))
-    .then(() => safe.auth.getAccessContainerInfo(accessContainers.publicNames))
+    .then(() => safe.auth.getContainer(accessContainers.publicNames))
     .then((mdata) => mdata.getEntries()
       .then((entries) => entries.mutate()
-        .then((mut) => mut.insert(publicId, publicIdName)
+        .then((mut) => mdata.encryptKey(publicId)
+          .then((encKey) => mdata.encryptValue(publicIdName)
+            .then((encVal) => mut.insert(encKey, encVal)))
           .then(() => mdata.applyEntriesMutation(mut)))));
 };
 
@@ -202,14 +216,23 @@ export const createService = (publicId, service, container) => {
     return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Container path' })));
   }
 
-  return safe.auth.getAccessContainerInfo(accessContainers.publicNames)
-    .then((mdata) => mdata.getEntries())
-    .then((entries) => entries.get(publicId))
-    .then((val) => safe.mutableData.newPublic(val.buf, typetag))
-    .then((publicIdMData) => publicIdMData.getEntries()
-      .then((entries) => entries.mutate()
-        .then((mut) => mut.insert(service, container)
-          .then(() => publicIdMData.applyEntriesMutation(mut)))));
+  return safe.auth.getContainer(accessContainers.publicNames)
+    .then((mdata) => {
+      return mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf));
+    })
+    .then((val) => {
+      return safe.mutableData.newPublic(val, typetag);
+    })
+    .then((publicIdMData) => {
+      return publicIdMData.getEntries()
+        .then((entries) => {
+          return entries.mutate()
+            .then((mut) => {
+              return mut.insert(service, container)
+                .then(() => publicIdMData.applyEntriesMutation(mut));
+            });
+        })
+    });
 };
 
 export const deleteService = (publicId, service) => {
@@ -224,19 +247,35 @@ export const deleteService = (publicId, service) => {
 
 export const createContainer = (path) => {
   return safe.mutableData.newRandomPublic(typetag)
-    .then((mdata) => mdata.quickSetup({})
-      .then(() => mdata.getNameAndTag()))
-    .then((data) => safe.auth.getAccessContainerInfo(accessContainers.public)
-      .then((mdata) => mdata.getEntries()
-        .then((entries) => entries.mutate()
-          .then((mut) => mut.insert(path, data.name)
-            .then(() => mdata.applyEntriesMutation(mut)))))
-      .then(() => data.name));
+    .then((mdata) => {
+      return mdata.quickSetup({})
+        .then(() => {
+          return mdata.getNameAndTag();
+        })
+    })
+    .then((data) => {
+      return safe.auth.getContainer(accessContainers.public)
+        .then((mdata) => {
+          return mdata.getEntries()
+            .then((entries) => {
+              return entries.mutate()
+                .then((mut) => {
+                  return mdata.encryptKey(path)
+                    .then((encKey) => mdata.encryptValue(data.name)
+                      .then((encVal) => mut.insert(encKey, encVal)))
+                    .then(() => mdata.applyEntriesMutation(mut));
+                });
+            });
+        })
+        .then(() => {
+          return data.name;
+        });
+    });
 };
 
 export const getPublicContainers = () => {
   const publicKeys = [];
-  return safe.auth.getAccessContainerInfo(accessContainers.public)
+  return safe.auth.getContainer(accessContainers.public)
     .then((mdata) => mdata.getKeys())
     .then((keys) => {
       return keys.len()
@@ -260,39 +299,41 @@ export const deleteItem = (nwPath) => {
     fileName = path.basename(nwPath);
   }
 
-  return safe.auth.getAccessContainerInfo(accessContainers.public)
-    .then((mdata) => mdata.getEntries()
-      .then((entries) => {
-        if (fileName) {
-          return entries.get(dirName)
-            .then((val) => {
-              return safe.mutableData.newPublic(val.buf, typetag)
-                .then((dirMdata) => dirMdata.getEntries()
-                  .then(() => dirMdata.getEntries()
-                    .then((dirEntries) => dirEntries.get(fileName)
-                      .then((val) => dirEntries.mutate()
-                        .then((mut) => mut.remove(fileName, val.version + 1)
-                          .then(() => dirMdata.applyEntriesMutation(mut)))))))
-            });
-        } else {
-          return entries.get(nwPath)
+  return safe.auth.getContainer(accessContainers.public)
+  // .then((mdata) => mdata.getEntries()
+    .then((mdata) => {
+      if (fileName) {
+        return mdata.encryptKey(dirName).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
+          .then((val) => {
+            return safe.mutableData.newPublic(val, typetag)
+              .then((dirMdata) => dirMdata.getEntries()
+                .then(() => dirMdata.getEntries()
+                  .then((dirEntries) => dirEntries.get(fileName)
+                    .then((val) => dirEntries.mutate()
+                      .then((mut) => mut.remove(fileName, val.version + 1)
+                        .then(() => dirMdata.applyEntriesMutation(mut)))))))
+          });
+      } else {
+        return mdata.getEntries()
+          .then((entries) => mdata.encryptKey(nwPath).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)
             .then((val) => entries.mutate()
-              .then((mut) => mut.remove(nwPath, val.version + 1)
-                .then(() => mdata.applyEntriesMutation(mut))));
-        }
-      }));
+              .then((mut) => mdata.encryptKey(nwPath)
+                .then((encKey) => mut.remove(encKey, value.version + 1))
+                .then(() => mdata.applyEntriesMutation(mut))))));
+      }
+    });
 };
 
 export const remapService = (service, publicId, container) => {
   let containerName = null;
-  return safe.auth.getAccessContainerInfo(accessContainers.public)
-    .then((mdata) => mdata.getEntries())
-    .then((entries) => entries.get(container))
-    .then((val) => (containerName = val.buf))
-    .then(() => safe.auth.getAccessContainerInfo(accessContainers.publicNames))
-    .then((mdata) => mdata.getEntries())
-    .then((entries) => entries.get(publicId))
-    .then((val) => safe.mutableData.newPublic(val.buf, typetag))
+  return safe.auth.getContainer(accessContainers.public)
+    .then((mdata) => mdata.encryptKey(container).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
+    // .then((entries) => entries.get(container))
+    .then((val) => (containerName = val))
+    .then(() => safe.auth.getContainer(accessContainers.publicNames))
+    .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
+    // .then((entries) => entries.get(publicId))
+    .then((val) => safe.mutableData.newPublic(val, typetag))
     .then((publicIdMData) => publicIdMData.getEntries()
       .then(() => publicIdMData.getEntries()
         .then((entries) => entries.get(service)
@@ -303,10 +344,11 @@ export const remapService = (service, publicId, container) => {
 
 export const getContainer = (path) => {
   let result = [];
-  return safe.auth.getAccessContainerInfo(accessContainers.public)
-    .then((mdata) => mdata.getEntries())
-    .then((entries) => entries.get(path.split('/').slice(0, 3).join('/')))
-    .then((val) => safe.mutableData.newPublic(val.buf, typetag))
+  return safe.auth.getContainer(accessContainers.public)
+    .then((mdata) => mdata.encryptKey(path.split('/').slice(0, 3).join('/'))
+      .then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
+    // .then((entries) => entries.get(path.split('/').slice(0, 3).join('/')))
+    .then((val) => safe.mutableData.newPublic(val, typetag))
     .then((mdata) => {
       const files = [];
       const nfs = mdata.emulateAs('NFS');
@@ -337,7 +379,11 @@ export const getContainer = (path) => {
               .then((i) => i.read())
               .then((co) => {
                 const dirName = path.split('/').slice(3).join('/');
-                result.unshift({ isFile: true, name: dirName ? file.substr(dirName.length + 1) : file, size: co.length });
+                result.unshift({
+                  isFile: true,
+                  name: dirName ? file.substr(dirName.length + 1) : file,
+                  size: co.length
+                });
               });
           }));
         });
@@ -365,9 +411,10 @@ export const cancelDownload = () => {
 
 const getContainerName = (mdataName) => {
   let res = null;
-  return safe.auth.getAccessContainerInfo(accessContainers.public)
+  return safe.auth.getContainer(accessContainers.public)
     .then((mdata) => mdata.getEntries()
       .then((entries) => entries.forEach((key, val) => {
+        debugger
         if (val.buf.equals(mdataName.buf)) {
           res = key.toString();
         }
