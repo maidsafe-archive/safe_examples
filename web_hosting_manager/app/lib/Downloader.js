@@ -19,9 +19,9 @@ export default class Downloader {
     const tokens = this.path.split('/');
     const filePath = path.join(getPath(), tokens.pop());
 
-    return safe.auth.getAccessContainerInfo(accessContainers.public)
-      .then((mdata) => mdata.get(containerPath.dir))
-      .then((val) => safe.mutableData.newPublic(val.buf, typetag))
+    return safe.auth.getContainer(accessContainers.public)
+      .then((mdata) => mdata.encryptKey(containerPath.dir).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
+      .then((val) => safe.mutableData.newPublic(val, typetag))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.fetch(containerPath.file)

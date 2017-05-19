@@ -36,9 +36,9 @@ export class FileUploadTask extends Task {
     }
     const containerPath = parseContainerPath(this.networkPath);
 
-    return safe.auth.getAccessContainerInfo(accessContainers.public)
-      .then((mdata) => mdata.get(containerPath.target))
-      .then((val) => safe.mutableData.newPublic(val.buf, typetag))
+    return safe.auth.getContainer(accessContainers.public)
+      .then((mdata) => mdata.encryptKey(containerPath.target).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
+      .then((val) => safe.mutableData.newPublic(val, typetag))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.create(fs.readFileSync(this.localPath))
