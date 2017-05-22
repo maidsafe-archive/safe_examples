@@ -158,7 +158,9 @@ export const saveFile = (filename, data) => {
             .then((val) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle)
               .then((mut) => {
                 FILE_INDEX[filename] = 1;
-                return window.safeMutableDataMutation.update(ACCESS_TOKEN, mut, FILE_INDEX_KEY, _getBufferedFileIndex(), (parseInt(val.version, 10) + 1))
+                return window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
+                  .then((encKey) => window.safeMutableData.encryptValue(ACCESS_TOKEN, mdata, _getBufferedFileIndex())
+                    .then((encVal) => window.safeMutableDataMutation.update(ACCESS_TOKEN, mut, encKey, encVal, (parseInt(val.version, 10) + 1))))
                   .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut));
               })))));
   }
@@ -182,6 +184,7 @@ export const getFileIndex = () => {
   return window.safeApp.getHomeContainer(ACCESS_TOKEN)
     .then((mdata) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
       .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
+      .then((value) => window.safeMutableData.decrypt(ACCESS_TOKEN, mdata, value.buf))
       .then((fileIndex) => {
         FILE_INDEX = JSON.parse(fileIndex.buf.toString());
         return FILE_INDEX;
@@ -193,7 +196,9 @@ export const getFileIndex = () => {
         // FIXME: check for exact error condition.
         return window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
           .then((entriesHandle) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle))
-          .then((mut) => window.safeMutableDataMutation.insert(ACCESS_TOKEN, mut, FILE_INDEX_KEY, _getBufferedFileIndex())
+          .then((mut) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
+            .then((encKey) => window.safeMutableData.encryptValue(ACCESS_TOKEN, mdata, _getBufferedFileIndex())
+              .then((encVal) => window.safeMutableDataMutation.insert(ACCESS_TOKEN, mut, encKey, encVal)))
             .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut)));
       }));
 };
