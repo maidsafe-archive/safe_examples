@@ -42,7 +42,7 @@ export const authApp = () => {
   let uri = getAuthData();
   if (uri) {
     return fromAuthURI(APP_INFO.info, uri)
-      .then((registered_app) => registered_app.auth.refreshContainerAccess()
+      .then((registered_app) => registered_app.auth.refreshContainersPermissions()
         .then(() => registered_app)
       )
       .catch((err) => {
@@ -60,7 +60,7 @@ export const connect = (uri) => {
   return fromAuthURI(APP_INFO.info, uri)
           .then((app) => registered_app = app)
           .then(() => saveAuthData(uri))
-          .then(() => registered_app.auth.refreshContainerAccess())
+          .then(() => registered_app.auth.refreshContainersPermissions())
           .then(() => registered_app);
 }
 
@@ -191,10 +191,9 @@ export const setupAccount = (app, emailId) => {
                     enc_sk: key_pair.privateKey, enc_pk: key_pair.publicKey})
       .then(() => newAccount.inbox_md.serialise())
       .then((md_serialised) => inbox_serialised = md_serialised)
-      .then(() => app.auth.getAccessContainerInfo(APP_INFO.containers.publicNames))
-      .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId)
-        .then((encrypted_publicId) => pub_names_md.get(encrypted_publicId))
-        .then((services) => addService(app, serviceInfo, inbox_serialised)
+      .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
+      .then((pub_names_md) => pub_names_md.get(serviceInfo.publicId)
+        .then((services) => addEmailService(app, serviceInfo, inbox_serialised)
           , (err) => {
             if (err.name === 'ERR_NO_SUCH_ENTRY') {
               return createPublicIdAndEmailService(app, pub_names_md,
