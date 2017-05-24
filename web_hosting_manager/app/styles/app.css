@@ -391,6 +391,7 @@ nav {
   color: white;
   padding: 8px 16px;
   font-size: 14px;
+  height: auto;
 }
 
 .custom-btn-grp .ant-select {
@@ -474,4 +475,3 @@ nav {
     transform: rotate(360deg);
   }
 }
-

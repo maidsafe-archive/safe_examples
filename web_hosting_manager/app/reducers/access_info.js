@@ -2,11 +2,12 @@
 
 import * as Action from '../actions/app';
 import { I18n } from 'react-redux-i18n';
+import { trimErrorMsg } from '../utils/app_utils';
 
 const initialState = {
-    fetchingAccessInfo: false,
-    fetchedAccessInfo: false,
-    error: null
+  fetchingAccessInfo: false,
+  fetchedAccessInfo: false,
+  error: null
 };
 
 const accessInfo = (state: Object = initialState, action: Object) => {
@@ -37,7 +38,7 @@ const accessInfo = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         fetchingAccessInfo: false,
-        error: I18n.t('messages.fetchingAccessFailed', { error: action.payload.message })
+        error: I18n.t('messages.fetchingAccessFailed', { error: trimErrorMsg(action.payload.message) })
       };
       break;
   }

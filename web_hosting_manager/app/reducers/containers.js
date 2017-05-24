@@ -1,5 +1,6 @@
 import * as Action from '../actions/app';
 import { I18n } from 'react-redux-i18n';
+import { trimErrorMsg } from '../utils/app_utils';
 
 const initialState = {
   fetchingPublicContainers: false,
@@ -41,13 +42,23 @@ const containers = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         fetchedPublicContainers: false,
-        error: I18n.t('messages.fetchingPublicContainerFailed', { error: action.payload.message })
+        error: I18n.t('messages.fetchingPublicContainerFailed', { error: trimErrorMsg(action.payload.message) })
       };
       break;
 
     case `${Action.CREATE_CONTAINER_AND_SERVICE}_FULFILLED`:
       const copy = state.publicContainers.map((name) => { return name; });
-      copy.push(action.payload);
+      // copy.push(action.payload);
+      let key = null;
+      for (key of Object.keys(action.payload)) {
+        let skey = null;
+        for (skey of Object.keys(action.payload[key])) {
+          const contName = action.payload[key][skey];
+          if (copy.indexOf(contName) === -1) {
+            copy.push(contName);
+          }
+        }
+      }
       state = {
         ...state,
         publicContainers: copy
@@ -75,7 +86,7 @@ const containers = (state: Object = initialState, action: Object) => {
         ...state,
         fetchingContainer: false,
         containerInfo: [],
-        error: I18n.t('messages.fetchingContainerFailed', { error: action.payload.message })
+        error: I18n.t('messages.fetchingContainerFailed', { error: trimErrorMsg(action.payload.message) })
       };
       break;
 
@@ -98,7 +109,13 @@ const containers = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         deleting: false,
-        error: action.payload.message
+        error: trimErrorMsg(action.payload.message)
+      };
+      break;
+    case Action.CLEAR_NOTIFICATION:
+      state = {
+        ...state,
+        error: undefined
       };
       break;
   }

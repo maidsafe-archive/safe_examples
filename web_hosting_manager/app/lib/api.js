@@ -138,19 +138,16 @@ export const fetchServices = () => {
     const services = {};
     return safe.auth.getContainer(accessContainers.publicNames)
       .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-      // get publicName mdata
-      // .then((entries) => entries.get(publicId))
       .then((decVal) => {
         return safe.mutableData.newPublic(decVal, typetag)
       })
-      // get services
       .then((mut) => mut.getEntries()
         .then((entries) => entries.forEach((key, val) => {
           const service = key.toString();
-          if (service.indexOf('@email') !== -1) {
+          if ((service.indexOf('@email') !== -1) || (val.buf.length === 0)) {
             return;
           }
-          services[key.toString()] = val;
+          services[service] = val;
         })))
       .then(() => {
         return Promise.all(Object.keys(services).map((key) => {
@@ -314,12 +311,29 @@ export const deleteItem = (nwPath) => {
                         .then(() => dirMdata.applyEntriesMutation(mut)))))))
           });
       } else {
-        return mdata.getEntries()
-          .then((entries) => mdata.encryptKey(nwPath).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)
-            .then((val) => entries.mutate()
-              .then((mut) => mdata.encryptKey(nwPath)
-                .then((encKey) => mut.remove(encKey, value.version + 1))
-                .then(() => mdata.applyEntriesMutation(mut))))));
+        return mdata.encryptKey(nwPath.split('/').slice(0, -1).join('/')).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
+          .then((val) => {
+            return safe.mutableData.newPublic(val, typetag)
+              .then((tarMdata) => {
+                const targetKeys = [];
+                return tarMdata.getEntries()
+                  .then((entries) => entries.forEach((key, val) => {
+                    const keyStr = key.toString();
+                    const dirname = nwPath.split('/').slice(-1).toString()
+                    if (keyStr.indexOf(dirname) !== 0) {
+                      return;
+                    }
+                    targetKeys.push({key: keyStr, version: val.version});
+                  })
+                    .then(() => Promise.all(targetKeys.map((tar) => {
+                      return entries.mutate()
+                        .then((mut) => {
+                          return mut.remove(tar.key, tar.version + 1)
+                            .then(() => tarMdata.applyEntriesMutation(mut))
+                        });
+                    }))));
+              });
+          });
       }
     });
 };
@@ -352,8 +366,11 @@ export const getContainer = (path) => {
     .then((mdata) => {
       const files = [];
       const nfs = mdata.emulateAs('NFS');
-      return mdata.getKeys()
-        .then((keys) => keys.forEach((key) => {
+      return mdata.getEntries()
+        .then((entries) => entries.forEach((key, value) => {
+          if (value.buf.length === 0) {
+            return
+          }
           let keyStr = key.toString();
           const rootName = path.split('/').slice(3).join('/');
           if (rootName && (keyStr.indexOf(rootName) !== 0)) {
@@ -409,12 +426,45 @@ export const cancelDownload = () => {
   downloader.cancel();
 };
 
+export const checkServiceExist = (publicId, service, path) => {
+  return safe.auth.getContainer(accessContainers.publicNames)
+    .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
+    .then((decVal) => {
+      return safe.mutableData.newPublic(decVal, typetag)
+    })
+    .then((pubMut) => {
+      return pubMut.get(service)
+        .then((value) => {
+          if (value.buf.length !== 0) {
+            return;
+          }
+          return safe.auth.getContainer(accessContainers.public)
+            .then((mdata) => {
+              return mdata.encryptKey(path).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
+            })
+            .then((val) => {
+              return pubMut.getEntries()
+                .then((entries) => {
+                  return entries.mutate().then((mut) => {
+                    return mut.update(service, val, value.version + 1).then(() => pubMut.applyEntriesMutation(mut));
+                  });
+                });
+            });
+        })
+        .catch((err) => {
+          if (err.name === 'ERR_NO_SUCH_ENTRY') {
+            return Promise.resolve(false);
+          }
+          return Promise.reject();
+        });
+    });
+};
+
 const getContainerName = (mdataName) => {
   let res = null;
   return safe.auth.getContainer(accessContainers.public)
     .then((mdata) => mdata.getEntries()
       .then((entries) => entries.forEach((key, val) => {
-        debugger
         if (val.buf.equals(mdataName.buf)) {
           res = key.toString();
         }

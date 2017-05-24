@@ -48,6 +48,10 @@ export default class CreateService extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.clearNotification();
+  }
+
   validate() {
     let valid = true;
     const serviceErrorMsg = I18n.t('messages.emptyServiceName');

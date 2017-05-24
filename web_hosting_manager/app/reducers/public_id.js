@@ -2,13 +2,14 @@
 
 import * as Action from '../actions/app';
 import { I18n } from 'react-redux-i18n';
+import { trimErrorMsg } from '../utils/app_utils';
 
 const initialState = {
-    fetchingPublicNames: false,
-    fetchedPublicNames: false,
-    publicNames: {},
-    creatingPublicId: false,
-    error: null
+  fetchingPublicNames: false,
+  fetchedPublicNames: false,
+  publicNames: {},
+  creatingPublicId: false,
+  error: null
 };
 
 const publicId = (state: Object = initialState, action: Object) => {
@@ -23,18 +24,25 @@ const publicId = (state: Object = initialState, action: Object) => {
     case `${Action.FETCH_PUBLIC_NAMES}_PENDING`:
       state = {
         ...state,
-        publicNames: [],
+        publicNames: {},
         fetchingPublicNames: true
       };
       break;
 
     case `${Action.FETCH_PUBLIC_NAMES}_FULFILLED`:
+    {
+      const publicNames = {};
+      let pkey = null;
+      for (pkey of Object.keys(action.payload)) {
+        publicNames[pkey] = { ...action.payload[pkey] };
+      }
       state = {
         ...state,
         fetchingPublicNames: false,
         fetchedPublicNames: true,
-        publicNames: action.payload
+        publicNames
       };
+    }
       break;
 
     case `${Action.FETCH_PUBLIC_NAMES}_REJECTED`:
@@ -42,7 +50,7 @@ const publicId = (state: Object = initialState, action: Object) => {
         ...state,
         fetchingPublicNames: false,
         publicNames: {},
-        error: I18n.t('messages.fetchingPublicNamesFailed', { error: action.payload.message })
+        error: I18n.t('messages.fetchingPublicNamesFailed', { error: trimErrorMsg(action.payload.message) })
       };
       break;
 
@@ -54,26 +62,80 @@ const publicId = (state: Object = initialState, action: Object) => {
       break;
 
     case `${Action.CREATE_PUBLIC_ID}_FULFILLED`:
+    {
+      const publicNames = {};
+      let pkey = null;
+      for (pkey of Object.keys(action.payload)) {
+        publicNames[pkey] = { ...action.payload[pkey] };
+      }
       state = {
         ...state,
         creatingPublicId: false,
-        publicNames: action.payload,
+        publicNames,
         error: ''
       };
+    }
       break;
 
     case `${Action.CREATE_PUBLIC_ID}_REJECTED`:
       state = {
         ...state,
         creatingPublicId: false,
-        error: action.payload.message
+        error: trimErrorMsg(action.payload.message)
       };
       break;
 
-    case `${Action.REMAP_SERVICE}_FULFILLED`:
+    case `${Action.DELETE_SERVICE}_FULFILLED`:
+    {
+      const publicNames = {};
+      let pkey = null;
+      for (pkey of Object.keys(action.payload)) {
+        publicNames[pkey] = { ...action.payload[pkey] };
+      }
       state = {
         ...state,
-        publicNames: action.payload
+        publicNames
+      };
+    }
+      break;
+
+    case `${Action.CREATE_CONTAINER_AND_SERVICE}_FULFILLED`:
+    {
+      const publicNames = {};
+      let pkey = null;
+      for (pkey of Object.keys(action.payload)) {
+        publicNames[pkey] = { ...action.payload[pkey] };
+      }
+      state = {
+        ...state,
+        publicNames
+      };
+    }
+      break;
+
+    case `${Action.FETCH_SERVICES}_FULFILLED`:
+    {
+      const publicNames = {};
+      let pkey = null;
+      for (pkey of Object.keys(action.payload)) {
+        publicNames[pkey] = { ...action.payload[pkey] };
+      }
+      state = {
+        ...state,
+        publicNames
+      };
+    }
+      break;
+
+    case `${Action.REMAP_SERVICE}_FULFILLED`:
+      const publicNames = {};
+      let pkey = null;
+      for (pkey of Object.keys(action.payload)) {
+        publicNames[pkey] = { ...action.payload[pkey] };
+      }
+      state = {
+        ...state,
+        publicNames
       };
       break;
   }
