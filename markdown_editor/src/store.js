@@ -118,12 +118,12 @@ const _fetchAccessInfo = () => {
  * @return {data, version} - data: file data, version: file entry version.
  */
 const _getFile = (mdata, filename) => {
-  return window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
-    .then((nfs) => window.safeNfs.fetch(ACCESS_TOKEN, nfs, filename))
+  return window.safeMutableData.emulateAs(mdata, 'NFS')
+    .then((nfs) => window.safeNfs.fetch(nfs, filename))
     .then((file) => {
       return window.safeNfs.getFileMeta(file)
         .then((meta) => window.safeImmutableData.fetch(ACCESS_TOKEN, meta.dataMapName)
-          .then((immut) => window.safeImmutableData.read(ACCESS_TOKEN, immut))
+          .then((immut) => window.safeImmutableData.read(immut))
           .then((data) => ({
             data: JSON.parse(data.toString()),
             version: meta.version
@@ -141,9 +141,9 @@ const _updateFile = (filename, payload) => {
   return _getHomeContainer()
     .then((mdata) => {
       return _getFile(mdata, filename)
-        .then((files) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
-          .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile(files.data, payload))
-            .then((file) => window.safeNfs.update(ACCESS_TOKEN, nfs, file, filename, parseInt(files.version, 10) + 1))));
+        .then((files) => window.safeMutableData.emulateAs(mdata, 'NFS')
+          .then((nfs) => window.safeNfs.create(nfs, _prepareFile(files.data, payload))
+            .then((file) => window.safeNfs.update(nfs, file, filename, parseInt(files.version, 10) + 1))));
     });
 };
 
@@ -172,19 +172,19 @@ export const saveFile = (filename, data) => {
     return _updateFile(filename, data);
   } else {
     return _getHomeContainer()
-      .then((mdata) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
-        .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile([], data))
-          .then((file) => window.safeNfs.insert(ACCESS_TOKEN, nfs, file, filename)))
-        .then(() => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
-          .then((entriesHandle) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
-            .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
-            .then((val) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle)
+      .then((mdata) => window.safeMutableData.emulateAs(mdata, 'NFS')
+        .then((nfs) => window.safeNfs.create(nfs, _prepareFile([], data))
+          .then((file) => window.safeNfs.insert(nfs, file, filename)))
+        .then(() => window.safeMutableData.getEntries(mdata)
+          .then((entriesHandle) => window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+            .then((key) => window.safeMutableData.get(mdata, key))
+            .then((val) => window.safeMutableDataEntries.mutate(entriesHandle)
               .then((mut) => {
                 FILE_INDEX[filename] = 1;
-                return window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
-                  .then((encKey) => window.safeMutableData.encryptValue(ACCESS_TOKEN, mdata, _getBufferedFileIndex())
-                    .then((encVal) => window.safeMutableDataMutation.update(ACCESS_TOKEN, mut, encKey, encVal, (parseInt(val.version, 10) + 1))))
-                  .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut));
+                return window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+                  .then((encKey) => window.safeMutableData.encryptValue(mdata, _getBufferedFileIndex())
+                    .then((encVal) => window.safeMutableDataMutation.update(mut, encKey, encVal, (parseInt(val.version, 10) + 1))))
+                  .then(() => window.safeMutableData.applyEntriesMutation(mdata, mut));
               })))));
   }
 };
@@ -205,24 +205,24 @@ export const getFileIndex = () => {
   if (FILE_INDEX) return Promise.resolve(FILE_INDEX);
 
   return _getHomeContainer()
-    .then((mdata) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
-      .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
-      .then((value) => window.safeMutableData.decrypt(ACCESS_TOKEN, mdata, value.buf))
+    .then((mdata) => window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+      .then((key) => window.safeMutableData.get(mdata, key))
+      .then((value) => window.safeMutableData.decrypt(mdata, value.buf))
       .then((fileIndex) => {
         FILE_INDEX = JSON.parse(fileIndex.buf.toString());
         return FILE_INDEX;
       })
-      .catch(() => {
+      .catch((err) => {
         FILE_INDEX = {};
         console.warn('Preparing Home container');
 
         // FIXME: check for exact error condition.
-        return window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
-          .then((entriesHandle) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle))
-          .then((mut) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
-            .then((encKey) => window.safeMutableData.encryptValue(ACCESS_TOKEN, mdata, _getBufferedFileIndex())
-              .then((encVal) => window.safeMutableDataMutation.insert(ACCESS_TOKEN, mut, encKey, encVal)))
-            .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut)));
+        return window.safeMutableData.getEntries(mdata)
+          .then((entriesHandle) => window.safeMutableDataEntries.mutate(entriesHandle))
+          .then((mut) => window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+            .then((encKey) => window.safeMutableData.encryptValue(mdata, _getBufferedFileIndex())
+              .then((encVal) => window.safeMutableDataMutation.insert(mut, encKey, encVal)))
+            .then(() => window.safeMutableData.applyEntriesMutation(mdata, mut)));
       }));
 };
 
