@@ -172,7 +172,7 @@ const createPublicIdAndEmailService = (app, pub_names_md, serviceInfo,
   return addEmailService(app, serviceInfo, inbox_serialised)
       .then((md) => md.getNameAndTag())
       .then((services) => app.mutableData.newMutation()
-        .then((mut) => mut.insert(serviceInfo.publicId, services.name)
+        .then((mut) => insertEncrypted(pub_names_md, mut, serviceInfo.publicId, services.name)
           .then(() => pub_names_md.applyEntriesMutation(mut))
         ))
 }
@@ -192,7 +192,7 @@ export const setupAccount = (app, emailId) => {
       .then(() => newAccount.inbox_md.serialise())
       .then((md_serialised) => inbox_serialised = md_serialised)
       .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
-      .then((pub_names_md) => pub_names_md.get(serviceInfo.publicId)
+      .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId).then((key) => pub_names_md.get(key))
         .then((services) => addEmailService(app, serviceInfo, inbox_serialised)
           , (err) => {
             if (err.name === 'ERR_NO_SUCH_ENTRY') {
