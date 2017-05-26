@@ -30,6 +30,7 @@ export const DOWNLOAD_STARTED = 'DOWNLOAD_STARTED';
 export const DOWNLOADING = 'DOWNLOADING';
 export const DOWNLOAD_FAILED = 'DOWNLOAD_FAILED';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
+export const CLEAR_NOTIFICATION = 'CLEAR_NOTIFICATION';
 
 export const DELETE = 'DELETE';
 
@@ -99,14 +100,17 @@ export const createContainerAndService = (publicId: string, service: string,
   const path = `${parentConatiner}/${publicId}/${conatinerName}`;
   return {
     type: CREATE_CONTAINER_AND_SERVICE,
-    payload: api.createContainer(path)
-      .then((name) => {
-        return api.createService(publicId, service, name);
+    payload: api.checkServiceExist(publicId, service, path)
+      .then((exist) => {
+        if (!exist) {
+          return api.createContainer(path)
+            .then((name) => {
+              return api.createService(publicId, service, name);
+            });
+        }
+        return Promise.resolve(true);
       })
       .then(() => api.fetchServices())
-      .then(() => {
-        return conatinerName;
-      })
   };
 };
 
@@ -225,4 +229,10 @@ export const deleteItem = (containerPath, name) => {
         return api.getContainer(containerPath);
       })
   };
+};
+
+export const clearNotification = () => {
+  return {
+    type: CLEAR_NOTIFICATION
+  }
 };

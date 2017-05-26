@@ -79,6 +79,12 @@ const file = (state: Object = initialState, action: Object) => {
         error: action.payload.message
       };
       break;
+    case Action.CLEAR_NOTIFICATION:
+      state = {
+        ...state,
+        error: undefined
+      };
+      break;
   }
   return state;
 };

@@ -59,6 +59,10 @@ export default class FileExplorer extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.clearNotification();
+  }
+
   bytesToSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     if (bytes === 0) {

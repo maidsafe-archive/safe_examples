@@ -42,7 +42,19 @@ export class FileUploadTask extends Task {
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.create(fs.readFileSync(this.localPath))
-          .then((file) => nfs.insert(containerPath.file, file));
+          .then((file) => nfs.insert(containerPath.file, file)
+            .catch((err) => {
+              if (err.name !== 'ERR_ENTRY_EXISTS') {
+                return Promise.reject(err);
+              }
+              return mdata.get(containerPath.file)
+                .then((value) => {
+                  if (value.buf.length !== 0) {
+                    return Promise.reject(err);
+                  }
+                  return nfs.update(containerPath.file, file, value.version + 1);
+                });
+            }));
       })
       .then(() => callback(null, {
         isFile: true,
@@ -52,3 +64,4 @@ export class FileUploadTask extends Task {
       .catch(callback);
   }
 }
+

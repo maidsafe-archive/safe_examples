@@ -2,6 +2,7 @@
 
 import * as Action from '../actions/app';
 import { I18n } from 'react-redux-i18n';
+import { trimErrorMsg } from '../utils/app_utils';
 
 const initialState = {
   fetchingServices: false,
@@ -40,7 +41,7 @@ const service = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         fetchingServices: false,
-        error: I18n.t('messages.fetchingServicesFailed', { error: action.payload.message })
+        error: I18n.t('messages.fetchingServicesFailed', { error: trimErrorMsg(action.payload.message) })
       };
       break;
 
@@ -63,7 +64,7 @@ const service = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         creatingService: false,
-        error: action.payload.message
+        error: trimErrorMsg(action.payload.message)
       };
       break;
 
@@ -87,7 +88,7 @@ const service = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         creatingService: false,
-        error: action.payload.message
+        error: trimErrorMsg(action.payload.message)
       };
       break;
 
@@ -111,7 +112,13 @@ const service = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         remapping: false,
-        error: action.payload.message
+        error: trimErrorMsg(action.payload.message)
+      };
+      break;
+    case Action.CLEAR_NOTIFICATION:
+      state = {
+        ...state,
+        error: undefined
       };
       break;
   }
