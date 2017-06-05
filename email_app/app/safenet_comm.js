@@ -195,7 +195,7 @@ export const setupAccount = (app, emailId) => {
       .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId).then((key) => pub_names_md.get(key))
         .then((services) => addEmailService(app, serviceInfo, inbox_serialised)
           , (err) => {
-            if (err.name === 'ERR_NO_SUCH_ENTRY') {
+            if (err.code === -106) {
               return createPublicIdAndEmailService(app, pub_names_md,
                                                 serviceInfo, inbox_serialised);
             }
