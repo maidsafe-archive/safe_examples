@@ -32,7 +32,7 @@ export default class CreateAccount extends Component {
     return createAccount(emailId)
         .then(this.storeCreatedAccount)
         .catch((err) => {
-          if (err.name === 'ERR_DATA_EXISTS') {
+          if (err.code === -104) {
             return createAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
           }
           return createAccountError(err);
