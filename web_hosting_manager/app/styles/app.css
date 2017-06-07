@@ -169,6 +169,10 @@ nav {
   margin-bottom: 40px;
 }
 
+.create-service .create-service-input .ant-input-group-wrapper {
+  width: 100% !important;
+}
+
 .split-cntr {
   position: relative;
 }
@@ -183,6 +187,7 @@ nav {
   width: 50%;
   display: inline-block;
   float: left;
+  text-align: center;
 }
 
 .split-cntr-i:first-child {
@@ -272,6 +277,10 @@ nav {
   font-size: 16px;
   line-height: 24px;
   margin-bottom: 16px;
+}
+
+.custom-card .ant-card-body .ant-input-group-wrapper {
+  width: 60%;
 }
 
 .custom-card .ant-card-body .ant-input-wrapper {

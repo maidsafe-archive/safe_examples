@@ -38,6 +38,12 @@ export default class CreateService extends Component {
     this.containerName = this.props.publicContainers[0];
   }
 
+  componentWillUpdate(nextProps) {
+    if (nextProps.isRevoked) {
+      nextProps.router.replace('/');
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.creatingService && !nextProps.creatingService && nextProps.serviceError) {
       this.setState({

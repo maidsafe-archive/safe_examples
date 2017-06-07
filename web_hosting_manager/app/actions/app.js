@@ -31,6 +31,7 @@ export const DOWNLOADING = 'DOWNLOADING';
 export const DOWNLOAD_FAILED = 'DOWNLOAD_FAILED';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
 export const CLEAR_NOTIFICATION = 'CLEAR_NOTIFICATION';
+export const REVOKED = 'REVOKED';
 
 export const DELETE = 'DELETE';
 
@@ -47,18 +48,30 @@ export const reset = () => {
   };
 };
 
-export const connect = (forceTempValue: boolean) => {
-  if (!forceTempValue && !api.hasLocalAuthInfo()) {
+export const revoked = () => {
+  return {
+    type: REVOKED
+  };
+};
+
+export const connect = (authRes: String) => {
+  if (!authRes && !api.hasLocalAuthInfo()) {
     return sendAuthRequest();
   }
-  return {
-    type: CONNECT,
-    payload: api.connect()
+  return (dispatch) => {
+    return dispatch({
+      type: CONNECT,
+      payload: api.connect(authRes)
+        .then((resType) => {
+          if (resType === api.AUTH_RES_TYPES.revoked) {
+            return dispatch(revoked());
+          }
+        })
+    })
   };
 };
 
 export const onAuthSuccess = (authInfo: Object) => {
-  api.saveAuthInfo(authInfo);
   return {
     type: ON_AUTH_SUCCESS
   };

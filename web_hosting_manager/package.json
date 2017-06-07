@@ -152,7 +152,7 @@
     "webpack-validator": "^2.2.9"
   },
   "dependencies": {
-    "antd": "^2.5.0",
+    "antd": "2.5.0",
     "electron-debug": "^1.0.1",
     "font-awesome": "^4.7.0",
     "json-loader": "^0.5.4",

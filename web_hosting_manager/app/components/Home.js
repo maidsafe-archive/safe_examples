@@ -57,7 +57,9 @@ export default class Auth extends Component {
   }
 
   componentWillUpdate(nextProps) {
-
+    if (nextProps.isRevoked) {
+      nextProps.router.replace('/');
+    }
     if (nextProps.fetchingPublicContainers) {
       this.reloadingContainer = true;
     }

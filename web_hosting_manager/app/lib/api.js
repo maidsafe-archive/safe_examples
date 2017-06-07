@@ -38,6 +38,11 @@ const APP_INFO = {
   }
 };
 
+export const AUTH_RES_TYPES = {
+  containers: 'containers',
+  revoked: 'revoked'
+};
+
 export const accessContainers = {
   public: '_public',
   publicNames: '_publicNames'
@@ -53,6 +58,10 @@ export let safe = null;
 
 const getLocalAuthInfo = () => {
   return keytar.getPassword(SERVICE, ACCOUNT);
+};
+
+const clearLocalAuthInfo = () => {
+  return keytar.deletePassword(SERVICE, ACCOUNT);
 };
 
 export const hasLocalAuthInfo = () => {
@@ -75,13 +84,29 @@ export const authorise = () => {
     });
 };
 
-export const connect = () => {
-  const authInfo = JSON.parse(getLocalAuthInfo());
-  if (!authInfo.data) {
-    return Promise.reject(new Error('Improper auth data'));
+export const connect = (res) => {
+  const authInfo = res || JSON.parse(getLocalAuthInfo());
+  if (!authInfo) {
+    return authorise();
   }
-  return safeApp.fromAuthURI(APP_INFO.data, authInfo.data)
-    .then((app) => (safe = app));
+  return safeApp.fromAuthURI(APP_INFO.data, authInfo)
+    .then((app) => {
+      if (res) {
+        saveAuthInfo(res);
+      }
+      (safe = app)
+    })
+    .catch((err) => {
+      if (err[0] === AUTH_RES_TYPES.containers) {
+        return Promise.resolve(AUTH_RES_TYPES.containers);
+      } else if (err[0] === AUTH_RES_TYPES.revoked) {
+        clearLocalAuthInfo();
+        return Promise.resolve(AUTH_RES_TYPES.revoked);
+      } else {
+        clearLocalAuthInfo();
+        return Promise.reject(err);
+      }
+    });
 };
 
 export const fetchAccessInfo = () => {
@@ -99,7 +124,7 @@ export const fetchAccessInfo = () => {
       }
     })
     .catch((e) => {
-      keytar.deletePassword(SERVICE, ACCOUNT);
+      clearLocalAuthInfo();
       return Promise.reject(e);
     });
 };
@@ -452,7 +477,7 @@ export const checkServiceExist = (publicId, service, path) => {
             });
         })
         .catch((err) => {
-          if (err.name === 'ERR_NO_SUCH_ENTRY') {
+          if (err.code === -106) {
             return Promise.resolve(false);
           }
           return Promise.reject();

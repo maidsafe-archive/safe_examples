@@ -21,7 +21,8 @@ const mapStateToProps = (state) => {
     remapping: state.service.remapping,
     serviceError: state.service.error,
     publicContainers: state.containers.publicContainers,
-    fetchingPublicContainers: state.containers.fetchingPublicContainers
+    fetchingPublicContainers: state.containers.fetchingPublicContainers,
+    isRevoked: state.auth.isRevoked
   };
 };
 
