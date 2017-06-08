@@ -42,6 +42,9 @@ export default class FileExplorer extends Component {
   }
 
   componentWillUpdate(nextProps) {
+    if (nextProps.isRevoked) {
+      nextProps.router.replace('/');
+    }
     if (this.props.fetchingContainer && !nextProps.fetchingContainer
       && this.fetchingContainerPath) {
       if (!nextProps.containerError) {

@@ -6,7 +6,8 @@ import { I18n } from 'react-redux-i18n';
 const initialState = {
     isAuthorised: false,
     isAuthorising: false,
-    error: null
+    error: null,
+    isRevoked: false
 };
 
 const auth = (state: Object = initialState, action: Object) => {
@@ -21,7 +22,8 @@ const auth = (state: Object = initialState, action: Object) => {
     case Action.AUTH_REQUEST_SENT:
       state = {
         ...state,
-        isAuthorising: true
+        isAuthorising: true,
+        isRevoked: false
       };
       break;
 
@@ -47,6 +49,12 @@ const auth = (state: Object = initialState, action: Object) => {
         isAuthorising: false,
         error: action.payload.message || I18n.t('messages.authorisationFailed')
       };
+      break;
+    case Action.REVOKED:
+      state = {
+        ...state,
+        isRevoked: true
+      }
       break;
   }
   return state;

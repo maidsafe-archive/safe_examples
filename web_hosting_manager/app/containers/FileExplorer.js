@@ -19,7 +19,8 @@ const mapStateToProps = (state) => {
     uploadStatus: state.file.uploadStatus,
     downloading: state.file.downloading,
     downloadProgress: state.file.downloadProgress,
-    fileError: state.file.error
+    fileError: state.file.error,
+    isRevoked: state.auth.isRevoked
   };
 };
 

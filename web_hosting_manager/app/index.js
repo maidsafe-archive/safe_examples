@@ -32,12 +32,9 @@ store.dispatch(setLocale(locale));
 initTempFolder();
 
 const listenForAuthReponse = (event, response) => {
-  // TODO parse response
   if (response) {
-    store.dispatch(onAuthSuccess({ data: response })); // TODO do it concurrently (no to linked dispatch)
-    setTimeout(() => {
-      store.dispatch(connect(true));
-    }, 2000)
+    store.dispatch(onAuthSuccess());
+    store.dispatch(connect(response));
   } else {
     store.dispatch(onAuthFailure(new Error('Authorisation failed')));
   }

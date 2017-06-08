@@ -36,11 +36,13 @@ export default class Auth extends Component {
   };
 
   componentDidMount() {
-    this.props.connect();
+    if (!this.props.isRevoked) {
+      this.props.connect();
+    }
   }
 
   componentWillUpdate(props) {
-    if (props.fetchedServices && !props.serviceError) {
+    if (!this.props.isRevoked && props.fetchedServices && !props.serviceError) {
       props.router.replace('/home');
     }
   }
@@ -66,6 +68,15 @@ export default class Auth extends Component {
   }
 
   getDisplayContent() {
+    if (this.props.isRevoked) {
+      return {
+        title: I18n.t('label.initialising.revoked'),
+        content: (<div className="error-cntr">
+          <div>Application got revoked. Please Reauthorise.</div>
+          <Button type="primary" onClick={this.reconnect.bind(this)}>Re-Authorise</Button>
+        </div>)
+      };
+    }
     if (this.props.authError) {
       return {
         title: I18n.t('label.initialising.authErrorTitle'),

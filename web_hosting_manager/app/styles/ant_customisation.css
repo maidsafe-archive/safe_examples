@@ -13,3 +13,7 @@
 .ant-popover-arrow {
   margin-left: -5px !important;
 }
+
+.ant-input-group-wrapper {
+  width: 100%;
+}

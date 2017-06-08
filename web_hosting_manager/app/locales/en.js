@@ -19,7 +19,8 @@ const en = {
       publicContainers: 'Fetching _public Container',
       preparingApp: 'Preparing Application',
       connectionErrorTitle: 'Failed To Connect',
-      authErrorTitle: 'Application Initialisation Failed'
+      authErrorTitle: 'Application Initialisation Failed',
+      revoked: 'Application Revoked'
     },
     networkStatus: {
       connecting: 'connecting',
