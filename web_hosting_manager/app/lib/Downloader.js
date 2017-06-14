@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { getPath } from './temp';
 import { shell } from 'electron';
-import { safe, typetag, accessContainers } from './api';
+import { safe, TAG_TYPE_WWW, accessContainers } from './api';
 
 export default class Downloader {
   constructor(networkPath, callback) {
@@ -21,7 +21,7 @@ export default class Downloader {
 
     return safe.auth.getContainer(accessContainers.public)
       .then((mdata) => mdata.encryptKey(containerPath.dir).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-      .then((val) => safe.mutableData.newPublic(val, typetag))
+      .then((val) => safe.mutableData.newPublic(val, TAG_TYPE_WWW))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.fetch(containerPath.file)

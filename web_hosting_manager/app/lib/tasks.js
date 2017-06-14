@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { I18n } from 'react-redux-i18n';
-import { safe, typetag, accessContainers } from './api';
+import { safe, TAG_TYPE_WWW, accessContainers } from './api';
 
 const parseContainerPath = (targetPath) => {
   if (!targetPath) {
@@ -38,13 +38,13 @@ export class FileUploadTask extends Task {
 
     return safe.auth.getContainer(accessContainers.public)
       .then((mdata) => mdata.encryptKey(containerPath.target).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-      .then((val) => safe.mutableData.newPublic(val, typetag))
+      .then((val) => safe.mutableData.newPublic(val, TAG_TYPE_WWW))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.create(fs.readFileSync(this.localPath))
           .then((file) => nfs.insert(containerPath.file, file)
             .catch((err) => {
-              if (err.name !== 'ERR_ENTRY_EXISTS') {
+              if (err.code === -106) {
                 return Promise.reject(err);
               }
               return mdata.get(containerPath.file)

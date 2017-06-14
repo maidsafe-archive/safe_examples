@@ -48,7 +48,9 @@ export const accessContainers = {
   publicNames: '_publicNames'
 };
 
-export const typetag = 15001;
+export const TAG_TYPE_DNS = 15001;
+export const TAG_TYPE_WWW = 15002;
+
 
 let publicIds = {};
 let uploader;
@@ -164,7 +166,7 @@ export const fetchServices = () => {
     return safe.auth.getContainer(accessContainers.publicNames)
       .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
       .then((decVal) => {
-        return safe.mutableData.newPublic(decVal, typetag)
+        return safe.mutableData.newPublic(decVal, TAG_TYPE_DNS)
       })
       .then((mut) => mut.getEntries()
         .then((entries) => entries.forEach((key, val) => {
@@ -196,7 +198,7 @@ export const createPublicId = (publicId) => {
   let publicIdName = null;
 
   return safe.crypto.sha3Hash(publicId)
-    .then((hashVal) => safe.mutableData.newPublic(hashVal, typetag))
+    .then((hashVal) => safe.mutableData.newPublic(hashVal, TAG_TYPE_DNS))
     .then((mdata) => {
       let permissionSet = null;
       let permissions = null;
@@ -243,7 +245,7 @@ export const createService = (publicId, service, container) => {
       return mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf));
     })
     .then((val) => {
-      return safe.mutableData.newPublic(val, typetag);
+      return safe.mutableData.newPublic(val, TAG_TYPE_DNS);
     })
     .then((publicIdMData) => {
       return publicIdMData.getEntries()
@@ -259,7 +261,7 @@ export const createService = (publicId, service, container) => {
 
 export const deleteService = (publicId, service) => {
   return safe.crypto.sha3Hash(publicId)
-    .then((hashVal) => safe.mutableData.newPublic(hashVal, typetag))
+    .then((hashVal) => safe.mutableData.newPublic(hashVal, TAG_TYPE_DNS))
     .then((mdata) => mdata.getEntries()
       .then((entries) => entries.get(service)
         .then((val) => entries.mutate()
@@ -268,7 +270,7 @@ export const deleteService = (publicId, service) => {
 };
 
 export const createContainer = (path) => {
-  return safe.mutableData.newRandomPublic(typetag)
+  return safe.mutableData.newRandomPublic(TAG_TYPE_WWW)
     .then((mdata) => {
       return mdata.quickSetup({})
         .then(() => {
@@ -327,7 +329,7 @@ export const deleteItem = (nwPath) => {
       if (fileName) {
         return mdata.encryptKey(dirName).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
           .then((val) => {
-            return safe.mutableData.newPublic(val, typetag)
+            return safe.mutableData.newPublic(val, TAG_TYPE_WWW)
               .then((dirMdata) => dirMdata.getEntries()
                 .then(() => dirMdata.getEntries()
                   .then((dirEntries) => dirEntries.get(fileName)
@@ -338,7 +340,7 @@ export const deleteItem = (nwPath) => {
       } else {
         return mdata.encryptKey(nwPath.split('/').slice(0, -1).join('/')).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
           .then((val) => {
-            return safe.mutableData.newPublic(val, typetag)
+            return safe.mutableData.newPublic(val, TAG_TYPE_WWW)
               .then((tarMdata) => {
                 const targetKeys = [];
                 return tarMdata.getEntries()
@@ -372,7 +374,7 @@ export const remapService = (service, publicId, container) => {
     .then(() => safe.auth.getContainer(accessContainers.publicNames))
     .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
     // .then((entries) => entries.get(publicId))
-    .then((val) => safe.mutableData.newPublic(val, typetag))
+    .then((val) => safe.mutableData.newPublic(val, TAG_TYPE_DNS))
     .then((publicIdMData) => publicIdMData.getEntries()
       .then(() => publicIdMData.getEntries()
         .then((entries) => entries.get(service)
@@ -387,7 +389,7 @@ export const getContainer = (path) => {
     .then((mdata) => mdata.encryptKey(path.split('/').slice(0, 3).join('/'))
       .then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
     // .then((entries) => entries.get(path.split('/').slice(0, 3).join('/')))
-    .then((val) => safe.mutableData.newPublic(val, typetag))
+    .then((val) => safe.mutableData.newPublic(val, TAG_TYPE_WWW))
     .then((mdata) => {
       const files = [];
       const nfs = mdata.emulateAs('NFS');
@@ -455,7 +457,7 @@ export const checkServiceExist = (publicId, service, path) => {
   return safe.auth.getContainer(accessContainers.publicNames)
     .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
     .then((decVal) => {
-      return safe.mutableData.newPublic(decVal, typetag)
+      return safe.mutableData.newPublic(decVal, TAG_TYPE_DNS)
     })
     .then((pubMut) => {
       return pubMut.get(service)
