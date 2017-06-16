@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { I18n } from 'react-redux-i18n';
 import { Link } from 'react-router';
 import NetworkStatus from './NetworkStatus';
+import { domainCheck } from '../utils/app_utils';
 
 import Nav from './Nav';
 
@@ -40,7 +41,8 @@ export default class Auth extends Component {
     this.state = {
       newPublicId: '',
       publicIdVisible: false,
-      showRemapModal: false
+      showRemapModal: false,
+      publicNameErr: ''
     };
     this.remap = {
       containerName: '',
@@ -80,6 +82,9 @@ export default class Auth extends Component {
   }
 
   createPublicId() {
+    if (!domainCheck(this.state.newPublicId)) {
+      return this.setState({ publicNameErr: I18n.t('messages.publicNameInvalid') });
+    }
     if (this.props.creatingPublicId) {
       return;
     }
@@ -128,7 +133,7 @@ export default class Auth extends Component {
               placeholder={I18n.t('label.enterPublicId')}
               onPressEnter={this.createPublicId.bind(this)}
             />
-            <div className="error-msg">{this.props.creatingPublicId ? '' : this.props.publicIdError}</div>
+            <div className="error-msg">{this.props.creatingPublicId ? '' : this.props.publicIdError || this.state.publicNameErr}</div>
           </div>
         </Modal>
       </div>
@@ -226,7 +231,7 @@ export default class Auth extends Component {
             defaultValue={this.state.newPublicId} placeholder={I18n.t('messages.publicIdPlaceholder')}
             onPressEnter={this.createPublicId.bind(this)}
           />
-          <div className="error-msg">{this.props.creatingPublicId ? '' : this.props.publicIdError}</div>
+          <div className="error-msg">{this.props.creatingPublicId ? '' : this.props.publicIdError || this.state.publicNameErr}</div>
           <Button
             type="primary" onClick={this.createPublicId.bind(this)}
             loading={this.props.creatingPublicId}

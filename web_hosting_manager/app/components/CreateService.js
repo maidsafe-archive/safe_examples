@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Button, Card, Input, Select, Icon } from 'antd';
 import { I18n } from 'react-redux-i18n';
+import { domainCheck } from '../utils/app_utils';
 
 import Nav from './Nav';
 
@@ -76,6 +77,11 @@ export default class CreateService extends Component {
     } else if (!this.state.containerName) {
       this.setState({
         containerError: containerNameErrorMsg
+      });
+      valid = false;
+    } else if(!domainCheck(this.state.serviceName)) {
+      this.setState({
+        serviceError: I18n.t('messages.serviceNameInvalid')
       });
       valid = false;
     }
