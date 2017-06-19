@@ -1,40 +1,9 @@
 import { Button, Card, Icon } from 'antd';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { I18n } from 'react-redux-i18n';
 
 export default class Auth extends Component {
-  static propTypes = {
-    connect: PropTypes.func.isRequired,
-    getAccessInfo: PropTypes.func.isRequired,
-    getPublicNames: PropTypes.func.isRequired,
-    getServices: PropTypes.func.isRequired,
-    reset: PropTypes.func.isRequired,
-
-    authError: PropTypes.string,
-    isAuthorising: PropTypes.bool.isRequired,
-    isAuthorised: PropTypes.bool.isRequired,
-
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-
-    fetchingAccessInfo: PropTypes.bool.isRequired,
-    fetchedAccessInfo: PropTypes.bool.isRequired,
-    accessInfoError: PropTypes.string,
-
-    fetchingPublicNames: PropTypes.bool.isRequired,
-    fetchedPublicNames: PropTypes.bool.isRequired,
-    publicNameError: PropTypes.string,
-
-    fetchingServices: PropTypes.bool.isRequired,
-    fetchedServices: PropTypes.bool.isRequired,
-    serviceError: PropTypes.string,
-
-    fetchingPublicContainers: PropTypes.bool.isRequired,
-    fetchedPublicContainers: PropTypes.bool.isRequired,
-    publicContainersError: PropTypes.string,
-  };
-
   componentDidMount() {
     if (!this.props.isRevoked) {
       this.props.connect();
@@ -176,3 +145,35 @@ export default class Auth extends Component {
     );
   }
 }
+
+Auth.propTypes = {
+  connect: PropTypes.func.isRequired,
+  getAccessInfo: PropTypes.func.isRequired,
+  getPublicNames: PropTypes.func.isRequired,
+  getServices: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+
+  authError: PropTypes.string,
+  isAuthorising: PropTypes.bool.isRequired,
+  isAuthorised: PropTypes.bool.isRequired,
+
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  connectionError: PropTypes.string,
+
+  fetchingAccessInfo: PropTypes.bool.isRequired,
+  fetchedAccessInfo: PropTypes.bool.isRequired,
+  accessInfoError: PropTypes.string,
+
+  fetchingPublicNames: PropTypes.bool.isRequired,
+  fetchedPublicNames: PropTypes.bool.isRequired,
+  publicNameError: PropTypes.string,
+
+  fetchingServices: PropTypes.bool.isRequired,
+  fetchedServices: PropTypes.bool.isRequired,
+  serviceError: PropTypes.string,
+
+  fetchingPublicContainers: PropTypes.bool.isRequired,
+  fetchedPublicContainers: PropTypes.bool.isRequired,
+  publicContainersError: PropTypes.string,
+};
