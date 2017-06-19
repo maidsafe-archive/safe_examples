@@ -1,6 +1,6 @@
 // @flow
 
-import { CONNECT, RESET } from '../actions/app';
+import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
 
 const initialState = {
@@ -11,21 +11,21 @@ const initialState = {
 
 const connection = (state: Object = initialState, action: Object) => {
   switch (action.type) {
-    case RESET:
+    case ACTION_TYPES.RESET:
       state = {
         ...state,
         ...initialState
       };
       break;
 
-    case `${CONNECT}_PENDING`:
+    case `${ACTION_TYPES.CONNECT}_PENDING`:
       state = {
         ...state,
         isConnecting: true
       };
       break;
 
-    case `${CONNECT}_FULFILLED`:
+    case `${ACTION_TYPES.CONNECT}_FULFILLED`:
       state = {
         ...state,
         isConnecting: false,
@@ -33,7 +33,7 @@ const connection = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case `${CONNECT}_REJECTED`:
+    case `${ACTION_TYPES.CONNECT}_REJECTED`:
       state = {
         ...state,
         isConnecting: false,

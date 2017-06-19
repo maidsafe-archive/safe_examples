@@ -1,6 +1,6 @@
 // @flow
 
-import * as Action from '../actions/app';
+import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
 import { trimErrorMsg } from '../utils/app_utils';
 
@@ -14,14 +14,14 @@ const initialState = {
 
 const publicId = (state: Object = initialState, action: Object) => {
   switch (action.type) {
-    case Action.RESET:
+    case ACTION_TYPES.RESET:
       state = {
         ...state,
         ...initialState
       };
       break;
 
-    case `${Action.FETCH_PUBLIC_NAMES}_PENDING`:
+    case `${ACTION_TYPES.FETCH_PUBLIC_NAMES}_PENDING`:
       state = {
         ...state,
         publicNames: {},
@@ -29,7 +29,7 @@ const publicId = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case `${Action.FETCH_PUBLIC_NAMES}_FULFILLED`:
+    case `${ACTION_TYPES.FETCH_PUBLIC_NAMES}_FULFILLED`:
     {
       const publicNames = {};
       let pkey = null;
@@ -45,7 +45,7 @@ const publicId = (state: Object = initialState, action: Object) => {
     }
       break;
 
-    case `${Action.FETCH_PUBLIC_NAMES}_REJECTED`:
+    case `${ACTION_TYPES.FETCH_PUBLIC_NAMES}_REJECTED`:
       state = {
         ...state,
         fetchingPublicNames: false,
@@ -54,14 +54,14 @@ const publicId = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case `${Action.CREATE_PUBLIC_ID}_PENDING`:
+    case `${ACTION_TYPES.CREATE_PUBLIC_ID}_PENDING`:
       state = {
         ...state,
         creatingPublicId: true
       };
       break;
 
-    case `${Action.CREATE_PUBLIC_ID}_FULFILLED`:
+    case `${ACTION_TYPES.CREATE_PUBLIC_ID}_FULFILLED`:
     {
       const publicNames = {};
       let pkey = null;
@@ -77,7 +77,7 @@ const publicId = (state: Object = initialState, action: Object) => {
     }
       break;
 
-    case `${Action.CREATE_PUBLIC_ID}_REJECTED`:
+    case `${ACTION_TYPES.CREATE_PUBLIC_ID}_REJECTED`:
       state = {
         ...state,
         creatingPublicId: false,
@@ -85,7 +85,7 @@ const publicId = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case `${Action.DELETE_SERVICE}_FULFILLED`:
+    case `${ACTION_TYPES.DELETE_SERVICE}_FULFILLED`:
     {
       const publicNames = {};
       let pkey = null;
@@ -99,7 +99,7 @@ const publicId = (state: Object = initialState, action: Object) => {
     }
       break;
 
-    case `${Action.CREATE_CONTAINER_AND_SERVICE}_FULFILLED`:
+    case `${ACTION_TYPES.CREATE_CONTAINER_AND_SERVICE}_FULFILLED`:
     {
       const publicNames = {};
       let pkey = null;
@@ -113,7 +113,7 @@ const publicId = (state: Object = initialState, action: Object) => {
     }
       break;
 
-    case `${Action.FETCH_SERVICES}_FULFILLED`:
+    case `${ACTION_TYPES.FETCH_SERVICES}_FULFILLED`:
     {
       const publicNames = {};
       let pkey = null;
@@ -127,7 +127,7 @@ const publicId = (state: Object = initialState, action: Object) => {
     }
       break;
 
-    case `${Action.REMAP_SERVICE}_FULFILLED`:
+    case `${ACTION_TYPES.REMAP_SERVICE}_FULFILLED`:
       const publicNames = {};
       let pkey = null;
       for (pkey of Object.keys(action.payload)) {
