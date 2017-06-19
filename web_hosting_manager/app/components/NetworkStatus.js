@@ -1,13 +1,9 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { I18n } from 'react-redux-i18n';
 
 export default class NetworkStatus extends Component {
-  static propTypes = {
-    status: PropTypes.number.isRequired,
-    message: PropTypes.string
-  };
-
   render() {
     return (
       <div className="nw-status">
@@ -25,3 +21,8 @@ export default class NetworkStatus extends Component {
     );
   }
 }
+
+NetworkStatus.propTypes = {
+  status: PropTypes.number.isRequired,
+  message: PropTypes.string
+};

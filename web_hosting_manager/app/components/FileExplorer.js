@@ -1,35 +1,12 @@
 import { remote } from 'electron';
 import { I18n } from 'react-redux-i18n';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Card, Button, Icon, Row, Col, notification, Popover, Progress } from 'antd';
 
 import Nav from './Nav';
 
 export default class FileExplorer extends Component {
-
-  static propTypes = {
-    getContainer: PropTypes.func.isRequired,
-    upload: PropTypes.func.isRequired,
-    cancelUpload: PropTypes.func.isRequired,
-    download: PropTypes.func.isRequired,
-    cancelDownload: PropTypes.func.isRequired,
-    deleteItem: PropTypes.func.isRequired,
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-    fetchingContainer: PropTypes.bool.isRequired,
-    deleting: PropTypes.bool.isRequired,
-    containerInfo: PropTypes.array.isRequired,
-    containerError: PropTypes.string,
-    uploading: PropTypes.bool.isRequired,
-    uploadStatus: PropTypes.object,
-    downloading: PropTypes.bool.isRequired,
-    downloadProgress: PropTypes.number.isRequired,
-    fileError: PropTypes.string,
-    params: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-  }
-
   constructor(props) {
     super(props);
     this.containerPath = undefined;
@@ -245,4 +222,27 @@ export default class FileExplorer extends Component {
       </div>
     );
   }
+}
+
+FileExplorer.propTypes = {
+  getContainer: PropTypes.func.isRequired,
+  upload: PropTypes.func.isRequired,
+  cancelUpload: PropTypes.func.isRequired,
+  download: PropTypes.func.isRequired,
+  cancelDownload: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  connectionError: PropTypes.string,
+  fetchingContainer: PropTypes.bool.isRequired,
+  deleting: PropTypes.bool.isRequired,
+  containerInfo: PropTypes.array.isRequired,
+  containerError: PropTypes.string,
+  uploading: PropTypes.bool.isRequired,
+  uploadStatus: PropTypes.object,
+  downloading: PropTypes.bool.isRequired,
+  downloadProgress: PropTypes.number.isRequired,
+  fileError: PropTypes.string,
+  params: PropTypes.object.isRequired,
+  router: PropTypes.object.isRequired,
 }

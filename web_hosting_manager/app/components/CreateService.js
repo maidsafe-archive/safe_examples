@@ -1,26 +1,11 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Card, Input, Select, Icon } from 'antd';
 import { I18n } from 'react-redux-i18n';
 
 import Nav from './Nav';
 
 export default class CreateService extends Component {
-  static propTypes = {
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-    creatingService: PropTypes.bool.isRequired,
-    serviceError: PropTypes.string,
-    fetchingPublicContainers: PropTypes.bool.isRequired,
-    publicContainers: PropTypes.array.isRequired,
-    publicContainersError: PropTypes.string,
-    params: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-    createContainerAndService: PropTypes.func.isRequired,
-    createService: PropTypes.func.isRequired,
-    getPublicContainers: PropTypes.func.isRequired,
-  }
-
   constructor(props) {
     super(props);
     this.containerName = '';
@@ -191,4 +176,20 @@ export default class CreateService extends Component {
       </div>
     );
   }
+}
+
+CreateService.propTypes = {
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  connectionError: PropTypes.string,
+  creatingService: PropTypes.bool.isRequired,
+  serviceError: PropTypes.string,
+  fetchingPublicContainers: PropTypes.bool.isRequired,
+  publicContainers: PropTypes.array.isRequired,
+  publicContainersError: PropTypes.string,
+  params: PropTypes.object.isRequired,
+  router: PropTypes.object.isRequired,
+  createContainerAndService: PropTypes.func.isRequired,
+  createService: PropTypes.func.isRequired,
+  getPublicContainers: PropTypes.func.isRequired,
 }

@@ -57,11 +57,15 @@
     "linux": {
       "target": "dir"
     },
-    "protocols": [{
-      "name": "safehostingmanager",
-      "role": "Viewer",
-      "schemes": ["safe-bmv0lm1hawrzywzllnnhzmvob3n0aw5nbwfuywdlcg"]
-    }]
+    "protocols": [
+      {
+        "name": "safehostingmanager",
+        "role": "Viewer",
+        "schemes": [
+          "safe-bmv0lm1hawrzywzllnnhzmvob3n0aw5nbwfuywdlcg"
+        ]
+      }
+    ]
   },
   "directories": {
     "buildResources": "resources",
@@ -156,6 +160,7 @@
     "electron-debug": "^1.0.1",
     "font-awesome": "^4.7.0",
     "json-loader": "^0.5.4",
+    "prop-types": "^15.5.10",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",

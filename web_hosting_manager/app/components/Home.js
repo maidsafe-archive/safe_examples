@@ -1,5 +1,6 @@
 import { Button, Card, Collapse, Input, Modal, Row, Col, Select, Icon } from 'antd';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { I18n } from 'react-redux-i18n';
 import { Link } from 'react-router';
@@ -8,33 +9,6 @@ import NetworkStatus from './NetworkStatus';
 import Nav from './Nav';
 
 export default class Auth extends Component {
-  static propTypes = {
-    connect: PropTypes.func.isRequired,
-    getAccessInfo: PropTypes.func.isRequired,
-    getPublicNames: PropTypes.func.isRequired,
-    getPublicContainers: PropTypes.func.isRequired,
-    createPublicId: PropTypes.func.isRequired,
-    remapService: PropTypes.func.isRequired,
-
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-
-    fetchingAccessInfo: PropTypes.bool.isRequired,
-    fetchedAccessInfo: PropTypes.bool.isRequired,
-    accessInfoError: PropTypes.string,
-
-    fetchingPublicNames: PropTypes.bool.isRequired,
-    publicNames: PropTypes.object.isRequired,
-    creatingPublicId: PropTypes.bool.isRequired,
-    publicIdError: PropTypes.string,
-
-    remapping: PropTypes.bool.isRequired,
-    serviceError: PropTypes.string,
-
-    publicContainers: PropTypes.array.isRequired
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -336,3 +310,30 @@ export default class Auth extends Component {
     );
   }
 }
+
+Auth.propTypes = {
+  connect: PropTypes.func.isRequired,
+  getAccessInfo: PropTypes.func.isRequired,
+  getPublicNames: PropTypes.func.isRequired,
+  getPublicContainers: PropTypes.func.isRequired,
+  createPublicId: PropTypes.func.isRequired,
+  remapService: PropTypes.func.isRequired,
+
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  connectionError: PropTypes.string,
+
+  fetchingAccessInfo: PropTypes.bool.isRequired,
+  fetchedAccessInfo: PropTypes.bool.isRequired,
+  accessInfoError: PropTypes.string,
+
+  fetchingPublicNames: PropTypes.bool.isRequired,
+  publicNames: PropTypes.object.isRequired,
+  creatingPublicId: PropTypes.bool.isRequired,
+  publicIdError: PropTypes.string,
+
+  remapping: PropTypes.bool.isRequired,
+  serviceError: PropTypes.string,
+
+  publicContainers: PropTypes.array.isRequired
+};

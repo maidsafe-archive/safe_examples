@@ -1,6 +1,6 @@
 // @flow
 
-import * as Action from '../actions/app';
+import ACTION_TYPES from '../actions/actionTypes';
 
 const initialState = {
   uploading: false,
@@ -12,14 +12,14 @@ const initialState = {
 
 const file = (state: Object = initialState, action: Object) => {
   switch (action.type) {
-    case Action.RESET:
+    case ACTION_TYPES.RESET:
       state = {
         ...state,
         ...initialState
       };
       break;
 
-    case Action.UPLOAD_STARTED:
+    case ACTION_TYPES.UPLOAD_STARTED:
       state = {
         ...state,
         uploading: true,
@@ -27,21 +27,21 @@ const file = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case Action.UPLOADING:
+    case ACTION_TYPES.UPLOADING:
       state = {
         ...state,
         uploadStatus: action.payload
       };
       break;
 
-    case Action.UPLOAD_COMPLETED:
+    case ACTION_TYPES.UPLOAD_COMPLETED:
       state = {
         ...state,
         uploading: false,
         uploadStatus: undefined
       };
       break;
-    case Action.UPLOAD_FAILED:
+    case ACTION_TYPES.UPLOAD_FAILED:
       state = {
         ...state,
         uploading: false,
@@ -49,7 +49,7 @@ const file = (state: Object = initialState, action: Object) => {
         error: action.payload.message
       };
       break;
-    case Action.DOWNLOAD_STARTED:
+    case ACTION_TYPES.DOWNLOAD_STARTED:
       state = {
         ...state,
         downloading: true,
@@ -57,21 +57,21 @@ const file = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case Action.DOWNLOADING:
+    case ACTION_TYPES.DOWNLOADING:
       state = {
         ...state,
         downloadProgress: action.payload
       };
       break;
 
-    case Action.DOWNLOAD_COMPLETED:
+    case ACTION_TYPES.DOWNLOAD_COMPLETED:
       state = {
         ...state,
         downloading: false,
         downloadProgress: 0
       };
       break;
-    case Action.DOWNLOAD_FAILED:
+    case ACTION_TYPES.DOWNLOAD_FAILED:
       state = {
         ...state,
         downloading: false,
@@ -79,7 +79,7 @@ const file = (state: Object = initialState, action: Object) => {
         error: action.payload.message
       };
       break;
-    case Action.CLEAR_NOTIFICATION:
+    case ACTION_TYPES.CLEAR_NOTIFICATION:
       state = {
         ...state,
         error: undefined
