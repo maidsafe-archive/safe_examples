@@ -153,6 +153,12 @@ export const fetchPublicNames = () => {
                       publicIds[decPubId] = {};
                     }
                   })
+                  .catch((err) => {
+                    if (err.code === -3) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(err);
+                  })
               }));
             })
         })))

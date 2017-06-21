@@ -54,6 +54,8 @@ const en = {
   messages: {
     emptyServiceName: 'Service name must be filled',
     emptyContainerName: 'Container name must be filled',
+    serviceNameInvalid: 'Service name must container only alphanumeric characters or - and should not exceed 62 characters',
+    publicNameInvalid: 'Public name must container only alphanumeric characters or - and should not exceed 62 characters',
     serviceNamePlaceholder: 'Enter Service Name',
     containerNamePlaceholder: 'Container Name. Eg, <service-name>-root',
     noContainerPlaceHolder: 'No Public Container Available',
