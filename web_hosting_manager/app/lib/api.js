@@ -1,500 +1,474 @@
-import { shell } from 'electron';
+/**
+ * SafeApi class expose all api requested for web hosting manager.
+ */
 import path from 'path';
-import keytar from 'keytar';
+import safeApp from 'safe-app';
+import { I18n } from 'react-redux-i18n';
+
 import Uploader from './Uploader';
 import Downloader from './Downloader';
-import { I18n } from 'react-redux-i18n';
-import safeApp from 'safe-app';
-import pkg from '../package.json';
-import { parseUrl } from './utils';
+import * as utils from './utils';
+import CONSTANTS from './constants';
 
-const SERVICE = 'WEB_HOST_MANAGER';
-const ACCOUNT = 'SAFE_USER';
-const APP_INFO = {
-  data: {
-    id: pkg.identifier,
-    scope: null,
-    name: pkg.name,
-    vendor: pkg.author.name
-  },
-  opt: {
-    own_container: false
-  },
-  permissions: { // TODO check permissions are right
-    _public: [
-      'Read',
-      'Insert',
-      'Update',
-      'Delete',
-      'ManagePermissions'
-    ],
-    _publicNames: [
-      'Read',
-      'Insert',
-      'Update',
-      'Delete',
-      'ManagePermissions'
-    ]
+class SafeApi {
+  constructor() {
+    this.app = null;
+    this.APP_INFO = CONSTANTS.APP_INFO;
+    this.publicNames = {};
+    this.uploader = null;
+    this.downloader = null;
   }
-};
 
-export const AUTH_RES_TYPES = {
-  containers: 'containers',
-  revoked: 'revoked'
-};
-
-export const accessContainers = {
-  public: '_public',
-  publicNames: '_publicNames'
-};
-
-export const TAG_TYPE_DNS = 15001;
-export const TAG_TYPE_WWW = 15002;
-
-
-let publicIds = {};
-let uploader;
-let downloader;
-
-export let safe = null;
-
-const getLocalAuthInfo = () => {
-  return keytar.getPassword(SERVICE, ACCOUNT);
-};
-
-const clearLocalAuthInfo = () => {
-  return keytar.deletePassword(SERVICE, ACCOUNT);
-};
-
-export const hasLocalAuthInfo = () => {
-  return getLocalAuthInfo();
-};
-
-export const saveAuthInfo = (authInfo) => {
-  return keytar.addPassword(SERVICE, ACCOUNT, JSON.stringify(authInfo)); // TODO check authInfo type
-};
-
-export const authorise = () => {
-  const authInfo = getLocalAuthInfo(); // TODO if authInfo is null => authorise app
-  if (authInfo) {
-    return authInfo;
+  /**
+   * Authorise with SAFE Authenticator
+   * @return {Promise}
+   */
+  authorise() {
+    const authInfo = utils.localAuthInfo.get();
+    if (authInfo) {
+      return authInfo;
+    }
+    return safeApp.initializeApp(this.APP_INFO.data)
+      .then((app) => app.auth.genAuthUri(this.APP_INFO.permissions, this.APP_INFO.opt))
+      .then((res) => utils.openExternal(res.uri));
   }
-  return safeApp.initializeApp(APP_INFO.data)
-    .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opt))
-    .then((res) => {
-      shell.openExternal(parseUrl(res.uri))
-    });
-};
 
-export const connect = (res) => {
-  const authInfo = res || JSON.parse(getLocalAuthInfo());
-  if (!authInfo) {
-    return authorise();
-  }
-  return safeApp.fromAuthURI(APP_INFO.data, authInfo)
-    .then((app) => {
-      if (res) {
-        saveAuthInfo(res);
-      }
-      (safe = app)
-    })
-    .catch((err) => {
-      if (err[0] === AUTH_RES_TYPES.containers) {
-        return Promise.resolve(AUTH_RES_TYPES.containers);
-      } else if (err[0] === AUTH_RES_TYPES.revoked) {
-        clearLocalAuthInfo();
-        return Promise.resolve(AUTH_RES_TYPES.revoked);
-      } else {
-        clearLocalAuthInfo();
-        return Promise.reject(err);
-      }
-    });
-};
-
-export const fetchAccessInfo = () => {
-  return safe.auth.refreshContainersPermissions()
-    .then(() => safe.auth.canAccessContainer(accessContainers.public))
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error(`No access to ${accessContainers.public} container`));
-      }
-    })
-    .then(() => safe.auth.canAccessContainer(accessContainers.publicNames))
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        return Promise.reject(new Error(`No access to ${accessContainers.publicNames} container`));
-      }
-    })
-    .catch((e) => {
-      clearLocalAuthInfo();
-      return Promise.reject(e);
-    });
-};
-
-export const fetchPublicNames = () => {
-  return safe.auth.getContainer(accessContainers.publicNames)
-    .then((mdata) => mdata.getKeys()
-      .then((keys) => keys.len()
-        .then((len) => {
-          if (len === 0) {
-            console.log('No public Ids found');
-            return;
-          }
-          const encPublicIds = [];
-          return keys.forEach(function (key) {
-            encPublicIds.push(key);
-          })
-            .then(() => {
-              return Promise.all(encPublicIds.map((pubId) => {
-                return mdata.decrypt(pubId)
-                  .then((decKey) => {
-                    const decPubId = decKey.toString()
-                    if (!publicIds[decPubId] || typeof publicIds[decPubId] !== 'object') {
-                      publicIds[decPubId] = {};
-                    }
-                  })
-              }));
-            })
-        })))
-    .then(() => publicIds);
-};
-
-export const fetchServices = () => {
-  const publicNamesKeys = Object.getOwnPropertyNames(publicIds);
-  return Promise.all(publicNamesKeys.map((publicId) => {
-    const services = {};
-    return safe.auth.getContainer(accessContainers.publicNames)
-      .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-      .then((decVal) => {
-        return safe.mutableData.newPublic(decVal, TAG_TYPE_DNS)
+  /**
+   * CONNECT with SAFE Network
+   * @param uri
+   * @return {*}
+   */
+  connect(uri) {
+    const authInfo = uri || JSON.parse(utils.localAuthInfo.get());
+    if (!authInfo) {
+      // FIXME shankar - handle from action
+      // return Promise.reject(new Error('Missing Authorisation information.'));
+      return this.authorise();
+    }
+    return safeApp.fromAuthURI(this.APP_INFO.data, authInfo)
+      .then((app) => {
+        // store Auth response
+        if (uri) {
+          utils.localAuthInfo.save(uri);
+        }
+        this.app = app;
       })
-      .then((mut) => mut.getEntries()
-        .then((entries) => entries.forEach((key, val) => {
-          const service = key.toString();
-          if ((service.indexOf('@email') !== -1) || (val.buf.length === 0)) {
-            return;
-          }
-          services[service] = val;
-        })))
+      .catch((err) => {
+        if (err[0] === CONSTANTS.AUTH_RES_TYPE.CONTAINERS) {
+          return Promise.resolve(CONSTANTS.AUTH_RES_TYPE.CONTAINERS);
+        } else if (err[0] === CONSTANTS.AUTH_RES_TYPE.REVOKED) {
+          utils.localAuthInfo.clear();
+          return Promise.resolve(CONSTANTS.AUTH_RES_TYPE.REVOKED);
+        } else {
+          utils.localAuthInfo.clear();
+          return Promise.reject(err);
+        }
+      });
+  }
+
+  /**
+   * Check access containers accessible
+   * @return {*}
+   */
+  canAccessContainers() {
+    if (!this.app) {
+      return Promise.reject(new Error('Application is not connected.'));
+    }
+    return this.app.auth.refreshContainersPermissions()
       .then(() => {
-        return Promise.all(Object.keys(services).map((key) => {
-          return getContainerName(services[key])
-            .then((val) => {
-              services[key] = val;
-            });
-        }))
+        return Promise.all(
+          Object.keys(CONSTANTS.ACCESS_CONTAINERS).map((cont) => {
+            return this.app.auth.canAccessContainer(CONSTANTS.ACCESS_CONTAINERS[cont])
+          })
+        );
       })
-      .then(() => publicIds[publicId] = services)
-      .catch(Promise.reject);
-  })).then(() => publicIds);
-};
-
-export const createPublicId = (publicId) => {
-  publicId = publicId.trim();
-  if (!publicId) {
-    const err = new Error(I18n.t('messages.cannotBeEmpty', { name: 'Public Id' }));
-    return Promise.reject(err);
-  }
-  let publicIdName = null;
-
-  return safe.crypto.sha3Hash(publicId)
-    .then((hashVal) => safe.mutableData.newPublic(hashVal, TAG_TYPE_DNS))
-    .then((mdata) => {
-      let permissionSet = null;
-      let permissions = null;
-      let pubSignKey = null;
-
-      return safe.mutableData.newPermissionSet()
-        .then((permSet) => (permissionSet = permSet))
-        .then(() => permissionSet.setAllow('Insert'))
-        .then(() => permissionSet.setAllow('Update'))
-        .then(() => permissionSet.setAllow('Delete'))
-        .then(() => permissionSet.setAllow('ManagePermissions'))
-        .then(() => safe.crypto.getAppPubSignKey())
-        .then((signKey) => (pubSignKey = signKey))
-        .then(() => safe.mutableData.newPermissions())
-        .then((perm) => (permissions = perm))
-        .then(() => permissions.insertPermissionSet(pubSignKey, permissionSet))
-        .then(() => safe.mutableData.newEntries())
-        .then((entries) => mdata.put(permissions, entries))
-        .then(() => mdata.getNameAndTag())
-    })
-    .then((data) => (publicIdName = data.name))
-    .then(() => safe.auth.getContainer(accessContainers.publicNames))
-    .then((mdata) => mdata.getEntries()
-      .then((entries) => entries.mutate()
-        .then((mut) => mdata.encryptKey(publicId)
-          .then((encKey) => mdata.encryptValue(publicIdName)
-            .then((encVal) => mut.insert(encKey, encVal)))
-          .then(() => mdata.applyEntriesMutation(mut)))));
-};
-
-export const createService = (publicId, service, container) => {
-  if (!publicId) {
-    return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Public Id' })));
-  }
-  if (!service) {
-    return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Service' })));
-  }
-  if (!container) {
-    return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Container path' })));
+      .catch((err) => {
+        utils.localAuthInfo.clear();
+        return Promise.reject(err);
+      });
   }
 
-  return safe.auth.getContainer(accessContainers.publicNames)
-    .then((mdata) => {
-      return mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf));
-    })
-    .then((val) => {
-      return safe.mutableData.newPublic(val, TAG_TYPE_DNS);
-    })
-    .then((publicIdMData) => {
-      return publicIdMData.getEntries()
-        .then((entries) => {
-          return entries.mutate()
-            .then((mut) => {
-              return mut.insert(service, container)
-                .then(() => publicIdMData.applyEntriesMutation(mut));
-            });
-        })
-    });
-};
-
-export const deleteService = (publicId, service) => {
-  return safe.crypto.sha3Hash(publicId)
-    .then((hashVal) => safe.mutableData.newPublic(hashVal, TAG_TYPE_DNS))
-    .then((mdata) => mdata.getEntries()
-      .then((entries) => entries.get(service)
-        .then((val) => entries.mutate()
-          .then((mut) => mut.remove(service, val.version + 1)
-            .then(() => mdata.applyEntriesMutation(mut))))));
-};
-
-export const createContainer = (path) => {
-  return safe.mutableData.newRandomPublic(TAG_TYPE_WWW)
-    .then((mdata) => {
-      return mdata.quickSetup({})
-        .then(() => {
-          return mdata.getNameAndTag();
-        })
-    })
-    .then((data) => {
-      return safe.auth.getContainer(accessContainers.public)
-        .then((mdata) => {
-          return mdata.getEntries()
-            .then((entries) => {
-              return entries.mutate()
-                .then((mut) => {
-                  return mdata.encryptKey(path)
-                    .then((encKey) => mdata.encryptValue(data.name)
-                      .then((encVal) => mut.insert(encKey, encVal)))
-                    .then(() => mdata.applyEntriesMutation(mut));
+  /**
+   * Fetch Public Names
+   */
+  fetchPublicNames() {
+    const self = this;
+    return this.getPublicNamesContainer()
+      .then((md) => md.getKeys()
+        .then((keys) => keys.len()
+          .then((keysLen) => {
+            if (keysLen === 0) {
+              console.warn('No Public Names found');
+              return;
+            }
+            const encPublicNames = [];
+            return keys.forEach(function (key) {
+              encPublicNames.push(key);
+            }).then(() => Promise.all(encPublicNames.map((key) => {
+              return md.decrypt(key)
+                .then((decKey) => {
+                  const decPubId = decKey.toString();
+                  if (!self.publicNames[decPubId] || typeof self.publicNames[decPubId] !== 'object') {
+                    self.publicNames[decPubId] = {};
+                  }
+                })
+                .catch((err) => { // FIXME shankar - to be removed once fixed symmetric decipher failure for unknown key decryption.
+                  if (err.code === CONSTANTS.ERROR_CODE.SYMMETRIC_DECIPHER_FAILURE) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(err);
                 });
-            });
-        })
-        .then(() => {
-          return data.name;
-        });
-    });
-};
+            })));
+          })))
+      .then(() => (self.publicNames));
+  }
 
-export const getPublicContainers = () => {
-  const publicKeys = [];
-  return safe.auth.getContainer(accessContainers.public)
-    .then((mdata) => mdata.getKeys())
-    .then((keys) => {
-      return keys.len()
+  /**
+   * Fetch Service of Public Names
+   * @return {Promise}
+   */
+  fetchServices() {
+    const self = this;
+    const publicNames = Object.getOwnPropertyNames(this.publicNames);
+    return Promise.all(publicNames.map((publicName) => {
+      const services = {};
+      return this.getPublicNamesContainer()
+        .then((md) => this.getMDataValueForKey(md, publicName))
+        .then((value) => this.app.mutableData.newPublic(value, CONSTANTS.TAG_TYPE.DNS))
+        .then((md) => md.getEntries()
+          .then((entries) => entries.forEach((key, val) => {
+            const service = key.toString();
+            // check service is not an email or deleted
+            if ((service.indexOf('@email') !== -1) || (val.buf.length === 0)) {
+              return;
+            }
+            services[service] = val;
+          })))
+        .then(() => Promise.all(Object.keys(services).map((service) => (
+          self._getServicePath(services[service])
+            .then((path) => {
+              services[service] = path;
+            })
+        ))))
+        .then(() => (self.publicNames[publicName] = services))
+        .catch(Promise.reject);
+    })).then(() => (self.publicNames));
+  }
+
+  /**
+   * Create new Public Name
+   * @param publicName
+   * @return {Promise<R>|Promise.<*>}
+   */
+  createPublicName(publicName) {
+    const name = publicName.trim();
+    if (!name) {
+      // FIXME correct error message to public name
+      const err = new Error(I18n.t('messages.cannotBeEmpty', { name: 'Public Id' }));
+      return Promise.reject(err);
+    }
+
+    return this.app.crypto.sha3Hash(name)
+      .then((hashedName) => this.app.mutableData.newPublic(hashedName, CONSTANTS.TAG_TYPE.DNS))
+      .then((md) => {
+        return this.app.mutableData.newPermissionSet()
+          .then((permSet) => permSet.setAllow('Insert')
+            .then(() => permSet.setAllow('Update'))
+            .then(() => permSet.setAllow('Delete'))
+            .then(() => permSet))
+          .then((permSet) => this.app.crypto.getAppPubSignKey()
+            .then((signKey) => this.app.mutableData.newPermissions()
+              .then((perm) => perm.insertPermissionSet(signKey, permSet).then(() => perm))))
+          .then((perm) => this.app.mutableData.newEntries()
+            .then((entries) => md.put(perm, entries)))
+          .then(() => md.getNameAndTag())
+          .then((mdMeta) => this.getPublicNamesContainer()
+            .then((pubMd) => this._insertToMData(pubMd, name, mdMeta.name, true)));
+      });
+  }
+
+  /**
+   * Create new Service
+   * @param publicName
+   * @param serviceName
+   * @param path
+   * @return {*}
+   */
+  createService(publicName, serviceName, pathXORName) {
+    if (!publicName) {
+      return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Public Id' })));
+    }
+    if (!serviceName) {
+      return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Service' })));
+    }
+    if (!path) {
+      return Promise.reject(new Error(I18n.t('messages.cannotBeEmpty', { name: 'Container path' })));
+    }
+
+    return this.getPublicNamesContainer()
+      .then((md) => this.getMDataValueForKey(md, publicName))
+      .then((decVal) => this.app.mutableData.newPublic(decVal, CONSTANTS.TAG_TYPE.DNS))
+      .then((md) => this._insertToMData(md, serviceName, pathXORName)
+        .catch((err) => {
+          if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
+            return Promise.reject(err);
+          }
+          return this._updateMDataKey(md, serviceName, pathXORName);
+        }));
+  }
+
+  /**
+   * Delete Service
+   * @param publicName
+   * @param serviceName
+   */
+  deleteService(publicName, serviceName) {
+    return this.app.crypto.sha3Hash(publicName)
+      .then((hashedPubName) => this.app.mutableData.newPublic(hashedPubName, CONSTANTS.TAG_TYPE.DNS))
+      .then((md) => this._removeFromMData(md, serviceName));
+  }
+
+  createServiceContainer(path) {
+    return this.app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE.WWW)
+      .then((md) => md.quickSetup({}).then(() => md.getNameAndTag()))
+      .then((mdMeta) => this.getPublicContainer()
+        .then((pubMd) => this._insertToMData(pubMd, path, mdMeta.name))
+        .then(() => mdMeta.name));
+  }
+
+  getPublicContainerKeys() {
+    const publicKeys = [];
+    return this.getPublicContainer()
+      .then((pubMd) => pubMd.getKeys())
+      .then((keys) => keys.len()
         .then((len) => {
           if (len === 0) {
             return Promise.resolve([]);
           }
           return keys.forEach((key) => {
+            if (!key) {
+              return;
+            }
             publicKeys.unshift(key.toString());
-          });
-        });
-    })
-    .then(() => publicKeys);
-};
-
-export const deleteItem = (nwPath) => {
-  let dirName = nwPath;
-  let fileName = null;
-  if (path.extname(nwPath)) {
-    dirName = path.dirname(nwPath);
-    fileName = path.basename(nwPath);
+          }).then(() => publicKeys);
+        }));
   }
 
-  return safe.auth.getContainer(accessContainers.public)
-  // .then((mdata) => mdata.getEntries()
-    .then((mdata) => {
-      if (fileName) {
-        return mdata.encryptKey(dirName).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
-          .then((val) => {
-            return safe.mutableData.newPublic(val, TAG_TYPE_WWW)
-              .then((dirMdata) => dirMdata.getEntries()
-                .then(() => dirMdata.getEntries()
-                  .then((dirEntries) => dirEntries.get(fileName)
-                    .then((val) => dirEntries.mutate()
-                      .then((mut) => mut.remove(fileName, val.version + 1)
-                        .then(() => dirMdata.applyEntriesMutation(mut)))))))
-          });
-      } else {
-        return mdata.encryptKey(nwPath.split('/').slice(0, -1).join('/')).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
-          .then((val) => {
-            return safe.mutableData.newPublic(val, TAG_TYPE_WWW)
-              .then((tarMdata) => {
-                const targetKeys = [];
-                return tarMdata.getEntries()
-                  .then((entries) => entries.forEach((key, val) => {
-                    const keyStr = key.toString();
-                    const dirname = nwPath.split('/').slice(-1).toString()
-                    if (keyStr.indexOf(dirname) !== 0) {
-                      return;
-                    }
-                    targetKeys.push({key: keyStr, version: val.version});
-                  })
-                    .then(() => Promise.all(targetKeys.map((tar) => {
-                      return entries.mutate()
-                        .then((mut) => {
-                          return mut.remove(tar.key, tar.version + 1)
-                            .then(() => tarMdata.applyEntriesMutation(mut))
-                        });
-                    }))));
-              });
-          });
-      }
-    });
-};
+  deleteFileOrDir(netPath) {
+    let dirName = netPath;
+    let fileName = null;
+    if (path.extname(netPath)) {
+      dirName = path.dirname(netPath);
+      fileName = path.basename(netPath);
+    }
 
-export const remapService = (service, publicId, container) => {
-  let containerName = null;
-  return safe.auth.getContainer(accessContainers.public)
-    .then((mdata) => mdata.encryptKey(container).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-    // .then((entries) => entries.get(container))
-    .then((val) => (containerName = val))
-    .then(() => safe.auth.getContainer(accessContainers.publicNames))
-    .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-    // .then((entries) => entries.get(publicId))
-    .then((val) => safe.mutableData.newPublic(val, TAG_TYPE_DNS))
-    .then((publicIdMData) => publicIdMData.getEntries()
-      .then(() => publicIdMData.getEntries()
-        .then((entries) => entries.get(service)
-          .then((val) => entries.mutate()
-            .then((mut) => mut.update(service, containerName, val.version + 1)
-              .then(() => publicIdMData.applyEntriesMutation(mut)))))));
-};
+    return this.getPublicContainer()
+      .then((pubMd) => {
+        // delete file
+        if (fileName) {
+          return this.getMDataValueForKey(pubMd, dirName)
+            .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
+            .then((md) => this._removeFromMData(md, fileName));
+        }
 
-export const getContainer = (path) => {
-  let result = [];
-  return safe.auth.getContainer(accessContainers.public)
-    .then((mdata) => mdata.encryptKey(path.split('/').slice(0, 3).join('/'))
-      .then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-    // .then((entries) => entries.get(path.split('/').slice(0, 3).join('/')))
-    .then((val) => safe.mutableData.newPublic(val, TAG_TYPE_WWW))
-    .then((mdata) => {
-      const files = [];
-      const nfs = mdata.emulateAs('NFS');
-      return mdata.getEntries()
-        .then((entries) => entries.forEach((key, value) => {
-          if (value.buf.length === 0) {
-            return
-          }
-          let keyStr = key.toString();
-          const rootName = path.split('/').slice(3).join('/');
-          if (rootName && (keyStr.indexOf(rootName) !== 0)) {
-            return
-          }
-          let keyStrTrimmed = keyStr;
-          if (rootName.length > 0) {
-            keyStrTrimmed = keyStr.substr(rootName.length + 1);
-          }
-          if (keyStrTrimmed.split('/').length > 1) {
-            const dirName = keyStrTrimmed.split('/')[0];
-            if (result.filter((files) => files.name === dirName).length === 0) {
-              return result.unshift({ isFile: false, name: dirName });
+        // delete directory
+        return this.getMDataValueForKey(pubMd, netPath.split('/').slice(0, -1).join('/'))
+          .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
+          .then((dirMd) => {
+            const fileKeys = [];
+            const nameOfDir = netPath.split('/').slice(-1).toString();
+            return dirMd.getEntries()
+              .then((entries) => entries.forEach((key, val) => {
+                const keyStr = key.toString();
+                if (keyStr.indexOf(nameOfDir) !== 0) {
+                  return;
+                }
+                fileKeys.push({ key: keyStr, version: val.version });
+              }).then(() => Promise.all(fileKeys.map((file) => {
+                return entries.mutate()
+                  .then((mut) => {
+                    return mut.remove(file.key, file.version + 1)
+                      .then(() => dirMd.applyEntriesMutation(mut))
+                  });
+              }))));
+          });
+      });
+  }
+
+  remapService(publicName, serviceName, path) {
+    return this.getPublicContainer()
+      .then((pubMd) => this.getMDataValueForKey(pubMd, path))
+      .then((containerVal) => {
+        return this.getPublicNamesContainer()
+          .then((pnMd) => this.getMDataValueForKey(pnMd, publicName))
+          .then((pnVal) => this.app.mutableData.newPublic(pnVal, CONSTANTS.TAG_TYPE.DNS))
+          .then((md) => this._updateMDataKey(md, serviceName, containerVal));
+      });
+  }
+
+  getServiceContainer(path) {
+    return this.getPublicContainer()
+      .then((md) => this.getMDataValueForKey(md, path.split('/').slice(0, 3).join('/')))
+      .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
+      .then((serMd) => {
+        const files = [];
+        let result = [];
+        const rootName = path.split('/').slice(3).join('/');
+        return serMd.getEntries()
+          .then((entries) => entries.forEach((key, val) => {
+            if (val.buf.length === 0) {
+              return;
             }
-            return;
-          }
-          files.unshift(keyStr);
-        }))
-        .then(() => {
-          return Promise.all(files.map((file) => {
-            return nfs.fetch(file)
-              .then((f) => safe.immutableData.fetch(f.dataMapName))
-              .then((i) => i.read())
-              .then((co) => {
-                const dirName = path.split('/').slice(3).join('/');
-                result.unshift({
-                  isFile: true,
-                  name: dirName ? file.substr(dirName.length + 1) : file,
-                  size: co.length
-                });
-              });
-          }));
-        });
-    })
-    .then(() => result);
-};
-
-export const upload = (localPath, networkPath, progressCallback, errorCallback) => {
-  uploader = new Uploader(localPath, networkPath, progressCallback, errorCallback);
-  uploader.start();
-};
-
-export const cancelUpload = () => {
-  uploader.cancel();
-};
-
-export const download = (networkPath, callback) => {
-  downloader = new Downloader(networkPath, callback);
-  downloader.start();
-};
-
-export const cancelDownload = () => {
-  downloader.cancel();
-};
-
-export const checkServiceExist = (publicId, service, path) => {
-  return safe.auth.getContainer(accessContainers.publicNames)
-    .then((mdata) => mdata.encryptKey(publicId).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-    .then((decVal) => {
-      return safe.mutableData.newPublic(decVal, TAG_TYPE_DNS)
-    })
-    .then((pubMut) => {
-      return pubMut.get(service)
-        .then((value) => {
-          if (value.buf.length !== 0) {
-            return;
-          }
-          return safe.auth.getContainer(accessContainers.public)
-            .then((mdata) => {
-              return mdata.encryptKey(path).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf))
-            })
-            .then((val) => {
-              return pubMut.getEntries()
-                .then((entries) => {
-                  return entries.mutate().then((mut) => {
-                    return mut.update(service, val, value.version + 1).then(() => pubMut.applyEntriesMutation(mut));
+            let keyStr = key.toString();
+            if (rootName && (keyStr.indexOf(rootName) !== 0)) {
+              return;
+            }
+            let keyStrTrimmed = keyStr;
+            if (rootName.length > 0) {
+              keyStrTrimmed = keyStr.substr(rootName.length + 1);
+            }
+            if (keyStrTrimmed.split('/').length > 1) {
+              const dirName = keyStrTrimmed.split('/')[0];
+              if (result.filter((files) => (files.name === dirName)).length === 0) {
+                return result.unshift({ isFile: false, name: dirName });
+              }
+              return;
+            }
+            files.unshift(keyStr);
+          })).then(() => {
+            const nfs = serMd.emulateAs('NFS');
+            return Promise.all(files.map((file) => {
+              return nfs.fetch(file)
+                .then((f) => this.app.immutableData.fetch(f.dataMapName))
+                .then((i) => i.read())
+                .then((co) => {
+                  const dirName = path.split('/').slice(3).join('/');
+                  result.unshift({
+                    isFile: true,
+                    name: dirName ? file.substr(dirName.length + 1) : file,
+                    size: co.length
                   });
                 });
-            });
-        })
-        .catch((err) => {
-          if (err.code === -106) {
-            return Promise.resolve(false);
-          }
-          return Promise.reject();
-        });
-    });
-};
+            })).then(() => result);
+          });
+      });
+  }
 
-const getContainerName = (mdataName) => {
-  let res = null;
-  return safe.auth.getContainer(accessContainers.public)
-    .then((mdata) => mdata.getEntries()
-      .then((entries) => entries.forEach((key, val) => {
-        if (val.buf.equals(mdataName.buf)) {
-          res = key.toString();
-        }
-      })))
-    .then(() => res);
-};
+  getServiceContainerMeta(path) {
+    return this.getPublicContainer()
+      .then((md) => this.getMDataValueForKey(md, path))
+      .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
+      .then((serMd) => serMd.getNameAndTag());
+  }
+
+  updateServiceIfExist(publicName, serviceName, path) {
+    return this.getPublicNamesContainer()
+      .then((pnMd) => this.getMDataValueForKey(pnMd, publicName))
+      .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.DNS))
+      .then((md) => {
+        return md.get(serviceName)
+          .then((value) => {
+            if (value.buf.length !== 0) {
+              return;
+            }
+            return this.getPublicContainer()
+              .then((pubMd) => this.getMDataValueForKey(pubMd, path))
+              .then((val) => this._updateMDataKey(md, serviceName, val));
+          })
+          .catch((err) => {
+            if (err.code === CONSTANTS.ERROR_CODE.NO_SUCH_ENTRY) {
+              return Promise.resolve(false);
+            }
+            return Promise.reject();
+          });
+      });
+  }
+
+  fileUpload(localPath, networkPath, progressCallback, errorCallback) {
+    this.uploader = new Uploader(localPath, networkPath, progressCallback, errorCallback);
+    this.uploader.start();
+  };
+
+  cancelFileUpload() {
+    this.uploader.cancel();
+  }
+
+  fileDownload(networkPath, callback) {
+    this.downloader = new Downloader(networkPath, callback);
+    this.downloader.start();
+  }
+
+  cancelFileDownload = () => {
+    this.downloader.cancel();
+  }
+
+  getPublicContainer() {
+    if (!this.app) {
+      return Promise.reject(new Error('Application is not connected.'));
+    }
+    return this.app.auth.getContainer(CONSTANTS.ACCESS_CONTAINERS.PUBLIC);
+  }
+
+  getPublicNamesContainer() {
+    if (!this.app) {
+      return Promise.reject(new Error('Application is not connected.'));
+    }
+    return this.app.auth.getContainer(CONSTANTS.ACCESS_CONTAINERS.PUBLIC_NAMES);
+  }
+
+  getMDataValueForKey(md, key) {
+    return md.encryptKey(key)
+      .then((encKey) => md.get(encKey))
+      .then((value) => md.decrypt(value.buf));
+  }
+
+  _updateMDataKey(md, key, value) {
+    return md.getEntries()
+      .then((entries) => entries.get(key)
+        .then((val) => entries.mutate()
+          .then((mut) => mut.update(key, value, val.version + 1)
+            .then(() => md.applyEntriesMutation(mut)))));
+  }
+
+  _removeFromMData(md, key) {
+    return md.getEntries()
+      .then((entries) => entries.get(key)
+        .then((value) => entries.mutate()
+          .then((mut) => mut.remove(key, value.version + 1)
+            .then(() => md.applyEntriesMutation(mut)))));
+  }
+
+  _insertToMData(md, key, val, toEncrypt) {
+    let keyToInsert = key;
+    let valToInsert = val;
+
+    return md.getEntries()
+      .then((entries) => entries.mutate()
+        .then((mut) => {
+          if (toEncrypt) {
+            return md.encryptKey(key)
+              .then((encKey) => md.encryptValue(val)
+                .then((encVal) => {
+                  keyToInsert = encKey;
+                  valToInsert = encVal
+                })).then(() => mut);
+          }
+          return mut;
+        })
+        .then((mut) => mut.insert(keyToInsert, valToInsert)
+          .then(() => md.applyEntriesMutation(mut))));
+  }
+
+  _getServicePath(serviceXorName) {
+    let path = null;
+    return this.getPublicContainer()
+      .then((md) => md.getEntries()
+        .then((entries) => entries.forEach((key, val) => {
+          if (val.buf.equals(serviceXorName.buf)) {
+            path = key.toString();
+          }
+        }))).then(() => path);
+  }
+}
+const safeApi = new SafeApi();
+export default safeApi;

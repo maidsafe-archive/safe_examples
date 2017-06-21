@@ -118,7 +118,8 @@ const service = (state: Object = initialState, action: Object) => {
     case ACTION_TYPES.CLEAR_NOTIFICATION:
       state = {
         ...state,
-        error: undefined
+        error: undefined,
+        remapping: false
       };
       break;
   }

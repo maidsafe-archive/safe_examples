@@ -1,7 +1,9 @@
 import path from 'path';
 import fs from 'fs';
 import { I18n } from 'react-redux-i18n';
-import { safe, TAG_TYPE_WWW, accessContainers } from './api';
+
+import safeApi from './api';
+import CONSTANTS from './constants';
 
 const parseContainerPath = (targetPath) => {
   if (!targetPath) {
@@ -31,20 +33,21 @@ export class FileUploadTask extends Task {
   }
 
   execute(callback) {
-    if (!safe) {
+    const app = safeApi.app;
+    if (!app) {
       return callback(new Error('App not registered'));
     }
     const containerPath = parseContainerPath(this.networkPath);
 
-    return safe.auth.getContainer(accessContainers.public)
-      .then((mdata) => mdata.encryptKey(containerPath.target).then((encKey) => mdata.get(encKey)).then((value) => mdata.decrypt(value.buf)))
-      .then((val) => safe.mutableData.newPublic(val, TAG_TYPE_WWW))
+    return safeApi.getPublicContainer()
+      .then((md) => safeApi.getMDataValueForKey(md, containerPath.target))
+      .then((val) => app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.create(fs.readFileSync(this.localPath))
           .then((file) => nfs.insert(containerPath.file, file)
             .catch((err) => {
-              if (err.code === -106) {
+              if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
                 return Promise.reject(err);
               }
               return mdata.get(containerPath.file)
@@ -64,4 +67,3 @@ export class FileUploadTask extends Task {
       .catch(callback);
   }
 }
-

@@ -1,11 +1,27 @@
+import { shell } from 'electron';
+import keytar from 'keytar';
 import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { I18n } from 'react-redux-i18n';
 
 import * as Task from './tasks';
+import CONSTANTS from './constants';
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024;
+class LocalAuthInfo {
+  constructor() {
+    this.SERVICE = CONSTANTS.KEY_TAR.SERVICE;
+    this.ACCOUNT = CONSTANTS.KEY_TAR.ACCOUNT;
+  }
+  save(info) {
+    return keytar.addPassword(this.SERVICE, this.ACCOUNT, JSON.stringify(info));
+  }
+  get() {
+    return keytar.getPassword(this.SERVICE, this.ACCOUNT);
+  }
+  clear() {
+    return keytar.deletePassword(this.SERVICE, this.ACCOUNT);
+  }
+}
 
 class TaskQueue {
 
@@ -49,6 +65,10 @@ export class DirStats {
   }
 }
 
+const parseUrl = (url) => (
+  (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
+);
+
 export const getDirectoryStats = (localPath) => {
   let stat;
   let tempStat;
@@ -68,8 +88,8 @@ export const getDirectoryStats = (localPath) => {
       stats.files += tempStat.files;
       stats.directories += tempStat.directories;
     } else {
-      if (stat.size > MAX_FILE_SIZE) {
-        throw new Error(I18n.t('messages.restrictedFileSize', { size: (MAX_FILE_SIZE / 1000000) }));
+      if (stat.size > CONSTANTS.MAX_FILE_SIZE) {
+        throw new Error(I18n.t('messages.restrictedFileSize', { size: (CONSTANTS.MAX_FILE_SIZE / 1000000) }));
       }
       stats.files += 1;
       stats.size += stat.size;
@@ -99,15 +119,8 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback) => {
   return taskQueue;
 };
 
-export const strToPtrBuf = (str) => {
-  const buf = new Buffer(str);
-  return { ptr: buf, len: buf.length };
-};
-
-export const randomStr = () => (
-  crypto.randomBytes(50).toString('hex')
+export const openExternal = (url) => (
+  shell.openExternal(parseUrl(url))
 );
 
-export const parseUrl = (url) => (
-  (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
-);
+export const localAuthInfo = new LocalAuthInfo();
