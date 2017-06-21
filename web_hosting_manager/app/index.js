@@ -12,7 +12,7 @@ import { initTempFolder } from './lib/temp';
 import routes from './routes';
 import configureStore from './store/configureStore';
 import loadLocale from './locales/loader';
-import { connect, onAuthSuccess, onAuthFailure } from './actions/app';
+import { connect, onAuthSuccess, onAuthFailure, clearAccessData } from './actions/app';
 import './app.global.css';
 
 const store = configureStore();
@@ -41,6 +41,13 @@ const listenForAuthReponse = (event, response) => {
 };
 
 ipc.on('auth-response', listenForAuthReponse);
+
+ipc.on('clear-access-data', (event, res) => {
+  if (res) {
+    store.dispatch(clearAccessData());
+  }
+});
+
 
 render(
   <Provider store={store}>

@@ -5,28 +5,26 @@ import { I18n } from 'react-redux-i18n';
 
 export default class Auth extends Component {
   componentDidMount() {
-    if (!this.props.isRevoked) {
-      this.props.connect();
-    }
+    this.props.connect();
   }
 
   componentWillUpdate(props) {
-    if (!this.props.isRevoked && props.fetchedServices && !props.serviceError) {
+    if (props.fetchedServices && !props.serviceError) {
       props.router.replace('/home');
     }
   }
 
   componentDidUpdate() {
-    if (this.props.isConnected && !this.props.fetchedAccessInfo && !this.props.accessInfoError) {
+    if (this.props.isConnected && !this.props.fetchingAccessInfo && !this.props.fetchedAccessInfo && !this.props.accessInfoError) {
       return this.props.getAccessInfo();
     }
-    if (this.props.fetchedAccessInfo && !this.props.fetchedPublicNames && !this.props.publicNameError) {
+    if (this.props.fetchedAccessInfo && !this.props.fetchingPublicNames && !this.props.fetchedPublicNames && !this.props.publicNameError) {
       return this.props.getPublicNames();
     }
-    if (this.props.fetchedPublicNames && !this.props.fetchedPublicContainers && !this.props.publicContainersError) {
+    if (this.props.fetchedPublicNames && !this.props.fetchingPublicContainers && !this.props.fetchedPublicContainers && !this.props.publicContainersError) {
       return this.props.getPublicContainers();
     }
-    if (this.props.fetchedPublicContainers && !this.props.fetchedServices && !this.props.serviceError) {
+    if (this.props.fetchedPublicContainers && !this.props.fetchingServices && !this.props.fetchedServices && !this.props.serviceError) {
       return this.props.getServices();
     }
   }
