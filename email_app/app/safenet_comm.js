@@ -210,7 +210,8 @@ const writeEmailContent = (app, email, pk) => {
 
   return app.immutableData.create()
       .then((email) => email.write(encryptedEmail)
-        .then(() => email.close())
+        .then(() => app.cipherOpt.newPlainText())
+        .then((cipherOpt) => email.close(cipherOpt))
       );
 }
 

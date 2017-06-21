@@ -34,7 +34,7 @@ export default class MailInbox extends Component {
       <div className="mail-list">
         <div className="mail-list-head">
           <div className="stats">
-            Inbox Space Used: <span className="highlight">{this.props.inboxSize}KB of {CONSTANTS.TOTAL_INBOX_SIZE}KB  </span>
+            Inbox Space Used: <span className="highlight">{this.props.inboxSize} of {CONSTANTS.TOTAL_INBOX_SIZE}</span>
           </div>
           <div className="options text-right">
             <button className="mdl-button mdl-js-button mdl-button--icon" title="Fetch emails" onClick={this.fetchMails}>
