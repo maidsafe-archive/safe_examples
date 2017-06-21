@@ -14,10 +14,22 @@ Please refer to the [Application Data Model](#application-data-model) section be
 
 ## Install
 
-First, clone the repo and then install dependencies.
+First, clone the repository:
 
 ```bash
-$ cd your-project-name && npm install
+$ cd your-project-name
+```
+
+And then install the dependencies:
+
+```bash
+$ npm install
+```
+
+If you are working on a development environment, you can run the command below instead, in order to get the `safe_client` libraries that use the `MockVault` file rather than connecting to the SAFE Network:
+
+```bash
+$ NODE_ENV=dev npm install
 ```
 
 ## Run
