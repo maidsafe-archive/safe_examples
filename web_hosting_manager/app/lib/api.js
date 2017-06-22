@@ -255,32 +255,31 @@ class SafeApi {
   }
 
   deleteFileOrDir(netPath) {
-    let dirName = netPath;
-    let fileName = null;
-    if (path.extname(netPath)) {
-      dirName = path.dirname(netPath);
-      fileName = path.basename(netPath);
+    const containerName = netPath.split('/').slice(0, 3).join('/');
+    let containerKey = netPath.slice(containerName.length);
+    if (containerKey[0] === '/') {
+      containerKey = containerKey.slice(1);
     }
 
     return this.getPublicContainer()
       .then((pubMd) => {
         // delete file
-        if (fileName) {
-          return this.getMDataValueForKey(pubMd, dirName)
+        if (path.extname(netPath)) {
+          return this.getMDataValueForKey(pubMd, containerName)
             .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
-            .then((md) => this._removeFromMData(md, fileName));
+            .then((md) => this._removeFromMData(md, containerKey));
         }
 
         // delete directory
-        return this.getMDataValueForKey(pubMd, netPath.split('/').slice(0, -1).join('/'))
+        return this.getMDataValueForKey(pubMd, containerName)
           .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
           .then((dirMd) => {
             const fileKeys = [];
-            const nameOfDir = netPath.split('/').slice(-1).toString();
+            // const nameOfDir = netPath.split('/').slice(-1).toString();
             return dirMd.getEntries()
               .then((entries) => entries.forEach((key, val) => {
                 const keyStr = key.toString();
-                if (keyStr.indexOf(nameOfDir) !== 0) {
+                if (keyStr.indexOf(containerKey) !== 0) {
                   return;
                 }
                 fileKeys.push({ key: keyStr, version: val.version });
@@ -320,6 +319,7 @@ class SafeApi {
               return;
             }
             let keyStr = key.toString();
+            console.log('keyStr', keyStr)
             if (rootName && (keyStr.indexOf(rootName) !== 0)) {
               return;
             }

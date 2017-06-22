@@ -45,7 +45,7 @@ class TaskQueue {
       if (this.queue.length === index) {
         return this.callback(undefined, undefined, true);
       }
-      if (!this.cancelled) {
+      if (!this.cancelled && this.queue[index]) {
         this.queue[index].execute(next);
       }
     };
@@ -102,7 +102,7 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback) => {
   let stat;
   let tempPath;
   const taskQueue = callback instanceof TaskQueue ? callback : new TaskQueue(callback);
-  const nextDir = `${networkPath}/${path.basename(localPath)}`;
+  let nextDir = null;
   const contents = fs.readdirSync(localPath);
   for (let i = 0; i < contents.length; i += 1) {
     if (!contents[i]) {
@@ -111,9 +111,10 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback) => {
     tempPath = `${localPath}/${contents[i]}`;
     stat = fs.statSync(tempPath);
     if (stat.isDirectory()) {
+      nextDir = `${networkPath}/${contents[i]}`;
       generateUploadTaskQueue(tempPath, nextDir, taskQueue);
     } else {
-      taskQueue.add(new Task.FileUploadTask(tempPath, `${nextDir}/${contents[i]}`));
+      taskQueue.add(new Task.FileUploadTask(tempPath, `${networkPath}/${contents[i]}`));
     }
   }
   return taskQueue;

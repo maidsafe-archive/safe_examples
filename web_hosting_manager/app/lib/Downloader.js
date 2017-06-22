@@ -13,7 +13,7 @@ export default class Downloader {
   }
 
   start() {
-
+    const app = safeApi.app;
     const containerPath = {
       dir: this.path.split('/').slice(0, 3).join('/'),
       file: this.path.split('/').slice(3).join('/')

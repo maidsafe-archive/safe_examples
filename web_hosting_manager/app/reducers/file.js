@@ -30,7 +30,9 @@ const file = (state: Object = initialState, action: Object) => {
     case ACTION_TYPES.UPLOADING:
       state = {
         ...state,
-        uploadStatus: action.payload
+        uploading: true,
+        uploadStatus: action.payload,
+        error: undefined
       };
       break;
 
@@ -38,7 +40,8 @@ const file = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         uploading: false,
-        uploadStatus: undefined
+        uploadStatus: undefined,
+        error: undefined
       };
       break;
     case ACTION_TYPES.UPLOAD_FAILED:
