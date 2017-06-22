@@ -78,6 +78,7 @@ export default class FileExplorer extends Component {
   }
 
   handleListItemClick(item) {
+    this.props.clearNotification();
     const path = `${this.currentPath}/${item.name}`;
     if (item.isFile) {
       return this.props.download(path);
@@ -134,6 +135,7 @@ export default class FileExplorer extends Component {
     tokens.pop();
     this.fetchingContainerPath = tokens.join('/');
     this.props.getContainer(this.fetchingContainerPath);
+    this.props.clearNotification();
   }
 
   explorerView() {
@@ -245,4 +247,4 @@ FileExplorer.propTypes = {
   fileError: PropTypes.string,
   params: PropTypes.object.isRequired,
   router: PropTypes.object.isRequired,
-}
+};

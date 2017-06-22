@@ -10,9 +10,11 @@ const parseContainerPath = (targetPath) => {
     return null;
   }
   const split = targetPath.split('/');
+  let fileName = targetPath.split('/').slice(3).join('/');
+
   return {
     target: split.slice(0, 3).join('/'),
-    file: targetPath.split('/').slice(4).join('/') || path.basename(targetPath)
+    file: fileName || path.basename(targetPath)
   };
 };
 
@@ -48,12 +50,12 @@ export class FileUploadTask extends Task {
           .then((file) => nfs.insert(containerPath.file, file)
             .catch((err) => {
               if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
-                return Promise.reject(err);
+                return callback(err);
               }
               return mdata.get(containerPath.file)
                 .then((value) => {
                   if (value.buf.length !== 0) {
-                    return Promise.reject(err);
+                    return callback(err);
                   }
                   return nfs.update(containerPath.file, file, value.version + 1);
                 });
