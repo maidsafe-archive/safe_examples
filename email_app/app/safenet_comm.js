@@ -41,7 +41,10 @@ export const authApp = () => {
 
   let uri = getAuthData();
   if (uri) {
-    return fromAuthURI(APP_INFO.info, uri)
+    console.log("we have uri so connect");
+    return fromAuthURI(APP_INFO.info, uri, (state) => {
+        console.log("New STATE desde cached: ", state);
+      })
       .then((registered_app) => registered_app.auth.refreshContainersPermissions()
         .then(() => registered_app)
       )
@@ -57,7 +60,9 @@ export const authApp = () => {
 
 export const connect = (uri) => {
   let registered_app;
-  return fromAuthURI(APP_INFO.info, uri)
+  return fromAuthURI(APP_INFO.info, uri, (state) => {
+            console.log("New STATE: ", state);
+          })
           .then((app) => registered_app = app)
           .then(() => saveAuthData(uri))
           .then(() => registered_app.auth.refreshContainersPermissions())

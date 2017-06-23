@@ -22,6 +22,7 @@ export const CONSTANTS = {
 export const APP_STATUS = {
   AUTHORISING: 'AUTHORISING',
   AUTHORISATION_FAILED: 'AUTHORISATION_FAILED',
+  AUTHORISATION_DENIED: 'AUTHORISATION_DENIED',
   AUTHORISED: 'AUTHORISED',
   READING_CONFIG: 'READING_CONFIG',
   READY: 'READY'
@@ -39,5 +40,6 @@ export const MESSAGES = {
   EMAIL_ID_TOO_LONG: 'Email ID is too long',
   EMAIL_ID_NOT_FOUND: 'Email ID not found on the network',
   AUTHORISATION_ERROR: 'Failed to authorise',
+  AUTHORISATION_DENIED: 'The authorisation request was denied',
   CHECK_CONFIGURATION_ERROR: 'Failed to retrieve configuration'
 };
