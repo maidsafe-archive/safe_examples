@@ -23,15 +23,13 @@ const CONSTANTS = {
         'Read',
         'Insert',
         'Update',
-        'Delete',
-        'ManagePermissions'
+        'Delete'
       ],
       _publicNames: [
         'Read',
         'Insert',
         'Update',
-        'Delete',
-        'ManagePermissions'
+        'Delete'
       ]
     }
   },

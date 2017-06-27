@@ -49,7 +49,8 @@ const en = {
     uploadingMessage: 'Uploading files',
     downloadingMessage: 'Downloading',
     loading: 'Loading...',
-    empty: 'Empty'
+    empty: 'Empty',
+    uploadSomeFiles: 'No files found. Please upload web files'
   },
   messages: {
     emptyServiceName: 'Service name must be filled',
