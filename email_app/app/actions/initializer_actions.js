@@ -14,11 +14,20 @@ export const onAuthFailure = (err) => {
   };
 };
 
+const newNetStatusCallback = (dispatch) => {
+  return function (state) {
+    dispatch({
+      type: ACTION_TYPES.NET_STATUS_CHANGED,
+      payload: state
+    });
+  }
+};
+
 export const receiveResponse = (uri) => {
   return function (dispatch) {
     return dispatch({
       type: ACTION_TYPES.AUTHORISE_APP,
-      payload: connect(uri)
+      payload: connect(uri, newNetStatusCallback(dispatch))
     });
   };
 };
@@ -28,7 +37,7 @@ export const authoriseApplication = () => {
     return dispatch({
       type: ACTION_TYPES.AUTHORISE_APP,
       payload: new Promise((resolve, reject) => {
-        authApp()
+        authApp(newNetStatusCallback(dispatch))
           .then(resolve)
           .catch(reject);
       })

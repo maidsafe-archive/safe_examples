@@ -1,15 +1,39 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link, IndexLink } from 'react-router';
+import Modal from 'react-modal';
 import className from 'classnames';
 import pkg from '../../package.json';
+import { CONSTANTS } from '../constants';
+
+const modalStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
 
 export default class Home extends Component {
   render() {
     const { router } = this.context;
-    const { coreData, inboxSize, savedSize } = this.props;
+    const { coreData, inboxSize, savedSize, network_status } = this.props;
+    const isNetworkDisconnected = (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
     return (
       <div className="home">
+        <Modal
+          isOpen={isNetworkDisconnected}
+          shouldCloseOnOverlayClick={false}
+          style={modalStyles}
+          contentLabel="Network connection lost"
+        >
+          <div className="alert">The application lost network connection.</div>
+          <div className="alert">Wating for network link to be up to automatically reconnect.</div>
+        </Modal>
+
         <div className="home-b">
           <div className={className('float-btn', { hide: router.isActive('/compose_mail')  })}>
             <button className="mdl-button mdl-js-button mdl-button--fab mdl-button--primary">

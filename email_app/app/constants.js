@@ -16,7 +16,8 @@ export const CONSTANTS = {
     SAVED: 'SAVED'
   },
   MAIL_CONTENT_LIMIT: 150,
-  DATE_FORMAT: 'h:MM-mmm dd'
+  DATE_FORMAT: 'h:MM-mmm dd',
+  NET_STATUS_CONNECTED: 'Connected'
 };
 
 export const APP_STATUS = {

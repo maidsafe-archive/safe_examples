@@ -33,7 +33,7 @@ const requestAuth = () => {
     );
 }
 
-export const authApp = () => {
+export const authApp = (netStatusCallback) => {
   if (process.env.SAFE_FAKE_AUTH) {
     return initializeApp(APP_INFO.info)
         .then((app) => app.auth.loginForTest(APP_INFO.permissions));
@@ -41,10 +41,7 @@ export const authApp = () => {
 
   let uri = getAuthData();
   if (uri) {
-    console.log("we have uri so connect");
-    return fromAuthURI(APP_INFO.info, uri, (state) => {
-        console.log("New STATE desde cached: ", state);
-      })
+    return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
       .then((registered_app) => registered_app.auth.refreshContainersPermissions()
         .then(() => registered_app)
       )
@@ -58,11 +55,9 @@ export const authApp = () => {
   return requestAuth();
 }
 
-export const connect = (uri) => {
+export const connect = (uri, netStatusCallback) => {
   let registered_app;
-  return fromAuthURI(APP_INFO.info, uri, (state) => {
-            console.log("New STATE: ", state);
-          })
+  return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
           .then((app) => registered_app = app)
           .then(() => saveAuthData(uri))
           .then(() => registered_app.auth.refreshContainersPermissions())
