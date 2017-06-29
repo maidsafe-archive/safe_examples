@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { MESSAGES, CONSTANTS } from '../constants';
+import { MESSAGES, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
 
 export default class CreateAccount extends Component {
   constructor() {
@@ -32,7 +32,7 @@ export default class CreateAccount extends Component {
     return createAccount(emailId)
         .then(this.storeCreatedAccount)
         .catch((err) => {
-          if (err.code === -104) {
+          if (err.code === SAFE_APP_ERROR_CODES.ERR_DATA_EXISTS) {
             return createAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
           }
           return createAccountError(err);

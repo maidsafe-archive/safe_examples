@@ -29,6 +29,12 @@ export const APP_STATUS = {
   READY: 'READY'
 }
 
+export const SAFE_APP_ERROR_CODES = {
+  ERR_AUTH_DENIED: -200,
+  ERR_NO_SUCH_ENTRY: -106,
+  ERR_DATA_EXISTS: -104
+}
+
 export const MESSAGES = {
   INITIALIZE: {
     AUTHORISE_APP: 'Authorising Application',

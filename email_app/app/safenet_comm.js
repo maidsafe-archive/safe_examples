@@ -1,5 +1,5 @@
 import { shell } from 'electron';
-import { CONSTANTS, MESSAGES } from './constants';
+import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genRandomEntryKey,
          genKeyPair, encrypt, decrypt, genServiceInfo, deserialiseArray, parseUrl } from './utils/app_utils';
@@ -195,7 +195,7 @@ export const setupAccount = (app, emailId) => {
       .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId).then((key) => pub_names_md.get(key))
         .then((services) => addEmailService(app, serviceInfo, inbox_serialised)
           , (err) => {
-            if (err.code === -106) {
+            if (err.code === SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
               return createPublicIdAndEmailService(app, pub_names_md,
                                                 serviceInfo, inbox_serialised);
             }

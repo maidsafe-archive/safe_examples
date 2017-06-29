@@ -1,5 +1,5 @@
 import ACTION_TYPES from '../actions/actionTypes';
-import { MESSAGES, APP_STATUS, CONSTANTS } from '../constants';
+import { MESSAGES, APP_STATUS, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
 
 const initialState = {
   app_status: null,
@@ -36,7 +36,7 @@ const initializer = (state = initialState, action) => {
       break;
     case `${ACTION_TYPES.AUTHORISE_APP}_ERROR`:
       status = APP_STATUS.AUTHORISATION_FAILED;
-      if (action.payload.message === "IPC error: AuthDenied") {
+      if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_AUTH_DENIED) {
         status = APP_STATUS.AUTHORISATION_DENIED;
       }
       return { ...state, app_status: status };
