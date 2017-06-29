@@ -30,7 +30,8 @@ export default class Home extends Component {
   reconnect() {
     this.setState({reconnecting: true});
     return this.props.reconnectApplication()
-              .then(() => this.setState({reconnecting: false}));
+              .catch((err) => 'not reconnected')
+              .then(() => this.setState({reconnecting: false}))
   }
 
   render() {
