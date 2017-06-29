@@ -1,5 +1,5 @@
 import { shell } from 'electron';
-import { CONSTANTS, MESSAGES } from './constants';
+import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genRandomEntryKey,
          genKeyPair, encrypt, decrypt, genServiceInfo, deserialiseArray, parseUrl } from './utils/app_utils';
@@ -33,7 +33,7 @@ const requestAuth = () => {
     );
 }
 
-export const authApp = () => {
+export const authApp = (netStatusCallback) => {
   if (process.env.SAFE_FAKE_AUTH) {
     return initializeApp(APP_INFO.info)
         .then((app) => app.auth.loginForTest(APP_INFO.permissions));
@@ -41,7 +41,7 @@ export const authApp = () => {
 
   let uri = getAuthData();
   if (uri) {
-    return fromAuthURI(APP_INFO.info, uri)
+    return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
       .then((registered_app) => registered_app.auth.refreshContainersPermissions()
         .then(() => registered_app)
       )
@@ -55,13 +55,17 @@ export const authApp = () => {
   return requestAuth();
 }
 
-export const connect = (uri) => {
+export const connect = (uri, netStatusCallback) => {
   let registered_app;
-  return fromAuthURI(APP_INFO.info, uri)
+  return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
           .then((app) => registered_app = app)
           .then(() => saveAuthData(uri))
           .then(() => registered_app.auth.refreshContainersPermissions())
           .then(() => registered_app);
+}
+
+export const reconnect = (app) => {
+  return app.reconnect();
 }
 
 export const readConfig = (app) => {
@@ -195,7 +199,7 @@ export const setupAccount = (app, emailId) => {
       .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId).then((key) => pub_names_md.get(key))
         .then((services) => addEmailService(app, serviceInfo, inbox_serialised)
           , (err) => {
-            if (err.code === -106) {
+            if (err.code === SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
               return createPublicIdAndEmailService(app, pub_names_md,
                                                 serviceInfo, inbox_serialised);
             }

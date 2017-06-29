@@ -1,5 +1,5 @@
 import ACTION_TYPES from './actionTypes';
-import { authApp, connect, readConfig, writeConfig,
+import { authApp, connect, reconnect, readConfig, writeConfig,
                     readInboxEmails, readArchivedEmails } from '../safenet_comm';
 
 export const setInitializerTask = (task) => ({
@@ -14,11 +14,20 @@ export const onAuthFailure = (err) => {
   };
 };
 
+const newNetStatusCallback = (dispatch) => {
+  return function (state) {
+    dispatch({
+      type: ACTION_TYPES.NET_STATUS_CHANGED,
+      payload: state
+    });
+  }
+};
+
 export const receiveResponse = (uri) => {
   return function (dispatch) {
     return dispatch({
       type: ACTION_TYPES.AUTHORISE_APP,
-      payload: connect(uri)
+      payload: connect(uri, newNetStatusCallback(dispatch))
     });
   };
 };
@@ -28,12 +37,22 @@ export const authoriseApplication = () => {
     return dispatch({
       type: ACTION_TYPES.AUTHORISE_APP,
       payload: new Promise((resolve, reject) => {
-        authApp()
+        authApp(newNetStatusCallback(dispatch))
           .then(resolve)
           .catch(reject);
       })
     })
     .catch(_ => {});
+  };
+};
+
+export const reconnectApplication = () => {
+  return function (dispatch, getState) {
+    let app = getState().initializer.app;
+    return dispatch({
+      type: ACTION_TYPES.RECONNECT_APP,
+      payload: reconnect(app)
+    });
   };
 };
 

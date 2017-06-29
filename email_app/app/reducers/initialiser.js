@@ -1,8 +1,9 @@
 import ACTION_TYPES from '../actions/actionTypes';
-import { MESSAGES, APP_STATUS } from '../constants';
+import { MESSAGES, APP_STATUS, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
 
 const initialState = {
   app_status: null,
+  network_status: null,
   app: null,
   tasks: [],
   accounts: [],
@@ -27,10 +28,24 @@ const initializer = (state = initialState, action) => {
       return { ...state, app: null, app_status: APP_STATUS.AUTHORISING };
       break;
     case `${ACTION_TYPES.AUTHORISE_APP}_SUCCESS`:
-      return { ...state, app: action.payload, app_status: APP_STATUS.AUTHORISED };
+      return { ...state,
+        app: action.payload,
+        app_status: APP_STATUS.AUTHORISED,
+        network_status: CONSTANTS.NET_STATUS_CONNECTED
+      };
       break;
     case `${ACTION_TYPES.AUTHORISE_APP}_ERROR`:
-      return { ...state, app_status: APP_STATUS.AUTHORISATION_FAILED };
+      status = APP_STATUS.AUTHORISATION_FAILED;
+      if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_AUTH_DENIED) {
+        status = APP_STATUS.AUTHORISATION_DENIED;
+      }
+      return { ...state, app_status: status };
+      break;
+    case ACTION_TYPES.NET_STATUS_CHANGED:
+      return { ...state, network_status: action.payload };
+      break;
+    case `${ACTION_TYPES.RECONNECT_APP}_SUCCESS`:
+      return { ...state, network_status: CONSTANTS.NET_STATUS_CONNECTED };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
       return { ...state, app_status: APP_STATUS.READING_CONFIG };
