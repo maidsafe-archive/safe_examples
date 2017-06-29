@@ -3,7 +3,7 @@
 import api from '../lib/api';
 import { I18n } from 'react-redux-i18n';
 import ACTION_TYPES from './actionTypes';
-import CONSTANTS from '../lib/constants';
+import CONSTANTS from '../constants';
 import * as utils from '../lib/utils';
 
 const sendAuthRequest = () => {
@@ -25,6 +25,15 @@ export const revoked = () => {
   };
 };
 
+const nwStateCallback = (dispatch) => {
+  return function (state) {
+    dispatch({
+      type: ACTION_TYPES.NET_STATUS_CHANGED,
+      state
+    });
+  }
+};
+
 export const connect = (authRes: String) => {
   if (!authRes && !utils.localAuthInfo.get()) {
     return sendAuthRequest();
@@ -32,9 +41,16 @@ export const connect = (authRes: String) => {
   return (dispatch) => {
     return dispatch({
       type: ACTION_TYPES.CONNECT,
-      payload: api.connect(authRes)
+      payload: api.connect(authRes, nwStateCallback(dispatch))
     });
   };
+};
+
+export const reconnect = () => {
+  return {
+    type: ACTION_TYPES.RECONNECT,
+    payload: api.reconnect()
+  }
 };
 
 export const onAuthSuccess = (authInfo: Object) => {

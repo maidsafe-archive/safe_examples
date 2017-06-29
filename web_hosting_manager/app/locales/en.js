@@ -23,8 +23,10 @@ const en = {
       revoked: 'Application Revoked'
     },
     networkStatus: {
-      connecting: 'connecting',
-      connected: 'connected'
+      connecting: 'Connecting',
+      disconnected: 'Disconnected',
+      connected: 'Connected',
+      unknown: 'Unknown'
     },
     createPublicId: 'Create Public Id',
     noPublicIdText: 'No Public Id found. Create one to begin.',

@@ -3,7 +3,7 @@ import path from 'path';
 import { getPath } from './temp';
 import { shell } from 'electron';
 import safeApi from './api';
-import CONSTANTS from './constants';
+import CONSTANTS from '../constants';
 
 export default class Downloader {
   constructor(networkPath, callback) {

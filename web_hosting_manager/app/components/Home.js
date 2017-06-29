@@ -6,6 +6,7 @@ import { I18n } from 'react-redux-i18n';
 import { Link } from 'react-router';
 import NetworkStatus from './NetworkStatus';
 import { domainCheck } from '../utils/app_utils';
+import CONSTANTS from '../constants';
 
 import Nav from './Nav';
 
@@ -291,9 +292,25 @@ export default class Auth extends Component {
   }
 
   getNetworkStatus() {
+    const status = this.props.networkState;
+    let message = null;
+    switch (status) {
+      case CONSTANTS.NETWORK_STATE.INIT:
+        message = I18n.t('label.networkStatus.connecting');
+        break;
+      case CONSTANTS.NETWORK_STATE.CONNECTED:
+        message = I18n.t('label.networkStatus.connected');
+        break;
+      case CONSTANTS.NETWORK_STATE.DISCONNECTED:
+        message = I18n.t('label.networkStatus.disconnected');
+        break;
+      default:
+        message = I18n.t('label.networkStatus.unknown');
+        break;
+    }
     return {
-      status: this.props.isConnected ? 1 : 0,
-      message: this.props.isConnected ? I18n.t('label.networkStatus.connected') : I18n.t('label.networkStatus.connecting')
+      status,
+      message
     };
   }
 
@@ -310,7 +327,7 @@ export default class Auth extends Component {
         </div>
         { this.publicIdModal() }
         { this.remapModal() }
-        <NetworkStatus status={networkStatus.status} message={networkStatus.message} />
+        <NetworkStatus status={networkStatus.status} message={networkStatus.message} reconnect={this.props.reconnect}/>
       </div>
     );
   }
@@ -318,6 +335,7 @@ export default class Auth extends Component {
 
 Auth.propTypes = {
   connect: PropTypes.func.isRequired,
+  reconnect: PropTypes.func.isRequired,
   getAccessInfo: PropTypes.func.isRequired,
   getPublicNames: PropTypes.func.isRequired,
   getPublicContainers: PropTypes.func.isRequired,
@@ -326,6 +344,7 @@ Auth.propTypes = {
 
   isConnecting: PropTypes.bool.isRequired,
   isConnected: PropTypes.bool.isRequired,
+  networkState: PropTypes.string.isRequired,
   connectionError: PropTypes.string,
 
   fetchingAccessInfo: PropTypes.bool.isRequired,

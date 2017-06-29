@@ -8,7 +8,7 @@ import { I18n } from 'react-redux-i18n';
 import Uploader from './Uploader';
 import Downloader from './Downloader';
 import * as utils from './utils';
-import CONSTANTS from './constants';
+import CONSTANTS from '../constants';
 
 class SafeApi {
   constructor() {
@@ -38,19 +38,20 @@ class SafeApi {
    * @param uri
    * @return {*}
    */
-  connect(uri) {
+  connect(uri, nwStateChangeCb) {
     const authInfo = uri || JSON.parse(utils.localAuthInfo.get());
     if (!authInfo) {
       // FIXME shankar - handle from action
       // return Promise.reject(new Error('Missing Authorisation information.'));
       return this.authorise();
     }
-    return safeApp.fromAuthURI(this.APP_INFO.data, authInfo)
+    return safeApp.fromAuthURI(this.APP_INFO.data, authInfo, nwStateChangeCb)
       .then((app) => {
         // store Auth response
         if (uri) {
           utils.localAuthInfo.save(uri);
         }
+        nwStateChangeCb(CONSTANTS.NETWORK_STATE.CONNECTED);
         this.app = app;
       })
       .catch((err) => {
@@ -64,6 +65,10 @@ class SafeApi {
           return Promise.reject(err);
         }
       });
+  }
+
+  reconnect() {
+    return this.app.reconnect();
   }
 
   /**

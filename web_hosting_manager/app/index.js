@@ -8,6 +8,7 @@ import { Router, hashHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { loadTranslations, setLocale, syncTranslationWithStore } from 'react-redux-i18n';
 
+
 import { initTempFolder } from './lib/temp';
 import routes from './routes';
 import configureStore from './store/configureStore';
@@ -39,6 +40,8 @@ const listenForAuthReponse = (event, response) => {
     store.dispatch(onAuthFailure(new Error('Authorisation failed')));
   }
 };
+
+
 
 ipc.on('auth-response', listenForAuthReponse);
 

@@ -5,7 +5,7 @@ import path from 'path';
 import { I18n } from 'react-redux-i18n';
 
 import * as Task from './tasks';
-import CONSTANTS from './constants';
+import CONSTANTS from '../constants';
 
 class LocalAuthInfo {
   constructor() {

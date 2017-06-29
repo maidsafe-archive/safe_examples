@@ -3,7 +3,7 @@ import fs from 'fs';
 import { I18n } from 'react-redux-i18n';
 
 import safeApi from './api';
-import CONSTANTS from './constants';
+import CONSTANTS from '../constants';
 
 const parseContainerPath = (targetPath) => {
   if (!targetPath) {

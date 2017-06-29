@@ -1,4 +1,4 @@
-import pkg from '../package.json';
+import pkg from './package.json';
 const CONSTANTS = {
   TAG_TYPE: {
     DNS: 15001,
@@ -46,6 +46,12 @@ const CONSTANTS = {
     NO_SUCH_ENTRY: -106,
     ENTRY_EXISTS: -107
   },
-  MAX_FILE_SIZE: 20 * 1024 * 1024
+  MAX_FILE_SIZE: 20 * 1024 * 1024,
+  NETWORK_STATE: {
+    INIT: 'Init',
+    CONNECTED: 'Connected',
+    UNKNOWN: 'Unknown',
+    DISCONNECTED: 'Disconnected'
+  }
 };
 export default CONSTANTS;
