@@ -18,10 +18,27 @@ const modalStyles = {
 };
 
 export default class Home extends Component {
+  constructor() {
+    super();
+    this.state = {
+      reconnecting: false
+    };
+
+    this.reconnect = this.reconnect.bind(this);
+  }
+
+  reconnect() {
+    this.setState({reconnecting: true});
+    return this.props.reconnectApplication()
+              .then(() => this.setState({reconnecting: false}));
+  }
+
   render() {
     const { router } = this.context;
     const { coreData, inboxSize, savedSize, network_status } = this.props;
+
     const isNetworkDisconnected = (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
+
     return (
       <div className="home">
         <Modal
@@ -30,8 +47,11 @@ export default class Home extends Component {
           style={modalStyles}
           contentLabel="Network connection lost"
         >
-          <div className="alert">The application lost network connection.</div>
-          <div className="alert">Wating for network link to be up to automatically reconnect.</div>
+          <div className="text-center">
+              <div>The application hast lost network connection.</div><br />
+              <div>Make sure the network link is up before trying to reconnect.</div><br />
+              <button disabled={this.state.reconnecting} className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
+          </div>
         </Modal>
 
         <div className="home-b">

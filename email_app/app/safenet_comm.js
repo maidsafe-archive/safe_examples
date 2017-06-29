@@ -64,6 +64,10 @@ export const connect = (uri, netStatusCallback) => {
           .then(() => registered_app);
 }
 
+export const reconnect = (app) => {
+  return app.reconnect();
+}
+
 export const readConfig = (app) => {
   let account = {};
   return app.auth.getHomeContainer()

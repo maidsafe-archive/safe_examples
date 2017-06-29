@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import Home from '../components/home';
+import { reconnectApplication } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
   return {
@@ -12,6 +13,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    reconnectApplication: () => (dispatch(reconnectApplication())),
   };
 };
 

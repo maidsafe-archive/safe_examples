@@ -44,6 +44,9 @@ const initializer = (state = initialState, action) => {
     case ACTION_TYPES.NET_STATUS_CHANGED:
       return { ...state, network_status: action.payload };
       break;
+    case `${ACTION_TYPES.RECONNECT_APP}_SUCCESS`:
+      return { ...state, network_status: CONSTANTS.NET_STATUS_CONNECTED };
+      break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
       return { ...state, app_status: APP_STATUS.READING_CONFIG };
       break;

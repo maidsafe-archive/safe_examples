@@ -32,7 +32,8 @@ export const APP_STATUS = {
 export const SAFE_APP_ERROR_CODES = {
   ERR_AUTH_DENIED: -200,
   ERR_NO_SUCH_ENTRY: -106,
-  ERR_DATA_EXISTS: -104
+  ERR_DATA_EXISTS: -104,
+  ERR_OPERATION_ABORTED: -14
 }
 
 export const MESSAGES = {

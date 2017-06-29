@@ -1,5 +1,5 @@
 import ACTION_TYPES from './actionTypes';
-import { authApp, connect, readConfig, writeConfig,
+import { authApp, connect, reconnect, readConfig, writeConfig,
                     readInboxEmails, readArchivedEmails } from '../safenet_comm';
 
 export const setInitializerTask = (task) => ({
@@ -43,6 +43,16 @@ export const authoriseApplication = () => {
       })
     })
     .catch(_ => {});
+  };
+};
+
+export const reconnectApplication = () => {
+  return function (dispatch, getState) {
+    let app = getState().initializer.app;
+    return dispatch({
+      type: ACTION_TYPES.RECONNECT_APP,
+      payload: reconnect(app)
+    });
   };
 };
 
