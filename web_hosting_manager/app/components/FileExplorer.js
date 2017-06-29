@@ -94,7 +94,7 @@ export default class FileExplorer extends Component {
   emptyContainer() {
     return (
       <div className="default">
-        { (this.props.fetchingContainer || this.props.deleting) ? I18n.t('label.loading') : I18n.t('label.empty') }
+        { (this.props.fetchingContainer || this.props.deleting) ? I18n.t('label.loading') : I18n.t('label.uploadSomeFiles') }
       </div>
     );
   }

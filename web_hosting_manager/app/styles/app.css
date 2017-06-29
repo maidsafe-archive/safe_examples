@@ -492,6 +492,35 @@ nav {
   display: inline-block;
 }
 
+.nw-status .nw-status-b {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nw-status .reconnect {
+  width: 24px;
+  height: 24px;
+}
+
+.nw-status .reconnect .reconnect-btn {
+  width: 100%;
+  height: 100%;
+  background-color: #FFF;
+  background-image: url("../img/nw-reload.svg");
+  background-position: center;
+  background-size: 16px;
+  background-repeat: no-repeat;
+  border: 0;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+}
+
+.nw-status .reconnect .reconnect-btn:hover {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

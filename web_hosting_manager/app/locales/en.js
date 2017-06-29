@@ -23,8 +23,10 @@ const en = {
       revoked: 'Application Revoked'
     },
     networkStatus: {
-      connecting: 'connecting',
-      connected: 'connected'
+      connecting: 'Connecting',
+      disconnected: 'Disconnected',
+      connected: 'Connected',
+      unknown: 'Unknown'
     },
     createPublicId: 'Create Public Id',
     noPublicIdText: 'No Public Id found. Create one to begin.',
@@ -49,7 +51,8 @@ const en = {
     uploadingMessage: 'Uploading files',
     downloadingMessage: 'Downloading',
     loading: 'Loading...',
-    empty: 'Empty'
+    empty: 'Empty',
+    uploadSomeFiles: 'No files found. Please upload web files'
   },
   messages: {
     emptyServiceName: 'Service name must be filled',

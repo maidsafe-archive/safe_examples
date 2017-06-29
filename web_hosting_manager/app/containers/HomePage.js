@@ -10,6 +10,7 @@ const mapStateToProps = (state) => {
   return {
     isConnecting: state.connection.isConnecting,
     isConnected: state.connection.isConnected,
+    networkState: state.connection.networkState,
     connectionError: state.connection.error,
     fetchingAccessInfo: state.accessInfo.fetchingAccessInfo,
     fetchedAccessInfo: state.accessInfo.fetchedAccessInfo,
