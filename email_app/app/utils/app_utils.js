@@ -5,20 +5,22 @@ import { CONSTANTS } from '../constants';
 import sodium from 'libsodium-wrappers';
 
 export const getAuthData = () => {
-  let authData = window.JSON.parse(
-    window.localStorage.getItem(CONSTANTS.LOCAL_AUTH_DATA_KEY)
-  );
-  return authData;
+  // let authData = window.JSON.parse(
+  //   window.localStorage.getItem(CONSTANTS.LOCAL_AUTH_DATA_KEY)
+  // );
+  // return authData;
+  return;
 };
 
 export const saveAuthData = (authData) => {
-  return window.localStorage.setItem(CONSTANTS.LOCAL_AUTH_DATA_KEY,
-    window.JSON.stringify(authData)
-  );
+  return;
+  //  window.localStorage.setItem(CONSTANTS.LOCAL_AUTH_DATA_KEY,
+  //   window.JSON.stringify(authData)
+  // );
 };
 
 export const clearAuthData = () => {
-  window.localStorage.removeItem(CONSTANTS.LOCAL_AUTH_DATA_KEY);
+  // window.localStorage.removeItem(CONSTANTS.LOCAL_AUTH_DATA_KEY);
 };
 
 export const genServiceInfo = (emailId) => {
