@@ -13,7 +13,6 @@
   "license": "MIT",
   "dependencies": {
     "classnames": "^2.2.5",
-    "keytar": "^3.0.2",
     "safe-app": "git+https://github.com/maidsafe/safe_app_nodejs.git"
   }
 }
