@@ -69,7 +69,7 @@ export default class Auth extends Component {
     if (this.props.accessInfoError || this.props.publicNameError
       || this.props.publicContainersError || this.props.serviceError) {
       return {
-        title: I18n.t('label.initialising.appErrorTitle'),
+        title: I18n.t('label.initialising.authErrorTitle'),
         content: (<div>
           <div>
             { this.props.accessInfoError || this.props.publicNameError || this.props.serviceError }

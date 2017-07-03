@@ -3,6 +3,7 @@
 import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
 import { trimErrorMsg } from '../utils/app_utils';
+import CONSTANTS from '../constants';
 
 const initialState = {
   fetchingAccessInfo: false,
@@ -35,10 +36,13 @@ const accessInfo = (state: Object = initialState, action: Object) => {
       break;
 
     case `${ACTION_TYPES.FETCH_ACCESS_INFO}_REJECTED`:
+      console.log('fetch Error', action.payload);
+      let errorMsg = (action.payload.code === CONSTANTS.ERROR_CODE.ENCODE_DECODE_ERROR) ?
+        I18n.t('label.initialising.revoked') : trimErrorMsg(action.payload.message);
       state = {
         ...state,
         fetchingAccessInfo: false,
-        error: I18n.t('messages.fetchingAccessFailed', { error: trimErrorMsg(action.payload.message) })
+        error: I18n.t('messages.fetchingAccessFailed', { error: errorMsg })
       };
       break;
   }

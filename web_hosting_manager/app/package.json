@@ -1,9 +1,9 @@
 {
-  "name": "safe_hosting_manager",
-  "productName": "SAFE Hosting Manager",
+  "name": "web_hosting_manager",
+  "productName": "Web Hosting Manager",
   "version": "0.1.0",
   "description": "Application to manage web hosting in SAFE Network",
-  "identifier": "net.maidsafe.safehostingmanager",
+  "identifier": "net.maidsafe.webhostingmanager",
   "main": "./main.js",
   "author": {
     "name": "MaidSafe",

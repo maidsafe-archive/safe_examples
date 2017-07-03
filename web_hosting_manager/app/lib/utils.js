@@ -1,7 +1,6 @@
 import { shell } from 'electron';
-import keytar from 'keytar';
+// import keytar from 'keytar';
 import fs from 'fs';
-import path from 'path';
 import { I18n } from 'react-redux-i18n';
 
 import * as Task from './tasks';
@@ -13,13 +12,16 @@ class LocalAuthInfo {
     this.ACCOUNT = CONSTANTS.KEY_TAR.ACCOUNT;
   }
   save(info) {
-    return keytar.addPassword(this.SERVICE, this.ACCOUNT, JSON.stringify(info));
+    // return keytar.addPassword(this.SERVICE, this.ACCOUNT, JSON.stringify(info));
+    return;
   }
   get() {
-    return keytar.getPassword(this.SERVICE, this.ACCOUNT);
+    // return keytar.getPassword(this.SERVICE, this.ACCOUNT);
+    return;
   }
   clear() {
-    return keytar.deletePassword(this.SERVICE, this.ACCOUNT);
+    // return keytar.deletePassword(this.SERVICE, this.ACCOUNT);
+    return;
   }
 }
 
