@@ -42,7 +42,9 @@ const CONSTANTS = {
     REVOKED: 'revoked'
   },
   ERROR_CODE: {
+    ENCODE_DECODE_ERROR: -1,
     SYMMETRIC_DECIPHER_FAILURE: -3,
+    ACCESS_DENIED: -100,
     NO_SUCH_ENTRY: -106,
     ENTRY_EXISTS: -107
   },

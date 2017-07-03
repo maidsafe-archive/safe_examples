@@ -36,6 +36,6 @@ export default class NetworkStatus extends Component {
 }
 
 NetworkStatus.propTypes = {
-  status: PropTypes.number.isRequired,
+  status: PropTypes.string.isRequired,
   message: PropTypes.string
 };
