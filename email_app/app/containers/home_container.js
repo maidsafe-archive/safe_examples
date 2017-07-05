@@ -7,7 +7,8 @@ const mapStateToProps = state => {
     coreData: state.initializer.coreData,
     inboxSize: state.initializer.inboxSize,
     savedSize: state.initializer.savedSize,
-    network_status: state.initializer.network_status
+    network_status: state.initializer.network_status,
+    processing: state.initializer.processing
   };
 };
 

@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link, IndexLink } from 'react-router';
 import Modal from 'react-modal';
+const Loading = require('react-loading-animation');
 import className from 'classnames';
 import pkg from '../../package.json';
 import { CONSTANTS } from '../constants';
 
 const modalStyles = {
   content : {
+    border                : '1px solid #ccc',
     top                   : '50%',
     left                  : '50%',
     right                 : 'auto',
@@ -20,39 +22,41 @@ const modalStyles = {
 export default class Home extends Component {
   constructor() {
     super();
-    this.state = {
-      reconnecting: false
-    };
 
     this.reconnect = this.reconnect.bind(this);
   }
 
   reconnect() {
-    this.setState({reconnecting: true});
-    return this.props.reconnectApplication()
-              .catch((err) => 'not reconnected')
-              .then(() => this.setState({reconnecting: false}))
+    return this.props.reconnectApplication();
   }
 
   render() {
     const { router } = this.context;
-    const { coreData, inboxSize, savedSize, network_status } = this.props;
+    const { coreData, inboxSize, savedSize, network_status, processing } = this.props;
 
-    const isNetworkDisconnected = (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
+    const isModalOpen = processing.state || (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
+    let processingModalStyle = { ...modalStyles, content: { ...modalStyles.content, border: '0px' } };
 
     return (
       <div className="home">
         <Modal
-          isOpen={isNetworkDisconnected}
+          isOpen={isModalOpen}
           shouldCloseOnOverlayClick={false}
-          style={modalStyles}
-          contentLabel="Network connection lost"
+          style={processing.state ? processingModalStyle : modalStyles}
+          contentLabel="Processing"
         >
-          <div className="text-center">
-              <div>The application hast lost network connection.</div><br />
-              <div>Make sure the network link is up before trying to reconnect.</div><br />
-              <button disabled={this.state.reconnecting} className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
-          </div>
+          {processing.state ? (
+              <div className="text-center">
+                <Loading /><br />
+                <div>{processing.msg}</div>
+              </div>
+          ) : (
+              <div className="text-center">
+                  <div>The application hast lost network connection.</div><br />
+                  <div>Make sure the network link is up before trying to reconnect.</div><br />
+                  <button className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
+              </div>
+          )}
         </Modal>
 
         <div className="home-b">
