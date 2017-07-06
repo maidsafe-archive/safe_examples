@@ -28,6 +28,7 @@ export default class Initializer extends Component {
   refreshConfig() {
     const { setInitializerTask, refreshConfig } = this.props;
     setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
+
     return refreshConfig()
         .then((_) => {
           if (Object.keys(this.props.accounts).length > 0) {

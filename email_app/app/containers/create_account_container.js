@@ -6,7 +6,7 @@ import { storeNewAccount } from '../actions/initializer_actions';
 const mapStateToProps = state => {
   return {
     error: state.createAccount.error,
-    processing: state.createAccount.processing,
+    processing: state.initializer.processing,
     newAccount: state.createAccount.newAccount,
     coreData: state.initializer.coreData
   };

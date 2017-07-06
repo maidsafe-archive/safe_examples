@@ -27,7 +27,10 @@ export default class Home extends Component {
   }
 
   reconnect() {
-    return this.props.reconnectApplication();
+    const { reconnectApplication, accounts, refreshEmail } = this.props;
+    return reconnectApplication()
+      .then(() => refreshEmail(accounts),
+            (err) => 'failed reconnecting');
   }
 
   render() {

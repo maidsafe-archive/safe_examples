@@ -52,6 +52,8 @@ const initializer = (state = initialState, action) => {
       return { ...state, processing: { state: true, msg: 'Reconnecting...' } };
       break;
     case `${ACTION_TYPES.RECONNECT_APP}_ERROR`:
+      return { ...state, processing: { state: false, msg: null } };
+      break;
     case `${ACTION_TYPES.RECONNECT_APP}_SUCCESS`:
       return { ...state,
         network_status: CONSTANTS.NET_STATUS_CONNECTED,
@@ -69,10 +71,14 @@ const initializer = (state = initialState, action) => {
       };
       break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_LOADING`:
-      return { ...state, processing: { state: true, msg: 'Creating account...' } };
+      return { ...state, processing: { state: true, msg: 'Creating email ID...' } };
       break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_ERROR`:
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_SUCCESS`:
       return { ...state, processing: { state: false, msg: null } };
+      break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_LOADING`:
+      return { ...state, processing: { state: true, msg: 'Storing email info...' } };
       break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
       return { ...state,
@@ -97,7 +103,7 @@ const initializer = (state = initialState, action) => {
       return { ...state, processing: { state: false, msg: null } };
       break;
     case `${ACTION_TYPES.MAIL_PROCESSING}_LOADING`:
-      return { ...state, processing: { state: true, msg: null } };
+      return { ...state, processing: { state: true, msg: action.msg } };
       break;
     case `${ACTION_TYPES.MAIL_PROCESSING}_SUCCESS`:
     case `${ACTION_TYPES.MAIL_PROCESSING}_ERROR`:
