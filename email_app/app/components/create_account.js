@@ -41,7 +41,6 @@ export default class CreateAccount extends Component {
 
   render() {
     const { processing, error } = this.props;
-
     return (
       <div className="create-account">
         <div className="create-account-b">
@@ -54,7 +53,7 @@ export default class CreateAccount extends Component {
                 <div className="alert">Email Id must be less than {CONSTANTS.EMAIL_ID_MAX_LENGTH} characters. (This is just a restriction in this tutorial)</div>
               </div>
               <div className="inp-btn-cnt">
-                <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary" disabled={processing}>Create</button>
+                <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary" disabled={processing.state}>Create</button>
               </div>
             </form>
             <h4 className="error">{error.message}</h4>

@@ -4,6 +4,10 @@ import { MESSAGES, APP_STATUS, CONSTANTS, SAFE_APP_ERROR_CODES } from '../consta
 const initialState = {
   app_status: null,
   network_status: null,
+  processing: {
+    state: false,
+    msg: null
+  },
   app: null,
   tasks: [],
   accounts: [],
@@ -44,8 +48,17 @@ const initializer = (state = initialState, action) => {
     case ACTION_TYPES.NET_STATUS_CHANGED:
       return { ...state, network_status: action.payload };
       break;
+    case `${ACTION_TYPES.RECONNECT_APP}_LOADING`:
+      return { ...state, processing: { state: true, msg: 'Reconnecting...' } };
+      break;
+    case `${ACTION_TYPES.RECONNECT_APP}_ERROR`:
+      return { ...state, processing: { state: false, msg: null } };
+      break;
     case `${ACTION_TYPES.RECONNECT_APP}_SUCCESS`:
-      return { ...state, network_status: CONSTANTS.NET_STATUS_CONNECTED };
+      return { ...state,
+        network_status: CONSTANTS.NET_STATUS_CONNECTED,
+        processing: { state: false, msg: null }
+      };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
       return { ...state, app_status: APP_STATUS.READING_CONFIG };
@@ -57,18 +70,44 @@ const initializer = (state = initialState, action) => {
         app_status: APP_STATUS.READY
       };
       break;
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_LOADING`:
+      return { ...state, processing: { state: true, msg: 'Creating email ID...' } };
+      break;
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_ERROR`:
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_SUCCESS`:
+      return { ...state, processing: { state: false, msg: null } };
+      break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_LOADING`:
+      return { ...state, processing: { state: true, msg: 'Storing email info...' } };
+      break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
       return { ...state,
         accounts: action.payload,
-        coreData: { ...state.coreData, id: action.payload.id }
+        coreData: { ...state.coreData, id: action.payload.id },
+        processing: { state: false, msg: null }
       };
+      break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_ERROR`:
+      return { ...state, processing: { state: false, msg: null } };
       break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_LOADING`:
       return { ...state,
         coreData: { ...state.coreData, inbox: [], saved: [] },
         inboxSize: 0,
-        savedSize: 0
+        savedSize: 0,
+        processing: { state: true, msg: 'Reading emails...' }
       };
+      break;
+    case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
+    case `${ACTION_TYPES.REFRESH_EMAIL}_ERROR`:
+      return { ...state, processing: { state: false, msg: null } };
+      break;
+    case `${ACTION_TYPES.MAIL_PROCESSING}_LOADING`:
+      return { ...state, processing: { state: true, msg: action.msg } };
+      break;
+    case `${ACTION_TYPES.MAIL_PROCESSING}_SUCCESS`:
+    case `${ACTION_TYPES.MAIL_PROCESSING}_ERROR`:
+      return { ...state, processing: { state: false, msg: null } };
       break;
     case ACTION_TYPES.PUSH_TO_INBOX: {
       let inbox = Object.assign({}, state.coreData.inbox, action.payload);

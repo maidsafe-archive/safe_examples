@@ -1,59 +1,63 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link, IndexLink } from 'react-router';
-import Modal from 'react-modal';
+import {ModalDialog, ModalPortal, ModalBackground} from 'react-modal-dialog';
+import ReactSpinner from 'react-spinjs';
 import className from 'classnames';
 import pkg from '../../package.json';
 import { CONSTANTS } from '../constants';
 
-const modalStyles = {
-  content : {
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)'
-  }
-};
-
 export default class Home extends Component {
   constructor() {
     super();
-    this.state = {
-      reconnecting: false
-    };
 
     this.reconnect = this.reconnect.bind(this);
   }
 
   reconnect() {
-    this.setState({reconnecting: true});
-    return this.props.reconnectApplication()
-              .catch((err) => 'not reconnected')
-              .then(() => this.setState({reconnecting: false}))
+    const { reconnectApplication, accounts, refreshEmail } = this.props;
+    return reconnectApplication()
+      .then(() => refreshEmail(accounts),
+            (err) => 'failed reconnecting');
   }
 
   render() {
     const { router } = this.context;
-    const { coreData, inboxSize, savedSize, network_status } = this.props;
+    const { coreData, inboxSize, savedSize, network_status, processing } = this.props;
 
-    const isNetworkDisconnected = (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
+    const isModalOpen = processing.state || (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
+    const spinnerBackgroundStyle = {
+      zIndex: '5',
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+      opacity: '0.75',
+      backgroundColor: 'white'
+    }
 
     return (
       <div className="home">
-        <Modal
-          isOpen={isNetworkDisconnected}
-          shouldCloseOnOverlayClick={false}
-          style={modalStyles}
-          contentLabel="Network connection lost"
-        >
-          <div className="text-center">
-              <div>The application hast lost network connection.</div><br />
-              <div>Make sure the network link is up before trying to reconnect.</div><br />
-              <button disabled={this.state.reconnecting} className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
-          </div>
-        </Modal>
+        {
+          isModalOpen &&
+          <ModalPortal>
+            {
+              processing.state ?
+                <div style={spinnerBackgroundStyle}>
+                  <ReactSpinner />
+                </div>
+                :
+                <ModalBackground>
+                  <ModalDialog>
+                    <div className="text-center">
+                        <div>The application hast lost network connection.</div><br />
+                        <div>Make sure the network link is up before trying to reconnect.</div><br />
+                        <button className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
+                    </div>
+                  </ModalDialog>
+                </ModalBackground>
+            }
+          </ModalPortal>
+        }
 
         <div className="home-b">
           <div className={className('float-btn', { hide: router.isActive('/compose_mail')  })}>

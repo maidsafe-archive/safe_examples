@@ -12,6 +12,6 @@ export const createAccount = (emailId) => {
 };
 
 export const createAccountError = (error) => ({
-  type: ACTION_TYPES.CREATE_ACCOUNT_ERROR,
-  error
+  type: ACTION_TYPES.CREATE_ACCOUNT,
+  payload: Promise.reject(error)
 });
