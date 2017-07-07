@@ -1,23 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link, IndexLink } from 'react-router';
-import Modal from 'react-modal';
-const Loading = require('react-loading-animation');
+import {ModalDialog, ModalPortal, ModalBackground} from 'react-modal-dialog';
+import ReactSpinner from 'react-spinjs';
 import className from 'classnames';
 import pkg from '../../package.json';
 import { CONSTANTS } from '../constants';
-
-const modalStyles = {
-  content : {
-    border                : '1px solid #ccc',
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)'
-  }
-};
 
 export default class Home extends Component {
   constructor() {
@@ -38,29 +26,38 @@ export default class Home extends Component {
     const { coreData, inboxSize, savedSize, network_status, processing } = this.props;
 
     const isModalOpen = processing.state || (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
-    let processingModalStyle = { ...modalStyles, content: { ...modalStyles.content, border: '0px' } };
+    const spinnerBackgroundStyle = {
+      zIndex: '5',
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+      opacity: '0.75',
+      backgroundColor: 'white'
+    }
 
     return (
       <div className="home">
-        <Modal
-          isOpen={isModalOpen}
-          shouldCloseOnOverlayClick={false}
-          style={processing.state ? processingModalStyle : modalStyles}
-          contentLabel="Processing"
-        >
-          {processing.state ? (
-              <div className="text-center">
-                <Loading /><br />
-                <div>{processing.msg}</div>
-              </div>
-          ) : (
-              <div className="text-center">
-                  <div>The application hast lost network connection.</div><br />
-                  <div>Make sure the network link is up before trying to reconnect.</div><br />
-                  <button className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
-              </div>
-          )}
-        </Modal>
+        {
+          isModalOpen &&
+          <ModalPortal>
+            {
+              processing.state ?
+                <div style={spinnerBackgroundStyle}>
+                  <ReactSpinner />
+                </div>
+                :
+                <ModalBackground>
+                  <ModalDialog>
+                    <div className="text-center">
+                        <div>The application hast lost network connection.</div><br />
+                        <div>Make sure the network link is up before trying to reconnect.</div><br />
+                        <button className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
+                    </div>
+                  </ModalDialog>
+                </ModalBackground>
+            }
+          </ModalPortal>
+        }
 
         <div className="home-b">
           <div className={className('float-btn', { hide: router.isActive('/compose_mail')  })}>
