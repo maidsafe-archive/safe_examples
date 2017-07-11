@@ -95,7 +95,6 @@ const fetchPublicIds = (app) => {
 
 export const fetchEmailIds = (app) => {
   let emailIds = [];
-  const regex = new RegExp('.*(?=' + CONSTANTS.SERVICE_NAME_POSTFIX +'$)', 'g');
 
   return fetchPublicIds(app)
     .then((publicIds) => Promise.all(publicIds.map((publicId) => {
@@ -108,9 +107,10 @@ export const fetchEmailIds = (app) => {
               .then(() => Promise.all(rawEmailIds.map((emailId) => {
                 // Let's filter out the services which are not email services,
                 // i.e. those which don't have the `@email` postfix
-                var res = regex.exec(emailId);
+                const regex = new RegExp('.*(?=' + CONSTANTS.SERVICE_NAME_POSTFIX +'$)', 'g');
+                let res = regex.exec(emailId);
                 if (res) {
-                  emailIds.push(res[0] + '.' + publicId.id);
+                  emailIds.push(res[0] + ((res[0].length > 0) ? '.' : '') + publicId.id);
                 }
               })))
             );
@@ -216,7 +216,18 @@ const createArchive = (app) => {
 
 const addEmailService = (app, serviceInfo, inbox_serialised) => {
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised }))
+      .then((md) => md.getVersion()
+        .then((version) => {
+          return md.getEntries()
+            .then((entries) => entries.insert(serviceInfo.serviceName, inbox_serialised))
+            .then(() => md);
+        }, (err) => {
+          if (err.code === SAFE_APP_ERROR_CODES.ERR_DATA_NOT_FOUND) {
+            return md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised });
+          }
+          throw err;
+        })
+      );
 }
 
 const createPublicIdAndEmailService = (app, pub_names_md, serviceInfo,
