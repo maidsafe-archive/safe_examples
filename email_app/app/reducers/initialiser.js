@@ -10,6 +10,7 @@ const initialState = {
   },
   app: null,
   tasks: [],
+  email_ids: [],
   accounts: [],
   coreData: {
     id: '',
@@ -59,6 +60,12 @@ const initializer = (state = initialState, action) => {
         network_status: CONSTANTS.NET_STATUS_CONNECTED,
         processing: { state: false, msg: null }
       };
+      break;
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_LOADING`:
+      return { ...state, app_status: APP_STATUS.FETCHING_EMAIL_IDS };
+      break;
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_SUCCESS`:
+      return { ...state, email_ids: action.payload };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
       return { ...state, app_status: APP_STATUS.READING_CONFIG };

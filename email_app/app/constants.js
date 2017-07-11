@@ -25,6 +25,7 @@ export const APP_STATUS = {
   AUTHORISATION_FAILED: 'AUTHORISATION_FAILED',
   AUTHORISATION_DENIED: 'AUTHORISATION_DENIED',
   AUTHORISED: 'AUTHORISED',
+  FETCHING_EMAIL_IDS: 'FETCHING_EMAIL_IDS',
   READING_CONFIG: 'READING_CONFIG',
   READY: 'READY'
 }
@@ -40,9 +41,7 @@ export const MESSAGES = {
   INITIALIZE: {
     AUTHORISE_APP: 'Authorising Application',
     CHECK_CONFIGURATION: 'Checking configuration',
-    FETCH_CORE_STRUCTURE: 'Fetching Core Structure',
-    CREATE_CORE_STRUCTURE: 'Creating Core Structure',
-    WRITE_CONFIG_FILE: 'Creating new configuration',
+    FETCH_EMAIL_IDS: 'Fetching owned email Ids'
   },
   EMAIL_ALREADY_TAKEN: 'Email ID already taken. Please try again',
   EMAIL_ID_TOO_LONG: 'Email ID is too long',

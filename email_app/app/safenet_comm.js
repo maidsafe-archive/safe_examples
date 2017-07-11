@@ -68,6 +68,56 @@ export const reconnect = (app) => {
   return app.reconnect();
 }
 
+const fetchPublicIds = (app) => {
+  let rawEntries = [];
+  let publicIds = [];
+  return app.auth.getContainer(APP_INFO.containers.publicNames)
+      .then((pub_names_md) => pub_names_md.getEntries()
+        .then((entries) => entries.forEach((key, value) => {
+            rawEntries.push({key, value});
+          })
+          .then(() => Promise.all(rawEntries.map((entry) => {
+            if (entry.value.buf.length === 0) { //FIXME: this condition is a work around for a limitation in safe_core
+              return Promise.resolve();
+            }
+
+            return pub_names_md.decrypt(entry.key)
+              .then((decKey) => pub_names_md.decrypt(entry.value.buf)
+                .then((decVal) => publicIds.push({
+                    id: decKey.toString(),
+                    service: decVal
+                  })
+                ));
+          })))
+        ))
+    .then(() => publicIds);
+}
+
+export const fetchEmailIds = (app) => {
+  let emailIds = [];
+  const regex = new RegExp('.*(?=' + CONSTANTS.SERVICE_NAME_POSTFIX +'$)', 'g');
+
+  return fetchPublicIds(app)
+    .then((publicIds) => Promise.all(publicIds.map((publicId) => {
+        let rawEmailIds = [];
+        return app.mutableData.newPublic(publicId.service, CONSTANTS.TAG_TYPE_DNS)
+            .then((services_md) => services_md.getKeys())
+            .then((keys) => keys.forEach((key) => {
+                rawEmailIds.push(key.toString());
+              })
+              .then(() => Promise.all(rawEmailIds.map((emailId) => {
+                // Let's filter out the services which are not email services,
+                // i.e. those which don't have the `@email` postfix
+                var res = regex.exec(emailId);
+                if (res) {
+                  emailIds.push(res[0] + '.' + publicId.id);
+                }
+              })))
+            );
+    })))
+    .then(() => emailIds);
+}
+
 export const readConfig = (app) => {
   let account = {};
   return app.auth.getHomeContainer()

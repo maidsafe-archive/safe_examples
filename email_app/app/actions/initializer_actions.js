@@ -1,6 +1,6 @@
 import ACTION_TYPES from './actionTypes';
-import { authApp, connect, reconnect, readConfig, writeConfig,
-                    readInboxEmails, readArchivedEmails } from '../safenet_comm';
+import { authApp, connect, reconnect, fetchEmailIds, readConfig,
+          writeConfig, readInboxEmails, readArchivedEmails } from '../safenet_comm';
 
 export const setInitializerTask = (task) => ({
   type: ACTION_TYPES.SET_INITIALIZER_TASK,
@@ -52,6 +52,16 @@ export const reconnectApplication = () => {
     return dispatch({
       type: ACTION_TYPES.RECONNECT_APP,
       payload: reconnect(app)
+    });
+  };
+};
+
+export const getEmailIds = () => {
+  return function (dispatch, getState) {
+    let app = getState().initializer.app;
+    return dispatch({
+      type: ACTION_TYPES.FETCH_EMAIL_IDS,
+      payload: fetchEmailIds(app)
     });
   };
 };
