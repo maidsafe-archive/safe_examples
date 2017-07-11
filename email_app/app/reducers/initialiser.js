@@ -68,13 +68,17 @@ const initializer = (state = initialState, action) => {
       return { ...state, email_ids: action.payload };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
-      return { ...state, app_status: APP_STATUS.READING_CONFIG };
+      return { ...state,
+        app_status: APP_STATUS.READING_CONFIG,
+        processing: { state: true, msg: 'Reading emails...' }
+      };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
       return { ...state,
         accounts: action.payload,
         coreData: { ...state.coreData, id: action.payload.id },
-        app_status: APP_STATUS.READY
+        app_status: APP_STATUS.READY,
+        processing: { state: false, msg: null }
       };
       break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_LOADING`:

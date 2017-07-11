@@ -66,12 +66,12 @@ export const getEmailIds = () => {
   };
 };
 
-export const refreshConfig = () => {
+export const refreshConfig = (emailId) => {
   return function (dispatch, getState) {
     let app = getState().initializer.app;
     return dispatch({
       type: ACTION_TYPES.GET_CONFIG,
-      payload: readConfig(app)
+      payload: readConfig(app, emailId)
     });
   };
 };

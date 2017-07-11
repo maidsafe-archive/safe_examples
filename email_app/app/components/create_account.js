@@ -8,10 +8,11 @@ export default class CreateAccount extends Component {
     this.errMrg = null;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
     this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
+    this.handleChooseAccount = this.handleChooseAccount.bind(this);
   }
 
   storeCreatedAccount() {
-    const { newAccount, storeNewAccount, createAccountError } = this.props;
+    const { newAccount, storeNewAccount, createAccountError, refreshConfig } = this.props;
     return storeNewAccount(newAccount)
         .then((_) => this.context.router.push('/home'))
         .catch((e) => createAccountError(new Error(e)));
@@ -39,7 +40,18 @@ export default class CreateAccount extends Component {
         });
   };
 
+  handleChooseAccount(e) {
+    e.preventDefault();
+    const { refreshConfig } = this.props;
+    const emailId = this.emailId.value;
+
+    return refreshConfig(emailId)
+        .then((_) => this.context.router.push('/home'))
+  };
+
   render() {
+    console.log("Email IDs to choose from: ", this.props.email_ids);
+
     const { processing, error } = this.props;
     return (
       <div className="create-account">

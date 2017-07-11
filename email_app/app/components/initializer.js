@@ -15,7 +15,7 @@ const showAuthError = (app_status) => {
 export default class Initializer extends Component {
   constructor() {
     super();
-    this.refreshConfig = this.refreshConfig.bind(this);
+    this.readEmailIds = this.readEmailIds.bind(this);
   }
 
   componentDidMount() {
@@ -25,21 +25,12 @@ export default class Initializer extends Component {
     return authoriseApplication();
   }
 
-  refreshConfig() {
-    const { setInitializerTask, refreshConfig } = this.props;
-    setInitializerTask(MESSAGES.INITIALIZE.CHECK_CONFIGURATION);
+  readEmailIds() {
+    const { setInitializerTask, getEmailIds } = this.props;
+    setInitializerTask(MESSAGES.INITIALIZE.FETCH_EMAIL_IDS);
 
-    return refreshConfig()
-        .then((_) => {
-          if (Object.keys(this.props.accounts).length > 0) {
-            return this.context.router.push('/home');
-          }
-          showAuthError();
-        })
-        .catch((_) => {
-          console.log("No email account found");
-          return this.context.router.push('/create_account');
-        });
+    return getEmailIds()
+        .then((_) => this.context.router.push('/create_account'));
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -49,7 +40,7 @@ export default class Initializer extends Component {
             || app_status === APP_STATUS.AUTHORISATION_FAILED) ) {
       showAuthError(app_status);
     } else if (app && app_status === APP_STATUS.AUTHORISED) {
-      return this.refreshConfig();
+      return this.readEmailIds();
     }
   }
 

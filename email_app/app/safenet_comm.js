@@ -118,21 +118,19 @@ export const fetchEmailIds = (app) => {
     .then(() => emailIds);
 }
 
-export const readConfig = (app) => {
-  let account = {};
+export const readConfig = (app, emailId) => {
+  let account = {id: emailId};
+  let storedAccount = {}
+
   return app.auth.getHomeContainer()
-      .then((md) => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_INBOX).then((key) => md.get(key))
-        .then((value) => md.decrypt(value.buf).then((decrypted) => app.mutableData.fromSerial(decrypted)))
+      .then((md) => md.encryptKey(emailId).then((key) => md.get(key))
+        .then((value) => md.decrypt(value.buf).then((decrypted) => storedAccount = JSON.parse(decrypted)))
+        .then(() => app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX]))
         .then((inbox_md) => account.inbox_md = inbox_md)
-        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ARCHIVE).then((key) => md.get(key)))
-        .then((value) => md.decrypt(value.buf).then((decrypted) => app.mutableData.fromSerial(decrypted)))
+        .then(() => app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE]))
         .then((archive_md) => account.archive_md = archive_md)
-        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ID).then((key) => md.get(key)))
-        .then((value) => md.decrypt(value.buf).then((decrypted) => account.id = decrypted.toString()))
-        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY).then((key) => md.get(key)))
-        .then((value) => md.decrypt(value.buf).then((decrypted) => account.enc_sk = decrypted.toString()))
-        .then(() => md.encryptKey(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY).then((key) => md.get(key)))
-        .then((value) => md.decrypt(value.buf).then((decrypted) => account.enc_pk = decrypted.toString()))
+        .then(() => account.enc_sk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY])
+        .then(() => account.enc_pk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY])
       )
       .then(() => account);
 }
@@ -145,19 +143,19 @@ const insertEncrypted = (md, mut, key, value) => {
 }
 
 export const writeConfig = (app, account) => {
-  let serialised_inbox;
-  let serialised_archive;
+  let emailAccount = {
+    [CONSTANTS.ACCOUNT_KEY_EMAIL_ID]: account.id,
+    [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY]: account.enc_sk,
+    [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]: account.enc_pk
+  };
+
   return account.inbox_md.serialise()
-      .then((serial) => serialised_inbox = serial)
+      .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX] = serial)
       .then(() => account.archive_md.serialise())
-      .then((serial) => serialised_archive = serial)
+      .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE] = serial)
       .then(() => app.auth.getHomeContainer())
       .then((md) => app.mutableData.newMutation()
-        .then((mut) => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_INBOX, serialised_inbox)
-          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ARCHIVE, serialised_archive))
-          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ID, account.id))
-          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ENC_SECRET_KEY, account.enc_sk))
-          .then(() => insertEncrypted(md, mut, CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY, account.enc_pk))
+        .then((mut) => insertEncrypted(md, mut, account.id, JSON.stringify(emailAccount))
           .then(() => md.applyEntriesMutation(mut))
         ))
       .then(() => account);
