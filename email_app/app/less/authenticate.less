@@ -1,26 +1,57 @@
 @import "variables.less";
 
 .create-account {
-	width: 100%;
-	height: 100%;
-	display: table;
-	.create-account-b {
-		display: table-cell;
-		vertical-align: middle;
-		.create-account-cnt {
-			width: 300px;
-			margin: 0 auto;
-			.error {
-				color: @red-100;
-			}
-			.title {
-				font-size: 36px;
-				font-weight: normal;
-				opacity: 0.8;
-			}
-			.form {
-				margin-top: 80px;
-			}
-		}
-	}
+  width: 100%;
+  height: 100%;
+  display: table;
+  .create-account-b {
+    display: table-cell;
+    vertical-align: middle;
+    .create-account-cnt {
+      width: 100%;
+      margin: 0 auto;
+      .error {
+        margin-top: 40px;
+        font-size: 16px;
+        font-weight: normal;
+        color: @red-100;
+      }
+      .title {
+        font-size: 20px;
+        font-weight: 300;
+        opacity: 0.8;
+      }
+      .email-ls {
+        .mdl-textfield {
+          width: 100%;
+          margin-top: -20px;
+          font-family: 'Open Sans';
+        }
+        .mdl-textfield__label {
+          color: #000;
+          font-size: 14px;
+          top: -11px;
+          font-weight: 600;
+        }
+        .form .inp-btn-cnt {
+          margin-top: 70px;
+        }
+        .form .inp-grp {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+.split-view {
+  width: 70%;
+  margin: 0 auto;
+  .split-view-i {
+    width: 50%;
+    display: inline-block;
+    float: left;
+    padding: 30px;
+  }
+  .clearfix();
 }

@@ -106,6 +106,7 @@
     "dateformat": "^1.0.12",
     "electron-compile": "^6.2.0",
     "electron-debug": "^1.0.1",
+    "getmdl-select": "^1.0.4",
     "less": "^2.7.2",
     "libsodium-wrappers": "^0.5.1",
     "material-design-lite": "^1.2.1",
