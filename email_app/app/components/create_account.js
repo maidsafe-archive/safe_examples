@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import ReactMaterialSelect from 'react-material-select'
 import { MESSAGES, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
 import { ModalPortal } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
@@ -46,7 +47,8 @@ export default class CreateAccount extends Component {
   handleChooseAccount(e) {
     e.preventDefault();
     const { refreshConfig, createAccountError } = this.props;
-    const emailId = this.emailSelected.value;
+    const emailId = this.refs.emailSelected.getValue();
+    console.log('emailId', emailId)
 
     return refreshConfig(emailId)
       .then((_) => this.context.router.push('/home'))
@@ -98,35 +100,20 @@ export default class CreateAccount extends Component {
                 <div className="email-ls">
                   <h3 className="title">Select Email Id</h3>
                   <form className="form">
-                    <div className="inp-grp">
-                      <div
-                        className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-                        <input
-                          className="mdl-textfield__input"
-                          type="text"
-                          id="selectEmail"
-                          ref={(c) => { this.emailSelected = c;}}
-                          readOnly="readOnly"
-                          placeholder="Select email ID"
-                          tabIndex="-1"
-                          value={emailIds[0]}
-                        />
-                        {
-                          emailIds.length !== 0 ? (<ul htmlFor="selectEmail" className="mdl-menu mdl-menu--bottom-left mdl-js-menu">
-                              { emailIds.map((email, i) => {
-                                return (<li key={`email${i}`} className="mdl-menu__item">{email}</li>)
-                              }) }
-                            </ul>) : null
-                        }
-                      </div>
-                      <div className="inp-btn-cnt">
-                        <button
-                          type="submit"
-                          className="mdl-button mdl-js-button mdl-button--raised bg-primary"
-                          disabled={emailIds.length === 0}
-                          onClick={this.handleChooseAccount}
-                        >Select</button>
-                      </div>
+                    <ReactMaterialSelect ref="emailSelected" defaultValue={emailIds[0]} label="Select Email Id">
+                      {
+                        emailIds.map((email, i) => {
+                          return (<option key={`email-${i}`} dataValue={email}>{email}</option>)
+                        })
+                      }
+                    </ReactMaterialSelect>
+                    <div className="inp-btn-cnt">
+                      <button
+                        type="submit"
+                        className="mdl-button mdl-js-button mdl-button--raised bg-primary"
+                        disabled={emailIds.length === 0}
+                        onClick={this.handleChooseAccount}
+                      >Select</button>
                     </div>
                   </form>
                 </div>
