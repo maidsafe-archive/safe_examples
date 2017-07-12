@@ -24,6 +24,7 @@ const FILE_INDEX_KEY = 'FILE_INDEX';
 // global access state
 let ACCESS_TOKEN;
 let FILE_INDEX;
+let HOME_CONTAINER_HANDLE;
 
 /**
  * Save response URI to local storage
@@ -75,6 +76,15 @@ const _prepareFile = (oldData, newData) => {
   return new Buffer(JSON.stringify(oldData));
 };
 
+const _getHomeContainer = () => {
+  if (HOME_CONTAINER_HANDLE) {
+    return Promise.resolve(HOME_CONTAINER_HANDLE);
+  }
+  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+    .then((mdata) => (HOME_CONTAINER_HANDLE = mdata))
+    .then(() => HOME_CONTAINER_HANDLE);
+};
+
 /**
  * Connect to safe network with response URI from Authenticator
  * @param token
@@ -86,6 +96,19 @@ const _connectAuthorised = (token, resUri) => {
     .then((token) => (ACCESS_TOKEN = token));
 };
 
+/**
+ * Check permission for granted access containers
+ * @private
+ */
+const _fetchAccessInfo = () => {
+  return window.safeApp.canAccessContainer(ACCESS_TOKEN, '_public')
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        throw new Error('Cannot access PUBLIC Container');
+      }
+      return true;
+    });
+};
 
 /**
  * Read file
@@ -95,12 +118,12 @@ const _connectAuthorised = (token, resUri) => {
  * @return {data, version} - data: file data, version: file entry version.
  */
 const _getFile = (mdata, filename) => {
-  return window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
-    .then((nfs) => window.safeNfs.fetch(ACCESS_TOKEN, nfs, filename))
+  return window.safeMutableData.emulateAs(mdata, 'NFS')
+    .then((nfs) => window.safeNfs.fetch(nfs, filename))
     .then((file) => {
       return window.safeNfs.getFileMeta(file)
         .then((meta) => window.safeImmutableData.fetch(ACCESS_TOKEN, meta.dataMapName)
-          .then((immut) => window.safeImmutableData.read(ACCESS_TOKEN, immut))
+          .then((immut) => window.safeImmutableData.read(immut))
           .then((data) => ({
             data: JSON.parse(data.toString()),
             version: meta.version
@@ -115,12 +138,12 @@ const _getFile = (mdata, filename) => {
  * @private
  */
 const _updateFile = (filename, payload) => {
-  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+  return _getHomeContainer()
     .then((mdata) => {
       return _getFile(mdata, filename)
-        .then((files) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
-          .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile(files.data, payload))
-            .then((file) => window.safeNfs.update(ACCESS_TOKEN, nfs, file, filename, parseInt(files.version, 10) + 1))));
+        .then((files) => window.safeMutableData.emulateAs(mdata, 'NFS')
+          .then((nfs) => window.safeNfs.create(nfs, _prepareFile(files.data, payload))
+            .then((file) => window.safeNfs.update(nfs, file, filename, parseInt(files.version, 10) + 1))));
     });
 };
 
@@ -130,7 +153,7 @@ const _updateFile = (filename, payload) => {
  * @param version
  */
 export const readFile = (filename, version) => {
-  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+  return _getHomeContainer()
     .then((mdata) => _getFile(mdata, filename))
     .then((file) => {
       return version ? file.data[version] : file.data
@@ -148,18 +171,20 @@ export const saveFile = (filename, data) => {
     console.log("existing");
     return _updateFile(filename, data);
   } else {
-    return window.safeApp.getHomeContainer(ACCESS_TOKEN)
-      .then((mdata) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
-        .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile([], data))
-          .then((file) => window.safeNfs.insert(ACCESS_TOKEN, nfs, file, filename)))
-        .then(() => window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
-          .then((entriesHandle) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
-            .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
-            .then((val) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle)
+    return _getHomeContainer()
+      .then((mdata) => window.safeMutableData.emulateAs(mdata, 'NFS')
+        .then((nfs) => window.safeNfs.create(nfs, _prepareFile([], data))
+          .then((file) => window.safeNfs.insert(nfs, file, filename)))
+        .then(() => window.safeMutableData.getEntries(mdata)
+          .then((entriesHandle) => window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+            .then((key) => window.safeMutableData.get(mdata, key))
+            .then((val) => window.safeMutableDataEntries.mutate(entriesHandle)
               .then((mut) => {
                 FILE_INDEX[filename] = 1;
-                return window.safeMutableDataMutation.update(ACCESS_TOKEN, mut, FILE_INDEX_KEY, _getBufferedFileIndex(), (parseInt(val.version, 10) + 1))
-                  .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut));
+                return window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+                  .then((encKey) => window.safeMutableData.encryptValue(mdata, _getBufferedFileIndex())
+                    .then((encVal) => window.safeMutableDataMutation.update(mut, encKey, encVal, (parseInt(val.version, 10) + 1))))
+                  .then(() => window.safeMutableData.applyEntriesMutation(mdata, mut));
               })))));
   }
 };
@@ -179,22 +204,25 @@ export const getFileVersions = (filename) => {
 export const getFileIndex = () => {
   if (FILE_INDEX) return Promise.resolve(FILE_INDEX);
 
-  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
-    .then((mdata) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
-      .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
+  return _getHomeContainer()
+    .then((mdata) => window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+      .then((key) => window.safeMutableData.get(mdata, key))
+      .then((value) => window.safeMutableData.decrypt(mdata, value.buf))
       .then((fileIndex) => {
         FILE_INDEX = JSON.parse(fileIndex.buf.toString());
         return FILE_INDEX;
       })
-      .catch(() => {
+      .catch((err) => {
         FILE_INDEX = {};
         console.warn('Preparing Home container');
 
         // FIXME: check for exact error condition.
-        return window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
-          .then((entriesHandle) => window.safeMutableDataEntries.mutate(ACCESS_TOKEN, entriesHandle))
-          .then((mut) => window.safeMutableDataMutation.insert(ACCESS_TOKEN, mut, FILE_INDEX_KEY, _getBufferedFileIndex())
-            .then(() => window.safeMutableData.applyEntriesMutation(ACCESS_TOKEN, mdata, mut)));
+        return window.safeMutableData.getEntries(mdata)
+          .then((entriesHandle) => window.safeMutableDataEntries.mutate(entriesHandle))
+          .then((mut) => window.safeMutableData.encryptKey(mdata, FILE_INDEX_KEY)
+            .then((encKey) => window.safeMutableData.encryptValue(mdata, _getBufferedFileIndex())
+              .then((encVal) => window.safeMutableDataMutation.insert(mut, encKey, encVal)))
+            .then(() => window.safeMutableData.applyEntriesMutation(mdata, mut)));
       }));
 };
 
@@ -218,5 +246,6 @@ export const authorise = () => {
           _saveResponseUri(resUri);
           return _connectAuthorised(token, resUri);
         });
-    });
+    })
+    .then(() => _fetchAccessInfo());
 };
