@@ -7,7 +7,6 @@ import { ipcRenderer as ipc } from 'electron';
 import routes from './routes';
 import configureStore from './store/configureStore';
 import { receiveResponse, onAuthFailure } from "./actions/initializer_actions";
-
 const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 
