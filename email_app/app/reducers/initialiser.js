@@ -2,15 +2,16 @@ import ACTION_TYPES from '../actions/actionTypes';
 import { MESSAGES, APP_STATUS, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
 
 const initialState = {
-  app_status: null,
-  network_status: null,
+  appStatus: null,
+  networkStatus: null,
   processing: {
     state: false,
     msg: null
   },
   app: null,
   tasks: [],
-  accounts: [],
+  emailIds: [],
+  account: [],
   coreData: {
     id: '',
     inbox: [],
@@ -29,13 +30,13 @@ const initializer = (state = initialState, action) => {
       break;
     }
     case `${ACTION_TYPES.AUTHORISE_APP}_LOADING`:
-      return { ...state, app: null, app_status: APP_STATUS.AUTHORISING };
+      return { ...state, app: null, appStatus: APP_STATUS.AUTHORISING };
       break;
     case `${ACTION_TYPES.AUTHORISE_APP}_SUCCESS`:
       return { ...state,
         app: action.payload,
-        app_status: APP_STATUS.AUTHORISED,
-        network_status: CONSTANTS.NET_STATUS_CONNECTED
+        appStatus: APP_STATUS.AUTHORISED,
+        networkStatus: CONSTANTS.NET_STATUS_CONNECTED
       };
       break;
     case `${ACTION_TYPES.AUTHORISE_APP}_ERROR`:
@@ -43,10 +44,10 @@ const initializer = (state = initialState, action) => {
       if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_AUTH_DENIED) {
         status = APP_STATUS.AUTHORISATION_DENIED;
       }
-      return { ...state, app_status: status };
+      return { ...state, appStatus: status };
       break;
     case ACTION_TYPES.NET_STATUS_CHANGED:
-      return { ...state, network_status: action.payload };
+      return { ...state, networkStatus: action.payload };
       break;
     case `${ACTION_TYPES.RECONNECT_APP}_LOADING`:
       return { ...state, processing: { state: true, msg: 'Reconnecting...' } };
@@ -56,18 +57,28 @@ const initializer = (state = initialState, action) => {
       break;
     case `${ACTION_TYPES.RECONNECT_APP}_SUCCESS`:
       return { ...state,
-        network_status: CONSTANTS.NET_STATUS_CONNECTED,
+        networkStatus: CONSTANTS.NET_STATUS_CONNECTED,
         processing: { state: false, msg: null }
       };
       break;
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_LOADING`:
+      return { ...state, appStatus: APP_STATUS.FETCHING_EMAIL_IDS };
+      break;
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_SUCCESS`:
+      return { ...state, emailIds: action.payload };
+      break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
-      return { ...state, app_status: APP_STATUS.READING_CONFIG };
+      return { ...state,
+        appStatus: APP_STATUS.READING_CONFIG,
+        processing: { state: true, msg: 'Reading emails...' }
+      };
       break;
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
       return { ...state,
-        accounts: action.payload,
+        account: action.payload,
         coreData: { ...state.coreData, id: action.payload.id },
-        app_status: APP_STATUS.READY
+        appStatus: APP_STATUS.READY,
+        processing: { state: false, msg: null }
       };
       break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_LOADING`:
@@ -82,7 +93,7 @@ const initializer = (state = initialState, action) => {
       break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
       return { ...state,
-        accounts: action.payload,
+        account: action.payload,
         coreData: { ...state.coreData, id: action.payload.id },
         processing: { state: false, msg: null }
       };

@@ -13,7 +13,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     sendEmail: (email, to) => (dispatch(sendEmail(email, to))),
-    cancelCompose: _ => dispatch(cancelCompose())
+    cancelCompose: (_) => dispatch(cancelCompose())
   };
 };
 

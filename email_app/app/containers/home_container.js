@@ -5,10 +5,10 @@ import { reconnectApplication, refreshEmail } from '../actions/initializer_actio
 const mapStateToProps = state => {
   return {
     coreData: state.initializer.coreData,
-    accounts: state.initializer.accounts,
+    account: state.initializer.account,
     inboxSize: state.initializer.inboxSize,
     savedSize: state.initializer.savedSize,
-    network_status: state.initializer.network_status,
+    networkStatus: state.initializer.networkStatus,
     processing: state.initializer.processing
   };
 };

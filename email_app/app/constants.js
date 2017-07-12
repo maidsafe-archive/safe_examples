@@ -4,10 +4,11 @@ export const CONSTANTS = {
   TAG_TYPE_INBOX: 15003,
   TAG_TYPE_EMAIL_ARCHIVE: 15004,
   SERVICE_NAME_POSTFIX: "@email",
-  MD_KEY_EMAIL_INBOX: "email_inbox",
-  MD_KEY_EMAIL_ARCHIVE: "email_archive",
-  MD_KEY_EMAIL_ID: "email_id",
-  MD_KEY_EMAIL_ENC_SECRET_KEY: "__email_enc_sk",
+  ACCOUNT_KEY_EMAIL_INBOX: "inbox",
+  ACCOUNT_KEY_EMAIL_ARCHIVE: "archive",
+  ACCOUNT_KEY_EMAIL_ID: "email_id",
+  ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY: "email_enc_sk",
+  ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY: "email_enc_pk",
   MD_KEY_EMAIL_ENC_PUBLIC_KEY: "__email_enc_pk",
   TOTAL_INBOX_SIZE: 100,
   EMAIL_ID_MAX_LENGTH: 100,
@@ -25,14 +26,17 @@ export const APP_STATUS = {
   AUTHORISATION_FAILED: 'AUTHORISATION_FAILED',
   AUTHORISATION_DENIED: 'AUTHORISATION_DENIED',
   AUTHORISED: 'AUTHORISED',
+  FETCHING_EMAIL_IDS: 'FETCHING_EMAIL_IDS',
   READING_CONFIG: 'READING_CONFIG',
   READY: 'READY'
 }
 
 export const SAFE_APP_ERROR_CODES = {
   ERR_AUTH_DENIED: -200,
+  ENTRY_ALREADY_EXISTS: -107,
   ERR_NO_SUCH_ENTRY: -106,
   ERR_DATA_EXISTS: -104,
+  ERR_DATA_NOT_FOUND: -103,
   ERR_OPERATION_ABORTED: -14
 }
 
@@ -40,9 +44,7 @@ export const MESSAGES = {
   INITIALIZE: {
     AUTHORISE_APP: 'Authorising Application',
     CHECK_CONFIGURATION: 'Checking configuration',
-    FETCH_CORE_STRUCTURE: 'Fetching Core Structure',
-    CREATE_CORE_STRUCTURE: 'Creating Core Structure',
-    WRITE_CONFIG_FILE: 'Creating new configuration',
+    FETCH_EMAIL_IDS: 'Fetching owned email Ids'
   },
   EMAIL_ALREADY_TAKEN: 'Email ID already taken. Please try again',
   EMAIL_ID_TOO_LONG: 'Email ID is too long',

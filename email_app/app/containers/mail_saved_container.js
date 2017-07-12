@@ -9,7 +9,7 @@ const mapStateToProps = state => {
     processing: state.mail.processing,
     error: state.mail.error,
     app: state.initializer.app,
-    accounts: state.initializer.accounts
+    account: state.initializer.account
   };
 };
 

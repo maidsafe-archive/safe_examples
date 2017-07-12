@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { MESSAGES, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
+import { ModalPortal } from 'react-modal-dialog';
+import ReactSpinner from 'react-spinjs';
 
 export default class CreateAccount extends Component {
   constructor() {
@@ -8,13 +10,14 @@ export default class CreateAccount extends Component {
     this.errMrg = null;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
     this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
+    this.handleChooseAccount = this.handleChooseAccount.bind(this);
   }
 
   storeCreatedAccount() {
     const { newAccount, storeNewAccount, createAccountError } = this.props;
     return storeNewAccount(newAccount)
-        .then((_) => this.context.router.push('/home'))
-        .catch((e) => createAccountError(new Error(e)));
+      .then((_) => this.context.router.push('/home'))
+      .catch((e) => createAccountError(new Error(e)));
   }
 
   handleCreateAccount(e) {
@@ -30,32 +33,105 @@ export default class CreateAccount extends Component {
     }
 
     return createAccount(emailId)
-        .then(this.storeCreatedAccount)
-        .catch((err) => {
-          if (err.code === SAFE_APP_ERROR_CODES.ERR_DATA_EXISTS) {
-            return createAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
-          }
-          return createAccountError(err);
-        });
+      .then(this.storeCreatedAccount)
+      .catch((err) => {
+        if (err.code === SAFE_APP_ERROR_CODES.ERR_DATA_EXISTS
+          || err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
+          return createAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
+        }
+        return createAccountError(err);
+      });
+  };
+
+  handleChooseAccount(e) {
+    e.preventDefault();
+    const { refreshConfig, createAccountError } = this.props;
+    const emailId = this.emailSelected.value;
+
+    return refreshConfig(emailId)
+      .then((_) => this.context.router.push('/home'))
+      .catch((e) => createAccountError(new Error(e)));
   };
 
   render() {
-    const { processing, error } = this.props;
+    const { emailIds, networkStatus, processing, error } = this.props;
+
+    const spinnerBackgroundStyle = {
+      zIndex: '5',
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+      opacity: '0.75',
+      backgroundColor: 'white'
+    }
+
     return (
       <div className="create-account">
+        {
+          processing.state &&
+          <ModalPortal>
+            <div style={spinnerBackgroundStyle}>
+              <ReactSpinner />
+            </div>
+          </ModalPortal>
+        }
+
         <div className="create-account-b">
           <div className="create-account-cnt text-center">
-            <h3 className="title">Create Email Id</h3>
-            <form className="form" onSubmit={this.handleCreateAccount}>
-              <div className="inp-grp">
-                <input type="text" name="emailId" id="emailId" ref={c => {this.emailId = c;}} autoFocus="autoFocus" required="required" />
-                <label htmlFor="emailId">Email ID</label>
-                <div className="alert">Email Id must be less than {CONSTANTS.EMAIL_ID_MAX_LENGTH} characters. (This is just a restriction in this tutorial)</div>
+            <div className="split-view">
+              <div className="split-view-i">
+                <div className="create-email">
+                  <h3 className="title">Create Email Id</h3>
+                  <form className="form" onSubmit={this.handleCreateAccount}>
+                    <div className="inp-grp">
+                      <input type="text" name="emailId" id="emailId" ref={c => {this.emailId = c;}} autoFocus="autoFocus" required="required" />
+                      <label htmlFor="emailId">Email ID</label>
+                      <div className="alert">Email Id must be less than {CONSTANTS.EMAIL_ID_MAX_LENGTH} characters. (This is just a restriction in this tutorial)</div>
+                    </div>
+                    <div className="inp-btn-cnt">
+                      <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary" disabled={processing.state}>Create</button>
+                    </div>
+                  </form>
+                </div>
               </div>
-              <div className="inp-btn-cnt">
-                <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary" disabled={processing.state}>Create</button>
+              <div className="split-view-i">
+                <div className="email-ls">
+                  <h3 className="title">Select Email Id</h3>
+                  <form className="form">
+                    <div className="inp-grp">
+                      <div
+                        className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                        <input
+                          className="mdl-textfield__input"
+                          type="text"
+                          id="selectEmail"
+                          ref={(c) => { this.emailSelected = c;}}
+                          readOnly="readOnly"
+                          placeholder="Select email ID"
+                          tabIndex="-1"
+                          value={emailIds[0]}
+                        />
+                        {
+                          emailIds.length !== 0 ? (<ul htmlFor="selectEmail" className="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                              { emailIds.map((email, i) => {
+                                return (<li key={`email${i}`} className="mdl-menu__item">{email}</li>)
+                              }) }
+                            </ul>) : null
+                        }
+                      </div>
+                      <div className="inp-btn-cnt">
+                        <button
+                          type="submit"
+                          className="mdl-button mdl-js-button mdl-button--raised bg-primary"
+                          disabled={emailIds.length === 0}
+                          onClick={this.handleChooseAccount}
+                        >Select</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
-            </form>
+            </div>
             <h4 className="error">{error.message}</h4>
           </div>
         </div>

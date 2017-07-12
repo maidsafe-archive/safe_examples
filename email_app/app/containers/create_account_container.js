@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
 import CreateAccount from '../components/create_account';
 import { createAccount, createAccountError } from '../actions/create_account_actions';
-import { storeNewAccount } from '../actions/initializer_actions';
+import { storeNewAccount, refreshConfig } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
   return {
     error: state.createAccount.error,
     processing: state.initializer.processing,
+    emailIds: state.initializer.emailIds,
     newAccount: state.createAccount.newAccount,
     coreData: state.initializer.coreData
   };
@@ -14,9 +15,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    createAccountError: error => (dispatch(createAccountError(error))),
-    createAccount: emailId => (dispatch(createAccount(emailId))),
-    storeNewAccount: account => (dispatch(storeNewAccount(account)))
+    createAccountError: (error) => (dispatch(createAccountError(error))),
+    createAccount: (emailId) => (dispatch(createAccount(emailId))),
+    storeNewAccount: (account) => (dispatch(storeNewAccount(account))),
+    refreshConfig: (emailId) => (dispatch(refreshConfig(emailId)))
   };
 };
 
