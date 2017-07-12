@@ -23,7 +23,7 @@ export const clearAuthData = () => {
   // window.localStorage.removeItem(CONSTANTS.LOCAL_AUTH_DATA_KEY);
 };
 
-export const genServiceInfo = (emailId) => {
+export const splitPublicIdAndService = (emailId) => {
   // It supports complex email IDs, e.g. 'emailA.myshop', 'emailB.myshop'
   let str = emailId.replace(/\.+$/, '');
   let toParts = str.split('.');
@@ -31,13 +31,8 @@ export const genServiceInfo = (emailId) => {
   const serviceId =  str.slice(0, -1 * (publicId.length+1));
   emailId = (serviceId.length > 0 ? (serviceId + '.') : '') + publicId;
   const serviceName = serviceId + CONSTANTS.SERVICE_NAME_POSTFIX;
-  const serviceAddr = hashPublicId(publicId);
-  return {emailId, publicId, serviceAddr, serviceName};
+  return {emailId, publicId, serviceName};
 }
-
-export const hashPublicId = publicId => {
-  return crypto.createHash('sha256').update(publicId).digest();
-};
 
 export const genRandomEntryKey = () => {
   return crypto.randomBytes(32).toString('hex');

@@ -1,8 +1,8 @@
 import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
-import { getAuthData, saveAuthData, clearAuthData, hashPublicId, genRandomEntryKey,
-         genKeyPair, encrypt, decrypt, genServiceInfo, deserialiseArray, parseUrl } from './utils/app_utils';
+import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
+         genKeyPair, encrypt, decrypt, splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
 import pkg from '../package.json';
 
 const APP_INFO = {
@@ -22,6 +22,15 @@ const APP_INFO = {
     _publicNames: ['Read', 'Insert', 'Update']
   }
 };
+
+const genServiceInfo = (app, emailId) => {
+  let serviceInfo = splitPublicIdAndService(emailId);
+  return app.crypto.sha3Hash(serviceInfo.publicId)
+      .then((hashed) => {
+        serviceInfo.serviceAddr = hashed;
+        return serviceInfo;
+      });
+}
 
 const requestAuth = () => {
   return initializeApp(APP_INFO.info)
@@ -216,38 +225,33 @@ const createArchive = (app) => {
 
 const addEmailService = (app, serviceInfo, inbox_serialised) => {
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => md.getVersion()
-        .then((version) => {
-          return md.getEntries()
-            .then((entries) => entries.insert(serviceInfo.serviceName, inbox_serialised))
-            .then(() => md);
-        }, (err) => {
-          if (err.code === SAFE_APP_ERROR_CODES.ERR_DATA_NOT_FOUND) {
-            return md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised });
-          }
-          throw err;
-        })
-      );
+      .then((md) => app.mutableData.newMutation()
+        .then((mut) => mut.insert(serviceInfo.serviceName, inbox_serialised)
+          .then(() => md.applyEntriesMutation(mut))
+        )
+        .then(() => md));
 }
 
 const createPublicIdAndEmailService = (app, pub_names_md, serviceInfo,
                                                           inbox_serialised) => {
-  return addEmailService(app, serviceInfo, inbox_serialised)
-      .then((md) => md.getNameAndTag())
-      .then((services) => app.mutableData.newMutation()
-        .then((mut) => insertEncrypted(pub_names_md, mut, serviceInfo.publicId, services.name)
+  return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
+      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised }))
+      .then((_) => app.mutableData.newMutation()
+        .then((mut) => insertEncrypted(pub_names_md, mut, serviceInfo.publicId, serviceInfo.serviceAddr)
           .then(() => pub_names_md.applyEntriesMutation(mut))
-        ))
+        ));
 }
 
 export const setupAccount = (app, emailId) => {
   let newAccount = {};
   let inbox_serialised;
   let inbox;
+  let serviceInfo;
   let key_pair = genKeyPair();
-  let serviceInfo = genServiceInfo(emailId);
 
-  return createInbox(app, key_pair.publicKey)
+  return genServiceInfo(app, emailId)
+      .then((info) => serviceInfo = info)
+      .then(() => createInbox(app, key_pair.publicKey))
       .then((md) => inbox = md)
       .then(() => createArchive(app))
       .then((md) => newAccount = {id: serviceInfo.emailId, inbox_md: inbox, archive_md: md,
@@ -279,8 +283,10 @@ const writeEmailContent = (app, email, pk) => {
 }
 
 export const storeEmail = (app, email, to) => {
-  let serviceInfo = genServiceInfo(to);
-  return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
+  let serviceInfo;
+  return genServiceInfo(app, to)
+      .then((info) => serviceInfo = info)
+      .then(() => app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS))
       .then((md) => md.get(serviceInfo.serviceName))
       .catch((err) => {throw MESSAGES.EMAIL_ID_NOT_FOUND})
       .then((service) => app.mutableData.fromSerial(service.buf))
