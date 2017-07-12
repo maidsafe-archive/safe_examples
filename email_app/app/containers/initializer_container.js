@@ -4,7 +4,7 @@ import { setInitializerTask, authoriseApplication, getEmailIds } from '../action
 
 const mapStateToProps = state => {
   return {
-    app_status: state.initializer.app_status,
+    appStatus: state.initializer.appStatus,
     app: state.initializer.app,
     tasks: state.initializer.tasks
   };

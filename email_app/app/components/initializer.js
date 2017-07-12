@@ -4,9 +4,9 @@ import { remote } from 'electron';
 import { showError } from '../utils/app_utils';
 import { MESSAGES, APP_STATUS } from '../constants';
 
-const showAuthError = (app_status) => {
+const showAuthError = (appStatus) => {
   let message = MESSAGES.AUTHORISATION_ERROR;
-  if (app_status === APP_STATUS.AUTHORISATION_DENIED) {
+  if (appStatus === APP_STATUS.AUTHORISATION_DENIED) {
     message = MESSAGES.AUTHORISATION_DENIED;
   }
   showError('Authorisation failed', message, _ => { remote.getCurrentWindow().close(); });
@@ -34,12 +34,12 @@ export default class Initializer extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { app_status, app } = this.props;
-    if (prevProps.app_status === APP_STATUS.AUTHORISING
-        && (app_status === APP_STATUS.AUTHORISATION_DENIED
-            || app_status === APP_STATUS.AUTHORISATION_FAILED) ) {
-      showAuthError(app_status);
-    } else if (app && app_status === APP_STATUS.AUTHORISED) {
+    const { appStatus, app } = this.props;
+    if (prevProps.appStatus === APP_STATUS.AUTHORISING
+        && (appStatus === APP_STATUS.AUTHORISATION_DENIED
+            || appStatus === APP_STATUS.AUTHORISATION_FAILED) ) {
+      showAuthError(appStatus);
+    } else if (app && appStatus === APP_STATUS.AUTHORISED) {
       return this.readEmailIds();
     }
   }

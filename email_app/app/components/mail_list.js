@@ -25,38 +25,35 @@ export default class MailList extends Component {
 
   handleDeleteFromInbox(e) {
     e.preventDefault();
-    const { accounts, deleteEmail, refreshEmail } = this.props;
-    deleteEmail(accounts.inbox_md, e.target.dataset.index)
+    const { account, deleteEmail, refreshEmail } = this.props;
+    deleteEmail(account.inboxMd, e.target.dataset.index)
         .catch((error) => {
           console.error('Failed trying to delete email from inbox: ', error);
           showError('Failed trying to delete email from inbox: ', error);
         })
-        .then(() => this.refreshEmail(accounts))
+        .then(() => this.refreshEmail(account))
   }
 
   handleDeleteSaved(e) {
     e.preventDefault();
-    const { accounts, deleteEmail, refreshEmail } = this.props;
-    deleteEmail(accounts.archive_md, e.target.dataset.index)
+    const { account, deleteEmail, refreshEmail } = this.props;
+    deleteEmail(account.archiveMd, e.target.dataset.index)
         .catch((error) => {
           console.error('Failed trying to delete saved email: ', error);
           showError('Failed trying to delete saved email: ', error);
         })
-        .then(() => this.refreshEmail(accounts))
+        .then(() => this.refreshEmail(account))
   }
 
   handleSave(e) {
     e.preventDefault();
-    const { accounts, saveEmail, refreshEmail } = this.props;
-    // TODO: Eventually the app can allow to choose which email account,
-    //       it now supports only one.
-    let chosenAccount = accounts;
-    saveEmail(chosenAccount, e.target.dataset.index)
+    const { account, saveEmail, refreshEmail } = this.props;
+    saveEmail(account, e.target.dataset.index)
         .catch((error) => {
           console.error('Failed trying to save the email: ', error);
           showError('Failed trying to save the email: ', error);
         })
-        .then(() => this.refreshEmail(chosenAccount))
+        .then(() => this.refreshEmail(account))
   }
 
   render() {

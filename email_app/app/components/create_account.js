@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { MESSAGES, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
+import { ModalPortal } from 'react-modal-dialog';
+import ReactSpinner from 'react-spinjs';
 
 export default class CreateAccount extends Component {
   constructor() {
@@ -43,20 +45,36 @@ export default class CreateAccount extends Component {
 
   handleChooseAccount(e) {
     e.preventDefault();
-    const { refreshConfig, createAccountError } = this.props;
-    const emailId = this.emailId.value;
+    const { refreshConfig } = this.props;
+    const emailId = this.choosenEmailId.value;
 
     return refreshConfig(emailId)
         .then((_) => this.context.router.push('/home'))
-        .catch((e) => createAccountError(new Error(e)));
   };
 
   render() {
-    console.log("Email IDs to choose from: ", this.props.email_ids);
+    const { networkStatus, processing, error } = this.props;
 
-    const { processing, error } = this.props;
+    const spinnerBackgroundStyle = {
+      zIndex: '5',
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
+      opacity: '0.75',
+      backgroundColor: 'white'
+    }
+
     return (
       <div className="create-account">
+        {
+          processing.state &&
+          <ModalPortal>
+            <div style={spinnerBackgroundStyle}>
+              <ReactSpinner />
+            </div>
+          </ModalPortal>
+        }
+
         <div className="create-account-b">
           <div className="create-account-cnt text-center">
             <h3 className="title">Create Email Id</h3>

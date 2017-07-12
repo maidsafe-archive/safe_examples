@@ -7,7 +7,7 @@ const mapStateToProps = state => {
   return {
     error: state.createAccount.error,
     processing: state.initializer.processing,
-    email_ids: state.initializer.email_ids,
+    emailIds: state.initializer.emailIds,
     newAccount: state.createAccount.newAccount,
     coreData: state.initializer.coreData
   };

@@ -18,11 +18,8 @@ export default class MailInbox extends Component {
       e.preventDefault();
     }
 
-    const { refreshEmail, accounts } = this.props;
-    // TODO: Eventually the app can allow to choose which email account,
-    //       it now supports only one.
-    let chosenAccount = accounts;
-    refreshEmail(chosenAccount)
+    const { refreshEmail, account } = this.props;
+    refreshEmail(account)
         .catch((error) => {
           console.error('Failed fetching emails: ', error);
           showError('Failed fetching emails: ', error);

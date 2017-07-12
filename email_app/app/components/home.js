@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link, IndexLink } from 'react-router';
-import {ModalDialog, ModalPortal, ModalBackground} from 'react-modal-dialog';
+import { ModalDialog, ModalPortal, ModalBackground } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
 import className from 'classnames';
 import pkg from '../../package.json';
@@ -15,17 +15,17 @@ export default class Home extends Component {
   }
 
   reconnect() {
-    const { reconnectApplication, accounts, refreshEmail } = this.props;
+    const { reconnectApplication, account, refreshEmail } = this.props;
     return reconnectApplication()
-      .then(() => refreshEmail(accounts),
+      .then(() => refreshEmail(account),
             (err) => 'failed reconnecting');
   }
 
   render() {
     const { router } = this.context;
-    const { coreData, inboxSize, savedSize, network_status, processing } = this.props;
+    const { coreData, inboxSize, savedSize, networkStatus, processing } = this.props;
 
-    const isModalOpen = processing.state || (network_status !== CONSTANTS.NET_STATUS_CONNECTED);
+    const isModalOpen = processing.state || (networkStatus !== CONSTANTS.NET_STATUS_CONNECTED);
     const spinnerBackgroundStyle = {
       zIndex: '5',
       position: 'fixed',

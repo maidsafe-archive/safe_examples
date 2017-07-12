@@ -51,8 +51,8 @@ export const authApp = (netStatusCallback) => {
   let uri = getAuthData();
   if (uri) {
     return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
-      .then((registered_app) => registered_app.auth.refreshContainersPermissions()
-        .then(() => registered_app)
+      .then((registeredApp) => registeredApp.auth.refreshContainersPermissions()
+        .then(() => registeredApp)
       )
       .catch((err) => {
         console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
@@ -65,12 +65,12 @@ export const authApp = (netStatusCallback) => {
 }
 
 export const connect = (uri, netStatusCallback) => {
-  let registered_app;
+  let registeredApp;
   return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
-          .then((app) => registered_app = app)
+          .then((app) => registeredApp = app)
           .then(() => saveAuthData(uri))
-          .then(() => registered_app.auth.refreshContainersPermissions())
-          .then(() => registered_app);
+          .then(() => registeredApp.auth.refreshContainersPermissions())
+          .then(() => registeredApp);
 }
 
 export const reconnect = (app) => {
@@ -81,7 +81,7 @@ const fetchPublicIds = (app) => {
   let rawEntries = [];
   let publicIds = [];
   return app.auth.getContainer(APP_INFO.containers.publicNames)
-      .then((pub_names_md) => pub_names_md.getEntries()
+      .then((pubNamesMd) => pubNamesMd.getEntries()
         .then((entries) => entries.forEach((key, value) => {
             rawEntries.push({key, value});
           })
@@ -90,8 +90,8 @@ const fetchPublicIds = (app) => {
               return Promise.resolve();
             }
 
-            return pub_names_md.decrypt(entry.key)
-              .then((decKey) => pub_names_md.decrypt(entry.value.buf)
+            return pubNamesMd.decrypt(entry.key)
+              .then((decKey) => pubNamesMd.decrypt(entry.value.buf)
                 .then((decVal) => publicIds.push({
                     id: decKey.toString(),
                     service: decVal
@@ -109,7 +109,7 @@ export const fetchEmailIds = (app) => {
     .then((publicIds) => Promise.all(publicIds.map((publicId) => {
         let rawEmailIds = [];
         return app.mutableData.newPublic(publicId.service, CONSTANTS.TAG_TYPE_DNS)
-            .then((services_md) => services_md.getKeys())
+            .then((servicesMd) => servicesMd.getKeys())
             .then((keys) => keys.forEach((key) => {
                 rawEmailIds.push(key.toString());
               })
@@ -135,32 +135,32 @@ export const readConfig = (app, emailId) => {
       .then((md) => md.encryptKey(emailId).then((key) => md.get(key))
         .then((value) => md.decrypt(value.buf).then((decrypted) => storedAccount = JSON.parse(decrypted)))
         .then(() => app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX]))
-        .then((inbox_md) => account.inbox_md = inbox_md)
+        .then((inboxMd) => account.inboxMd = inboxMd)
         .then(() => app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE]))
-        .then((archive_md) => account.archive_md = archive_md)
-        .then(() => account.enc_sk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY])
-        .then(() => account.enc_pk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY])
+        .then((archiveMd) => account.archiveMd = archiveMd)
+        .then(() => account.encSk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY])
+        .then(() => account.encPk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY])
       )
       .then(() => account);
 }
 
 const insertEncrypted = (md, mut, key, value) => {
   return md.encryptKey(key)
-      .then((encrypted_key) => md.encryptValue(value)
-        .then((encrypted_value) => mut.insert(encrypted_key, encrypted_value))
+      .then((encryptedKey) => md.encryptValue(value)
+        .then((encryptedValue) => mut.insert(encryptedKey, encryptedValue))
       );
 }
 
 export const writeConfig = (app, account) => {
   let emailAccount = {
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ID]: account.id,
-    [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY]: account.enc_sk,
-    [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]: account.enc_pk
+    [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY]: account.encSk,
+    [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]: account.encPk
   };
 
-  return account.inbox_md.serialise()
+  return account.inboxMd.serialise()
       .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX] = serial)
-      .then(() => account.archive_md.serialise())
+      .then(() => account.archiveMd.serialise())
       .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE] = serial)
       .then(() => app.auth.getHomeContainer())
       .then((md) => app.mutableData.newMutation()
@@ -172,19 +172,19 @@ export const writeConfig = (app, account) => {
 
 const decryptEmail = (app, account, key, value, cb) => {
   if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-    let entry_value = decrypt(value, account.enc_sk, account.enc_pk);
-    return app.immutableData.fetch(deserialiseArray(entry_value))
+    let entryValue = decrypt(value, account.encSk, account.encPk);
+    return app.immutableData.fetch(deserialiseArray(entryValue))
       .then((immData) => immData.read())
       .then((content) => {
         let decryptedEmail;
-        decryptedEmail = JSON.parse(decrypt(content.toString(), account.enc_sk, account.enc_pk));
+        decryptedEmail = JSON.parse(decrypt(content.toString(), account.encSk, account.encPk));
         cb({ [key]: decryptedEmail });
       });
   }
 }
 
 export const readInboxEmails = (app, account, cb) => {
-  return account.inbox_md.getEntries()
+  return account.inboxMd.getEntries()
       .then((entries) => entries.forEach((key, value) => {
           if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
             return decryptEmail(app, account, key, value.buf.toString(), cb);
@@ -194,28 +194,28 @@ export const readInboxEmails = (app, account, cb) => {
 }
 
 export const readArchivedEmails = (app, account, cb) => {
-  return account.archive_md.getEntries()
+  return account.archiveMd.getEntries()
       .then((entries) => entries.forEach((key, value) => {
           return decryptEmail(app, account, key, value.buf.toString(), cb);
         })
       );
 }
 
-const createInbox = (app, enc_pk) => {
-  let base_inbox = {
-    [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: enc_pk
+const createInbox = (app, encPk) => {
+  let baseInbox = {
+    [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: encPk
   };
-  let inbox_md;
+  let inboxMd;
   let permSet;
 
   return app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_INBOX)
-      .then((md) => md.quickSetup(base_inbox))
-      .then((md) => inbox_md = md)
+      .then((md) => md.quickSetup(baseInbox))
+      .then((md) => inboxMd = md)
       .then(() => app.mutableData.newPermissionSet())
       .then((pmSet) => permSet = pmSet)
       .then(() => permSet.setAllow('Insert'))
-      .then(() => inbox_md.setUserPermissions(null, permSet, 1))
-      .then(() => inbox_md);
+      .then(() => inboxMd.setUserPermissions(null, permSet, 1))
+      .then(() => inboxMd);
 }
 
 const createArchive = (app) => {
@@ -223,48 +223,50 @@ const createArchive = (app) => {
       .then((md) => md.quickSetup());
 }
 
-const addEmailService = (app, serviceInfo, inbox_serialised) => {
-  return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
+const addEmailService = (app, servicesXorName, serviceName, inboxSerialised) => {
+  return app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS)
       .then((md) => app.mutableData.newMutation()
-        .then((mut) => mut.insert(serviceInfo.serviceName, inbox_serialised)
+        .then((mut) => mut.insert(serviceName, inboxSerialised)
           .then(() => md.applyEntriesMutation(mut))
         )
         .then(() => md));
 }
 
-const createPublicIdAndEmailService = (app, pub_names_md, serviceInfo,
-                                                          inbox_serialised) => {
+const createPublicIdAndEmailService = (app, pubNamesMd, serviceInfo,
+                                                          inboxSerialised) => {
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inbox_serialised }))
+      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inboxSerialised }))
       .then((_) => app.mutableData.newMutation()
-        .then((mut) => insertEncrypted(pub_names_md, mut, serviceInfo.publicId, serviceInfo.serviceAddr)
-          .then(() => pub_names_md.applyEntriesMutation(mut))
+        .then((mut) => insertEncrypted(pubNamesMd, mut, serviceInfo.publicId, serviceInfo.serviceAddr)
+          .then(() => pubNamesMd.applyEntriesMutation(mut))
         ));
 }
 
 export const setupAccount = (app, emailId) => {
   let newAccount = {};
-  let inbox_serialised;
+  let inboxSerialised;
   let inbox;
   let serviceInfo;
-  let key_pair = genKeyPair();
+  let keyPair = genKeyPair();
 
   return genServiceInfo(app, emailId)
       .then((info) => serviceInfo = info)
-      .then(() => createInbox(app, key_pair.publicKey))
+      .then(() => createInbox(app, keyPair.publicKey))
       .then((md) => inbox = md)
       .then(() => createArchive(app))
-      .then((md) => newAccount = {id: serviceInfo.emailId, inbox_md: inbox, archive_md: md,
-                    enc_sk: key_pair.privateKey, enc_pk: key_pair.publicKey})
-      .then(() => newAccount.inbox_md.serialise())
-      .then((md_serialised) => inbox_serialised = md_serialised)
+      .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
+                    encSk: keyPair.privateKey, encPk: keyPair.publicKey})
+      .then(() => newAccount.inboxMd.serialise())
+      .then((mdSerialised) => inboxSerialised = mdSerialised)
       .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
-      .then((pub_names_md) => pub_names_md.encryptKey(serviceInfo.publicId).then((key) => pub_names_md.get(key))
-        .then((services) => addEmailService(app, serviceInfo, inbox_serialised)
+      .then((pubNamesMd) => pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key))
+        .then((encryptedAddr) => pubNamesMd.decrypt(encryptedAddr.buf)
+            .then((servicesXorName) => addEmailService(app, servicesXorName,
+                                      serviceInfo.serviceName, inboxSerialised))
           , (err) => {
             if (err.code === SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
-              return createPublicIdAndEmailService(app, pub_names_md,
-                                                serviceInfo, inbox_serialised);
+              return createPublicIdAndEmailService(app, pubNamesMd,
+                                                serviceInfo, inboxSerialised);
             }
             throw err;
           })
@@ -290,14 +292,14 @@ export const storeEmail = (app, email, to) => {
       .then((md) => md.get(serviceInfo.serviceName))
       .catch((err) => {throw MESSAGES.EMAIL_ID_NOT_FOUND})
       .then((service) => app.mutableData.fromSerial(service.buf))
-      .then((inbox_md) => inbox_md.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY)
+      .then((inboxMd) => inboxMd.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY)
         .then((pk) => writeEmailContent(app, email, pk.buf.toString())
-          .then((email_addr) => app.mutableData.newMutation()
+          .then((emailAddr) => app.mutableData.newMutation()
             .then((mut) => {
-              let entry_key = genRandomEntryKey();
-              let entry_value = encrypt(email_addr.toString(), pk.buf.toString());
-              return mut.insert(entry_key, entry_value)
-                .then(() => inbox_md.applyEntriesMutation(mut))
+              let entryKey = genRandomEntryKey();
+              let entryValue = encrypt(emailAddr.toString(), pk.buf.toString());
+              return mut.insert(entryKey, entryValue)
+                .then(() => inboxMd.applyEntriesMutation(mut))
             })
           )));
 }
@@ -310,15 +312,15 @@ export const removeEmail = (app, container, key) => {
 }
 
 export const archiveEmail = (app, account, key) => {
-  let new_entry_key = genRandomEntryKey();
-  return account.inbox_md.get(key)
+  let newEntryKey = genRandomEntryKey();
+  return account.inboxMd.get(key)
       .then((xorName) => app.mutableData.newMutation()
-        .then((mut) => mut.insert(new_entry_key, xorName.buf)
-          .then(() => account.archive_md.applyEntriesMutation(mut))
+        .then((mut) => mut.insert(newEntryKey, xorName.buf)
+          .then(() => account.archiveMd.applyEntriesMutation(mut))
         )
       )
       .then(() => app.mutableData.newMutation())
       .then((mut) => mut.remove(key, 1)
-        .then(() => account.inbox_md.applyEntriesMutation(mut))
+        .then(() => account.inboxMd.applyEntriesMutation(mut))
       )
 }
