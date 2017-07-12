@@ -1,7 +1,7 @@
 {
   "name": "web_hosting_manager",
   "productName": "Web Hosting Manager",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Application to manage web hosting in SAFE Network",
   "identifier": "net.maidsafe.webhostingmanager",
   "main": "./main.js",
