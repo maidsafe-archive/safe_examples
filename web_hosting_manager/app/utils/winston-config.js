@@ -25,7 +25,7 @@ let winston = new (winstonModule.Logger)({
       level: 'silly'
     }),
     new (require('winston-daily-rotate-file'))({
-      filename: `${logDir}/-email_app.log`,
+      filename: `${logDir}/-web_hosting_manager.log`,
       timestamp: timeStampFormat,
       // The most specific part of the date pattern determines the frequency of file creationg
       // For example, if datePattern is 'dd-MM-yyyy-mm',a new -safe-browser.log file will be generated each new minute
