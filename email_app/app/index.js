@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron';
+import winston from './utils/winston-config';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -9,6 +10,15 @@ const sendResponse = (res) => {
 };
 
 const createWindow = () => {
+
+  // winston log levels
+  winston.error('ERROR');
+  winston.warn('WARN');
+  winston.info('INFO');
+  winston.verbose('VERBOSE');
+  winston.debug('DEBUG');
+  winston.silly('SILLY');
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     show: false,
