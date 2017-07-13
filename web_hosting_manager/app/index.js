@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { Router, hashHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { loadTranslations, setLocale, syncTranslationWithStore } from 'react-redux-i18n';
+import winston from './utils/winston-config';
 
 
 import { initTempFolder } from './lib/temp';
@@ -50,6 +51,14 @@ ipc.on('clear-access-data', (event, res) => {
     store.dispatch(clearAccessData());
   }
 });
+
+// winston log levels
+winston.error('ERROR');
+winston.warn('WARN');
+winston.info('INFO');
+winston.verbose('VERBOSE');
+winston.debug('DEBUG');
+winston.silly('SILLY');
 
 
 render(

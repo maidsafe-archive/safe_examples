@@ -1,5 +1,6 @@
 node_modules
 *.log
+winston-logs
 .DS_Store
 Thumbs.db
 .idea
