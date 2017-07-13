@@ -10,6 +10,7 @@ const mapStateToProps = (state) => {
   return {
     isConnecting: state.connection.isConnecting,
     isConnected: state.connection.isConnected,
+    networkState: state.connection.networkState,
     connectionError: state.connection.error,
     fetchingAccessInfo: state.accessInfo.fetchingAccessInfo,
     fetchedAccessInfo: state.accessInfo.fetchedAccessInfo,
@@ -21,7 +22,8 @@ const mapStateToProps = (state) => {
     remapping: state.service.remapping,
     serviceError: state.service.error,
     publicContainers: state.containers.publicContainers,
-    fetchingPublicContainers: state.containers.fetchingPublicContainers
+    fetchingPublicContainers: state.containers.fetchingPublicContainers,
+    isRevoked: state.auth.isRevoked
   };
 };
 

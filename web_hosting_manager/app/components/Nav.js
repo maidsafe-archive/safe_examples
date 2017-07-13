@@ -1,11 +1,8 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Icon } from 'antd';
 
 export default class Nav extends Component {
-  static propTypes = {
-    title: PropTypes.string.isRequired
-  }
-
   backButton() {
     return (
       <div className="nav-btn">
@@ -23,4 +20,8 @@ export default class Nav extends Component {
       </nav>
     );
   }
+}
+
+Nav.propTypes = {
+  title: PropTypes.string.isRequired
 }

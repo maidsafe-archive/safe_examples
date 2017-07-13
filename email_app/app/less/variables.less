@@ -7,3 +7,19 @@
 @gray-200: #EEEEEE;
 
 @red-100: #e26464;
+
+// The clearfix mixin
+.clearfix() {
+  &:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+}
+
+// Apply clearfix on .parent
+.parent {
+  .clearfix();
+}

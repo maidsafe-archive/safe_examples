@@ -1,26 +1,12 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Card, Input, Select, Icon } from 'antd';
 import { I18n } from 'react-redux-i18n';
+import { domainCheck } from '../utils/app_utils';
 
 import Nav from './Nav';
 
 export default class CreateService extends Component {
-  static propTypes = {
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-    creatingService: PropTypes.bool.isRequired,
-    serviceError: PropTypes.string,
-    fetchingPublicContainers: PropTypes.bool.isRequired,
-    publicContainers: PropTypes.array.isRequired,
-    publicContainersError: PropTypes.string,
-    params: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-    createContainerAndService: PropTypes.func.isRequired,
-    createService: PropTypes.func.isRequired,
-    getPublicContainers: PropTypes.func.isRequired,
-  }
-
   constructor(props) {
     super(props);
     this.containerName = '';
@@ -38,14 +24,25 @@ export default class CreateService extends Component {
     this.containerName = this.props.publicContainers[0];
   }
 
+  componentWillUpdate(nextProps) {
+    if (nextProps.isRevoked) {
+      nextProps.router.replace('/');
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.creatingService && !nextProps.creatingService && nextProps.serviceError) {
       this.setState({
         isCreatingContainerAndService: false
       });
     } else if (this.props.creatingService && !nextProps.creatingService) {
-      this.props.router.goBack();
+      const servicePath = this.state.isCreatingContainerAndService ? `_public/${this.props.params.publicId}/${this.state.containerName}` : this.containerName;
+      this.props.router.replace(`files/${this.state.serviceName}/${this.props.params.publicId}/${encodeURIComponent(servicePath)}`);
     }
+  }
+
+  componentWillUnmount() {
+    this.props.clearNotification();
   }
 
   validate() {
@@ -66,6 +63,11 @@ export default class CreateService extends Component {
     } else if (!this.state.containerName) {
       this.setState({
         containerError: containerNameErrorMsg
+      });
+      valid = false;
+    } else if(!domainCheck(this.state.serviceName)) {
+      this.setState({
+        serviceError: I18n.t('messages.serviceNameInvalid')
       });
       valid = false;
     }
@@ -182,3 +184,19 @@ export default class CreateService extends Component {
     );
   }
 }
+
+CreateService.propTypes = {
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  connectionError: PropTypes.string,
+  creatingService: PropTypes.bool.isRequired,
+  serviceError: PropTypes.string,
+  fetchingPublicContainers: PropTypes.bool.isRequired,
+  publicContainers: PropTypes.array.isRequired,
+  publicContainersError: PropTypes.string,
+  params: PropTypes.object.isRequired,
+  router: PropTypes.object.isRequired,
+  createContainerAndService: PropTypes.func.isRequired,
+  createService: PropTypes.func.isRequired,
+  getPublicContainers: PropTypes.func.isRequired,
+};

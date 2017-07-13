@@ -1,18 +1,20 @@
 import ACTION_TYPES from '../actions/actionTypes';
 
 const initialState = {
-  authorised: false,
-  processing: false,
-  error: {}
+  error: {},
+  newAccount: null
 };
 
 const createAccount = (state = initialState, action) => {
   switch (action.type) {
-    case ACTION_TYPES.SET_CREATE_ACCOUNT_PROCESSING: {
-      return { ...state, processing: true };
-    }
-    case ACTION_TYPES.SET_CREATE_ACCOUNT_ERROR:
-      return { ...state, error: action.error, processing: false };
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_ERROR`:
+      return { ...state, error: action.payload };
+      break;
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_SUCCESS`:
+      return { ...state, newAccount: action.payload };
+      break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_ERROR`:
+      return { ...state, error: action.payload };
       break;
     default:
       return state;

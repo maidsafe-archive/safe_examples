@@ -1,31 +1,34 @@
 // @flow
 
-import { CONNECT, RESET } from '../actions/app';
+import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
+import CONSTANTS from '../constants';
 
 const initialState = {
-    isConnected: false,
-    isConnecting: false,
-    error: null
+  isConnected: false,
+  isConnecting: false,
+  reconnecting: false,
+  networkState: null,
+  error: null
 };
 
 const connection = (state: Object = initialState, action: Object) => {
   switch (action.type) {
-    case RESET:
+    case ACTION_TYPES.RESET:
       state = {
         ...state,
         ...initialState
       };
       break;
 
-    case `${CONNECT}_PENDING`:
+    case `${ACTION_TYPES.CONNECT}_PENDING`:
       state = {
         ...state,
         isConnecting: true
       };
       break;
 
-    case `${CONNECT}_FULFILLED`:
+    case `${ACTION_TYPES.CONNECT}_FULFILLED`:
       state = {
         ...state,
         isConnecting: false,
@@ -33,12 +36,43 @@ const connection = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case `${CONNECT}_REJECTED`:
+    case `${ACTION_TYPES.CONNECT}_REJECTED`:
       state = {
         ...state,
         isConnecting: false,
         isConnected: false,
         error: I18n.t('messages.safeNetworkDisconnected')
+      };
+      break;
+    case `${ACTION_TYPES.RECONNECT}_PENDING`:
+      state = {
+        ...state,
+        reconnecting: true,
+        networkState: CONSTANTS.NETWORK_STATE.INIT
+      };
+      break;
+    case `${ACTION_TYPES.RECONNECT}_FULFILLED`:
+      state = {
+        ...state,
+        reconnecting: false,
+        isConnected: true,
+      };
+      break;
+
+    case `${ACTION_TYPES.RECONNECT}_REJECTED`:
+      state = {
+        ...state,
+        reconnecting: false,
+        isConnected: false,
+        error: I18n.t('messages.safeNetworkDisconnected')
+      };
+      break;
+
+    case ACTION_TYPES.NET_STATUS_CHANGED:
+      state = {
+        ...state,
+        networkState: action.state,
+        reconnecting: false,
       };
       break;
   }

@@ -1,10 +1,17 @@
 import ACTION_TYPES from './actionTypes';
+import { setupAccount } from '../safenet_comm';
 
-export const setCreateAccountProcessing = () => ({
-  type: ACTION_TYPES.SET_CREATE_ACCOUNT_PROCESSING
-});
+export const createAccount = (emailId) => {
+  return function (dispatch, getState) {
+    let app = getState().initializer.app;
+    return dispatch({
+      type: ACTION_TYPES.CREATE_ACCOUNT,
+      payload: setupAccount(app, emailId)
+    });
+  };
+};
 
-export const setCreateAccountError = (error) => ({
-  type: ACTION_TYPES.SET_CREATE_ACCOUNT_ERROR,
-  error
+export const createAccountError = (error) => ({
+  type: ACTION_TYPES.CREATE_ACCOUNT,
+  payload: Promise.reject(error)
 });

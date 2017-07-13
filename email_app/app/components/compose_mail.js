@@ -1,181 +1,19 @@
-import React, { Component, PropTypes } from 'react';
-import * as base64 from 'urlsafe-base64';
-import { hashEmailId, showError, showSuccess } from '../utils/app_utils';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { showError, showSuccess } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
 
 export default class ComposeMail extends Component {
-  static contextTypes = {
-    router: PropTypes.object.isRequired
-  };
-
   constructor() {
     super();
-    this.newMail = {};
     this.tempMailContent = null;
-    this.newMailId = null;
-    this.appendableDataId = null;
     this.sendMail = this.sendMail.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
-    this.getAppendableDataIdHandle = this.getAppendableDataIdHandle.bind(this);
-    this.fetchAppendableDataHandle = this.fetchAppendableDataHandle.bind(this);
-    this.appendAppendableData = this.appendAppendableData.bind(this);
-    this.dropAppendableData = this.dropAppendableData.bind(this);
-    this.createMail = this.createMail.bind(this);
-    this.getEncryptedKey = this.getEncryptedKey.bind(this);
     this.handleTextLimit = this.handleTextLimit.bind(this);
-  }
-
-
-  dropAppendableData() {
-    const { token, dropAppendableDataHandle, clearMailProcessing } = this.props;
-    dropAppendableDataHandle(token, this.appendableDataId)
-      .then(res => {
-        clearMailProcessing();
-        if (res.error) {
-          return showError('Drop Appendable Handler Error', res.error.message);
-        }
-        showSuccess('Mail Success', 'Mail sent successfully!');
-        return this.context.router.push('/inbox');
-      });
-  }
-
-  appendAppendableData(immutableHandle) {
-    const { token, appendAppendableData, clearMailProcessing } = this.props;
-
-    appendAppendableData(token, this.appendableDataId, immutableHandle)
-      .then(res => {
-        if (res.error) {
-          clearMailProcessing();
-          return showError('Append Appendable Data Error', res.error.message);
-        }
-        return this.dropAppendableData();
-      });
-  }
-
-  createMail(cipherHandleId) {
-    const { token, createImmutableDataWriterHandle, writeImmutableData, putImmutableData, closeImmutableDataWriter, clearMailProcessing } = this.props;
-
-    const dropWriter = (writerHandle) => {
-      closeImmutableDataWriter(token, writerHandle)
-        .then(res => {
-          if (res.error) {
-            return console.error('Drop Immutable Data Writer Handle Error', res.error.message);
-          }
-          console.warn('Immutable Data Writer Handle Dropped');
-        });
-    };
-
-    const save = (writerHandleId) => {
-      putImmutableData(token, writerHandleId, cipherHandleId)
-        .then(res => {
-          if (res.error) {
-            clearMailProcessing();
-            return showError('Create Immutable Data Writer Error', res.error.message);
-          }
-          dropWriter(writerHandleId);
-          return this.appendAppendableData(res.payload.data.handleId);
-        });
-    };
-
-    const write = (writerHandleId) => {
-      writeImmutableData(token, writerHandleId, this.newMail)
-        .then(res => {
-          if (res.error) {
-            clearMailProcessing();
-            return showError('Create Immutable Data Writer Error', res.error.message);
-          }
-          return save(writerHandleId);
-        })
-    };
-
-    const createImmutWriter = () => {
-      createImmutableDataWriterHandle(token)
-        .then(res => {
-          if (res.error) {
-            clearMailProcessing();
-            return showError('Create Immutable Data Writer Error', res.error.message);
-          }
-          return write(res.payload.data.handleId);
-        });
-    };
-    createImmutWriter();
-  }
-
-  getEncryptedKey() {
-    const { token, getEncryptedKey, getCipherOptsHandle, deleteEncryptedKey, clearMailProcessing } = this.props;
-
-    const deleteEncryptHandle = (encryptHandle) => {
-      deleteEncryptedKey(token, encryptHandle)
-        .then(res => {
-          if (res.error) {
-            return console.error('Delete Encrypt-Key Handle Error', res.error.message);
-          }
-          console.warn('Encrypt Key Handle Deleted');
-        });
-    };
-
-    const getCipherHandle = (encryptHandle) => {
-      getCipherOptsHandle(token, CONSTANTS.ENCRYPTION.ASYMMETRIC, encryptHandle)
-        .then(res => {
-          if (res.error) {
-            clearMailProcessing();
-            return showError('Get Cipher Opts Handle Error', res.error.message);
-          }
-          deleteEncryptHandle(encryptHandle);
-          return this.createMail(res.payload.data.handleId);
-        });
-    };
-
-    getEncryptedKey(token, this.appendableDataId)
-      .then(res => {
-        if (res.error) {
-          clearMailProcessing();
-          return showError('Get Encrypted Key Error', res.error.message);
-        }
-        return getCipherHandle(res.payload.data.handleId);
-      });
-  }
-
-  fetchAppendableDataHandle(dataIdHandle) {
-    const { token, fetchAppendableDataHandle, dropHandler, clearMailProcessing } = this.props;
-
-    const dropDataIdHandle = () => {
-      dropHandler(token, dataIdHandle)
-        .then(res => {
-          if (res.error) {
-            return console.error('Drop Data Id Handle Error', res.error.message);
-          }
-          console.warn('Data Id Handle Dropped');
-        });
-    };
-
-    fetchAppendableDataHandle(token, dataIdHandle)
-      .then(res => {
-        if (res.error) {
-          clearMailProcessing();
-          return showError('Fetch Appendable Data Error', res.error.message);
-        }
-        this.appendableDataId = res.payload.data.handleId;
-        dropDataIdHandle();
-        return this.getEncryptedKey();
-      });
-  }
-
-  getAppendableDataIdHandle(emailId) {
-    const { token, getAppendableDataIdHandle, clearMailProcessing } = this.props;
-
-    getAppendableDataIdHandle(token, base64.encode(hashEmailId(emailId)))
-      .then(res => {
-        if (res.error) {
-          clearMailProcessing();
-          return showError('Get Appendable Data Id Handle Error', res.error.message);
-        }
-        return this.fetchAppendableDataHandle(res.payload.data.handleId);
-      });
+    this.handleCancel = this.handleCancel.bind(this);
   }
 
   sendMail(e) {
-    const { token, fromMail, setMailProcessing } = this.props;
+    const { app, fromMail, sendEmail } = this.props;
 
     e.preventDefault();
     const mailTo = this.mailTo.value.trim();
@@ -187,14 +25,16 @@ export default class ComposeMail extends Component {
     if (mailContent.length > CONSTANTS.MAIL_CONTENT_LIMIT) {
       return showError('Mail Content is too Long', 'Mail Content is too long!');
     }
-    this.newMail = {
+
+    let newEmail = {
       subject: mailSub,
       from: fromMail,
       time: (new Date()).toUTCString(),
       body: mailContent
     };
-    setMailProcessing();
-    return this.getAppendableDataIdHandle(mailTo);
+    return sendEmail(newEmail, mailTo)
+        .then(() => this.context.router.push('/home'))
+        .catch((err) => showError('Error sending email', err));
   }
 
   handleCancel() {
@@ -232,7 +72,7 @@ export default class ComposeMail extends Component {
             <div className="inp-grp">
               <textarea name="mailContent" onKeyUp={this.handleTextLimit} ref={c => {
                 this.mailContent = c;
-              }} required="required">{' '}</textarea>
+              }} required="required" defaultValue=" " />
               <div className="limit">
                 Only { CONSTANTS.MAIL_CONTENT_LIMIT } characters allowed. (This is just a restriction in this tutorial to not handle multiple chunks for content)
               </div>
@@ -250,3 +90,7 @@ export default class ComposeMail extends Component {
     );
   }
 }
+
+ComposeMail.contextTypes = {
+  router: PropTypes.object.isRequired
+};

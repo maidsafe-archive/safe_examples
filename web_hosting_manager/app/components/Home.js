@@ -1,46 +1,23 @@
 import { Button, Card, Collapse, Input, Modal, Row, Col, Select, Icon } from 'antd';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { I18n } from 'react-redux-i18n';
 import { Link } from 'react-router';
 import NetworkStatus from './NetworkStatus';
+import { domainCheck } from '../utils/app_utils';
+import CONSTANTS from '../constants';
 
 import Nav from './Nav';
 
 export default class Auth extends Component {
-  static propTypes = {
-    connect: PropTypes.func.isRequired,
-    getAccessInfo: PropTypes.func.isRequired,
-    getPublicNames: PropTypes.func.isRequired,
-    getPublicContainers: PropTypes.func.isRequired,
-    createPublicId: PropTypes.func.isRequired,
-    remapService: PropTypes.func.isRequired,
-
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-
-    fetchingAccessInfo: PropTypes.bool.isRequired,
-    fetchedAccessInfo: PropTypes.bool.isRequired,
-    accessInfoError: PropTypes.string,
-
-    fetchingPublicNames: PropTypes.bool.isRequired,
-    publicNames: PropTypes.object.isRequired,
-    creatingPublicId: PropTypes.bool.isRequired,
-    publicIdError: PropTypes.string,
-
-    remapping: PropTypes.bool.isRequired,
-    serviceError: PropTypes.string,
-
-    publicContainers: PropTypes.array.isRequired
-  };
-
   constructor(props) {
     super(props);
     this.state = {
       newPublicId: '',
       publicIdVisible: false,
-      showRemapModal: false
+      showRemapModal: false,
+      publicNameErr: ''
     };
     this.remap = {
       containerName: '',
@@ -57,7 +34,6 @@ export default class Auth extends Component {
   }
 
   componentWillUpdate(nextProps) {
-
     if (nextProps.fetchingPublicContainers) {
       this.reloadingContainer = true;
     }
@@ -78,6 +54,9 @@ export default class Auth extends Component {
   }
 
   createPublicId() {
+    if (!domainCheck(this.state.newPublicId)) {
+      return this.setState({ publicNameErr: I18n.t('messages.publicNameInvalid') });
+    }
     if (this.props.creatingPublicId) {
       return;
     }
@@ -85,8 +64,10 @@ export default class Auth extends Component {
   }
 
   cancelpublicId() {
+    this.setState({ publicNameErr: null });
     this.refs.publicId.refs.input.value = '';
     this.resetPublicIdModal();
+    this.props.clearNotification();
   }
 
   resetPublicIdModal() {
@@ -126,7 +107,7 @@ export default class Auth extends Component {
               placeholder={I18n.t('label.enterPublicId')}
               onPressEnter={this.createPublicId.bind(this)}
             />
-            <div className="error-msg">{this.props.creatingPublicId ? '' : this.props.publicIdError}</div>
+            <div className="error-msg withMar">{this.props.creatingPublicId ? '' : this.props.publicIdError || this.state.publicNameErr}</div>
           </div>
         </Modal>
       </div>
@@ -198,6 +179,7 @@ export default class Auth extends Component {
     this.setState({
       showRemapModal: false
     });
+    this.props.clearNotification();
   }
 
   showRemapModal(service, publicId) {
@@ -224,7 +206,7 @@ export default class Auth extends Component {
             defaultValue={this.state.newPublicId} placeholder={I18n.t('messages.publicIdPlaceholder')}
             onPressEnter={this.createPublicId.bind(this)}
           />
-          <div className="error-msg">{this.props.creatingPublicId ? '' : this.props.publicIdError}</div>
+          <div className="error-msg">{this.props.creatingPublicId ? '' : this.props.publicIdError || this.state.publicNameErr}</div>
           <Button
             type="primary" onClick={this.createPublicId.bind(this)}
             loading={this.props.creatingPublicId}
@@ -310,9 +292,25 @@ export default class Auth extends Component {
   }
 
   getNetworkStatus() {
+    const status = this.props.networkState;
+    let message = null;
+    switch (status) {
+      case CONSTANTS.NETWORK_STATE.INIT:
+        message = I18n.t('label.networkStatus.connecting');
+        break;
+      case CONSTANTS.NETWORK_STATE.CONNECTED:
+        message = I18n.t('label.networkStatus.connected');
+        break;
+      case CONSTANTS.NETWORK_STATE.DISCONNECTED:
+        message = I18n.t('label.networkStatus.disconnected');
+        break;
+      default:
+        message = I18n.t('label.networkStatus.unknown');
+        break;
+    }
     return {
-      status: this.props.isConnected ? 1 : 0,
-      message: this.props.isConnected ? I18n.t('label.networkStatus.connected') : I18n.t('label.networkStatus.connecting')
+      status,
+      message
     };
   }
 
@@ -329,8 +327,37 @@ export default class Auth extends Component {
         </div>
         { this.publicIdModal() }
         { this.remapModal() }
-        <NetworkStatus status={networkStatus.status} message={networkStatus.message} />
+        <NetworkStatus status={networkStatus.status} message={networkStatus.message} reconnect={this.props.reconnect}/>
       </div>
     );
   }
 }
+
+Auth.propTypes = {
+  connect: PropTypes.func.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  getAccessInfo: PropTypes.func.isRequired,
+  getPublicNames: PropTypes.func.isRequired,
+  getPublicContainers: PropTypes.func.isRequired,
+  createPublicId: PropTypes.func.isRequired,
+  remapService: PropTypes.func.isRequired,
+
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  networkState: PropTypes.string.isRequired,
+  connectionError: PropTypes.string,
+
+  fetchingAccessInfo: PropTypes.bool.isRequired,
+  fetchedAccessInfo: PropTypes.bool.isRequired,
+  accessInfoError: PropTypes.string,
+
+  fetchingPublicNames: PropTypes.bool.isRequired,
+  publicNames: PropTypes.object.isRequired,
+  creatingPublicId: PropTypes.bool.isRequired,
+  publicIdError: PropTypes.string,
+
+  remapping: PropTypes.bool.isRequired,
+  serviceError: PropTypes.string,
+
+  publicContainers: PropTypes.array.isRequired
+};

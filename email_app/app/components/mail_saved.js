@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import MailList from './mail_list';
 
 export default class MailSaved extends Component {

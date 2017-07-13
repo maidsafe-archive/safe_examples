@@ -5,7 +5,7 @@ const en = {
       line1: 'Authorisation request sent.',
       'line2-1': 'Application needs manage access, to',
       'line2-2': 'containers. Approve the request from authenticator to continue.',
-      'line3-1': 'The public id and services must be added to the',
+      'line3-1': 'The Public ID and Services must be added to the',
       'line3-2': 'container for allowing other applications to collaborate.',
       line4: 'Authorisation information will be stored on local keychain. The local data can be manually cleared from the menu option.',
       'line5-1': 'File',
@@ -19,14 +19,17 @@ const en = {
       publicContainers: 'Fetching _public Container',
       preparingApp: 'Preparing Application',
       connectionErrorTitle: 'Failed To Connect',
-      authErrorTitle: 'Application Initialisation Failed'
+      authErrorTitle: 'Application Initialisation Failed',
+      revoked: 'Application Revoked'
     },
     networkStatus: {
-      connecting: 'connecting',
-      connected: 'connected'
+      connecting: 'Connecting',
+      disconnected: 'Disconnected',
+      connected: 'Connected',
+      unknown: 'Unknown'
     },
-    createPublicId: 'Create Public Id',
-    noPublicIdText: 'No Public Id found. Create one to begin.',
+    createPublicId: 'Create Public ID',
+    noPublicIdText: 'No Public ID found. Create one to begin.',
     createService: 'Create Service',
     createNewContainer: 'Create a new public container',
     or: 'Or',
@@ -48,15 +51,18 @@ const en = {
     uploadingMessage: 'Uploading files',
     downloadingMessage: 'Downloading',
     loading: 'Loading...',
-    empty: 'Empty'
+    empty: 'Empty',
+    uploadSomeFiles: 'No files found. Please upload web files'
   },
   messages: {
     emptyServiceName: 'Service name must be filled',
     emptyContainerName: 'Container name must be filled',
+    serviceNameInvalid: 'Service name must container only alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
+    publicNameInvalid: 'Public name must container only alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
     serviceNamePlaceholder: 'Enter Service Name',
     containerNamePlaceholder: 'Container Name. Eg, <service-name>-root',
     noContainerPlaceHolder: 'No Public Container Available',
-    publicIdPlaceHolder: 'Enter Public Id',
+    publicIdPlaceHolder: 'Enter Public ID',
     notImplemented: 'Not implemented',
     cannotBeEmpty: '%{name} can not be empty',
     restrictedFileSize: 'File larger than %{size} Mb can not be uploaded',
