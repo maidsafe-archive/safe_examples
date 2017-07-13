@@ -1,40 +1,9 @@
 import { Button, Card, Icon } from 'antd';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { I18n } from 'react-redux-i18n';
 
 export default class Auth extends Component {
-  static propTypes = {
-    connect: PropTypes.func.isRequired,
-    getAccessInfo: PropTypes.func.isRequired,
-    getPublicNames: PropTypes.func.isRequired,
-    getServices: PropTypes.func.isRequired,
-    reset: PropTypes.func.isRequired,
-
-    authError: PropTypes.string,
-    isAuthorising: PropTypes.bool.isRequired,
-    isAuthorised: PropTypes.bool.isRequired,
-
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-
-    fetchingAccessInfo: PropTypes.bool.isRequired,
-    fetchedAccessInfo: PropTypes.bool.isRequired,
-    accessInfoError: PropTypes.string,
-
-    fetchingPublicNames: PropTypes.bool.isRequired,
-    fetchedPublicNames: PropTypes.bool.isRequired,
-    publicNameError: PropTypes.string,
-
-    fetchingServices: PropTypes.bool.isRequired,
-    fetchedServices: PropTypes.bool.isRequired,
-    serviceError: PropTypes.string,
-
-    fetchingPublicContainers: PropTypes.bool.isRequired,
-    fetchedPublicContainers: PropTypes.bool.isRequired,
-    publicContainersError: PropTypes.string,
-  };
-
   componentDidMount() {
     this.props.connect();
   }
@@ -46,16 +15,16 @@ export default class Auth extends Component {
   }
 
   componentDidUpdate() {
-    if (this.props.isConnected && !this.props.fetchedAccessInfo && !this.props.accessInfoError) {
+    if (this.props.isConnected && !this.props.fetchingAccessInfo && !this.props.fetchedAccessInfo && !this.props.accessInfoError) {
       return this.props.getAccessInfo();
     }
-    if (this.props.fetchedAccessInfo && !this.props.fetchedPublicNames && !this.props.publicNameError) {
+    if (this.props.fetchedAccessInfo && !this.props.fetchingPublicNames && !this.props.fetchedPublicNames && !this.props.publicNameError) {
       return this.props.getPublicNames();
     }
-    if (this.props.fetchedPublicNames && !this.props.fetchedPublicContainers && !this.props.publicContainersError) {
+    if (this.props.fetchedPublicNames && !this.props.fetchingPublicContainers && !this.props.fetchedPublicContainers && !this.props.publicContainersError) {
       return this.props.getPublicContainers();
     }
-    if (this.props.fetchedPublicContainers && !this.props.fetchedServices && !this.props.serviceError) {
+    if (this.props.fetchedPublicContainers && !this.props.fetchingServices && !this.props.fetchedServices && !this.props.serviceError) {
       return this.props.getServices();
     }
   }
@@ -66,6 +35,15 @@ export default class Auth extends Component {
   }
 
   getDisplayContent() {
+    if (this.props.isRevoked) {
+      return {
+        title: I18n.t('label.initialising.revoked'),
+        content: (<div className="error-cntr">
+          <div>Application got revoked. Please Reauthorise.</div>
+          <Button type="primary" onClick={this.reconnect.bind(this)}>Re-Authorise</Button>
+        </div>)
+      };
+    }
     if (this.props.authError) {
       return {
         title: I18n.t('label.initialising.authErrorTitle'),
@@ -91,7 +69,7 @@ export default class Auth extends Component {
     if (this.props.accessInfoError || this.props.publicNameError
       || this.props.publicContainersError || this.props.serviceError) {
       return {
-        title: I18n.t('label.initialising.appErrorTitle'),
+        title: I18n.t('label.initialising.authErrorTitle'),
         content: (<div>
           <div>
             { this.props.accessInfoError || this.props.publicNameError || this.props.serviceError }
@@ -165,3 +143,35 @@ export default class Auth extends Component {
     );
   }
 }
+
+Auth.propTypes = {
+  connect: PropTypes.func.isRequired,
+  getAccessInfo: PropTypes.func.isRequired,
+  getPublicNames: PropTypes.func.isRequired,
+  getServices: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+
+  authError: PropTypes.string,
+  isAuthorising: PropTypes.bool.isRequired,
+  isAuthorised: PropTypes.bool.isRequired,
+
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  connectionError: PropTypes.string,
+
+  fetchingAccessInfo: PropTypes.bool.isRequired,
+  fetchedAccessInfo: PropTypes.bool.isRequired,
+  accessInfoError: PropTypes.string,
+
+  fetchingPublicNames: PropTypes.bool.isRequired,
+  fetchedPublicNames: PropTypes.bool.isRequired,
+  publicNameError: PropTypes.string,
+
+  fetchingServices: PropTypes.bool.isRequired,
+  fetchedServices: PropTypes.bool.isRequired,
+  serviceError: PropTypes.string,
+
+  fetchingPublicContainers: PropTypes.bool.isRequired,
+  fetchedPublicContainers: PropTypes.bool.isRequired,
+  publicContainersError: PropTypes.string,
+};

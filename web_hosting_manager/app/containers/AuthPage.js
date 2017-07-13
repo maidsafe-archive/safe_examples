@@ -11,6 +11,7 @@ const mapStateToProps = (state) => {
     isAuthorising: state.auth.isAuthorising,
     isAuthorised: state.auth.isAuthorised,
     authError: state.auth.error,
+    isRevoked: state.auth.isRevoked,
     isConnecting: state.connection.isConnecting,
     isConnected: state.connection.isConnected,
     connectionError: state.connection.error,

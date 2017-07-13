@@ -1,52 +1,55 @@
-import pkg from '../package.json';
-
 export const CONSTANTS = {
   LOCAL_AUTH_DATA_KEY: 'local_auth_data_key',
-  SERVER_URL: 'http://localhost:8100',
-  ROOT_PATH: 'APP',
-  TAG_TYPE: {
-    DEFAULT: 500,
-    VERSIONED: 501
-  },
-  APPENDABLE_DATA_FILTER_TYPE: {
-    WHITE_LIST: 'WHITE_LIST',
-    BLACK_LIST: 'BLACK_LIST'
-  },
-  ENCRYPTION: {
-    PLAIN: 'PLAIN',
-    SYMMETRIC: 'SYMMETRIC',
-    ASYMMETRIC: 'ASYMMETRIC'
-  },
+  TAG_TYPE_DNS: 15001,
+  TAG_TYPE_INBOX: 15003,
+  TAG_TYPE_EMAIL_ARCHIVE: 15004,
+  SERVICE_NAME_POSTFIX: "@email",
+  ACCOUNT_KEY_EMAIL_INBOX: "inbox",
+  ACCOUNT_KEY_EMAIL_ARCHIVE: "archive",
+  ACCOUNT_KEY_EMAIL_ID: "email_id",
+  ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY: "email_enc_sk",
+  ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY: "email_enc_pk",
+  MD_KEY_EMAIL_ENC_PUBLIC_KEY: "__email_enc_pk",
   TOTAL_INBOX_SIZE: 100,
-  NEW_EMAIL_SIZE: 100,
+  EMAIL_ID_MAX_LENGTH: 100,
   HOME_TABS: {
     INBOX: 'INBOX',
-    OUTBOX: 'OUTBOX',
     SAVED: 'SAVED'
   },
   MAIL_CONTENT_LIMIT: 150,
-  DATE_FORMAT: 'h:MM-mmm dd'
+  DATE_FORMAT: 'h:MM-mmm dd',
+  NET_STATUS_CONNECTED: 'Connected'
 };
+
+export const APP_STATUS = {
+  AUTHORISING: 'AUTHORISING',
+  AUTHORISATION_FAILED: 'AUTHORISATION_FAILED',
+  AUTHORISATION_DENIED: 'AUTHORISATION_DENIED',
+  AUTHORISED: 'AUTHORISED',
+  FETCHING_EMAIL_IDS: 'FETCHING_EMAIL_IDS',
+  READING_CONFIG: 'READING_CONFIG',
+  READY: 'READY'
+}
+
+export const SAFE_APP_ERROR_CODES = {
+  ERR_AUTH_DENIED: -200,
+  ENTRY_ALREADY_EXISTS: -107,
+  ERR_NO_SUCH_ENTRY: -106,
+  ERR_DATA_EXISTS: -104,
+  ERR_DATA_NOT_FOUND: -103,
+  ERR_OPERATION_ABORTED: -14
+}
 
 export const MESSAGES = {
   INITIALIZE: {
     AUTHORISE_APP: 'Authorising Application',
     CHECK_CONFIGURATION: 'Checking configuration',
-    FETCH_CORE_STRUCTURE: 'Fetching Core Structure',
-    CREATE_CORE_STRUCTURE: 'Creating Core Structure',
-    WRITE_CONFIG_FILE: 'Creating new configuration',
+    FETCH_EMAIL_IDS: 'Fetching owned email Ids'
   },
-  EMAIL_ALREADY_TAKEN: 'Email already taken. Please try again',
-  EMAIL_TOO_LONG: 'EMAIL is too long',
-  AUTHORISATION_ERROR: 'Failed to authorise with launcher'
-};
-
-export const AUTH_PAYLOAD = {
-  app: {
-    name: pkg.productName,
-    vendor: pkg.author.name,
-    version: pkg.version,
-    id: pkg.identifier
-  },
-  permissions: ['LOW_LEVEL_API']
+  EMAIL_ALREADY_TAKEN: 'Email ID already taken. Please try again',
+  EMAIL_ID_TOO_LONG: 'Email ID is too long',
+  EMAIL_ID_NOT_FOUND: 'Email ID not found on the network',
+  AUTHORISATION_ERROR: 'Failed to authorise',
+  AUTHORISATION_DENIED: 'The authorisation request was denied',
+  CHECK_CONFIGURATION_ERROR: 'Failed to retrieve configuration'
 };

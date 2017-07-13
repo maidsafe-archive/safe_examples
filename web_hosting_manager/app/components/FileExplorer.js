@@ -1,35 +1,12 @@
 import { remote } from 'electron';
 import { I18n } from 'react-redux-i18n';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Card, Button, Icon, Row, Col, notification, Popover, Progress } from 'antd';
 
 import Nav from './Nav';
 
 export default class FileExplorer extends Component {
-
-  static propTypes = {
-    getContainer: PropTypes.func.isRequired,
-    upload: PropTypes.func.isRequired,
-    cancelUpload: PropTypes.func.isRequired,
-    download: PropTypes.func.isRequired,
-    cancelDownload: PropTypes.func.isRequired,
-    deleteItem: PropTypes.func.isRequired,
-    isConnecting: PropTypes.bool.isRequired,
-    isConnected: PropTypes.bool.isRequired,
-    connectionError: PropTypes.string,
-    fetchingContainer: PropTypes.bool.isRequired,
-    deleting: PropTypes.bool.isRequired,
-    containerInfo: PropTypes.array.isRequired,
-    containerError: PropTypes.string,
-    uploading: PropTypes.bool.isRequired,
-    uploadStatus: PropTypes.object,
-    downloading: PropTypes.bool.isRequired,
-    downloadProgress: PropTypes.number.isRequired,
-    fileError: PropTypes.string,
-    params: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-  }
-
   constructor(props) {
     super(props);
     this.containerPath = undefined;
@@ -42,6 +19,9 @@ export default class FileExplorer extends Component {
   }
 
   componentWillUpdate(nextProps) {
+    if (nextProps.isRevoked) {
+      nextProps.router.replace('/');
+    }
     if (this.props.fetchingContainer && !nextProps.fetchingContainer
       && this.fetchingContainerPath) {
       if (!nextProps.containerError) {
@@ -57,6 +37,10 @@ export default class FileExplorer extends Component {
         description: this.props.fileError
       });
     }
+  }
+
+  componentWillUnmount() {
+    this.props.clearNotification();
   }
 
   bytesToSize(bytes) {
@@ -94,6 +78,7 @@ export default class FileExplorer extends Component {
   }
 
   handleListItemClick(item) {
+    this.props.clearNotification();
     const path = `${this.currentPath}/${item.name}`;
     if (item.isFile) {
       return this.props.download(path);
@@ -109,7 +94,7 @@ export default class FileExplorer extends Component {
   emptyContainer() {
     return (
       <div className="default">
-        { (this.props.fetchingContainer || this.props.deleting) ? I18n.t('label.loading') : I18n.t('label.empty') }
+        { (this.props.fetchingContainer || this.props.deleting) ? I18n.t('label.loading') : I18n.t('label.uploadSomeFiles') }
       </div>
     );
   }
@@ -150,6 +135,7 @@ export default class FileExplorer extends Component {
     tokens.pop();
     this.fetchingContainerPath = tokens.join('/');
     this.props.getContainer(this.fetchingContainerPath);
+    this.props.clearNotification();
   }
 
   explorerView() {
@@ -239,3 +225,26 @@ export default class FileExplorer extends Component {
     );
   }
 }
+
+FileExplorer.propTypes = {
+  getContainer: PropTypes.func.isRequired,
+  upload: PropTypes.func.isRequired,
+  cancelUpload: PropTypes.func.isRequired,
+  download: PropTypes.func.isRequired,
+  cancelDownload: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+  isConnecting: PropTypes.bool.isRequired,
+  isConnected: PropTypes.bool.isRequired,
+  connectionError: PropTypes.string,
+  fetchingContainer: PropTypes.bool.isRequired,
+  deleting: PropTypes.bool.isRequired,
+  containerInfo: PropTypes.array.isRequired,
+  containerError: PropTypes.string,
+  uploading: PropTypes.bool.isRequired,
+  uploadStatus: PropTypes.object,
+  downloading: PropTypes.bool.isRequired,
+  downloadProgress: PropTypes.number.isRequired,
+  fileError: PropTypes.string,
+  params: PropTypes.object.isRequired,
+  router: PropTypes.object.isRequired,
+};

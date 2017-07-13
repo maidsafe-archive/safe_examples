@@ -1,16 +1,20 @@
 import path from 'path';
 import fs from 'fs';
 import { I18n } from 'react-redux-i18n';
-import { safe, typetag, accessContainers } from './api';
+
+import safeApi from './api';
+import CONSTANTS from '../constants';
 
 const parseContainerPath = (targetPath) => {
   if (!targetPath) {
     return null;
   }
   const split = targetPath.split('/');
+  let fileName = targetPath.split('/').slice(3).join('/');
+
   return {
     target: split.slice(0, 3).join('/'),
-    file: targetPath.split('/').slice(4).join('/') || path.basename(targetPath)
+    file: fileName || path.basename(targetPath)
   };
 };
 
@@ -31,18 +35,31 @@ export class FileUploadTask extends Task {
   }
 
   execute(callback) {
-    if (!safe) {
+    const app = safeApi.app;
+    if (!app) {
       return callback(new Error('App not registered'));
     }
     const containerPath = parseContainerPath(this.networkPath);
 
-    return safe.auth.getAccessContainerInfo(accessContainers.public)
-      .then((mdata) => mdata.get(containerPath.target))
-      .then((val) => safe.mutableData.newPublic(val.buf, typetag))
+    return safeApi.getPublicContainer()
+      .then((md) => safeApi.getMDataValueForKey(md, containerPath.target))
+      .then((val) => app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.create(fs.readFileSync(this.localPath))
-          .then((file) => nfs.insert(containerPath.file, file));
+          .then((file) => nfs.insert(containerPath.file, file)
+            .catch((err) => {
+              if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
+                return callback(err);
+              }
+              return mdata.get(containerPath.file)
+                .then((value) => {
+                  if (value.buf.length !== 0) {
+                    return callback(err);
+                  }
+                  return nfs.update(containerPath.file, file, value.version + 1);
+                });
+            }));
       })
       .then(() => callback(null, {
         isFile: true,
