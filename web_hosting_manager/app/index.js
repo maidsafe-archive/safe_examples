@@ -10,6 +10,7 @@ import { loadTranslations, setLocale, syncTranslationWithStore } from 'react-red
 import winston from './utils/winston-config';
 
 
+
 import { initTempFolder } from './lib/temp';
 import routes from './routes';
 import configureStore from './store/configureStore';
