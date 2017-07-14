@@ -8,11 +8,12 @@ import { Router, hashHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { loadTranslations, setLocale, syncTranslationWithStore } from 'react-redux-i18n';
 
+
 import { initTempFolder } from './lib/temp';
 import routes from './routes';
 import configureStore from './store/configureStore';
 import loadLocale from './locales/loader';
-import { connect, onAuthSuccess, onAuthFailure } from './actions/app';
+import { connect, onAuthSuccess, onAuthFailure, clearAccessData } from './actions/app';
 import './app.global.css';
 
 const store = configureStore();
@@ -32,18 +33,24 @@ store.dispatch(setLocale(locale));
 initTempFolder();
 
 const listenForAuthReponse = (event, response) => {
-  // TODO parse response
   if (response) {
-    store.dispatch(onAuthSuccess({ data: response })); // TODO do it concurrently (no to linked dispatch)
-    setTimeout(() => {
-      store.dispatch(connect(true));
-    }, 2000)
+    store.dispatch(onAuthSuccess());
+    store.dispatch(connect(response));
   } else {
     store.dispatch(onAuthFailure(new Error('Authorisation failed')));
   }
 };
 
+
+
 ipc.on('auth-response', listenForAuthReponse);
+
+ipc.on('clear-access-data', (event, res) => {
+  if (res) {
+    store.dispatch(clearAccessData());
+  }
+});
+
 
 render(
   <Provider store={store}>

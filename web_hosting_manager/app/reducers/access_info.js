@@ -1,31 +1,33 @@
 // @flow
 
-import * as Action from '../actions/app';
+import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
+import { trimErrorMsg } from '../utils/app_utils';
+import CONSTANTS from '../constants';
 
 const initialState = {
-    fetchingAccessInfo: false,
-    fetchedAccessInfo: false,
-    error: null
+  fetchingAccessInfo: false,
+  fetchedAccessInfo: false,
+  error: null
 };
 
 const accessInfo = (state: Object = initialState, action: Object) => {
   switch (action.type) {
-    case Action.RESET:
+    case ACTION_TYPES.RESET:
       state = {
         ...state,
         ...initialState
       };
       break;
 
-    case `${Action.FETCH_ACCESS_INFO}_PENDING`:
+    case `${ACTION_TYPES.FETCH_ACCESS_INFO}_PENDING`:
       state = {
         ...state,
         fetchingAccessInfo: true
       };
       break;
 
-    case `${Action.FETCH_ACCESS_INFO}_FULFILLED`:
+    case `${ACTION_TYPES.FETCH_ACCESS_INFO}_FULFILLED`:
       state = {
         ...state,
         fetchingAccessInfo: false,
@@ -33,11 +35,14 @@ const accessInfo = (state: Object = initialState, action: Object) => {
       };
       break;
 
-    case `${Action.FETCH_ACCESS_INFO}_REJECTED`:
+    case `${ACTION_TYPES.FETCH_ACCESS_INFO}_REJECTED`:
+      console.log('fetch Error', action.payload);
+      let errorMsg = (action.payload.code === CONSTANTS.ERROR_CODE.ENCODE_DECODE_ERROR) ?
+        I18n.t('label.initialising.revoked') : trimErrorMsg(action.payload.message);
       state = {
         ...state,
         fetchingAccessInfo: false,
-        error: I18n.t('messages.fetchingAccessFailed', { error: action.payload.message })
+        error: I18n.t('messages.fetchingAccessFailed', { error: errorMsg })
       };
       break;
   }

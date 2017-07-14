@@ -68,6 +68,11 @@ To run the application without packaging run
 $ npm run build
 $ npm start
 ```
+#### Clear Access Data
+#####macOs
+ Click `SAFE Hosting Manager -> Clear Access Data` from the menu.
+#####Windows and Linux
+ Click `File -> Clear Access Data` from the menu.
 
 # License
 

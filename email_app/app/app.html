@@ -1,21 +1,33 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>SAFE Mail Tutorial</title>
-    <link rel="stylesheet" href="../node_modules/open-sans-fontface/open-sans.css">
-    <link rel="stylesheet" href="../node_modules/material-design-lite/material.min.css">
-    <script src="../node_modules/material-design-lite/material.min.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script>
-      {
-        const script = document.createElement('script');
-        const port = process.env.PORT || 3000;
-        script.src = (process.env.HOT) ? `http://localhost:${port}/dist/bundle.js` : '../dist/bundle.js';
-        document.write(script.outerHTML);
-      }
-    </script>
-  </body>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+  <meta charset="utf-8">
+  <title>SAFE Mail Tutorial</title>
+  <link rel="stylesheet" href="../node_modules/open-sans-fontface/open-sans.css">
+  <link rel="stylesheet" href="../node_modules/material-design-lite/material.min.css">
+  <script src="../node_modules/material-design-lite/material.min.js"></script>
+  <link rel="stylesheet" href="./less/main.less" />
+  <link rel="stylesheet" href="../node_modules/react-material-select/lib/css/reactMaterialSelect.css" />
+</head>
+<body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 0" >
+  <div id="root"></div>
+</body>
+
+<script type="text/jsx">
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {AppContainer} from 'react-hot-loader';
+
+const render = () => {
+  const App = require('./app').default;
+  ReactDOM.render(<AppContainer><App /></AppContainer>, document.getElementById('root'));
+}
+
+render();
+if (module.hot) {
+  module.hot.accept(render);
+}
+</script>
 </html>

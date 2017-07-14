@@ -8,6 +8,11 @@ const sendResponse = (success) => {
   mainWindow.webContents.send('auth-response', success ? success : '');
 };
 
+const clearAccessData = () => {
+  mainWindow.webContents.send('clear-access-data', true);
+};
+
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support'); // eslint-disable-line
   sourceMapSupport.install();
@@ -98,6 +103,11 @@ app.on('ready', async () => {
       submenu: [{
         label: 'About',
         selector: 'orderFrontStandardAboutPanel:'
+      }, {
+        label: '&Clear Access Data',
+        click() {
+          clearAccessData();
+        }
       }, {
         type: 'separator'
       }, {
