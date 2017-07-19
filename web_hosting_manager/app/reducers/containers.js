@@ -1,6 +1,6 @@
 import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
-import { trimErrorMsg } from '../utils/app_utils';
+import { parseErrorMsg } from '../utils/app_utils';
 
 const initialState = {
   fetchingPublicContainers: false,
@@ -42,7 +42,7 @@ const containers = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         fetchedPublicContainers: false,
-        error: I18n.t('messages.fetchingPublicContainerFailed', { error: trimErrorMsg(action.payload.message) })
+        error: I18n.t('messages.fetchingPublicContainerFailed', { error: parseErrorMsg(action.payload) })
       };
       break;
 
@@ -86,7 +86,7 @@ const containers = (state: Object = initialState, action: Object) => {
         ...state,
         fetchingContainer: false,
         containerInfo: [],
-        error: I18n.t('messages.fetchingContainerFailed', { error: trimErrorMsg(action.payload.message) })
+        error: I18n.t('messages.fetchingContainerFailed', { error: parseErrorMsg(action.payload) })
       };
       break;
 
@@ -109,7 +109,7 @@ const containers = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         deleting: false,
-        error: trimErrorMsg(action.payload.message)
+        error: parseErrorMsg(action.payload)
       };
       break;
     case ACTION_TYPES.CLEAR_NOTIFICATION:

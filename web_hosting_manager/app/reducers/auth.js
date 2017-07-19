@@ -2,6 +2,7 @@
 
 import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
+import { parseErrorMsg } from '../utils/app_utils';
 
 const initialState = {
     isAuthorised: false,
@@ -47,7 +48,7 @@ const auth = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         isAuthorising: false,
-        error: action.payload.message || I18n.t('messages.authorisationFailed')
+        error: action.payload.message ? parseErrorMsg(action.payload) : I18n.t('messages.authorisationFailed')
       };
       break;
     case ACTION_TYPES.REVOKED:

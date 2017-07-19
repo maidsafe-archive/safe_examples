@@ -2,7 +2,7 @@
 
 import ACTION_TYPES from '../actions/actionTypes';
 import { I18n } from 'react-redux-i18n';
-import { trimErrorMsg } from '../utils/app_utils';
+import { parseErrorMsg } from '../utils/app_utils';
 
 const initialState = {
   fetchingPublicNames: false,
@@ -50,7 +50,7 @@ const publicId = (state: Object = initialState, action: Object) => {
         ...state,
         fetchingPublicNames: false,
         publicNames: {},
-        error: I18n.t('messages.fetchingPublicNamesFailed', { error: trimErrorMsg(action.payload.message) })
+        error: I18n.t('messages.fetchingPublicNamesFailed', { error: parseErrorMsg(action.payload) })
       };
       break;
 
@@ -81,7 +81,7 @@ const publicId = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         creatingPublicId: false,
-        error: trimErrorMsg(action.payload.message)
+        error: parseErrorMsg(action.payload)
       };
       break;
 

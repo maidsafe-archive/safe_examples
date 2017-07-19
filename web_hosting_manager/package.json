@@ -57,6 +57,9 @@
     "linux": {
       "target": "dir"
     },
+    "mac": {
+      "target": "dir"
+    },
     "protocols": [
       {
         "name": "webhostingmanager",
