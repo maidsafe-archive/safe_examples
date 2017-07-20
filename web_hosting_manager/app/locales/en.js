@@ -75,7 +75,19 @@ const en = {
     fetchingServicesFailed: 'Fetching Services Failed: %{error}',
     safeNetworkDisconnected: 'Could not connect to SAFE Network',
     downloadCancelled: 'Download cancelled',
-    uploadCancelled: 'Upload cancelled'
+    uploadCancelled: 'Upload cancelled',
+    accountAlreadyExists: 'Account already exists',
+    entryAlreadyExists: 'Entry already exists',
+    publicIdAlreadyExists: 'Public ID already exists',
+    serviceAlreadyExists: 'Service already exists',
+    fileAlreadyExists: 'File already exists',
+    insufficientAccBalance: 'Network operation is not possible as there is insufficient account balance',
+    keyNotFound: 'Key not found',
+    fileNotFound: 'No such file available for this service',
+    serviceNotFound: 'No such service available for this public Name',
+    tooManyEntries: 'Mutable data has reached its maximum entries',
+    noMoreService: 'No more services allowed for current public ID',
+    noMoreFiles: 'No more files can be added to current service'
   }
 };
 
