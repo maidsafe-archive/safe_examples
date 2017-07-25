@@ -102,9 +102,13 @@ nav {
 }
 
 .nav-title {
+  width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0 auto;
   text-align: center;
   padding: 0;
-  margin: 0;
   color: #fff;
   font-size: 20px;
   line-height: 50px;
@@ -262,6 +266,9 @@ nav {
 .service-list .ant-row > div {
   padding-right: 8px;
   line-height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .service-list .ant-row > div a {
@@ -323,7 +330,12 @@ nav {
 }
 
 .explorer > .options-tray .title {
+  width: 90%;
   text-align: center;
+  margin: 0 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .explorer .options-tray .opt-btn i {
