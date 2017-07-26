@@ -17,3 +17,10 @@
 .ant-input-group-wrapper {
   width: 100%;
 }
+
+.ant-collapse>.ant-collapse-item>.ant-collapse-header {
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

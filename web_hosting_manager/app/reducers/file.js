@@ -1,6 +1,7 @@
 // @flow
 
 import ACTION_TYPES from '../actions/actionTypes';
+import { parseErrorMsg, MD_TARGET } from '../utils/app_utils';
 
 const initialState = {
   uploading: false,
@@ -49,7 +50,7 @@ const file = (state: Object = initialState, action: Object) => {
         ...state,
         uploading: false,
         uploadStatus: undefined,
-        error: action.payload.message
+        error: parseErrorMsg(action.payload, MD_TARGET.SERVICE)
       };
       break;
     case ACTION_TYPES.DOWNLOAD_STARTED:
@@ -79,7 +80,7 @@ const file = (state: Object = initialState, action: Object) => {
         ...state,
         downloading: false,
         downloadProgress: 0,
-        error: action.payload.message
+        error: parseErrorMsg(action.payload, MD_TARGET.SERVICE)
       };
       break;
     case ACTION_TYPES.CLEAR_NOTIFICATION:
