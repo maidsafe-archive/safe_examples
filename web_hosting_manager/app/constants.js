@@ -54,6 +54,9 @@ const CONSTANTS = {
     CONNECTED: 'Connected',
     UNKNOWN: 'Unknown',
     DISCONNECTED: 'Disconnected'
+  },
+  FILE_OPEN_MODE: {
+    OPEN_MODE_READ: 4
   }
 };
 export default CONSTANTS;
