@@ -27,8 +27,8 @@ export default class Downloader {
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.fetch(containerPath.file)
-          .then((file) => app.immutableData.fetch(file.dataMapName))
-          .then((i) => i.read());
+          .then((file) => nfs.open(file, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
+          .then((f) => f.size().then((size) => f.read(0, size)));
       })
       .then((data) => {
         return new Promise((resolve) => {
