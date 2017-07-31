@@ -272,7 +272,11 @@ class SafeApi {
         if (path.extname(netPath)) {
           return this.getMDataValueForKey(pubMd, containerName)
             .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
-            .then((md) => this._removeFromMData(md, containerKey));
+            .then((md) => {
+              const nfs = md.emulateAs('NFS');
+              return nfs.fetch(containerKey)
+                .then((file) => nfs.delete(containerKey, file.version + 1));
+            });
         }
 
         // delete directory
@@ -289,11 +293,9 @@ class SafeApi {
                 }
                 fileKeys.push({ key: keyStr, version: val.version });
               }).then(() => Promise.all(fileKeys.map((file) => {
-                return entries.mutate()
-                  .then((mut) => {
-                    return mut.remove(file.key, file.version + 1)
-                      .then(() => dirMd.applyEntriesMutation(mut))
-                  });
+                const nfs = dirMd.emulateAs('NFS');
+                return nfs.fetch(file.key)
+                  .then((f) => nfs.delete(file.key, f.version + 1));
               }))));
           });
       });
@@ -344,8 +346,7 @@ class SafeApi {
             return Promise.all(files.map((file) => {
               return nfs.fetch(file)
                 .then((f) => nfs.open(f, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
-                .then((f) => f.size()
-                  .then((size) => f.read(0, size)))
+                .then((f) => f.read(0, 0))
                 .then((co) => {
                   const dirName = path.split('/').slice(3).join('/');
                   result.unshift({
