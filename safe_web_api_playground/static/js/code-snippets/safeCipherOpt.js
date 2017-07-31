@@ -1,7 +1,7 @@
 module.exports = {
   safeCipherOpt: {
     newPlainText: () => {
-      return window.safeCipherOpt.newPlainText(appToken)
+      return window.safeCipherOpt.newPlainText(appHandle)
       .then(res => {
       	cipherOptHandle = res;
 
@@ -10,7 +10,7 @@ module.exports = {
     },
 
     newSymmetric: () => {
-      return window.safeCipherOpt.newSymmetric(appToken)
+      return window.safeCipherOpt.newSymmetric(appHandle)
       .then(res => {
       	cipherOptHandle = res;
 
@@ -19,7 +19,7 @@ module.exports = {
     },
 
     newAsymmetric: () => {
-      return window.safeCipherOpt.newAsymmetric(appToken)
+      return window.safeCipherOpt.newAsymmetric(appHandle)
       .then(res => {
       	cipherOptHandle = res;
 
@@ -28,11 +28,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeCipherOpt.free(cipherOptHandle)
-      .then(_ => {
-        cipherOptHandle = null;
-      	return 'cipherOptHandle freed from memory';
-      });
+      cipherOptHandle = null;
+      
+      return window.safeCipherOpt.free(cipherOptHandle);
     },
 
   }

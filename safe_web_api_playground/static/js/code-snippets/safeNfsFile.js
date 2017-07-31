@@ -16,7 +16,7 @@ module.exports = {
 
       let position = FILE_READ_FROM_BEGIN;
       let len = FILE_READ_TO_END;
-      
+
       return window.safeNfsFile.read(fileContextHandle, position, len)
       .then(data => {
         return String.fromCharCode.apply(null, new Uint8Array(data));
@@ -46,11 +46,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeNfsFile.free(fileContextHandle)
-      .then(_ => {
-        fileContextHandle = null;
-        return 'fileContextHandle freed from memory';
-      });
+      fileContextHandle = null;
+
+      return window.safeNfsFile.free(fileContextHandle);
     }
   }
 }

@@ -51,11 +51,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeMutableDataEntries.free(entriesHandle)
-      .then(_ => {
-        entriesHandle = null;
-        return 'Handle to MutableData entries freed from memory';
-      });
+      entriesHandle = null;
+
+      return window.safeMutableDataEntries.free(entriesHandle);
     },
 
   }

@@ -10,7 +10,6 @@ Instead of having to upload your site to the network every time you want to test
 - clone this repository and `cd` into the respective directory
 - Run `npm install -g gulp`
 - Run `npm install`
-- Run `bower install`
 - Run `gulp` to start server
 - Visit `localhost://p:3003` in your SAFE browser to see page
 

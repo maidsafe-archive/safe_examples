@@ -23,11 +23,11 @@ module.exports = {
 
     insertPermissionsSet: () => {
       // Example:
-      // window.safeCrypto.getAppPubSignKey(appToken)
+      // window.safeCrypto.getAppPubSignKey(appHandle)
       //    .then((pk) => signKeyHandle = pk)
       //    .then(_ => window.safeMutableData.getPermissions(mdHandle))
       //    .then((h) => permsHandle = h)
-      //    .then(_ => window.safeMutableData.newPermissionSet(appToken))
+      //    .then(_ => window.safeMutableData.newPermissionSet(appHandle))
       //    .then((h) => permSetHandle = h)
       //    .then(_ => window.safeMutableDataPermissionsSet.setAllow(permSetHandle, 'Insert'))
       //    .then(_ => window.safeMutableDataPermissionsSet.setAllow(permSetHandle, 'ManagePermissions'))
@@ -52,11 +52,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeMutableDataPermissions.free(permsHandle)
-      .then(_ => {
-        permsHandle = null;
-      	return 'Frees permsHandle from memory'
-      });
+      permsHandle = null;
+
+      return window.safeMutableDataPermissions.free(permsHandle);
     },
 
   }

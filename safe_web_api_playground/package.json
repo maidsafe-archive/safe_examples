@@ -22,6 +22,7 @@
   "dependencies": {
     "babelify": "^7.3.0",
     "body-parser": "^1.17.2",
+    "bootstrap": "^3.3.7",
     "browserify": "^14.4.0",
     "envfile": "^2.1.1",
     "express": "^4.15.3",
@@ -37,6 +38,7 @@
     "gulp-sourcemaps": "^2.6.0",
     "gulp-uglify": "^3.0.0",
     "gulp-watch": "^4.3.11",
+    "jquery": "^3.2.1",
     "jshint": "^2.9.4",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"

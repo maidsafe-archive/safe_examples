@@ -19,11 +19,8 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeCryptoSecEncKey.free(secEncKeyHandle)
-      .then(_ => {
-        secEncKeyHandle = null;
-      	return 'secEncKeyHandle freed from memory';
-      });
+      secEncKeyHandle = null;
+      return window.safeCryptoSecEncKey.free(secEncKeyHandle);
     },
 
   }

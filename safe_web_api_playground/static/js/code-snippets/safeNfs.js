@@ -76,11 +76,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeNfs.free(nfsHandle)
-      .then(_ => {
-        nfsHandle = null;
-        return 'nfsHandle is freed from memory';
-      })
+      nfsHandle = null;
+
+      return window.safeNfs.free(nfsHandle);
     }
 
   }

@@ -21,11 +21,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeMutableDataKeys.free(keysHandle)
-      .then(_ => {
-        keysHandle = null;
-      	return 'keysHandle is freed from memory';
-      });
+      keysHandle = null;
+      
+      return window.safeMutableDataKeys.free(keysHandle);
     },
 
   }

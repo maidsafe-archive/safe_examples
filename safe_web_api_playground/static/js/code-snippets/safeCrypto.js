@@ -1,7 +1,7 @@
 module.exports = {
   safeCrypto: {
     sha3Hash: () => {
-      return window.safeCrypto.sha3Hash(appToken, '1010101010101')
+      return window.safeCrypto.sha3Hash(appHandle, '1010101010101')
       .then((res) => {
         hashedString = res;
       	return 'SHA3 Hash generated: ', String.fromCharCode.apply(null, new Uint8Array(res));
@@ -9,7 +9,7 @@ module.exports = {
     },
 
     getAppPubSignKey: () => {
-      return window.safeCrypto.getAppPubSignKey(appToken)
+      return window.safeCrypto.getAppPubSignKey(appHandle)
       .then((res) => {
       	signKeyHandle = res;
 
@@ -18,7 +18,7 @@ module.exports = {
     },
 
     getAppPubEncKey: () => {
-      return window.safeCrypto.getAppPubEncKey(appToken)
+      return window.safeCrypto.getAppPubEncKey(appHandle)
       .then((res) => {
       	pubEncKeyHandle = res;
 
@@ -28,7 +28,7 @@ module.exports = {
     },
 
     generateEncKeyPair: () => {
-      return window.safeCrypto.generateEncKeyPair(appToken)
+      return window.safeCrypto.generateEncKeyPair(appHandle)
     	.then((res) => {
       	keyPairHandle = res;
 
@@ -37,7 +37,7 @@ module.exports = {
     },
 
     getSignKeyFromRaw: () => {
-      return window.safeCrypto.getSignKeyFromRaw(appToken, rawSignKey)
+      return window.safeCrypto.getSignKeyFromRaw(appHandle, rawSignKey)
       .then((res) => {
       	signKeyHandle = res;
 
@@ -46,7 +46,7 @@ module.exports = {
     },
 
     pubEncKeyKeyFromRaw: () => {
-      return window.safeCrypto.pubEncKeyKeyFromRaw(appToken, rawPubEncKey)
+      return window.safeCrypto.pubEncKeyKeyFromRaw(appHandle, rawPubEncKey)
       .then((res) => {
       	pubEncKeyHandle = res;
 
@@ -55,7 +55,7 @@ module.exports = {
     },
 
     secEncKeyKeyFromRaw: () => {
-      return window.safeCrypto.secEncKeyKeyFromRaw(appToken, rawSecEncKey)
+      return window.safeCrypto.secEncKeyKeyFromRaw(appHandle, rawSecEncKey)
       .then((res) => {
       	secEncKeyHandle = res;
 
@@ -64,7 +64,7 @@ module.exports = {
     },
 
     generateEncKeyPairFromRaw: () => {
-      return window.safeCrypto.generateEncKeyPairFromRaw(appToken, rawPubEncKey, rawSecEncKey)
+      return window.safeCrypto.generateEncKeyPairFromRaw(appHandle, rawPubEncKey, rawSecEncKey)
       .then((res) => {
       	keyPairHandle = res;
 
@@ -73,7 +73,7 @@ module.exports = {
     },
 
     generateNonce: () => {
-      return window.safeCrypto.generateNonce(appToken)
+      return window.safeCrypto.generateNonce(appHandle)
       .then((res) => {
       	nonce = res.buffer;
 

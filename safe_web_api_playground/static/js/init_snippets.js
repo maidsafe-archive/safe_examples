@@ -119,7 +119,7 @@ codeSnippets.map(function(module) {
 
   window.snippets[moduleName] = Object.assign({}, module[moduleName]);
 
-  let titleEl = window.document.createElement('h3');
+  let titleEl = window.document.createElement('h4');
   titleEl.setAttribute('data-toggle', 'collapse');
   titleEl.setAttribute('class', 'module-title');
   titleEl.setAttribute('data-target', '#'+moduleName);

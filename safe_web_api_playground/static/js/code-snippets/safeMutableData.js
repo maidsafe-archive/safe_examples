@@ -1,7 +1,7 @@
 module.exports = {
   safeMutableData: {
     newRandomPrivate: () => {
-      return window.safeMutableData.newRandomPrivate(appToken, 15001)
+      return window.safeMutableData.newRandomPrivate(appHandle, 15001)
       .then((res) => {
       	mdHandle = res;
       	return 'Returns handle to newly created, private, randomly named MutableData structure: ' + res;
@@ -9,7 +9,7 @@ module.exports = {
     },
 
     newRandomPublic: () => {
-      return window.safeMutableData.newRandomPublic(appToken, 15001)
+      return window.safeMutableData.newRandomPublic(appHandle, 15001)
       .then((res) => {
       	mdHandle = res;
       	return 'Returns handle to newly created, public, randomly named MutableData structure: ' + res;
@@ -25,7 +25,7 @@ module.exports = {
       let name = 'name-private-0101010101010101010';
       let secKey = 'secret-key-010101010101010101010';
 
-      return window.safeMutableData.newPrivate(appToken, name, 15001, secKey, nonce)
+      return window.safeMutableData.newPrivate(appHandle, name, 15001, secKey, nonce)
       .then((res) => {
       	mdHandle = res;
       	return 'Returns handle to newly created or already existing, private, explicitly named Mutable Data structure: ' + res;
@@ -37,7 +37,7 @@ module.exports = {
       // You can use safeCrypto.sha3Hash to generate a 32 byte hash based on the string you input
 
       let name = 'name-public-01010101010101010101';
-      return window.safeMutableData.newPublic(appToken, name, 15001)
+      return window.safeMutableData.newPublic(appHandle, name, 15001)
       .then((res) => {
       	mdHandle = res;
       	return 'Returns handle to newly created or already existing, public, explicitly named Mutable Data structure: ' + res;
@@ -47,7 +47,7 @@ module.exports = {
     newPermissions: () => {
       // This function and it's return value correspond to safeMutableDataPermissions functions
 
-      return window.safeMutableData.newPermissions(appToken)
+      return window.safeMutableData.newPermissions(appHandle)
       .then((res) => {
       	permsHandle = res;
       	return 'Newly created permissions handle returned: ' + res;
@@ -57,7 +57,7 @@ module.exports = {
     newPermissionSet: () => {
       // This function and it's return value correspond to safeMutableDataPermissionsSet functions
 
-      return window.safeMutableData.newPermissionSet(appToken)
+      return window.safeMutableData.newPermissionSet(appHandle)
       .then((res) => {
       	permSetHandle = res;
       	return 'Returns newly created PermissionsSet handle: ' + res;
@@ -67,7 +67,7 @@ module.exports = {
     newMutation: () => {
       // This function and it's return value correspond to safeMutableDataMutation functions
 
-      return window.safeMutableData.newMutation(appToken)
+      return window.safeMutableData.newMutation(appHandle)
       .then((res) => {
       	mutationHandle = res;
       	return 'Returns handle to be able to call safeMutableDataMutation functions: ' + res;
@@ -75,7 +75,7 @@ module.exports = {
     },
 
     newEntries: () => {
-      return window.safeMutableData.newEntries(appToken)
+      return window.safeMutableData.newEntries(appHandle)
       .then((res) => {
       	entriesHandle = res;
       	return 'Returns an entries handle to be used with safeMutableDataEntries functions: ' + res;
@@ -221,7 +221,7 @@ module.exports = {
     },
 
     fromSerial: () => {
-      return window.safeMutableData.fromSerial(appToken, serializedMD)
+      return window.safeMutableData.fromSerial(appHandle, serializedMD)
       .then((res) => {
       	mdHandle = res;
       	return 'Returns handle to MutableData: ' + res;
@@ -240,11 +240,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeMutableData.free(mdHandle)
-      .then(_ => {
-        mdHandle = null;
-        return 'MutableData is freed from memory';
-      });
+      mdHandle = null;
+      
+      return window.safeMutableData.free(mdHandle);
     },
 
   }

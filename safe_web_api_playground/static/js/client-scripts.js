@@ -1,7 +1,7 @@
 let initSnippets = require('./init_snippets.js');
 
 let apiVariables = [
-  'appToken',
+  'appHandle',
   'authUri',
   'permsHandle',
   'idReaderHandle',
@@ -33,81 +33,93 @@ let apiVariables = [
   'mdName'
 ];
 
+function updateVariableValues() {
+  return apiVariables.map(variable => {
+    try {
+      if(eval(variable)) {
+        if(document.getElementById('tempText')) {
+          let tempText = document.getElementById('tempText');
+          tempText.parentNode.removeChild(tempText);
+        }
+
+        let varBoxEl = document.getElementById('variables');
+        if(document.getElementById(variable)) {
+          let pEl = document.getElementById(variable);
+          let currentTextContent = pEl.textContent;
+
+          pEl.textContent = '';
+          let spanEl = document.createElement('span');
+          spanEl.setAttribute('class', 'varName');
+          spanEl.textContent = variable + ': ';
+          pEl.appendChild(spanEl);
+
+          let textNodeEl = document.createTextNode(eval(variable));
+
+          pEl.appendChild(textNodeEl);
+
+          let regexObject = new RegExp(eval(variable));
+
+          if(!(regexObject.test(currentTextContent))) {
+              pEl.setAttribute('class', 'flash');
+          }
+
+          varBoxEl.appendChild(pEl);
+        } else {
+          let pEl = document.createElement('p');
+          pEl.setAttribute('id', variable);
+          pEl.setAttribute('class', 'varValue');
+          let spanEl = document.createElement('span');
+          spanEl.setAttribute('class', 'varName');
+          spanEl.textContent = variable + ': ';
+          pEl.appendChild(spanEl);
+
+          let textNodeEl = document.createTextNode(eval(variable));
+
+          pEl.appendChild(textNodeEl);
+          pEl.setAttribute('class', 'flash');
+          varBoxEl.appendChild(pEl);
+        }
+      } else {
+        let targetEl = document.getElementById(variable);
+        targetEl.parentNode.removeChild(targetEl);
+
+        let varBox = document.getElementById('variables');
+
+        if(varBox.children.length == 1) {
+          let italicEl = document.createElement('i');
+          italicEl.textContent = 'No variables saved yet.';
+          let pEl = document.createElement('p');
+          pEl.setAttribute('id', 'tempText');
+          pEl.appendChild(italicEl);
+          varBox.appendChild(pEl);
+        }
+      }
+    } catch (e) {
+      return;
+    }
+  });
+}
+
 function handleSubmit() {
+  let loader = document.createElement('div');
+  loader.setAttribute('class', 'loader');
+  document.getElementById('rightside').appendChild(loader);
+
   let el = document.getElementById('code');
   try {
     let res = eval(el.value);
     let isFreeSyncFunction = new RegExp('free').test(el.value);
     if(isFreeSyncFunction) {
-      return res();
+      loader.parentNode.removeChild(loader);
+      res();
+      updateVariableValues();
+      return;
     }
     return res().then(res => {
+      loader.parentNode.removeChild(loader);
       console.log(res);
-      apiVariables.map(variable => {
-        try {
-          if(eval(window[variable])) {
 
-            if(document.getElementById('tempText')) {
-              let tempText = document.getElementById('tempText');
-              tempText.parentNode.removeChild(tempText);
-            }
-
-            let varBoxEl = document.getElementById('variables');
-            if(document.getElementById(variable)) {
-              let pEl = document.getElementById(variable);
-              let currentTextContent = pEl.textContent;
-
-              pEl.textContent = '';
-              let spanEl = document.createElement('span');
-              spanEl.setAttribute('class', 'varName');
-              spanEl.textContent = variable + ': ';
-              pEl.appendChild(spanEl);
-
-              let textNodeEl = textNodeEl = document.createTextNode(eval(window[variable]));
-
-              pEl.appendChild(textNodeEl);
-
-              let regexObject = new RegExp(eval(window[variable]));
-
-              if(!(regexObject.test(currentTextContent))) {
-                  pEl.setAttribute('class', 'flash');
-              }
-
-              varBoxEl.appendChild(pEl);
-            } else {
-              let pEl = document.createElement('p');
-              pEl.setAttribute('id', variable);
-              pEl.setAttribute('class', 'varValue');
-              let spanEl = document.createElement('span');
-              spanEl.setAttribute('class', 'varName');
-              spanEl.textContent = variable + ': ';
-              pEl.appendChild(spanEl);
-
-              let textNodeEl = textNodeEl = document.createTextNode(eval(window[variable]));
-
-              pEl.appendChild(textNodeEl);
-              pEl.setAttribute('class', 'flash');
-              varBoxEl.appendChild(pEl);
-            }
-          } else {
-            let targetEl = document.getElementById(variable);
-            targetEl.parentNode.removeChild(targetEl);
-
-            let varBox = document.getElementById('variables');
-
-            if(varBox.children.length == 1) {
-              let italicEl = document.createElement('i');
-              italicEl.textContent = 'No variables saved yet.';
-              let pEl = document.createElement('p');
-              pEl.setAttribute('id', 'tempText');
-              pEl.appendChild(italicEl);
-              varBox.appendChild(pEl);
-            }
-          }
-        } catch (e) {
-          return;
-        }
-      });
+      updateVariableValues();
 
       if(/Setup Incomplete/.test(res)) {
         let div = document.createElement('div');
@@ -121,7 +133,7 @@ function handleSubmit() {
         p2.textContent = '- First run safeApp.initialise';
         p3.textContent = '- Then run safeApp.authorise';
         p4.textContent = '- Finally, run safeApp.connectAuthorised';
-        p5.textContent = 'Your appToken will then be authorised to perform this operation!';
+        p5.textContent = 'Your appHandle will then be authorised to perform this operation!';
         div.appendChild(p1);
         let pElArray = [p1, p2, p3, p4, p5];
         pElArray.map(function(p) {
@@ -216,8 +228,8 @@ function handleSubmit() {
           return 'authUri not yet defined. Use safeApp.authorise to first obtain authUri';
           break;
 
-        case 'appToken':
-          return 'appToken not yet defined. Use safeApp.initialise to first obtain appToken';
+        case 'appHandle':
+          return 'appHandle not yet defined. Use safeApp.initialise to first obtain appHandle';
           break;
 
         case 'encryptedKey':

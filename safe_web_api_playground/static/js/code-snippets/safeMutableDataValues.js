@@ -21,11 +21,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeMutableDataValues.free(valuesHandle)
-      .then(_ => {
-        valuesHandle = null;
-      	return 'valuesHandle is freed from memory';
-      });
+      valuesHandle = null;
+
+      return window.safeMutableDataValues.free(valuesHandle);
     },
 
   }

@@ -1,9 +1,9 @@
 module.exports = {
   safeMutableDataPermissionsSet: {
     setAllow: () => {
-      // window.safeCrypto.getAppPubSignKey(appToken)
+      // window.safeCrypto.getAppPubSignKey(appHandle)
       //.then((pk) => signKeyHandle = pk)
-      //.then(_ => window.safeMutableData.newPermissionSet(appToken))
+      //.then(_ => window.safeMutableData.newPermissionSet(appHandle))
       //.then((h) => permSetHandle = h)
       //.then(_ => window.safeMutableDataPermissionsSet.setAllow(permSetHandle, 'Delete'))
       //    .then(_ => window.safeMutableData.getVersion(mdHandle))
@@ -21,9 +21,9 @@ module.exports = {
     },
 
     setDeny: () => {
-      // window.safeCrypto.getAppPubSignKey(appToken)
+      // window.safeCrypto.getAppPubSignKey(appHandle)
       // .then((pk) => signKeyHandle = pk)
-      // .then(_ => window.safeMutableData.newPermissionSet(appToken))
+      // .then(_ => window.safeMutableData.newPermissionSet(appHandle))
       // .then((h) => permSetHandle = h)
       // .then(_ => window.safeMutableDataPermissionsSet.setDeny(permSetHandle, 'Update'))
       // .then(_ => window.safeMutableData.getVersion(mdHandle))
@@ -41,9 +41,9 @@ module.exports = {
     },
 
     clear: () => {
-      // window.safeCrypto.getAppPubSignKey(appToken)
+      // window.safeCrypto.getAppPubSignKey(appHandle)
       // .then((pk) => signKeyHandle = pk)
-      // .then(_ => window.safeMutableData.newPermissionSet(appToken))
+      // .then(_ => window.safeMutableData.newPermissionSet(appHandle))
       // .then((h) => permSetHandle = h)
       // .then(_ => window.safeMutableDataPermissionsSet.clear(permSetHandle, 'Insert'))
       // .then(_ => window.safeMutableData.getVersion(mdHandle))
@@ -63,11 +63,9 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeMutableDataPermissionsSet.free(permSetHandle)
-      .then(_ => {
-        permSetHandle = null;
-      	return 'permissionsSetHandle is freed from memory';
-      });
+      permSetHandle = null;
+
+      return window.safeMutableDataPermissionsSet.free(permSetHandle);
     },
 
   }

@@ -1,7 +1,7 @@
 module.exports = {
   safeImmutableData: {
     create: () => {
-      return window.safeImmutableData.create(appToken)
+      return window.safeImmutableData.create(appHandle)
       .then((res) => {
       	idWriterHandle = res;
       	return 'ImmutableData writer handle: ' + res;
@@ -31,7 +31,7 @@ module.exports = {
       // idAddress argument is a buffer address to an ImmutableData structure
       // Use safeImmutableData.closeWriter to obtain idAddress
 
-      return window.safeImmutableData.fetch(appToken, idAddress)
+      return window.safeImmutableData.fetch(appHandle, idAddress)
       .then((res) => {
       	idReaderHandle = res;
       	return 'Return ImmutableData reader handle: ' + res;
@@ -53,11 +53,8 @@ module.exports = {
     },
 
     free: () => {
-      return window.safeImmutableData.free(idReaderHandle).
-      then(_ => {
-        idReaderHandle = null;
-      	return 'ImmutableData reader handle freed from memory.';
-      })
+      idReaderHandle = null;
+      return window.safeImmutableData.free(idReaderHandle);
     },
 
   }
