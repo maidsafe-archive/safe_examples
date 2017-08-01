@@ -346,7 +346,7 @@ class SafeApi {
             return Promise.all(files.map((file) => {
               return nfs.fetch(file)
                 .then((f) => nfs.open(f, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
-                .then((f) => f.read(0, 0))
+                .then((f) => f.read(CONSTANTS.FILE_READ.FROM_START, CONSTANTS.FILE_READ.TILL_END))
                 .then((co) => {
                   const dirName = path.split('/').slice(3).join('/');
                   result.unshift({
