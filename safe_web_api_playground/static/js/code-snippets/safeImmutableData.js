@@ -53,8 +53,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeImmutableData.free(idReaderHandle);
       idReaderHandle = null;
-      return window.safeImmutableData.free(idReaderHandle);
+      return;
     },
 
   }

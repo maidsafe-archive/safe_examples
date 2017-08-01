@@ -63,9 +63,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeMutableDataPermissionsSet.free(permSetHandle);
       permSetHandle = null;
-
-      return window.safeMutableDataPermissionsSet.free(permSetHandle);
+      return;
     },
 
   }

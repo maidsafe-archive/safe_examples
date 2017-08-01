@@ -52,9 +52,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeMutableDataPermissions.free(permsHandle);
       permsHandle = null;
-
-      return window.safeMutableDataPermissions.free(permsHandle);
+      return;
     },
 
   }

@@ -21,9 +21,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeMutableDataValues.free(valuesHandle);
       valuesHandle = null;
-
-      return window.safeMutableDataValues.free(valuesHandle);
+      return;
     },
 
   }

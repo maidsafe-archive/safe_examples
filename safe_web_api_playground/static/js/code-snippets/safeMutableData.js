@@ -240,9 +240,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeMutableData.free(mdHandle);
       mdHandle = null;
-      
-      return window.safeMutableData.free(mdHandle);
+      return;
     },
 
   }

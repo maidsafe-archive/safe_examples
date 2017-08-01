@@ -10,8 +10,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeCryptoSignKey.free(signKeyHandle);
       signKeyHandle = null;
-      return window.safeCryptoSignKey.free(signKeyHandle);
+      return;
     },
 
   }

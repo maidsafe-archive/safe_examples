@@ -139,11 +139,11 @@ module.exports = {
     },
 
     free: () => {
+      // Free the SAFE app instance from memory
+      window.safeApp.free(appHandle);
       appHandle = null;
       authUri = null;
-      
-      // Free the SAFE app instance from memory
-      return window.safeApp.free(appHandle);
+      return;
     },
 
   }

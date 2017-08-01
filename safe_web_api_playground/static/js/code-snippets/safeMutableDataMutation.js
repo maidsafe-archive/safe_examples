@@ -34,9 +34,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeMutableDataMutation.free(mutationHandle);
       mutationHandle = null;
-      
-      return window.safeMutableDataMutation.free(mutationHandle);
+      return;
     },
 
   }

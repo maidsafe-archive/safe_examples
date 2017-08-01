@@ -76,9 +76,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeNfs.free(nfsHandle);
       nfsHandle = null;
-
-      return window.safeNfs.free(nfsHandle);
+      return;
     }
 
   }

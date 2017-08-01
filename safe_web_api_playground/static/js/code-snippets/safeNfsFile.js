@@ -46,9 +46,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeNfsFile.free(fileContextHandle);
       fileContextHandle = null;
-
-      return window.safeNfsFile.free(fileContextHandle);
+      return;
     }
   }
 }

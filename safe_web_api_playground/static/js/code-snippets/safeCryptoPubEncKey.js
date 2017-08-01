@@ -35,8 +35,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeCryptoPubEncKey.free(pubEncKeyHandle);
       pubEncKeyHandle = null;
-      return window.safeCryptoPubEncKey.free(pubEncKeyHandle);
+      return;
     },
 
   }

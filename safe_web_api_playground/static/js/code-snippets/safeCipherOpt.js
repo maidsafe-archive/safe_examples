@@ -28,9 +28,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeCipherOpt.free(cipherOptHandle);
       cipherOptHandle = null;
-      
-      return window.safeCipherOpt.free(cipherOptHandle);
+      return;
     },
 
   }

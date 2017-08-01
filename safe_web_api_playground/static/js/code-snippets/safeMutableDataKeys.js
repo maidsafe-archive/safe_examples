@@ -21,9 +21,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeMutableDataKeys.free(keysHandle);
       keysHandle = null;
-      
-      return window.safeMutableDataKeys.free(keysHandle);
+      return;
     },
 
   }

@@ -29,9 +29,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeCryptoKeyPair.free(keyPairHandle);
       keyPairHandle = null;
-
-      return window.safeCryptoKeyPair.free(keyPairHandle);
+      return;
     },
 
   }

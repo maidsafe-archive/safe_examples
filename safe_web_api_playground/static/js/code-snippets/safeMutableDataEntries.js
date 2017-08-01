@@ -51,9 +51,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeMutableDataEntries.free(entriesHandle);
       entriesHandle = null;
-
-      return window.safeMutableDataEntries.free(entriesHandle);
+      return;
     },
 
   }

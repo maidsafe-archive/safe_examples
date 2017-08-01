@@ -19,8 +19,9 @@ module.exports = {
     },
 
     free: () => {
+      window.safeCryptoSecEncKey.free(secEncKeyHandle);
       secEncKeyHandle = null;
-      return window.safeCryptoSecEncKey.free(secEncKeyHandle);
+      return;
     },
 
   }
