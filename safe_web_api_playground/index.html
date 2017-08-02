@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>SAFE web API playground</title>
+    <link rel="icon" href="./favicon.ico" sizes="16x16" />
+    <link rel="stylesheet" href="css/deps.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- 
+          //                        `/ssss/`
+          //                        :ssssss:
+          //                        :ssssss:
+          //             `/oooo/`    .ssss.    -+ooo+-
+          //             +ssssss+     ssss    -sssssso-
+          //             :ssssss/     ssss    .osssssso+:.
+          //   .+ooo+.    .+sso.    `:ssss:`   `-///:+ossso+ooo+.
+          //   sssssss-    +ss+     :ssssss/          `-/ssssssss
+          //  osssssso+:` +ss+     :ssssssso/.      `.:ossssssso
+          //  `:oss++ssssoosso:`    ./////ossso++++oossso+:///:`
+          //    oss: `-/ossssss+          `.:+ssssssso:.
+          //    oss:    /sssssss+:.       `-/ossssssso/-`
+          //  `/sss+.    -osso/ossss/+++++sssso/////ossss+/+++/`
+          //  sssssss.    +ss+  ./ossssssss+:`       `:+ssssssss
+          //  sssssss.    +ss+     :ssssss:             .sssssss
+          //  `/+++/.   `-osso-`    -ssss-    .:+++:.    ./+++/`
+          //            /ssssss/     ssss    .ossssso.
+          //         `-/ossssss+     ssss `.:+ssssssso:.
+          //  `:////+sssso++++:`    -ssss/ossso++++oossso+:///:`
+          //  osssssso+:`          :ssssssso/.       .:ossssssso
+          //  sssssss-          `:+ossssss/             -sssssss
+          //  .+ooo+.    .://::ossss+ssss:`   `-///-`    .+ooo+.
+          //            /ssssssso/-` ssss    .ossssso`
+          //            +ssssss+     ssss  `-+sssssso.
+          //            `/oooo/`    .ssss/osssooooo+-
+          //                       :ssssssso+-`
+          //                       :ssssss/
+          //                       `/ssss/` -->
+  </head>
+  <body>
+
+    <div class="container-fluid">
+      <header>
+        <div class="row">
+          <div class="col-xs-3 header mint-bg">
+
+          </div>
+          <div class="col-xs-9 header primary-blue-bg" id="rightheader">
+            <img id="safe-logo" class="pull-right" src="images/safenetwork_logo_mono.svg" alt="Safe Network Logo">
+          </div>
+        </div>
+      </header>
+
+      <div class="row">
+
+        <div class="col-xs-3">
+          <h2>SAFE web API playground</h2>
+          <div class="row">
+            <div class="col-xs-12" id="snippetParent">
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xs-9 primary-grey-bg" id="rightside">
+
+          <div class="row">
+
+            <div class="col-xs-9" id="codebox">
+              <div class="box">
+                <form class="form" id="codeForm">
+                  <textarea class="form-control" id="code" ></textarea>
+                  <button type="button" class="btn btn-default" id="runButton" onclick="handleSubmit()">RUN</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-xs-3">
+              <div class="box" id="variables">
+                <h4>Saved variables</h4>
+                <p id="tempText"><i>No variables saved yet.</i></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script type="text/javascript" src="js/deps.js"></script>
+    <script type="text/javascript" src="js/client-scripts.js"></script>
+
+    </script>
+  </body>
+</html>

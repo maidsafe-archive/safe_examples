@@ -57,6 +57,10 @@ const CONSTANTS = {
   },
   FILE_OPEN_MODE: {
     OPEN_MODE_READ: 4
+  },
+  FILE_READ: {
+    FROM_START: 0,
+    TILL_END: 0
   }
 };
 export default CONSTANTS;
