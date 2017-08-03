@@ -74,7 +74,7 @@ export default class ComposeMail extends Component {
                 this.mailContent = c;
               }} required="required" defaultValue=" " />
               <div className="limit">
-                Only { CONSTANTS.MAIL_CONTENT_LIMIT } characters allowed. (This is just a restriction in this tutorial to not handle multiple chunks for content)
+                Only { CONSTANTS.MAIL_CONTENT_LIMIT } characters allowed (this restriction is to reduce the number of chunks managed by the tutorial).
               </div>
             </div>
             <div className="inp-btn-cnt">
