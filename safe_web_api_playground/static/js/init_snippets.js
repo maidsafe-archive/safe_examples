@@ -15,7 +15,7 @@ let safeCryptoKeyPair = require('./code-snippets/safeCryptoKeyPair');
 let safeCryptoPubEncKey = require('./code-snippets/safeCryptoPubEncKey');
 let safeCryptoSecEncKey = require('./code-snippets/safeCryptoSecEncKey');
 let safeCryptoSignKey = require('./code-snippets/safeCryptoSignKey');
-let helpers = require('./code-snippets/helpers');
+// let helpers = require('./code-snippets/helpers');
 
 let codeSnippets = [
   safeApp,
@@ -35,7 +35,7 @@ let codeSnippets = [
   safeCryptoPubEncKey,
   safeCryptoSecEncKey,
   safeCryptoSignKey,
-  helpers
+  // helpers
 ];
 
 function updateCode(string) {
