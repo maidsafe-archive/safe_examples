@@ -48,7 +48,6 @@ export class FileUploadTask extends Task {
         const nfs = mdata.emulateAs('NFS');
         return nfs.create(fs.readFileSync(this.localPath))
           .then((file) => {
-            console.log('upload file', containerPath, containerPath.file, safeApi.currentDir);
             if (safeApi.currentDir.filter((i) => (i.name === containerPath.file)).length !== 0) {
               return mdata.get(containerPath.file)
                 .then((value) => {

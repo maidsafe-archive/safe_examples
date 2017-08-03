@@ -325,7 +325,6 @@ class SafeApi {
           .then((entries) => entries.forEach((key, val) => {
             let keyStr = key.toString();
             if (val.buf.length === 0) {
-              console.log('empty val', key.toString())
               return result.unshift({ isFile: true, name: keyStr, size: 0 });
             }
             if (rootName && (keyStr.indexOf(rootName) !== 0)) {
@@ -359,7 +358,6 @@ class SafeApi {
                 });
             })).then(() => {
               this.currentDir = result;
-              console.log('Current Dir', this.currentDir);
               return result;
             });
           });
