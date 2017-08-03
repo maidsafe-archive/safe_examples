@@ -11,7 +11,8 @@ module.exports = {
       let appInfo = {
         id: 'net.maidsafe.api_playground.webclient.10',
         name: 'SAFE web API playground',
-        vendor: 'MaidSafe Ltd.'
+        vendor: 'MaidSafe Ltd.',
+        scope: null
       };
 
       return window.safeApp.initialise(appInfo)
