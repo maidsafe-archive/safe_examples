@@ -58,7 +58,7 @@ const en = {
     emptyServiceName: 'Service name must be filled',
     emptyContainerName: 'Container name must be filled',
     serviceNameInvalid: 'Service name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
-    publicNameInvalid: 'Public name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
+    publicNameInvalid: 'Public ID must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
     serviceNamePlaceholder: 'Enter Service Name',
     containerNamePlaceholder: 'Container Name. Eg, <service-name>-root',
     noContainerPlaceHolder: 'No Public Container Available',

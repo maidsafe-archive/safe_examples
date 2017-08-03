@@ -101,6 +101,9 @@ export default class FileExplorer extends Component {
 
   showContainer() {
     const list = this.props.containerInfo.map((data, i) => {
+      if (data.size === 0) {
+        return null;
+      }
       return (
         <Row key={i}>
           <div className="file-list-i">
@@ -169,7 +172,7 @@ export default class FileExplorer extends Component {
           </Row>
         </div>
         <div className="file-list">
-          { this.props.containerInfo.length === 0 || this.props.deleting ?
+          { this.props.containerInfo.filter((i) => { if (typeof i.size === 'number') { return (i.size !== 0); } return true; }).length === 0 || this.props.deleting ?
             this.emptyContainer() : this.showContainer() }
         </div>
       </div>
