@@ -6,14 +6,15 @@ module.exports = {
 
       // fileContent can either be a string or a file buffer.
       // Choose a file and then use the line of code directly below to retreive file buffer.
-      let fileContent = document.getElementById('fileExplorer').files[0];
+      let fileContent = window.fileContent;
 
       return window.safeNfs.create(nfsHandle, fileContent)
       .then((res) => {
         fileContextHandle = res;
 
-      	return 'Returns the file handle of a newly created file: ' + res;
+        return 'Returns the file handle of a newly created file: ' + res;
       });
+
     },
 
     fetch: () => {

@@ -40,7 +40,7 @@ let codeSnippets = [
 
 function updateCode(string) {
 
-  let regExNfsCreate = new RegExp('fileExplorer');
+  let regExNfsCreate = new RegExp('fileContent');
   let regExNfsUploadDirectory =  new RegExp('dirExplorer');
 
   if(regExNfsCreate.test(string)) {
@@ -56,6 +56,18 @@ function updateCode(string) {
       fileInputEl.setAttribute('class', 'form-control');
       fileInputEl.setAttribute('id', 'fileExplorer');
       fileInputEl.setAttribute('value', ' file');
+
+      fileInputEl.addEventListener('change', function(event) {
+
+        let fileReader = new FileReader();
+
+        fileReader.onload = function(event) {
+          let fileBuffer = new Buffer(event.target.result);
+          window.fileContent = fileBuffer;
+        }
+
+        fileReader.readAsArrayBuffer(event.target.files[0]);
+      });
 
       let parentEl = document.getElementById('codeForm');
       let buttonEl = document.getElementById('runButton');

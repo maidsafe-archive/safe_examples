@@ -141,7 +141,7 @@ module.exports = {
     put: () => {
       return window.safeMutableData.put(mdHandle, permsHandle, entriesHandle)
       .then(_ => {
-      	return 'Finished creating and committing MutableData to the network';
+      	return 'Finished creating and committing MutableData to the network' + _;
       });
     },
 
@@ -208,7 +208,7 @@ module.exports = {
 
       return window.safeMutableData.applyEntriesMutation(mdHandle, mutationHandle)
       .then(_ => {
-      	return 'New entry was inserted in the MutableData and committed to the network';
+      	return 'New entry was inserted in the MutableData and committed to the network' + _;
       });
     },
 
