@@ -15,9 +15,9 @@ module.exports = {
 
       return window.safeMutableDataValues.forEach(valuesHandle, (v) => {
 
-        this.send('forEachResult', v.buf);
+        console.log(String.fromCharCode.apply(null, new Uint8Array(v.buf)));
 
-      }).then(_ => forEachResults.join('\n'));
+      }).then(_ => 'Iteration complete');
     },
 
     free: () => {
