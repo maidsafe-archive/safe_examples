@@ -18,7 +18,7 @@ module.exports = {
       	console.log(String.fromCharCode.apply(null, k));
 
       }).then(_ => {
-        return 'Interation complete' + _;
+        return 'Iteration complete' + _;
       });
     },
 
