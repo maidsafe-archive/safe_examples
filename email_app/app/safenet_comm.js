@@ -172,14 +172,13 @@ export const writeConfig = (app, account) => {
 
 const decryptEmail = (app, account, key, value, cb) => {
   if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-    let entryValue = decrypt(value, account.encSk, account.encPk);
-    return app.immutableData.fetch(deserialiseArray(entryValue))
+    return decrypt(app, value, account.encSk, account.encPk)
+    .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
       .then((immData) => immData.read())
-      .then((content) => {
-        let decryptedEmail;
-        decryptedEmail = JSON.parse(decrypt(content.toString(), account.encSk, account.encPk));
-        cb({ [key]: decryptedEmail });
-      });
+      .then((content) => decrypt(app, content.toString(), account.encSk, account.encPk)
+        .then(decryptedEmail => cb({ [key]: JSON.parse(decryptedEmail) }))
+      )
+    )
   }
 }
 
@@ -251,11 +250,12 @@ export const setupAccount = (app, emailId) => {
   return genServiceInfo(app, emailId)
       .then((info) => serviceInfo = info)
       .then(() => genKeyPair(app)
-        .then((keyPair) => createInbox(app, keyPair.publicKey))
-        .then((md) => inbox = md)
-        .then(() => createArchive(app))
-        .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
-                      encSk: keyPair.privateKey, encPk: keyPair.publicKey})
+        .then((keyPair) => createInbox(app, keyPair.publicKey)
+          .then((md) => inbox = md)
+          .then(() => createArchive(app))
+          .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
+                        encSk: keyPair.privateKey, encPk: keyPair.publicKey})
+        )
       )
       .then(() => newAccount.inboxMd.serialise())
       .then((mdSerialised) => inboxSerialised = mdSerialised)
@@ -276,13 +276,13 @@ export const setupAccount = (app, emailId) => {
 }
 
 const writeEmailContent = (app, email, pk) => {
-  const encryptedEmail = encrypt(JSON.stringify(email), pk);
-
-  return app.immutableData.create()
-      .then((email) => email.write(encryptedEmail)
-        .then(() => app.cipherOpt.newPlainText())
-        .then((cipherOpt) => email.close(cipherOpt))
-      );
+  return encrypt(app, JSON.stringify(email))
+  .then(encryptedEmail => app.immutableData.create()
+     .then((email) => email.write(encryptedEmail)
+       .then(() => app.cipherOpt.newPlainText())
+       .then((cipherOpt) => email.close(cipherOpt))
+     )
+  )
 }
 
 export const storeEmail = (app, email, to) => {
@@ -298,9 +298,11 @@ export const storeEmail = (app, email, to) => {
           .then((emailAddr) => app.mutableData.newMutation()
             .then((mut) => {
               let entryKey = genRandomEntryKey();
-              let entryValue = encrypt(emailAddr.toString(), pk.buf.toString());
-              return mut.insert(entryKey, entryValue)
+
+              return encrypt(app, emailAddr.toString())
+              .then(entryValue => mut.insert(entryKey, entryValue)
                 .then(() => inboxMd.applyEntriesMutation(mut))
+              )
             })
           )));
 }

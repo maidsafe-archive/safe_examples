@@ -65,19 +65,32 @@ export const deserialiseArray = (str) => {
 }
 
 export const genKeyPair = (app) => {
+  let rawKeyPair = {};
   return app.crypto.generateEncKeyPair()
-  .then(keyPair => {
-    return {
-      publicKey: keyPair.pubEncKey(),
-      privateKey: keyPair.secEncKey()
-    }
-  })
+  .then(keyPair => keyPair.pubEncKey.getRaw()
+    .then(rawPubEncKey => {
+      rawKeyPair.publicKey = rawPubEncKey.buffer;
+      return;
+    })
+    .then(() => keyPair.secEncKey.getRaw())
+    .then(rawSecEncKey => {
+      rawKeyPair.privateKey = rawSecEncKey.buffer;
+      return rawKeyPair;
+    })
+  )
 }
 
-export const encrypt = (input, pk) => sodium.crypto_box_seal(input, Buffer.from(pk, 'hex'), 'hex');
+export const encrypt = (app, input) => {
+  return app.crypto.getAppPubEncKey()
+  .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
+};
 
-export const decrypt = (cipherMsg, sk, pk) => sodium.crypto_box_seal_open(
-                              Buffer.from(cipherMsg, 'hex'),
-                              Buffer.from(pk, 'hex'),
-                              Buffer.from(sk, 'hex'),
-                              'text');
+export const decrypt = (app, cipherMsg, sk, pk) => {
+  return app.crypto.generateEncKeyPairFromRaw(pk, sk)
+  .then(keyPair => {
+    return keyPair.decryptSealed(cipherMsg).catch(e => {
+      console.log('ERRIR"');
+      console.log(e);
+    })
+  })
+};
