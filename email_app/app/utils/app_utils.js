@@ -81,14 +81,14 @@ export const genKeyPair = (app) => {
 }
 
 export const encrypt = (app, input, pk) => {
-  console.log("encrypt public key: ", new Uint8Array(pk.buf));
+  console.log("public key used for encrypt: ", new Uint8Array(pk.buf));
 
   return app.crypto.pubEncKeyKeyFromRaw(new Uint8Array(pk.buf))
   .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
 };
 
 export const decrypt = (app, cipherMsg, sk, pk) => {
-  console.log("decrypt public key: ", new Uint8Array(pk.buffer));
+  console.log("public key used for decrypt : ", new Uint8Array(pk.buffer));
 
   return app.crypto.generateEncKeyPairFromRaw(new Uint8Array(pk.buffer), new Uint8Array(sk.buffer))
   .then(keyPair => {
