@@ -247,15 +247,16 @@ export const setupAccount = (app, emailId) => {
   let inboxSerialised;
   let inbox;
   let serviceInfo;
-  let keyPair = genKeyPair();
 
   return genServiceInfo(app, emailId)
       .then((info) => serviceInfo = info)
-      .then(() => createInbox(app, keyPair.publicKey))
-      .then((md) => inbox = md)
-      .then(() => createArchive(app))
-      .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
-                    encSk: keyPair.privateKey, encPk: keyPair.publicKey})
+      .then(() => genKeyPair(app)
+        .then((keyPair) => createInbox(app, keyPair.publicKey))
+        .then((md) => inbox = md)
+        .then(() => createArchive(app))
+        .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
+                      encSk: keyPair.privateKey, encPk: keyPair.publicKey})
+      )
       .then(() => newAccount.inboxMd.serialise())
       .then((mdSerialised) => inboxSerialised = mdSerialised)
       .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
