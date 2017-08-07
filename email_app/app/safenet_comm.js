@@ -276,7 +276,7 @@ export const setupAccount = (app, emailId) => {
 }
 
 const writeEmailContent = (app, email, pk) => {
-  return encrypt(app, JSON.stringify(email))
+  return encrypt(app, JSON.stringify(email), pk)
   .then(encryptedEmail => app.immutableData.create()
      .then((email) => email.write(encryptedEmail)
        .then(() => app.cipherOpt.newPlainText())
@@ -294,12 +294,11 @@ export const storeEmail = (app, email, to) => {
       .catch((err) => {throw MESSAGES.EMAIL_ID_NOT_FOUND})
       .then((service) => app.mutableData.fromSerial(service.buf))
       .then((inboxMd) => inboxMd.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY)
-        .then((pk) => writeEmailContent(app, email, pk.buf.toString())
+        .then((pk) => writeEmailContent(app, email, pk)
           .then((emailAddr) => app.mutableData.newMutation()
             .then((mut) => {
               let entryKey = genRandomEntryKey();
-
-              return encrypt(app, emailAddr.toString())
+              return encrypt(app, emailAddr.toString(), pk)
               .then(entryValue => mut.insert(entryKey, entryValue)
                 .then(() => inboxMd.applyEntriesMutation(mut))
               )

@@ -69,28 +69,32 @@ export const genKeyPair = (app) => {
   return app.crypto.generateEncKeyPair()
   .then(keyPair => keyPair.pubEncKey.getRaw()
     .then(rawPubEncKey => {
-      rawKeyPair.publicKey = rawPubEncKey.buffer;
+      rawKeyPair.publicKey = rawPubEncKey;
       return;
     })
     .then(() => keyPair.secEncKey.getRaw())
     .then(rawSecEncKey => {
-      rawKeyPair.privateKey = rawSecEncKey.buffer;
+      rawKeyPair.privateKey = rawSecEncKey;
       return rawKeyPair;
     })
   )
 }
 
-export const encrypt = (app, input) => {
-  return app.crypto.getAppPubEncKey()
+export const encrypt = (app, input, pk) => {
+  console.log("encrypt public key: ", new Uint8Array(pk.buf));
+
+  return app.crypto.pubEncKeyKeyFromRaw(new Uint8Array(pk.buf))
   .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
 };
 
 export const decrypt = (app, cipherMsg, sk, pk) => {
-  return app.crypto.generateEncKeyPairFromRaw(pk, sk)
+  console.log("decrypt public key: ", new Uint8Array(pk.buffer));
+
+  return app.crypto.generateEncKeyPairFromRaw(new Uint8Array(pk.buffer), new Uint8Array(sk.buffer))
   .then(keyPair => {
     return keyPair.decryptSealed(cipherMsg).catch(e => {
-      console.log('ERRIR"');
-      console.log(e);
+      // FIXME: program currently failing hear after attempting to send mail to self
+      console.log('decryptSealed failed:', e);
     })
   })
 };
