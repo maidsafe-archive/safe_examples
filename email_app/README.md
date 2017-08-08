@@ -7,7 +7,7 @@ Demonstrates the usage of:
  - Private MutableData
  - Public MutableData
  - Immutable data
- - App's home container
+ - App's own container
  - `_publicNames` and services containers
 
 Please refer to the [Application Data Model](#application-data-model) section below for additional details.

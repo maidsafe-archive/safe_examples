@@ -131,7 +131,7 @@ export const readConfig = (app, emailId) => {
   let account = {id: emailId};
   let storedAccount = {}
 
-  return app.auth.getHomeContainer()
+  return app.auth.getOwnContainer()
       .then((md) => md.encryptKey(emailId).then((key) => md.get(key))
         .then((value) => md.decrypt(value.buf).then((decrypted) => storedAccount = JSON.parse(decrypted)))
         .then(() => app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX]))
@@ -162,7 +162,7 @@ export const writeConfig = (app, account) => {
       .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX] = serial)
       .then(() => account.archiveMd.serialise())
       .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE] = serial)
-      .then(() => app.auth.getHomeContainer())
+      .then(() => app.auth.getOwnContainer())
       .then((md) => app.mutableData.newMutation()
         .then((mut) => insertEncrypted(md, mut, account.id, JSON.stringify(emailAccount))
           .then(() => md.applyEntriesMutation(mut))

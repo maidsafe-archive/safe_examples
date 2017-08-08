@@ -122,11 +122,11 @@ module.exports = {
       });
     },
 
-    getHomeContainer: () => {
-      return window.safeApp.getHomeContainer(appHandle)
+    getOwnContainer: () => {
+      return window.safeApp.getOwnContainer(appHandle)
       .then((res) => {
         mdHandle = res;
-        return 'Returns handle for Mutable Data structure behind home container created by authenticator: ' + res;
+        return 'Returns handle for Mutable Data structure behind own container created by authenticator: ' + res;
       });
     },
 
