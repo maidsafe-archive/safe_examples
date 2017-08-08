@@ -63,38 +63,3 @@ export const deserialiseArray = (str) => {
   let arrItems = str.split(',');
   return Uint8Array.from(arrItems);
 }
-
-export const genKeyPair = (app) => {
-  let rawKeyPair = {};
-  return app.crypto.generateEncKeyPair()
-  .then(keyPair => keyPair.pubEncKey.getRaw()
-    .then(rawPubEncKey => {
-      rawKeyPair.publicKey = rawPubEncKey;
-      return;
-    })
-    .then(() => keyPair.secEncKey.getRaw())
-    .then(rawSecEncKey => {
-      rawKeyPair.privateKey = rawSecEncKey;
-      return rawKeyPair;
-    })
-  )
-}
-
-export const encrypt = (app, input, pk) => {
-  console.log("public key used for encrypt: ", new Uint8Array(pk.buf));
-
-  return app.crypto.pubEncKeyKeyFromRaw(new Uint8Array(pk.buf))
-  .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
-};
-
-export const decrypt = (app, cipherMsg, sk, pk) => {
-  console.log("public key used for decrypt : ", new Uint8Array(pk.buffer));
-
-  return app.crypto.generateEncKeyPairFromRaw(new Uint8Array(pk.buffer), new Uint8Array(sk.buffer))
-  .then(keyPair => {
-    return keyPair.decryptSealed(cipherMsg).catch(e => {
-      // FIXME: program currently failing hear after attempting to send mail to self
-      console.log('decryptSealed failed:', e);
-    })
-  })
-};

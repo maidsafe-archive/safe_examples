@@ -2,7 +2,7 @@ import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
-         genKeyPair, encrypt, decrypt, splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
+         splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
 import pkg from '../package.json';
 
 const APP_INFO = {
@@ -326,3 +326,38 @@ export const archiveEmail = (app, account, key) => {
         .then(() => account.inboxMd.applyEntriesMutation(mut))
       )
 }
+
+const genKeyPair = (app) => {
+  let rawKeyPair = {};
+  return app.crypto.generateEncKeyPair()
+  .then(keyPair => keyPair.pubEncKey.getRaw()
+    .then(rawPubEncKey => {
+      rawKeyPair.publicKey = rawPubEncKey;
+      return;
+    })
+    .then(() => keyPair.secEncKey.getRaw())
+    .then(rawSecEncKey => {
+      rawKeyPair.privateKey = rawSecEncKey;
+      return rawKeyPair;
+    })
+  )
+}
+
+const encrypt = (app, input, pk) => {
+  console.log("public key used for encrypt: ", pk.buf);
+
+  return app.crypto.pubEncKeyKeyFromRaw(pk.buf)
+  .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
+};
+
+const decrypt = (app, cipherMsg, sk, pk) => {
+  console.log("public key used for decrypt : ", new Buffer(pk.buffer));
+
+  return app.crypto.generateEncKeyPairFromRaw(new Buffer(pk.buffer), new Buffer(sk.buffer))
+  .then(keyPair => {
+    return keyPair.decryptSealed(cipherMsg).catch(e => {
+      // FIXME: program currently failing hear after attempting to send mail to self
+      console.log('decryptSealed failed:', e);
+    })
+  })
+};
