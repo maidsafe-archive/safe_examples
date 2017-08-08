@@ -332,28 +332,33 @@ const genKeyPair = (app) => {
   return app.crypto.generateEncKeyPair()
   .then(keyPair => keyPair.pubEncKey.getRaw()
     .then(rawPubEncKey => {
-      rawKeyPair.publicKey = rawPubEncKey;
+      rawKeyPair.publicKey = rawPubEncKey.toArray();
       return;
     })
     .then(() => keyPair.secEncKey.getRaw())
     .then(rawSecEncKey => {
-      rawKeyPair.privateKey = rawSecEncKey;
+      rawKeyPair.privateKey = rawSecEncKey.toArray();
+      console.log(rawKeyPair);
       return rawKeyPair;
     })
   )
 }
 
 const encrypt = (app, input, pk) => {
-  console.log("public key used for encrypt: ", pk.buf);
+  let bufferToArray = pk.buf.subarray().toString().split(',').map(Number);
+  console.log("Public key for encrypt: ", bufferToArray);
 
-  return app.crypto.pubEncKeyKeyFromRaw(pk.buf)
+  return app.crypto.pubEncKeyKeyFromRaw(bufferToArray)
   .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
 };
 
 const decrypt = (app, cipherMsg, sk, pk) => {
-  console.log("public key used for decrypt : ", new Buffer(pk.buffer));
+  let pkBufferToArray = pk.toString().split(',').map(Number);
+  let skBufferToArray = sk.toString().split(',').map(Number);
+  console.log("Public key for decrypt: ", pkBufferToArray);
+  console.log("Private key for decrypt: ", skBufferToArray);
 
-  return app.crypto.generateEncKeyPairFromRaw(new Buffer(pk.buffer), new Buffer(sk.buffer))
+  return app.crypto.generateEncKeyPairFromRaw(pkBufferToArray, skBufferToArray)
   .then(keyPair => {
     return keyPair.decryptSealed(cipherMsg).catch(e => {
       // FIXME: program currently failing hear after attempting to send mail to self
