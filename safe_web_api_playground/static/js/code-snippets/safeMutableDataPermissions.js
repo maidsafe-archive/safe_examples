@@ -36,15 +36,13 @@ module.exports = {
 
       return window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, signKeyHandle, permSetHandle)
       .then(_ => {
-      	return 'Finished inserting new permissions';
+      	return 'Finished inserting new permissions' + _;
       });
     },
 
     forEach: () => {
       return window.safeMutableDataPermissions.forEach(permsHandle, (p) => {
 
-        // Please note that values logged here will show up in your SAFE browser console.
-        // Check there for the following logged values.
         console.log(p);
       	console.log('Permissions-set entry handle: ', String.fromCharCode.apply(null, new Uint8Array(p)));
 

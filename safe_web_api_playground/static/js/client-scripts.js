@@ -19,7 +19,7 @@ let apiVariables = [
   'encryptedValue',
   'signKeyHandle',
   'version',
-  'fileHandle',
+  'fileContextHandle ',
   'pubEncKeyHandle',
   'keyPairHandle',
   'rawSignKey',
@@ -248,8 +248,8 @@ function handleSubmit() {
           return 'version not yet defined. Use safeMutableData.getVersion to first obtain version';
           break;
 
-        case 'fileHandle':
-          return 'fileHandle not yet defined. Use safeNfs.create to first obtain fileHandle';
+        case 'fileContextHandle':
+          return 'fileContextHandle not yet defined. Use safeNfs.create to first obtain fileContextHandle';
           break;
 
         case 'pubEncKeyHandle':

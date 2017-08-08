@@ -15,9 +15,11 @@ module.exports = {
 
       return window.safeMutableDataKeys.forEach(keysHandle, (k) => {
 
-      	this.send('forEachResult', String.fromCharCode.apply(null, k));
+      	console.log(String.fromCharCode.apply(null, k));
 
-      }).then(_ => forEachResults.join('\n'));
+      }).then(_ => {
+        return 'Interation complete' + _;
+      });
     },
 
     free: () => {

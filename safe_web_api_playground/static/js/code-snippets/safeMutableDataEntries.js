@@ -16,7 +16,7 @@ module.exports = {
 
       return window.safeMutableDataEntries.get(entriesHandle, 'key1')
       .then((value) => {
-      	return 'Value: ' + value;
+      	return 'Value: ' + String.fromCharCode.apply(null, new Uint8Array(value.buf));
       });
     },
 
@@ -30,14 +30,18 @@ module.exports = {
         let key = String.fromCharCode.apply(null, k);
         let value = String.fromCharCode.apply(null, new Uint8Array(v.buf));
 
-        this.send('forEachResult', {key: key, value: v.buf});
+        console.log(key + ': ' + value);
 
-      }).then(_ => forEachResults.join('\n'))
+      }).then(_ => {
+        return 'Interation complete' + _;
+      })
     },
 
     insert: () => {
       return window.safeMutableDataEntries.insert(entriesHandle, 'key1', 'value1')
-      .then(_ => 'New entry inserted');
+      .then(_ => {
+        return 'New entry inserted' + _;
+      });
     },
 
     mutate: () => {
