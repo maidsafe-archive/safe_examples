@@ -59,7 +59,11 @@ export const parseUrl = (url) => (
   (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
 );
 
-export const deserialiseArray = (str) => {
-  let arrItems = str.split(',');
+export const deserialiseArray = (strOrBuffer) => {
+  if(Buffer.isBuffer(strOrBuffer)) {
+    let buffertoArray = strOrBuffer.toString().split(',').map(Number);
+    return Uint8Array.from(buffertoArray);
+  }
+  let arrItems = strOrBuffer.split(',');
   return Uint8Array.from(arrItems);
 }

@@ -175,7 +175,7 @@ const decryptEmail = (app, account, key, value, cb) => {
     return decrypt(app, value, account.encSk, account.encPk)
     .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
       .then((immData) => immData.read())
-      .then((content) => decrypt(app, content.toString(), account.encSk, account.encPk)
+      .then((content) => decrypt(app, content, account.encSk, account.encPk)
         .then(decryptedEmail => cb({ [key]: JSON.parse(decryptedEmail) }))
       )
     )
@@ -186,7 +186,7 @@ export const readInboxEmails = (app, account, cb) => {
   return account.inboxMd.getEntries()
       .then((entries) => entries.forEach((key, value) => {
           if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
-            return decryptEmail(app, account, key, value.buf.toString(), cb);
+            return decryptEmail(app, account, key, value.buf, cb);
           }
         })
       );
@@ -298,7 +298,7 @@ export const storeEmail = (app, email, to) => {
           .then((emailAddr) => app.mutableData.newMutation()
             .then((mut) => {
               let entryKey = genRandomEntryKey();
-              return encrypt(app, emailAddr.toString(), pk.buf.toString())
+              return encrypt(app, emailAddr, pk.buf.toString())
               .then(entryValue => mut.insert(entryKey, entryValue)
                 .then(() => inboxMd.applyEntriesMutation(mut))
               )
@@ -338,13 +338,16 @@ const genKeyPair = (app) => {
     .then(() => keyPair.secEncKey.getRaw())
     .then(rawSecEncKey => {
       rawKeyPair.privateKey = rawSecEncKey.buffer.toString('hex');
-      console.log(rawKeyPair);
       return rawKeyPair;
     })
   )
 }
 
 const encrypt = (app, input, pk) => {
+  if(Array.isArray(input)) {
+    input = input.toString();
+  }
+
   let stringToBuffer = Buffer.from(pk, 'hex');
 
   return app.crypto.pubEncKeyKeyFromRaw(stringToBuffer)
@@ -352,12 +355,8 @@ const encrypt = (app, input, pk) => {
 };
 
 const decrypt = (app, cipherMsg, sk, pk) => {
-
   return app.crypto.generateEncKeyPairFromRaw(Buffer.from(pk, 'hex'), Buffer.from(sk, 'hex'))
   .then(keyPair => {
-    return keyPair.decryptSealed(cipherMsg).catch(e => {
-      // FIXME: program currently failing hear after attempting to send mail to self
-      console.log('decryptSealed failed:', e);
-    })
+    return keyPair.decryptSealed(cipherMsg)
   })
 };
