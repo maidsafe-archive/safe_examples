@@ -46,20 +46,49 @@ export class FileUploadTask extends Task {
       .then((val) => app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
-        return nfs.create(fs.readFileSync(this.localPath))
-          .then((file) => nfs.insert(containerPath.file, file)
-            .catch((err) => {
-              if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
-                return callback(err);
-              }
-              return mdata.get(containerPath.file)
-                .then((value) => {
-                  if (value.buf.length !== 0) {
+        return nfs.open()
+              .then(file => {
+                  return new Promise((resolve, reject) => {
+                     const fd = fs.openSync(this.localPath, 'r');
+                     let offset = 0;
+                     const size = fd.size;
+                     const MAX_SIZE = 1000000;
+                     let chunkSize = 0;
+                     let buffer = null;
+                     const writeFile = () => {
+                        chunkSize = size - offset;
+                         chunkSize = (chunkSize < MAX_SIZE) ? chunkSize : (offset + MAX_SIZE)
+                         buffer = new Buffer(chunkSize);
+                         fs.readSync(fd, buffer, 0, chunkSize, offset);
+                         file.write(buffer)
+                              .then(() => {
+                                      offset += chunkSize;
+                                      // Update progress bar
+                                      callback(null, {
+                                        isFile: true,
+                                        isCompleted: false,
+                                        size: offset
+                                      })
+                                      offset === size ? resolve(file) : writeFile();
+                               })
+                               .catch(err => reject(err));
+                     };
+                     writeFile();
+                  });
+               })
+              .then((file) => nfs.insert(containerPath.file, file)
+                .catch((err) => {
+                  if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
                     return callback(err);
                   }
-                  return nfs.update(containerPath.file, file, value.version + 1);
-                });
-            }));
+                  return mdata.get(containerPath.file)
+                    .then((value) => {
+                      if (value.buf.length !== 0) {
+                        return callback(err);
+                      }
+                      return nfs.update(containerPath.file, file, value.version + 1);
+                    });
+                }));
       })
       .then(() => callback(null, {
         isFile: true,
