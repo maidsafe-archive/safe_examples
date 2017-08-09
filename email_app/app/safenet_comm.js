@@ -224,18 +224,29 @@ const createArchive = (app) => {
 }
 
 const addEmailService = (app, servicesXorName, serviceName, inboxSerialised) => {
-  return app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => app.mutableData.newMutation()
-        .then((mut) => mut.insert(serviceName, inboxSerialised)
-          .then(() => md.applyEntriesMutation(mut))
-        )
-        .then(() => md));
+  return app.auth.genShareMDataUri({type_tag: CONSTANTS.TAG_TYPE_DNS,
+                                    name: servicesXorName,
+                                    perms: ['Insert']
+                                  })
+      .then((uri) => fromAuthURI(APP_INFO.info, uri, netStatusCallback))
+      .then((app) => app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS)
+        .then((md) => app.mutableData.newMutation()
+          .then((mut) => mut.insert(serviceName, inboxSerialised)
+            .then(() => md.applyEntriesMutation(mut))
+          )
+          .then(() => md))
+      );
 }
 
 const createPublicIdAndEmailService = (app, pubNamesMd, serviceInfo,
                                                           inboxSerialised) => {
+  const metadata = {...CONSTANTS.SERVICE_METADATA,
+          description: (`${CONSTANTS.SERVICE_METADATA} '${serviceInfo.publicId}'` )
+  };
+
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
       .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inboxSerialised }))
+      .then((serviceMd) => serviceMd.setMetadata(metadata))
       .then((_) => app.mutableData.newMutation()
         .then((mut) => insertEncrypted(pubNamesMd, mut, serviceInfo.publicId, serviceInfo.serviceAddr)
           .then(() => pubNamesMd.applyEntriesMutation(mut))
