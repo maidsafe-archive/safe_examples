@@ -115,7 +115,7 @@ const _getFile = (mdata, filename) => {
  * @private
  */
 const _updateFile = (filename, payload) => {
-  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+  return window.safeApp.getOwnContainer(ACCESS_TOKEN)
     .then((mdata) => {
       return _getFile(mdata, filename)
         .then((files) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
@@ -130,7 +130,7 @@ const _updateFile = (filename, payload) => {
  * @param version
  */
 export const readFile = (filename, version) => {
-  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+  return window.safeApp.getOwnContainer(ACCESS_TOKEN)
     .then((mdata) => _getFile(mdata, filename))
     .then((file) => {
       return version ? file.data[version] : file.data
@@ -148,7 +148,7 @@ export const saveFile = (filename, data) => {
     console.log("existing");
     return _updateFile(filename, data);
   } else {
-    return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+    return window.safeApp.getOwnContainer(ACCESS_TOKEN)
       .then((mdata) => window.safeMutableData.emulateAs(ACCESS_TOKEN, mdata, 'NFS')
         .then((nfs) => window.safeNfs.create(ACCESS_TOKEN, nfs, _prepareFile([], data))
           .then((file) => window.safeNfs.insert(ACCESS_TOKEN, nfs, file, filename)))
@@ -173,13 +173,13 @@ export const getFileVersions = (filename) => {
 };
 
 /**
- * Get index of files or prepare home container
+ * Get index of files or prepare own container
  * @return {Promise}
  */
 export const getFileIndex = () => {
   if (FILE_INDEX) return Promise.resolve(FILE_INDEX);
 
-  return window.safeApp.getHomeContainer(ACCESS_TOKEN)
+  return window.safeApp.getOwnContainer(ACCESS_TOKEN)
     .then((mdata) => window.safeMutableData.encryptKey(ACCESS_TOKEN, mdata, FILE_INDEX_KEY)
       .then((key) => window.safeMutableData.get(ACCESS_TOKEN, mdata, key))
       .then((fileIndex) => {
@@ -188,7 +188,7 @@ export const getFileIndex = () => {
       })
       .catch(() => {
         FILE_INDEX = {};
-        console.warn('Preparing Home container');
+        console.warn('Preparing Own container');
 
         // FIXME: check for exact error condition.
         return window.safeMutableData.getEntries(ACCESS_TOKEN, mdata)
