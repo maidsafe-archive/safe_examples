@@ -173,12 +173,12 @@ export const writeConfig = (app, account) => {
 const decryptEmail = (app, account, key, value, cb) => {
   if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
     return decrypt(app, value, account.encSk, account.encPk)
-    .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
-      .then((immData) => immData.read())
-      .then((content) => decrypt(app, content, account.encSk, account.encPk)
-        .then(decryptedEmail => cb({ [key]: JSON.parse(decryptedEmail) }))
+      .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
+        .then((immData) => immData.read())
+        .then((content) => decrypt(app, content, account.encSk, account.encPk)
+          .then(decryptedEmail => cb({ [key]: JSON.parse(decryptedEmail) }))
+        )
       )
-    )
   }
 }
 
@@ -195,7 +195,7 @@ export const readInboxEmails = (app, account, cb) => {
 export const readArchivedEmails = (app, account, cb) => {
   return account.archiveMd.getEntries()
       .then((entries) => entries.forEach((key, value) => {
-          return decryptEmail(app, account, key, value.buf.toString(), cb);
+          return decryptEmail(app, account, key, value.buf, cb);
         })
       );
 }
@@ -277,12 +277,12 @@ export const setupAccount = (app, emailId) => {
 
 const writeEmailContent = (app, email, pk) => {
   return encrypt(app, JSON.stringify(email), pk)
-  .then(encryptedEmail => app.immutableData.create()
-     .then((email) => email.write(encryptedEmail)
-       .then(() => app.cipherOpt.newPlainText())
-       .then((cipherOpt) => email.close(cipherOpt))
-     )
-  )
+    .then(encryptedEmail => app.immutableData.create()
+       .then((email) => email.write(encryptedEmail)
+         .then(() => app.cipherOpt.newPlainText())
+         .then((cipherOpt) => email.close(cipherOpt))
+       )
+    )
 }
 
 export const storeEmail = (app, email, to) => {
@@ -299,9 +299,9 @@ export const storeEmail = (app, email, to) => {
             .then((mut) => {
               let entryKey = genRandomEntryKey();
               return encrypt(app, emailAddr, pk.buf.toString())
-              .then(entryValue => mut.insert(entryKey, entryValue)
-                .then(() => inboxMd.applyEntriesMutation(mut))
-              )
+                .then(entryValue => mut.insert(entryKey, entryValue)
+                  .then(() => inboxMd.applyEntriesMutation(mut))
+                )
             })
           )));
 }
@@ -351,12 +351,11 @@ const encrypt = (app, input, pk) => {
   let stringToBuffer = Buffer.from(pk, 'hex');
 
   return app.crypto.pubEncKeyKeyFromRaw(stringToBuffer)
-  .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
+    .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
 };
 
 const decrypt = (app, cipherMsg, sk, pk) => {
   return app.crypto.generateEncKeyPairFromRaw(Buffer.from(pk, 'hex'), Buffer.from(sk, 'hex'))
-  .then(keyPair => {
-    return keyPair.decryptSealed(cipherMsg)
-  })
+    .then(keyPair => keyPair.decryptSealed(cipherMsg))
+    .then((decrypted) => decrypted.toString())
 };
