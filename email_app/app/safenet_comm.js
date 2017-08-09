@@ -2,7 +2,7 @@ import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
-         genKeyPair, encrypt, decrypt, splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
+         splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
 import pkg from '../package.json';
 
 const APP_INFO = {
@@ -172,14 +172,13 @@ export const writeConfig = (app, account) => {
 
 const decryptEmail = (app, account, key, value, cb) => {
   if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-    let entryValue = decrypt(value, account.encSk, account.encPk);
-    return app.immutableData.fetch(deserialiseArray(entryValue))
+    return decrypt(app, value, account.encSk, account.encPk)
+    .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
       .then((immData) => immData.read())
-      .then((content) => {
-        let decryptedEmail;
-        decryptedEmail = JSON.parse(decrypt(content.toString(), account.encSk, account.encPk));
-        cb({ [key]: decryptedEmail });
-      });
+      .then((content) => decrypt(app, content, account.encSk, account.encPk)
+        .then(decryptedEmail => cb({ [key]: JSON.parse(decryptedEmail) }))
+      )
+    )
   }
 }
 
@@ -187,7 +186,7 @@ export const readInboxEmails = (app, account, cb) => {
   return account.inboxMd.getEntries()
       .then((entries) => entries.forEach((key, value) => {
           if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
-            return decryptEmail(app, account, key, value.buf.toString(), cb);
+            return decryptEmail(app, account, key, value.buf, cb);
           }
         })
       );
@@ -247,15 +246,17 @@ export const setupAccount = (app, emailId) => {
   let inboxSerialised;
   let inbox;
   let serviceInfo;
-  let keyPair = genKeyPair();
 
   return genServiceInfo(app, emailId)
       .then((info) => serviceInfo = info)
-      .then(() => createInbox(app, keyPair.publicKey))
-      .then((md) => inbox = md)
-      .then(() => createArchive(app))
-      .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
-                    encSk: keyPair.privateKey, encPk: keyPair.publicKey})
+      .then(() => genKeyPair(app)
+        .then((keyPair) => createInbox(app, keyPair.publicKey)
+          .then((md) => inbox = md)
+          .then(() => createArchive(app))
+          .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
+                        encSk: keyPair.privateKey, encPk: keyPair.publicKey})
+        )
+      )
       .then(() => newAccount.inboxMd.serialise())
       .then((mdSerialised) => inboxSerialised = mdSerialised)
       .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
@@ -275,13 +276,13 @@ export const setupAccount = (app, emailId) => {
 }
 
 const writeEmailContent = (app, email, pk) => {
-  const encryptedEmail = encrypt(JSON.stringify(email), pk);
-
-  return app.immutableData.create()
-      .then((email) => email.write(encryptedEmail)
-        .then(() => app.cipherOpt.newPlainText())
-        .then((cipherOpt) => email.close(cipherOpt))
-      );
+  return encrypt(app, JSON.stringify(email), pk)
+  .then(encryptedEmail => app.immutableData.create()
+     .then((email) => email.write(encryptedEmail)
+       .then(() => app.cipherOpt.newPlainText())
+       .then((cipherOpt) => email.close(cipherOpt))
+     )
+  )
 }
 
 export const storeEmail = (app, email, to) => {
@@ -297,9 +298,10 @@ export const storeEmail = (app, email, to) => {
           .then((emailAddr) => app.mutableData.newMutation()
             .then((mut) => {
               let entryKey = genRandomEntryKey();
-              let entryValue = encrypt(emailAddr.toString(), pk.buf.toString());
-              return mut.insert(entryKey, entryValue)
+              return encrypt(app, emailAddr, pk.buf.toString())
+              .then(entryValue => mut.insert(entryKey, entryValue)
                 .then(() => inboxMd.applyEntriesMutation(mut))
+              )
             })
           )));
 }
@@ -324,3 +326,37 @@ export const archiveEmail = (app, account, key) => {
         .then(() => account.inboxMd.applyEntriesMutation(mut))
       )
 }
+
+const genKeyPair = (app) => {
+  let rawKeyPair = {};
+  return app.crypto.generateEncKeyPair()
+  .then(keyPair => keyPair.pubEncKey.getRaw()
+    .then(rawPubEncKey => {
+      rawKeyPair.publicKey = rawPubEncKey.buffer.toString('hex');
+      return;
+    })
+    .then(() => keyPair.secEncKey.getRaw())
+    .then(rawSecEncKey => {
+      rawKeyPair.privateKey = rawSecEncKey.buffer.toString('hex');
+      return rawKeyPair;
+    })
+  )
+}
+
+const encrypt = (app, input, pk) => {
+  if(Array.isArray(input)) {
+    input = input.toString();
+  }
+
+  let stringToBuffer = Buffer.from(pk, 'hex');
+
+  return app.crypto.pubEncKeyKeyFromRaw(stringToBuffer)
+  .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
+};
+
+const decrypt = (app, cipherMsg, sk, pk) => {
+  return app.crypto.generateEncKeyPairFromRaw(Buffer.from(pk, 'hex'), Buffer.from(sk, 'hex'))
+  .then(keyPair => {
+    return keyPair.decryptSealed(cipherMsg)
+  })
+};

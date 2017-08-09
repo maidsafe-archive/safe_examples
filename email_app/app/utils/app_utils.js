@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import * as base64 from 'urlsafe-base64';
 import { remote } from 'electron';
 import { CONSTANTS } from '../constants';
-import sodium from 'libsodium-wrappers';
 
 export const getAuthData = () => {
   // let authData = window.JSON.parse(
@@ -60,20 +59,11 @@ export const parseUrl = (url) => (
   (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
 );
 
-export const deserialiseArray = (str) => {
-  let arrItems = str.split(',');
+export const deserialiseArray = (strOrBuffer) => {
+  if(Buffer.isBuffer(strOrBuffer)) {
+    let buffertoArray = strOrBuffer.toString().split(',').map(Number);
+    return Uint8Array.from(buffertoArray);
+  }
+  let arrItems = strOrBuffer.split(',');
   return Uint8Array.from(arrItems);
 }
-
-export const genKeyPair = () => {
-  let {keyType, privateKey, publicKey} = sodium.crypto_box_keypair('hex');
-  return {privateKey, publicKey};
-}
-
-export const encrypt = (input, pk) => sodium.crypto_box_seal(input, Buffer.from(pk, 'hex'), 'hex');
-
-export const decrypt = (cipherMsg, sk, pk) => sodium.crypto_box_seal_open(
-                              Buffer.from(cipherMsg, 'hex'),
-                              Buffer.from(pk, 'hex'),
-                              Buffer.from(sk, 'hex'),
-                              'text');
