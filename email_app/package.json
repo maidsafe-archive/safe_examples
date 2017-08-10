@@ -107,7 +107,6 @@
     "electron-compile": "^6.2.0",
     "electron-debug": "^1.0.1",
     "less": "^2.7.2",
-    "libsodium-wrappers": "^0.5.1",
     "material-design-lite": "^1.2.1",
     "open-sans-fontface": "^1.4.0",
     "postcss": "^5.1.2",
