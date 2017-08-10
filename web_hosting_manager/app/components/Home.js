@@ -245,7 +245,7 @@ export default class Auth extends Component {
         return (
           <Row key={ `serviceName-${i}`}>
             <Col md={{ span: 8 }} lg={{ span: 8 }}>
-              <a href={`safe://${serviceName}.${publicId}/index.html`}>{serviceName}</a>
+              <a href={`safe://${serviceName}.${publicId}`}>{serviceName}</a>
             </Col>
             <Col md={{ span: 10 }} lg={{ span: 10 }}>
               <Link
