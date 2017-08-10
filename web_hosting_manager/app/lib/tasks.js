@@ -49,14 +49,17 @@ export class FileUploadTask extends Task {
         return nfs.open()
               .then(file => {
                   return new Promise((resolve, reject) => {
+                    // QUESTION: Is it possible to get file size from openSync?
+                    // That's the only reason I'm using readFileSync
                      const fd = fs.openSync(this.localPath, 'r');
+                     const fileContents = fs.readFileSync(this.localPath);
                      let offset = 0;
-                     const size = fd.size;
+                     const size = fileContents.length;
                      const MAX_SIZE = 1000000;
-                     let chunkSize = 0;
+                     let chunkSize = 1000;
                      let buffer = null;
                      const writeFile = () => {
-                        chunkSize = size - offset;
+                         chunkSize = size - offset;
                          chunkSize = (chunkSize < MAX_SIZE) ? chunkSize : (offset + MAX_SIZE)
                          buffer = new Buffer(chunkSize);
                          fs.readSync(fd, buffer, 0, chunkSize, offset);
@@ -69,7 +72,7 @@ export class FileUploadTask extends Task {
                                         isCompleted: false,
                                         size: offset
                                       })
-                                      offset === size ? resolve(file) : writeFile();
+                                      offset === size ? file.close().then(() => resolve(file)) : writeFile();
                                })
                                .catch(err => reject(err));
                      };
