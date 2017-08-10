@@ -49,18 +49,26 @@ export class FileUploadTask extends Task {
         return nfs.open()
               .then(file => {
                   return new Promise((resolve, reject) => {
-                    // QUESTION: Is it possible to get file size from openSync?
-                    // That's the only reason I'm using readFileSync
                      const fd = fs.openSync(this.localPath, 'r');
+                     // QUESTION: Is it possible to get file size from openSync?
+                     // That's the only reason I'm using readFileSync
                      const fileContents = fs.readFileSync(this.localPath);
                      let offset = 0;
                      const size = fileContents.length;
-                     const MAX_SIZE = 1000000;
-                     let chunkSize = 1000;
+                     // QUESTION: What's the ideal chunk size?
+                     // Should it be dynamically based on total file size?
+                     // Probably should be dynamically set because recursing /
+                     // through file write greatly slows down upload progress
+
+                     // Currently set to 1 Mb
+                     let chunkSize = 1000000;
                      let buffer = null;
-                     const writeFile = () => {
-                         chunkSize = size - offset;
-                         chunkSize = (chunkSize < MAX_SIZE) ? chunkSize : (offset + MAX_SIZE)
+                     const writeFile = (remainingBytes) => {
+
+                        if(remainingBytes < chunkSize) {
+                          chunkSize = remainingBytes;
+                        }
+
                          buffer = new Buffer(chunkSize);
                          fs.readSync(fd, buffer, 0, chunkSize, offset);
                          file.write(buffer)
@@ -72,11 +80,12 @@ export class FileUploadTask extends Task {
                                         isCompleted: false,
                                         size: offset
                                       })
-                                      offset === size ? file.close().then(() => resolve(file)) : writeFile();
+                                      remainingBytes -= chunkSize;
+                                      offset === size ? file.close().then(() => resolve(file)) : writeFile(remainingBytes);
                                })
                                .catch(err => reject(err));
                      };
-                     writeFile();
+                     writeFile(size);
                   });
                })
               .then((file) => nfs.insert(containerPath.file, file)
@@ -93,11 +102,13 @@ export class FileUploadTask extends Task {
                     });
                 }));
       })
-      .then(() => callback(null, {
-        isFile: true,
-        isCompleted: true,
-        size: fs.statSync(this.localPath).size
-      }))
+      .then(() => {
+        return callback(null, {
+          isFile: true,
+          isCompleted: true,
+          size: fs.statSync(this.localPath).size
+        });
+      })
       .catch(callback);
   }
 }

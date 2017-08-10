@@ -41,7 +41,8 @@ export default class Uploader {
         this[status].completed.directories += taskStatus.isFile ? 0 : 1;
       }
       this[status].completed.size += taskStatus ? taskStatus.size : 0;
-      const progress = Math.floor((this[status].completed.size / this[status].total.size) * 100);
+      const progress = Math.floor((taskStatus.size / this[status].total.size) * 100);
+
       return this[progressCb]({
         total: this[status].total,
         completed: this[status].completed,
