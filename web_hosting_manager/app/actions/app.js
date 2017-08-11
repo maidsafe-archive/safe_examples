@@ -98,7 +98,8 @@ export const createContainerAndService = (publicId: string, service: string,
     payload: api.updateServiceIfExist(publicId, service, path)
       .then((exist) => {
         if (!exist) {
-          return api.createServiceContainer(path)
+          const metaName = `${service}.${publicId}`;
+          return api.createServiceContainer(path, metaName)
             .then((name) => {
               return api.createService(publicId, service, name);
             });
