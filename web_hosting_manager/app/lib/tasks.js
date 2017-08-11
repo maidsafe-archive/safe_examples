@@ -40,6 +40,7 @@ export class FileUploadTask extends Task {
       return callback(new Error('App not registered'));
     }
     const containerPath = parseContainerPath(this.networkPath);
+    const fileStats = fs.statSync(this.localPath);
 
     return safeApi.getPublicContainer()
       .then((md) => safeApi.getMDataValueForKey(md, containerPath.target))
@@ -50,16 +51,12 @@ export class FileUploadTask extends Task {
               .then(file => {
                   return new Promise((resolve, reject) => {
                      const fd = fs.openSync(this.localPath, 'r');
-                     // QUESTION: Is it possible to get file size from openSync?
-                     // That's the only reason I'm using readFileSync
-                     const fileContents = fs.readFileSync(this.localPath);
                      let offset = 0;
-                     const size = fileContents.length;
+                     const size = fileStats.size;
                      // QUESTION: What's the ideal chunk size?
                      // Should it be dynamically based on total file size?
                      // Probably should be dynamically set because recursing /
-                     // through file write greatly slows down upload progress
-
+                     // through file write greatly slows down upload process
                      // Currently set to 1 Mb
                      let chunkSize = 1000000;
                      let buffer = null;
@@ -106,7 +103,7 @@ export class FileUploadTask extends Task {
         return callback(null, {
           isFile: true,
           isCompleted: true,
-          size: fs.statSync(this.localPath).size
+          size: fileStats.size
         });
       })
       .catch(callback);

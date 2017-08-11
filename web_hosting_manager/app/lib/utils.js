@@ -45,7 +45,12 @@ class TaskQueue {
       }
       index += 1;
       if (this.queue.length === index) {
-        return this.callback(undefined, undefined, true);
+        const taskStatus = {
+          isFile: true,
+          isCompleted: true,
+          size: status.size
+        };
+        return this.callback(null, taskStatus);
       }
       if (!this.cancelled && this.queue[index]) {
         this.queue[index].execute(next);

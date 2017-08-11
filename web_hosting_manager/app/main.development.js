@@ -58,6 +58,7 @@ app.on('ready', async () => {
     resizable: false
   });
 
+  mainWindow.openDevTools();
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
   mainWindow.webContents.on('did-finish-load', () => {
