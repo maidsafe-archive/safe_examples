@@ -236,8 +236,8 @@ class SafeApi {
       .then((md) => this._removeFromMData(md, serviceName));
   }
 
-  createServiceContainer(path, metaName) {
-    const metaName = `Service Root Directory for ${metaName}`;
+  createServiceContainer(path, meta) {
+    const metaName = `Service Root Directory for ${meta}`;
     const metaDesc = `Has the files hosted for the service`;
     return this.app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE.WWW)
       .then((md) => md.quickSetup({}).then(() => md.getNameAndTag()))
