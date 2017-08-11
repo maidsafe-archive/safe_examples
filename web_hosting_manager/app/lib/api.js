@@ -135,6 +135,7 @@ class SafeApi {
   fetchServices() {
     const self = this;
     const publicNames = Object.getOwnPropertyNames(this.publicNames);
+    // this.createDemoMd();
     return Promise.all(publicNames.map((publicName) => {
       const services = {};
       return this.getPublicNamesContainer()
@@ -168,10 +169,12 @@ class SafeApi {
   createPublicName(publicName) {
     const name = publicName.trim();
     if (!name) {
-      // FIXME correct error message to public name
       const err = new Error(I18n.t('messages.cannotBeEmpty', { name: 'Public Id' }));
       return Promise.reject(err);
     }
+
+    const metaName = `Services container for Public ID - ${publicName}`;
+    const metaDesc = `Container where all the services are mapped for the Public ID`;
 
     return this.app.crypto.sha3Hash(name)
       .then((hashedName) => this.app.mutableData.newPublic(hashedName, CONSTANTS.TAG_TYPE.DNS))
@@ -185,7 +188,7 @@ class SafeApi {
             .then((signKey) => this.app.mutableData.newPermissions()
               .then((perm) => perm.insertPermissionSet(signKey, permSet).then(() => perm))))
           .then((perm) => this.app.mutableData.newEntries()
-            .then((entries) => md.put(perm, entries)))
+            .then((entries) => entries.setMetaData(metaName, metaDesc).then(() => md.put(perm, entries))))
           .then(() => md.getNameAndTag())
           .then((mdMeta) => this.getPublicNamesContainer()
             .then((pubMd) => this._insertToMData(pubMd, name, mdMeta.name, true)));
@@ -233,10 +236,14 @@ class SafeApi {
       .then((md) => this._removeFromMData(md, serviceName));
   }
 
-  createServiceContainer(path) {
+  createServiceContainer(path, meta) {
+    const metaName = `Service Root Directory for ${meta}`;
+    const metaDesc = `Has the files hosted for the service`;
     return this.app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE.WWW)
       .then((md) => md.quickSetup({}).then(() => md.getNameAndTag()))
-      .then((mdMeta) => this.getPublicContainer()
+      .then((mdMeta) => mdMeta.getEntries()
+        .then((entries) => entries.setMetaData(metaName, metaDesc))
+        .then(() => this.getPublicContainer())
         .then((pubMd) => this._insertToMData(pubMd, path, mdMeta.name))
         .then(() => mdMeta.name));
   }
