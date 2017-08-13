@@ -11,6 +11,7 @@ const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 
 ipc.on('auth-response', (event, response) => {
+  console.log("RESPONSE RECEIVED: ", response)
   if (response && response.indexOf('safe-') == 0) {
     store.dispatch(receiveResponse(response)); // TODO do it concurrently (no to linked dispatch)
   } else {

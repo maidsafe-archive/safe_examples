@@ -8,7 +8,7 @@ import ReactSpinner from 'react-spinjs';
 export default class CreateAccount extends Component {
   constructor() {
     super();
-    this.errMrg = null;
+    //this.errMrg = null;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
     this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
     this.handleChooseAccount = this.handleChooseAccount.bind(this);
@@ -34,7 +34,7 @@ export default class CreateAccount extends Component {
     }
 
     return createAccount(emailId)
-      .then(this.storeCreatedAccount)
+      //.then(() => TODO load spinner)
       .catch((err) => {
         if (err.code === SAFE_APP_ERROR_CODES.ERR_DATA_EXISTS
           || err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
@@ -48,11 +48,24 @@ export default class CreateAccount extends Component {
     e.preventDefault();
     const { refreshConfig, createAccountError } = this.props;
     const emailId = this.refs.emailSelected.getValue();
-    console.log('emailId', emailId)
 
     return refreshConfig(emailId)
       .then((_) => this.context.router.push('/home'))
       .catch((e) => createAccountError(new Error(e)));
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    const { accStatus, createAccountError } = this.props;
+    if (prevProps.accStatus === ACC_STATUS.AUTHORISING) {
+      switch (accStatus) {
+        case ACC_STATUS.AUTHORISATION_DENIED:
+          return createAccountError(new Error(MESSAGES.AUTHORISATION_DENIED));
+        case ACC_STATUS.AUTHORISATION_FAILED:
+          return createAccountError(new Error(MESSAGES.AUTHORISATION_ERROR));
+        case ACC_STATUS.AUTHORISED:
+          return this.storeCreatedAccount();
+      };
+    }
   };
 
   render() {

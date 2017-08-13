@@ -7,6 +7,13 @@ export const createAccount = (emailId) => {
     return dispatch({
       type: ACTION_TYPES.CREATE_ACCOUNT,
       payload: setupAccount(app, emailId)
+                .catch((serviceToRegister) => {
+                  console.log("SERVICE TO REGISTER: ", serviceToRegister)
+                  return dispatch({
+                    type: ACTION_TYPES.AUTHORISE_SHARE_MD,
+                    payload: Promise.resolve(serviceToRegister)
+                  });
+                })
     });
   };
 };

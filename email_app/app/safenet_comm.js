@@ -32,6 +32,15 @@ const genServiceInfo = (app, emailId) => {
       });
 }
 
+const requestShareMdAuth = (app, mdPermissions) => {
+  return app.auth.genShareMDataUri(mdPermissions)
+    .then((resp) => {
+      console.log("SHARE MD URI SENT: ", resp.uri)
+      shell.openExternal(parseUrl(resp.uri));
+      return null;
+    });
+}
+
 const requestAuth = () => {
   return initializeApp(APP_INFO.info)
     .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
@@ -222,21 +231,6 @@ const createArchive = (app) => {
       .then((md) => md.quickSetup());
 }
 
-const addEmailService = (app, servicesXorName, serviceName, inboxSerialised) => {
-  return app.auth.genShareMDataUri({type_tag: CONSTANTS.TAG_TYPE_DNS,
-                                    name: servicesXorName,
-                                    perms: ['Insert']
-                                  })
-      .then((uri) => fromAuthURI(APP_INFO.info, uri, netStatusCallback))
-      .then((app) => app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS)
-        .then((md) => app.mutableData.newMutation()
-          .then((mut) => mut.insert(serviceName, inboxSerialised)
-            .then(() => md.applyEntriesMutation(mut))
-          )
-          .then(() => md))
-      );
-}
-
 const createPublicIdAndEmailService = (app, pubNamesMd, serviceInfo,
                                                           inboxSerialised) => {
   const metadata = {...CONSTANTS.SERVICE_METADATA,
@@ -245,43 +239,69 @@ const createPublicIdAndEmailService = (app, pubNamesMd, serviceInfo,
 
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
       .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inboxSerialised }))
-      .then((serviceMd) => serviceMd.setMetadata(metadata))
+      //.then((serviceMd) => serviceMd.setMetaData(metadata.name, metadata.description))
       .then((_) => app.mutableData.newMutation()
         .then((mut) => insertEncrypted(pubNamesMd, mut, serviceInfo.publicId, serviceInfo.serviceAddr)
           .then(() => pubNamesMd.applyEntriesMutation(mut))
         ));
 }
 
-export const setupAccount = (app, emailId) => {
-  let newAccount = {};
-  let inboxSerialised;
-  let inbox;
-  let serviceInfo;
+const genNewAccount = (app, id) => {
+  let inboxMd;
+  return genKeyPair(app)
+      .then((keyPair) => createInbox(app, keyPair.publicKey)
+        .then((md) => inboxMd = md)
+        .then(() => createArchive(app))
+        .then((archiveMd) => ({id, inboxMd, archiveMd,
+                              encSk: keyPair.privateKey,
+                              encPk: keyPair.publicKey}))
+      );
+}
 
+export const setupAccount = (app, emailId) => {
+  let serviceInfo;
   return genServiceInfo(app, emailId)
       .then((info) => serviceInfo = info)
-      .then(() => genKeyPair(app)
-        .then((keyPair) => createInbox(app, keyPair.publicKey)
-          .then((md) => inbox = md)
-          .then(() => createArchive(app))
-          .then((md) => newAccount = {id: serviceInfo.emailId, inboxMd: inbox, archiveMd: md,
-                        encSk: keyPair.privateKey, encPk: keyPair.publicKey})
-        )
-      )
-      .then(() => newAccount.inboxMd.serialise())
-      .then((mdSerialised) => inboxSerialised = mdSerialised)
       .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
       .then((pubNamesMd) => pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key))
         .then((encryptedAddr) => pubNamesMd.decrypt(encryptedAddr.buf)
-            .then((servicesXorName) => addEmailService(app, servicesXorName,
-                                      serviceInfo.serviceName, inboxSerialised))
+            // Service container already exists, request permissions to be shared
+            .then((servicesXorName) => requestShareMdAuth(app,
+                [{ type_tag: CONSTANTS.TAG_TYPE_DNS, name: servicesXorName, perms: ['Insert'] }] )
+              .then(() => Promise.reject({ servicesXorName,
+                                           emailId: serviceInfo.emailId,
+                                           serviceName: serviceInfo.serviceName
+                                          }))
+            )
           , (err) => {
-            if (err.code === SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
-              return createPublicIdAndEmailService(app, pubNamesMd,
-                                                serviceInfo, inboxSerialised);
+            if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
+              throw err;
             }
-            throw err;
+            // The public ID doesn't exist in _publicNames
+            return genNewAccount(app, serviceInfo.emailId)
+              .then((newAccount) => newAccount.inboxMd.serialise())
+              .then((inboxSerialised) => createPublicIdAndEmailService(app,
+                                    pubNamesMd, serviceInfo, inboxSerialised));
           })
+      );
+}
+
+export const connectWithSharedMd = (app, uri, serviceToRegister) => {
+  console.log("RECONNECTING...")
+  let inboxSerialised;
+  let newAccount;
+  return app.loginFromURI(uri)
+      .then(() => app.auth.refreshContainersPermissions())
+      .then(() => console.log("RECONNECTING OK"))
+      .then(() => genNewAccount(app, serviceToRegister.emailId))
+      .then((account) => newAccount = account)
+      .then(() => newAccount.inboxMd.serialise())
+      .then((serialised) => inboxSerialised = serialised)
+      .then(() => app.mutableData.newPublic(serviceToRegister.servicesXorName, CONSTANTS.TAG_TYPE_DNS))
+      .then((md) => app.mutableData.newMutation()
+        .then((mut) => mut.insert(serviceToRegister.serviceName, inboxSerialised)
+          .then(() => md.applyEntriesMutation(mut))
+        )
       )
       .then(() => newAccount);
 }
