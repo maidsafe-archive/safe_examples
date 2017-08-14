@@ -27,7 +27,6 @@ const newNetStatusCallback = (dispatch) => {
 export const receiveResponse = (uri) => {
   return function (dispatch, getState) {
     let appStatus = getState().initializer.appStatus;
-    console.log(" appStatus", appStatus)
     if (appStatus === APP_STATUS.AUTHORISED) {
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_APP,
@@ -36,7 +35,6 @@ export const receiveResponse = (uri) => {
     } else {
       let app = getState().initializer.app;
       let serviceToRegister = getState().createAccount.serviceToRegister;
-      console.log("We received the share auth MD")
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_SHARE_MD,
         payload: connectWithSharedMd(app, uri, serviceToRegister)

@@ -14,9 +14,13 @@ const createAccount = (state = initialState, action) => {
       return { ...state, error: action.payload };
       break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_SUCCESS`:
-      return { ...state, newAccount: action.payload };
-      break;
-    case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_LOADING`:
+      if (action.payload.newAccount) {
+        return { ...state,
+          newAccount: action.payload.newAccount,
+          accStatus: ACC_STATUS.CREATED
+        };
+      }
+
       return { ...state,
         accStatus: ACC_STATUS.AUTHORISING,
         serviceToRegister: action.payload
@@ -24,7 +28,7 @@ const createAccount = (state = initialState, action) => {
       break;
     case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_ERROR`:
       status = ACC_STATUS.AUTHORISATION_FAILED;
-      if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_AUTH_DENIED) {
+      if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_SHARE_MDATA_DENIED) {
         status = ACC_STATUS.AUTHORISATION_DENIED;
       }
       return { ...state,
@@ -35,7 +39,7 @@ const createAccount = (state = initialState, action) => {
       break;
     case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_SUCCESS`:
       return { ...state,
-        accStatus: ACC_STATUS.AUTHORISED,
+        accStatus: ACC_STATUS.CREATED,
         newAccount: action.payload,
         serviceToRegister: null
       };

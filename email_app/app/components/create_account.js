@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactMaterialSelect from 'react-material-select'
-import { MESSAGES, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
+import { MESSAGES, CONSTANTS, ACC_STATUS, AFE_APP_ERROR_CODES } from '../constants';
 import { ModalPortal } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
 
@@ -34,7 +34,6 @@ export default class CreateAccount extends Component {
     }
 
     return createAccount(emailId)
-      //.then(() => TODO load spinner)
       .catch((err) => {
         if (err.code === SAFE_APP_ERROR_CODES.ERR_DATA_EXISTS
           || err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
@@ -56,20 +55,21 @@ export default class CreateAccount extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { accStatus, createAccountError } = this.props;
-    if (prevProps.accStatus === ACC_STATUS.AUTHORISING) {
+    if (prevProps.accStatus !== ACC_STATUS.CREATED
+        && accStatus === ACC_STATUS.CREATED) {
+      return this.storeCreatedAccount();
+    } else if (prevProps.accStatus === ACC_STATUS.AUTHORISING) {
       switch (accStatus) {
         case ACC_STATUS.AUTHORISATION_DENIED:
           return createAccountError(new Error(MESSAGES.AUTHORISATION_DENIED));
         case ACC_STATUS.AUTHORISATION_FAILED:
           return createAccountError(new Error(MESSAGES.AUTHORISATION_ERROR));
-        case ACC_STATUS.AUTHORISED:
-          return this.storeCreatedAccount();
       };
     }
   };
 
   render() {
-    const { emailIds, networkStatus, processing, error } = this.props;
+    const { emailIds, networkStatus, processing, accStatus, error } = this.props;
 
     const spinnerBackgroundStyle = {
       zIndex: '5',
@@ -83,7 +83,7 @@ export default class CreateAccount extends Component {
     return (
       <div className="create-account">
         {
-          processing.state &&
+          (processing.state || accStatus === ACC_STATUS.AUTHORISING) &&
           <ModalPortal>
             <div style={spinnerBackgroundStyle}>
               <ReactSpinner />

@@ -19,7 +19,7 @@ const APP_INFO = {
     publicNames: '_publicNames'
   },
   permissions: {
-    _publicNames: ['Read', 'Insert', 'Update']
+    _publicNames: ['Read', 'Insert']
   }
 };
 
@@ -35,7 +35,6 @@ const genServiceInfo = (app, emailId) => {
 const requestShareMdAuth = (app, mdPermissions) => {
   return app.auth.genShareMDataUri(mdPermissions)
     .then((resp) => {
-      console.log("SHARE MD URI SENT: ", resp.uri)
       shell.openExternal(parseUrl(resp.uri));
       return null;
     });
@@ -264,35 +263,38 @@ export const setupAccount = (app, emailId) => {
       .then((info) => serviceInfo = info)
       .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
       .then((pubNamesMd) => pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key))
+        // If service container already exists, request permissions to be shared
         .then((encryptedAddr) => pubNamesMd.decrypt(encryptedAddr.buf)
-            // Service container already exists, request permissions to be shared
             .then((servicesXorName) => requestShareMdAuth(app,
-                [{ type_tag: CONSTANTS.TAG_TYPE_DNS, name: servicesXorName, perms: ['Insert'] }] )
-              .then(() => Promise.reject({ servicesXorName,
-                                           emailId: serviceInfo.emailId,
-                                           serviceName: serviceInfo.serviceName
-                                          }))
+                [{ type_tag: CONSTANTS.TAG_TYPE_DNS,
+                   name: servicesXorName,
+                   perms: ['Insert']
+                 }] )
+              .then(() => ({ servicesXorName,
+                             emailId: serviceInfo.emailId,
+                             serviceName: serviceInfo.serviceName
+                           }))
             )
-          , (err) => {
-            if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
-              throw err;
-            }
-            // The public ID doesn't exist in _publicNames
-            return genNewAccount(app, serviceInfo.emailId)
-              .then((newAccount) => newAccount.inboxMd.serialise())
+        , (err) => {
+          if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
+            throw err;
+          }
+          // The public ID doesn't exist in _publicNames
+          return genNewAccount(app, serviceInfo.emailId)
+            .then((newAccount) => newAccount.inboxMd.serialise()
               .then((inboxSerialised) => createPublicIdAndEmailService(app,
-                                    pubNamesMd, serviceInfo, inboxSerialised));
-          })
+                                  pubNamesMd, serviceInfo, inboxSerialised))
+              .then(() => ({ newAccount }))
+            )
+        })
       );
 }
 
 export const connectWithSharedMd = (app, uri, serviceToRegister) => {
-  console.log("RECONNECTING...")
   let inboxSerialised;
   let newAccount;
-  return app.loginFromURI(uri)
+  return app.auth.loginFromURI(uri)
       .then(() => app.auth.refreshContainersPermissions())
-      .then(() => console.log("RECONNECTING OK"))
       .then(() => genNewAccount(app, serviceToRegister.emailId))
       .then((account) => newAccount = account)
       .then(() => newAccount.inboxMd.serialise())
