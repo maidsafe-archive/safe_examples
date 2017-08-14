@@ -4,7 +4,7 @@ export const CONSTANTS = {
   TAG_TYPE_INBOX: 15003,
   TAG_TYPE_EMAIL_ARCHIVE: 15004,
   SERVICE_NAME_POSTFIX: "@email",
-  SERVICE_METADATA: {name: "Services container", description: "Services published for public ID"},
+  SERVICE_METADATA: {name: "Services container for", description: "Container where all the services are mapped for the Public ID"},
   ACCOUNT_KEY_EMAIL_INBOX: "inbox",
   ACCOUNT_KEY_EMAIL_ARCHIVE: "archive",
   ACCOUNT_KEY_EMAIL_ID: "email_id",
