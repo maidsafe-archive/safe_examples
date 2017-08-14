@@ -238,8 +238,8 @@ const createPublicIdAndEmailService = (app, pubNamesMd, serviceInfo,
   };
 
   return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inboxSerialised }))
-      //.then((serviceMd) => serviceMd.setMetaData(metadata.name, metadata.description))
+      .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inboxSerialised },
+                                    metadata.name, metadata.description))
       .then((_) => app.mutableData.newMutation()
         .then((mut) => insertEncrypted(pubNamesMd, mut, serviceInfo.publicId, serviceInfo.serviceAddr)
           .then(() => pubNamesMd.applyEntriesMutation(mut))
