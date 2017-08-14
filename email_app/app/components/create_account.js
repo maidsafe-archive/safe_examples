@@ -5,10 +5,25 @@ import { MESSAGES, CONSTANTS, ACC_STATUS, AFE_APP_ERROR_CODES } from '../constan
 import { ModalPortal } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
 
+const spinnerBackgroundStyle = {
+  zIndex: '5',
+  position: 'fixed',
+  height: '100%',
+  width: '100%',
+  opacity: '0.75',
+  backgroundColor: 'white'
+}
+
+const spinnerMessageStyle = {
+  position: 'fixed',
+  top: '55%',
+  width: '100%',
+  textAlign: 'center'
+}
+
 export default class CreateAccount extends Component {
   constructor() {
     super();
-    //this.errMrg = null;
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
     this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
     this.handleChooseAccount = this.handleChooseAccount.bind(this);
@@ -71,15 +86,6 @@ export default class CreateAccount extends Component {
   render() {
     const { emailIds, networkStatus, processing, accStatus, error } = this.props;
 
-    const spinnerBackgroundStyle = {
-      zIndex: '5',
-      position: 'fixed',
-      height: '100%',
-      width: '100%',
-      opacity: '0.75',
-      backgroundColor: 'white'
-    }
-
     return (
       <div className="create-account">
         {
@@ -87,6 +93,11 @@ export default class CreateAccount extends Component {
           <ModalPortal>
             <div style={spinnerBackgroundStyle}>
               <ReactSpinner />
+              { accStatus === ACC_STATUS.AUTHORISING &&
+                <div style={spinnerMessageStyle}>
+                  Authorising access to the services container...
+                </div>
+              }
             </div>
           </ModalPortal>
         }
