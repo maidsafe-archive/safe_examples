@@ -39,9 +39,9 @@ export default class Uploader {
       if (taskStatus && taskStatus.isCompleted) {
         this[status].completed.files += taskStatus.isFile ? 1 : 0;
         this[status].completed.directories += taskStatus.isFile ? 0 : 1;
-      } else {
-        this[status].completed.size += taskStatus ? taskStatus.size : 0;
       }
+
+      this[status].completed.size += taskStatus ? taskStatus.size : 0;
 
       const progress = Math.floor((this[status].completed.size / this[status].total.size) * 100);
 
@@ -49,7 +49,7 @@ export default class Uploader {
         total: this[status].total,
         completed: this[status].completed,
         progress
-      }, progress >= 100);
+      }, progress === 100);
     };
     if (stat.isDirectory()) {
       this[status].total = Helper.getDirectoryStats(this[localPath]);

@@ -48,7 +48,7 @@ class TaskQueue {
         const taskStatus = {
           isFile: true,
           isCompleted: true,
-          size: status.size
+          size: 0
         };
         return this.callback(null, taskStatus);
       }

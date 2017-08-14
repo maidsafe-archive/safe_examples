@@ -68,17 +68,27 @@ export class FileUploadTask extends Task {
 
                          buffer = new Buffer(chunkSize);
                          fs.readSync(fd, buffer, 0, chunkSize, offset);
-                         file.write(buffer)
+                         return file.write(buffer)
                               .then(() => {
                                       offset += chunkSize;
-                                      // Update progress bar
-                                      callback(null, {
-                                        isFile: true,
-                                        isCompleted: false,
-                                        size: offset
-                                      })
+
                                       remainingBytes -= chunkSize;
-                                      offset === size ? file.close().then(() => resolve(file)) : writeFile(remainingBytes);
+
+                                      if(offset === size) {
+                                        callback(null, {
+                                          isFile: true,
+                                          isCompleted: false,
+                                          size: chunkSize
+                                        })
+                                        return file.close().then(() => resolve(file));
+                                      } else {
+                                        callback(null, {
+                                          isFile: true,
+                                          isCompleted: false,
+                                          size: chunkSize
+                                        })
+                                        return writeFile(remainingBytes);
+                                      }
                                })
                                .catch(err => reject(err));
                      };
@@ -103,7 +113,7 @@ export class FileUploadTask extends Task {
         return callback(null, {
           isFile: true,
           isCompleted: true,
-          size: fileStats.size
+          size: 0
         });
       })
       .catch(callback);
