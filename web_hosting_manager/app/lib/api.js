@@ -15,6 +15,7 @@ class SafeApi {
     this.app = null;
     this.APP_INFO = CONSTANTS.APP_INFO;
     this.publicNames = {};
+    this.currentDir = [];
     this.uploader = null;
     this.downloader = null;
   }
@@ -322,10 +323,10 @@ class SafeApi {
         const rootName = path.split('/').slice(3).join('/');
         return serMd.getEntries()
           .then((entries) => entries.forEach((key, val) => {
-            if (val.buf.length === 0) {
-              return;
-            }
             let keyStr = key.toString();
+            if (val.buf.length === 0) {
+              return result.unshift({ isFile: true, name: keyStr, size: 0 });
+            }
             if (rootName && (keyStr.indexOf(rootName) !== 0)) {
               return;
             }
@@ -355,7 +356,10 @@ class SafeApi {
                     size: co.length
                   });
                 });
-            })).then(() => result);
+            })).then(() => {
+              this.currentDir = result;
+              return result;
+            });
           });
       });
   }

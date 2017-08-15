@@ -4,6 +4,10 @@ let menu;
 let template;
 let mainWindow = null;
 
+const mockRes = () => {
+  sendResponse('safe-bmV0Lm1haWRzYWZlLndlYmhvc3RpbmdtYW5hZ2Vy:AQAAAH1cjoIAAAAAAAAAACAAAAAAAAAA7P8vAEC9m7Sg3XwbbF75mVYf5Apa84aqRquCTyAG7uogAAAAAAAAALEeq-DebDWqsqMjO6GB55F-hajEy1j0NZlfkMSBxLzwIAAAAAAAAABo4PmCcwPYR_1VAeVx8Y80b0TZHrsrfVRjeb-EAYD5b0AAAAAAAAAAVp72yqqMbhKIpM-2jQsCAm7VZrTAEAxYoX5NREaqCrpo4PmCcwPYR_1VAeVx8Y80b0TZHrsrfVRjeb-EAYD5byAAAAAAAAAAIhs_lgWeR8BPeaRl1wGRwhJFGbpnnIVYUPWGgbd3mHAgAAAAAAAAAIV5WXjkhUWLZNNdDFQ4ZeUfU-uXdByjXIq0Exdat2STAAAAAAAAAAAAAAAAAAAAAO-bo10EfLz8YGB0DZbt7KvhxtVNiF4X0g8qRF7wf-bdmDoAAAAAAAAYAAAAAAAAACPXPpWkSSQ687emzE7ZYT_IoHj1icBBEg==');
+};
+
 const sendResponse = (success) => {
   mainWindow.webContents.send('auth-response', success ? success : '');
 };
@@ -84,7 +88,6 @@ app.on('ready', async () => {
   if (shouldQuit) {
     app.quit();
   }
-
   if (process.env.NODE_ENV === 'development') {
     mainWindow.openDevTools();
     mainWindow.webContents.on('context-menu', (e, props) => {
@@ -109,6 +112,11 @@ app.on('ready', async () => {
         label: '&Clear Access Data',
         click() {
           clearAccessData();
+        }
+      }, {
+        label: '&Mock res',
+        click() {
+          mockRes();
         }
       }, {
         type: 'separator'
