@@ -4,12 +4,14 @@ export const CONSTANTS = {
   TAG_TYPE_INBOX: 15003,
   TAG_TYPE_EMAIL_ARCHIVE: 15004,
   SERVICE_NAME_POSTFIX: "@email",
+  SERVICE_METADATA: {name: "Services container for", description: "Container where all the services are mapped for the Public ID"},
   ACCOUNT_KEY_EMAIL_INBOX: "inbox",
   ACCOUNT_KEY_EMAIL_ARCHIVE: "archive",
   ACCOUNT_KEY_EMAIL_ID: "email_id",
   ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY: "email_enc_sk",
   ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY: "email_enc_pk",
   MD_KEY_EMAIL_ENC_PUBLIC_KEY: "__email_enc_pk",
+  MD_META_KEY: '_metadata',
   TOTAL_INBOX_SIZE: 100,
   EMAIL_ID_MAX_LENGTH: 100,
   HOME_TABS: {
@@ -31,7 +33,17 @@ export const APP_STATUS = {
   READY: 'READY'
 }
 
+export const ACC_STATUS = {
+  CREATING: 'CREATING',
+  FAILED: 'FAILED',
+  CREATED: 'CREATED',
+  AUTHORISING: 'AUTHORISING',
+  AUTHORISATION_FAILED: 'AUTHORISATION_FAILED',
+  AUTHORISATION_DENIED: 'AUTHORISATION_DENIED'
+}
+
 export const SAFE_APP_ERROR_CODES = {
+  ERR_SHARE_MDATA_DENIED: -206,
   ERR_AUTH_DENIED: -200,
   ENTRY_ALREADY_EXISTS: -107,
   ERR_NO_SUCH_ENTRY: -106,

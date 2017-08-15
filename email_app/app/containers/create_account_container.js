@@ -5,6 +5,7 @@ import { storeNewAccount, refreshConfig } from '../actions/initializer_actions';
 
 const mapStateToProps = state => {
   return {
+    accStatus: state.createAccount.accStatus,
     error: state.createAccount.error,
     processing: state.initializer.processing,
     emailIds: state.initializer.emailIds,
