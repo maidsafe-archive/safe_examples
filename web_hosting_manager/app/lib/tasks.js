@@ -32,6 +32,7 @@ export class FileUploadTask extends Task {
     super();
     this.localPath = localPath;
     this.networkPath = networkPath;
+    this.cancelled = false;
   }
 
   execute(callback) {
@@ -56,11 +57,16 @@ export class FileUploadTask extends Task {
                      // QUESTION: What's the ideal chunk size?
                      // Should it be dynamically based on total file size?
                      // Probably should be dynamically set because recursing /
-                     // through file write greatly slows down upload process
+                     // through file write greatly slows down upload process /
+                     // depending on file size vs chunk size
                      // Currently set to 1 Mb
                      let chunkSize = 1000000;
                      let buffer = null;
                      const writeFile = (remainingBytes) => {
+
+                        if(this.cancelled) {
+                          return reject(new Error('Upload cancelled'));
+                        }
 
                         if(remainingBytes < chunkSize) {
                           chunkSize = remainingBytes;

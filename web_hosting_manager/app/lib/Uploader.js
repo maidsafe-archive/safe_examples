@@ -10,6 +10,7 @@ const progressCb = Symbol('progressCb');
 const networkPath = Symbol('networkPath');
 const dirName = Symbol('dirName');
 const taskQueue = Symbol('taskQueue');
+const currentTask = Symbol('currentTask');
 
 export default class Uploader {
 
@@ -26,6 +27,7 @@ export default class Uploader {
       errored: false,
       cancelled: false
     };
+    this[currentTask] = undefined;
   }
 
   start() {
@@ -59,17 +61,21 @@ export default class Uploader {
       this[taskQueue].run();
     } else {
       const fileName = path.basename(this[localPath]);
-      const task = new FileUploadTask(this[localPath], `${this[networkPath]}/${fileName}`);
+      this[currentTask] = new FileUploadTask(this[localPath], `${this[networkPath]}/${fileName}`);
       this[status].total = new Helper.DirStats();
       this[status].total.size = fs.statSync(this[localPath]).size;
       this[status].completed = new Helper.DirStats();
       this[status].total.files = 1;
-      task.execute(callback);
+      this[currentTask].execute(callback);
     }
   }
 
   cancel() {
-    this[taskQueue].cancel();
+    if(this[taskQueue]) {
+      this[taskQueue].cancel();
+    } else {
+      this[currentTask].cancelled = true;
+    }
     this[status].cancelled = true;
   }
 
