@@ -1,5 +1,6 @@
 import ACTION_TYPES from './actionTypes';
-import { authApp, connect, reconnect, fetchEmailIds, readConfig,
+import { APP_STATUS } from '../constants';
+import { authApp, connect, reconnect, connectWithSharedMd, fetchEmailIds, readConfig,
           writeConfig, readInboxEmails, readArchivedEmails } from '../safenet_comm';
 
 export const setInitializerTask = (task) => ({
@@ -24,11 +25,21 @@ const newNetStatusCallback = (dispatch) => {
 };
 
 export const receiveResponse = (uri) => {
-  return function (dispatch) {
-    return dispatch({
-      type: ACTION_TYPES.AUTHORISE_APP,
-      payload: connect(uri, newNetStatusCallback(dispatch))
-    });
+  return function (dispatch, getState) {
+    let appStatus = getState().initializer.appStatus;
+    if (appStatus === APP_STATUS.AUTHORISED) {
+      return dispatch({
+        type: ACTION_TYPES.AUTHORISE_APP,
+        payload: connect(uri, newNetStatusCallback(dispatch))
+      });
+    } else {
+      let app = getState().initializer.app;
+      let serviceToRegister = getState().createAccount.serviceToRegister;
+      return dispatch({
+        type: ACTION_TYPES.AUTHORISE_SHARE_MD,
+        payload: connectWithSharedMd(app, uri, serviceToRegister)
+      });
+    }
   };
 };
 
