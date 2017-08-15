@@ -9,7 +9,11 @@ const initialState = {
   fetchedServices: false,
   creatingService: false,
   remapping: false,
-  error: null
+  error: null,
+  errorCode: null,
+  isMDAuthorised: false,
+  isMDAuthorising: false,
+  isMDAuthorisedAck: false,
 };
 
 const service = (state: Object = initialState, action: Object) => {
@@ -64,7 +68,8 @@ const service = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         creatingService: false,
-        error: parseErrorMsg(action.payload, MD_TARGET.PUBLIC_ID)
+        error: parseErrorMsg(action.payload, MD_TARGET.PUBLIC_ID),
+        errorCode: action.payload.code
       };
       break;
 
@@ -88,7 +93,8 @@ const service = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         creatingService: false,
-        error: parseErrorMsg(action.payload, MD_TARGET.PUBLIC_ID)
+        error: parseErrorMsg(action.payload, MD_TARGET.PUBLIC_ID),
+        errorCode: action.payload.code
       };
       break;
 
@@ -121,6 +127,36 @@ const service = (state: Object = initialState, action: Object) => {
         error: undefined,
         remapping: false
       };
+      break;
+    case `${ACTION_TYPES.MD_AUTH_REQUEST}_PENDING`:
+      state = {
+        ...state,
+        isMDAuthorising: true,
+        isMDAuthorised: false,
+        isMDAuthorisedAck: false,
+        error: null
+      };
+      break;
+    case `${ACTION_TYPES.MD_CONNECT}_FULFILLED`:
+      state = {
+        ...state,
+        isMDAuthorising: false,
+        isMDAuthorised: true
+      };
+      break;
+    case `${ACTION_TYPES.MD_CONNECT}_REJECTED`:
+      state = {
+        ...state,
+        isMDAuthorising: false,
+        isMDAuthorised: false,
+        error: 'Failed to authorise MD'
+      };
+      break;
+    case ACTION_TYPES.MD_CONNECT_ACK:
+      state = {
+        ...state,
+        isMDAuthorisedAck: true
+      }
       break;
   }
   return state;

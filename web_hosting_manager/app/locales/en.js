@@ -87,7 +87,11 @@ const en = {
     serviceNotFound: 'No such service available for this public Name',
     tooManyEntries: 'Mutable data has reached its maximum entries',
     noMoreService: 'No more services allowed for current public ID',
-    noMoreFiles: 'No more files can be added to current service'
+    noMoreFiles: 'No more files can be added to current service',
+    mdAuthReqTitle: 'Mutable Data Authourisation',
+    mdAuthReqDesc: '%{name} can not be modified. Will require authorisation to be provided for modifying the contents in the container. Send authorisation request now?',
+    mdAuthorisedTitle: 'Mutable Data Authourisation',
+    mdAuthorisedDesc: '%{name} has been granted permission!'
   }
 };
 

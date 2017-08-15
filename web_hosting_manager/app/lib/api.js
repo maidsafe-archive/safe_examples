@@ -71,6 +71,28 @@ class SafeApi {
     return this.app.reconnect();
   }
 
+  sendMDReq(mdPermissions) {
+    return this.app.auth.genShareMDataUri(mdPermissions)
+      .then((res) => utils.openExternal(res.uri));
+  }
+
+  authoriseMD(publicName) {
+    return this.getPublicNamesContainer()
+    .then((md) => this.getMDataValueForKey(md, publicName))
+    .then((xorName) => this.sendMDReq([{
+      type_tag: CONSTANTS.TAG_TYPE.DNS,
+      name: xorName,
+      perms: ['Insert', `Update`]
+    }]))
+  }
+
+  connectSharedMD(resURI) {
+    return safeApp.fromAuthURI(this.APP_INFO.data, resURI)
+      .then((res) => {
+        console.log('connected with MD');
+      });
+  }
+
   /**
    * Check access containers accessible
    * @return {*}
@@ -113,6 +135,9 @@ class SafeApi {
               return md.decrypt(key)
                 .then((decKey) => {
                   const decPubId = decKey.toString();
+                  if (decPubId === CONSTANTS.MD_META_KEY) {
+                    return;
+                  }
                   if (!self.publicNames[decPubId] || typeof self.publicNames[decPubId] !== 'object') {
                     self.publicNames[decPubId] = {};
                   }
@@ -144,7 +169,7 @@ class SafeApi {
           .then((entries) => entries.forEach((key, val) => {
             const service = key.toString();
             // check service is not an email or deleted
-            if ((service.indexOf('@email') !== -1) || (val.buf.length === 0)) {
+            if ((service.indexOf('@email') !== -1) || (val.buf.length === 0) || service === CONSTANTS.MD_META_KEY) {
               return;
             }
             services[service] = val;
@@ -173,19 +198,13 @@ class SafeApi {
       return Promise.reject(err);
     }
 
+    const metaName = `Services container for: ${publicName}`;
+    const metaDesc = `Container where all the services are mapped for the Public ID: ${publicName}`;
+
     return this.app.crypto.sha3Hash(name)
       .then((hashedName) => this.app.mutableData.newPublic(hashedName, CONSTANTS.TAG_TYPE.DNS))
       .then((md) => {
-        return this.app.mutableData.newPermissionSet()
-          .then((permSet) => permSet.setAllow('Insert')
-            .then(() => permSet.setAllow('Update'))
-            .then(() => permSet.setAllow('Delete'))
-            .then(() => permSet))
-          .then((permSet) => this.app.crypto.getAppPubSignKey()
-            .then((signKey) => this.app.mutableData.newPermissions()
-              .then((perm) => perm.insertPermissionSet(signKey, permSet).then(() => perm))))
-          .then((perm) => this.app.mutableData.newEntries()
-            .then((entries) => md.put(perm, entries)))
+        return md.quickSetup({}, metaName, metaDesc)
           .then(() => md.getNameAndTag())
           .then((mdMeta) => this.getPublicNamesContainer()
             .then((pubMd) => this._insertToMData(pubMd, name, mdMeta.name, true)));
@@ -232,13 +251,22 @@ class SafeApi {
       .then((hashedPubName) => this.app.mutableData.newPublic(hashedPubName, CONSTANTS.TAG_TYPE.DNS))
       .then((md) => this._removeFromMData(md, serviceName));
   }
-
-  createServiceContainer(path) {
+  
+  createServiceContainer(path, meta) {
+    const metaName = `Service Root Directory for: ${meta}`;
+    const metaDesc = `Has the files hosted for the service: ${meta}`;
     return this.app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE.WWW)
-      .then((md) => md.quickSetup({}).then(() => md.getNameAndTag()))
+      .then((md) => md.quickSetup({}, metaName, metaDesc).then(() => md.getNameAndTag()))
       .then((mdMeta) => this.getPublicContainer()
         .then((pubMd) => this._insertToMData(pubMd, path, mdMeta.name))
         .then(() => mdMeta.name));
+  }
+
+  checkPublicNameAccessible(publicName) {
+    return this.getPublicNamesContainer()
+        .then((md) => this.getMDataValueForKey(md, publicName))
+        .then((decVal) => this.app.mutableData.newPublic(decVal, CONSTANTS.TAG_TYPE.DNS))
+        .then((md) => this._checkMDAccessible(md));
   }
 
   getPublicContainerKeys() {
@@ -320,13 +348,13 @@ class SafeApi {
         const files = [];
         let result = [];
         const rootName = path.split('/').slice(3).join('/');
-        return serMd.getEntries()
+        return this._checkMDAccessible(serMd).then(() => serMd.getEntries())
           .then((entries) => entries.forEach((key, val) => {
             if (val.buf.length === 0) {
               return;
             }
             let keyStr = key.toString();
-            if (rootName && (keyStr.indexOf(rootName) !== 0)) {
+            if ((rootName && (keyStr.indexOf(rootName) !== 0)) || keyStr === CONSTANTS.MD_META_KEY) {
               return;
             }
             let keyStrTrimmed = keyStr;
@@ -426,6 +454,12 @@ class SafeApi {
     return md.encryptKey(key)
       .then((encKey) => md.get(encKey))
       .then((value) => md.decrypt(value.buf));
+  }
+
+  _checkMDAccessible(md) {
+    return md.getPermissions()
+      .then((perm) => this.app.crypto.getAppPubSignKey()
+        .then((signKey) => perm.getPermissionSet(signKey)));
   }
 
   _updateMDataKey(md, key, value) {

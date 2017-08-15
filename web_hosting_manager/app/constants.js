@@ -46,7 +46,8 @@ const CONSTANTS = {
     SYMMETRIC_DECIPHER_FAILURE: -3,
     ACCESS_DENIED: -100,
     NO_SUCH_ENTRY: -106,
-    ENTRY_EXISTS: -107
+    ENTRY_EXISTS: -107,
+    INVALID_SIGN_KEY_HANDLE: -1011
   },
   MAX_FILE_SIZE: 20 * 1024 * 1024,
   NETWORK_STATE: {
@@ -61,6 +62,7 @@ const CONSTANTS = {
   FILE_READ: {
     FROM_START: 0,
     TILL_END: 0
-  }
+  },
+  MD_META_KEY: '_metadata'
 };
 export default CONSTANTS;
