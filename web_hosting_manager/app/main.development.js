@@ -12,7 +12,6 @@ const clearAccessData = () => {
   mainWindow.webContents.send('clear-access-data', true);
 };
 
-
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support'); // eslint-disable-line
   sourceMapSupport.install();
@@ -84,7 +83,6 @@ app.on('ready', async () => {
   if (shouldQuit) {
     app.quit();
   }
-
   if (process.env.NODE_ENV === 'development') {
     mainWindow.openDevTools();
     mainWindow.webContents.on('context-menu', (e, props) => {

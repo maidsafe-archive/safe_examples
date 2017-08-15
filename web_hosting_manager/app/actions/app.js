@@ -38,7 +38,15 @@ export const connect = (authRes: String) => {
   if (!authRes && !utils.localAuthInfo.get()) {
     return sendAuthRequest();
   }
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    console.log('getState', getState(), authRes);
+    const state = getState();
+    if (state.service.isMDAuthorising) {
+      return dispatch({
+        type: ACTION_TYPES.MD_CONNECT,
+        payload: api.connectSharedMD(authRes)
+      });
+    }
     return dispatch({
       type: ACTION_TYPES.CONNECT,
       payload: api.connect(authRes, nwStateCallback(dispatch))
@@ -64,6 +72,13 @@ export const onAuthFailure = (error: Object) => {
     type: ACTION_TYPES.ON_AUTH_FAILURE,
     payload: error
   };
+};
+
+export const authoriseMD = (publicName) => {
+  return {
+    type: ACTION_TYPES.MD_AUTH_REQUEST,
+    payload: api.authoriseMD(publicName)
+  }
 };
 
 export const getAccessInfo = () => {
@@ -93,19 +108,21 @@ export const createPublicId = (publicId: string) => {
 export const createContainerAndService = (publicId: string, service: string,
                                           conatinerName: string, parentConatiner: string) => {
   const path = `${parentConatiner}/${publicId}/${conatinerName}`;
+  const metaName = `${service}.${publicId}`;
   return {
     type: ACTION_TYPES.CREATE_CONTAINER_AND_SERVICE,
-    payload: api.updateServiceIfExist(publicId, service, path)
-      .then((exist) => {
-        if (!exist) {
-          return api.createServiceContainer(path)
-            .then((name) => {
-              return api.createService(publicId, service, name);
-            });
-        }
-        return Promise.resolve(true);
-      })
-      .then(() => api.fetchServices())
+    payload: api.checkPublicNameAccessible(publicId)
+    .then(() => api.updateServiceIfExist(publicId, service, path)
+    .then((exist) => {
+      if (!exist) {
+        return api.createServiceContainer(path, metaName)
+          .then((name) => {
+            return api.createService(publicId, service, name);
+          });
+      }
+      return Promise.resolve(true);
+    })
+    .then(() => api.fetchServices()))
   };
 };
 
@@ -239,3 +256,7 @@ export const clearAccessData = () => {
     type: ACTION_TYPES.CLEAR_ACCESS_DATA
   };
 };
+
+export const ackMDConnect = () => ({
+  type: ACTION_TYPES.MD_CONNECT_ACK
+});
