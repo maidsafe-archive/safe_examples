@@ -11,6 +11,7 @@ export const CONSTANTS = {
   ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY: "email_enc_sk",
   ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY: "email_enc_pk",
   MD_KEY_EMAIL_ENC_PUBLIC_KEY: "__email_enc_pk",
+  MD_META_KEY: '_metadata',
   TOTAL_INBOX_SIZE: 100,
   EMAIL_ID_MAX_LENGTH: 100,
   HOME_TABS: {

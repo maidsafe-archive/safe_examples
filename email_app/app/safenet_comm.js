@@ -99,12 +99,14 @@ const fetchPublicIds = (app) => {
           }
 
           return pubNamesMd.decrypt(entry.key)
-            .then((decKey) => pubNamesMd.decrypt(entry.value.buf)
-              .then((decVal) => publicIds.push({
-                  id: decKey.toString(),
-                  service: decVal
-                })
-              ));
+            .then((decKey) => {
+              const id = decKey.toString();
+              if (id === CONSTANTS.MD_META_KEY) { // Skip the metadata entry
+                return Promise.resolve();
+              }
+              return pubNamesMd.decrypt(entry.value.buf)
+                .then((service) => publicIds.push({ id, service }));
+            });
         })))
       ))
     .then(() => publicIds);
@@ -123,7 +125,8 @@ export const fetchEmailIds = (app) => {
               })
               .then(() => Promise.all(rawEmailIds.map((emailId) => {
                 // Let's filter out the services which are not email services,
-                // i.e. those which don't have the `@email` postfix
+                // i.e. those which don't have the `@email` postfix.
+                // This will filter out the MD metadata entry also.
                 const regex = new RegExp('.*(?=' + CONSTANTS.SERVICE_NAME_POSTFIX +'$)', 'g');
                 let res = regex.exec(emailId);
                 if (res) {
