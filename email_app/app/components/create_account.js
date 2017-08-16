@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactMaterialSelect from 'react-material-select'
-import { MESSAGES, CONSTANTS, ACC_STATUS, AFE_APP_ERROR_CODES } from '../constants';
+import { MESSAGES, CONSTANTS, ACC_STATUS, SAFE_APP_ERROR_CODES } from '../constants';
 import { ModalPortal } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
 
