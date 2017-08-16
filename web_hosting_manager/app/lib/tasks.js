@@ -54,12 +54,6 @@ export class FileUploadTask extends Task {
                      const fd = fs.openSync(this.localPath, 'r');
                      let offset = 0;
                      const size = fileStats.size;
-                     // QUESTION: What's the ideal chunk size?
-                     // Should it be dynamically based on total file size?
-                     // Probably should be dynamically set because recursing /
-                     // through file write greatly slows down upload process /
-                     // depending on file size vs chunk size
-                     // Currently set to 1 Mb
                      let chunkSize = 1000000;
                      let buffer = null;
                      const writeFile = (remainingBytes) => {
