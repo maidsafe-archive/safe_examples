@@ -65,7 +65,7 @@ export class FileUploadTask extends Task {
                      const writeFile = (remainingBytes) => {
 
                         if(this.cancelled) {
-                          return reject(new Error('Upload cancelled'));
+                          return reject(new Error());
                         }
 
                         if(remainingBytes < chunkSize) {
