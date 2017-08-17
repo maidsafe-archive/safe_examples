@@ -12,6 +12,10 @@ const clearAccessData = () => {
   mainWindow.webContents.send('clear-access-data', true);
 };
 
+const sendMockRes = () => {
+  sendResponse('safe-bmV0Lm1haWRzYWZlLndlYmhvc3RpbmdtYW5hZ2Vy:AQAAACqp-6UAAAAAAAAAACAAAAAAAAAA2RbZ_7y6PDEpn6heUXDcqVIFJpzf-av4KPtQy2uJVNggAAAAAAAAAHMldhXHNCFBbPt39JfcUhNmN2CXpabk6Qt662DVPDVQIAAAAAAAAACrFH5jL86kM5-RA25VMRzD6URggrT1D0nCfIy_GQhQWUAAAAAAAAAADbkmmSraZyX8xUpBANi_bm4wupk7EWnmxMsJuJHbrI-rFH5jL86kM5-RA25VMRzD6URggrT1D0nCfIy_GQhQWSAAAAAAAAAARYWJGjJFAuC3bWesGzaoLcQxI39WZJhpvQfGrODUsyIgAAAAAAAAAD0dB0Jvt3_l-QJetgC_kwjUhz_B3e9nszHUsRkDyFe7AAAAAAAAAAAAAAAAAAAAAMVfSdxjWEALnHA164ji2UNXNMij59zRpfxJaKm3-ADGmDoAAAAAAAAYAAAAAAAAAHeJ-Vk-eeeaS0pYQ5nZhxhTKZr0uvPyhA==');
+};
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support'); // eslint-disable-line
   sourceMapSupport.install();
@@ -25,7 +29,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  app.quit();
 });
 
 
@@ -83,6 +87,7 @@ app.on('ready', async () => {
   if (shouldQuit) {
     app.quit();
   }
+
   if (process.env.NODE_ENV === 'development') {
     mainWindow.openDevTools();
     mainWindow.webContents.on('context-menu', (e, props) => {
@@ -103,11 +108,6 @@ app.on('ready', async () => {
       submenu: [{
         label: 'About',
         selector: 'orderFrontStandardAboutPanel:'
-      }, {
-        label: '&Clear Access Data',
-        click() {
-          clearAccessData();
-        }
       }, {
         type: 'separator'
       }, {
@@ -227,6 +227,15 @@ app.on('ready', async () => {
       }]
     }];
 
+    if (process.env.NODE_ENV === 'development') {
+      template[0].submenu.unshift({
+        label: '&Simulate Mock Response',
+        click() {
+          sendMockRes();
+        }
+      });
+    }
+
     menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
   } else {
@@ -296,6 +305,16 @@ app.on('ready', async () => {
         }
       }]
     }];
+
+    if (process.env.NODE_ENV === 'development') {
+      template[0].submenu.unshift({
+        label: '&Simulate Mock Response',
+        click() {
+          sendMockRes();
+        }
+      });
+    }
+    
     menu = Menu.buildFromTemplate(template);
     mainWindow.setMenu(menu);
   }

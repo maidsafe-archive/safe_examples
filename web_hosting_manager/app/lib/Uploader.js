@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { I18n } from 'react-redux-i18n';
 import * as Helper from './utils';
 import { FileUploadTask } from './tasks';
+import CONSTANTS from '../constants';
 
 const status = Symbol('status');
 const errorCb = Symbol('errorCb');
@@ -66,6 +68,14 @@ export default class Uploader {
       this[status].total.size = fs.statSync(this[localPath]).size;
       this[status].completed = new Helper.DirStats();
       this[status].total.files = 1;
+      if (this[status].total.size > CONSTANTS.MAX_FILE_SIZE) {
+        callback(new Error(I18n.t('messages.restrictedFileSize', { size: (CONSTANTS.MAX_FILE_SIZE / 1000000) })))
+        return this[progressCb]({
+          total: 0,
+          completed: 0,
+          progress: 0
+        }, true);
+      }
       this[currentTask].execute(callback);
     }
   }
