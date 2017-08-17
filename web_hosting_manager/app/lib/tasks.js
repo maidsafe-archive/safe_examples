@@ -32,6 +32,7 @@ export class FileUploadTask extends Task {
     super();
     this.localPath = localPath;
     this.networkPath = networkPath;
+    this.cancelled = false;
   }
 
   execute(callback) {
@@ -40,32 +41,81 @@ export class FileUploadTask extends Task {
       return callback(new Error('App not registered'));
     }
     const containerPath = parseContainerPath(this.networkPath);
+    const fileStats = fs.statSync(this.localPath);
 
     return safeApi.getPublicContainer()
       .then((md) => safeApi.getMDataValueForKey(md, containerPath.target))
       .then((val) => app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
-        return nfs.create(fs.readFileSync(this.localPath))
-          .then((file) => nfs.insert(containerPath.file, file)
-            .catch((err) => {
-              if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
-                return callback(err);
-              }
-              return mdata.get(containerPath.file)
-                .then((value) => {
-                  if (value.buf.length !== 0) {
+        return nfs.open()
+              .then(file => {
+                  return new Promise((resolve, reject) => {
+                     const fd = fs.openSync(this.localPath, 'r');
+                     let offset = 0;
+                     const size = fileStats.size;
+                     let chunkSize = 1000000;
+                     let buffer = null;
+                     const writeFile = (remainingBytes) => {
+
+                        if(this.cancelled) {
+                          return reject(new Error());
+                        }
+
+                        if(remainingBytes < chunkSize) {
+                          chunkSize = remainingBytes;
+                        }
+
+                         buffer = new Buffer(chunkSize);
+                         fs.readSync(fd, buffer, 0, chunkSize, offset);
+                         return file.write(buffer)
+                              .then(() => {
+                                      offset += chunkSize;
+
+                                      remainingBytes -= chunkSize;
+
+                                      if(offset === size) {
+                                        callback(null, {
+                                          isFile: true,
+                                          isCompleted: false,
+                                          size: chunkSize
+                                        })
+                                        return file.close().then(() => resolve(file));
+                                      } else {
+                                        callback(null, {
+                                          isFile: true,
+                                          isCompleted: false,
+                                          size: chunkSize
+                                        })
+                                        return writeFile(remainingBytes);
+                                      }
+                               })
+                               .catch(err => reject(err));
+                     };
+                     writeFile(size);
+                  });
+               })
+              .then((file) => nfs.insert(containerPath.file, file)
+                .catch((err) => {
+                  if (err.code !== CONSTANTS.ERROR_CODE.ENTRY_EXISTS) {
                     return callback(err);
                   }
-                  return nfs.update(containerPath.file, file, value.version + 1);
-                });
-            }));
+                  return mdata.get(containerPath.file)
+                    .then((value) => {
+                      if (value.buf.length !== 0) {
+                        return callback(err);
+                      }
+                      return nfs.update(containerPath.file, file, value.version + 1);
+                    });
+                }));
       })
-      .then(() => callback(null, {
-        isFile: true,
-        isCompleted: true,
-        size: fs.statSync(this.localPath).size
-      }))
+      .then(() => {
+        return callback(null, {
+          isFile: true,
+          isCompleted: true,
+          size: 0
+        });
+      })
       .catch(callback);
   }
 }

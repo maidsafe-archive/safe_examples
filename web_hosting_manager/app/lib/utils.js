@@ -31,6 +31,7 @@ class TaskQueue {
     this.callback = callback;
     this.queue = [];
     this.cancelled = false;
+    this.index = 0;
   }
 
   add(task) {
@@ -38,20 +39,26 @@ class TaskQueue {
   }
 
   run() {
-    let index = 0;
     const next = (err, status) => {
       if (!this.cancelled) {
         this.callback(err, status);
+      } else {
+        this.queue[this.index].cancelled = true;
       }
-      index += 1;
-      if (this.queue.length === index) {
-        return this.callback(undefined, undefined, true);
+      this.index += 1;
+      if (this.queue.length === this.index) {
+        const taskStatus = {
+          isFile: true,
+          isCompleted: true,
+          size: 0
+        };
+        return this.callback(null, taskStatus);
       }
-      if (!this.cancelled && this.queue[index]) {
-        this.queue[index].execute(next);
+      if (!this.cancelled && this.queue[this.index]) {
+        this.queue[this.index].execute(next);
       }
     };
-    this.queue[index].execute(next);
+    this.queue[this.index].execute(next);
   }
 
   cancel() {
