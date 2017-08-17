@@ -51,6 +51,16 @@ ipc.on('clear-access-data', (event, res) => {
   }
 });
 
+// disable drag and drop
+window.document.addEventListener('drop', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+});
+window.document.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+});
+
 
 render(
   <Provider store={store}>

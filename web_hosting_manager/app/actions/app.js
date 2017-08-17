@@ -39,7 +39,6 @@ export const connect = (authRes: String) => {
     return sendAuthRequest();
   }
   return (dispatch, getState) => {
-    console.log('getState', getState(), authRes);
     const state = getState();
     if (state.service.isMDAuthorising) {
       return dispatch({
@@ -175,13 +174,15 @@ export const getContainer = (containerPath: string) => {
 export const upload = (localPath: string, networkPath: string) => {
   return (dispatch) => {
     const progressCallback = (status, isCompleted) => {
-      dispatch({
-        type: isCompleted ? ACTION_TYPES.UPLOAD_COMPLETED : ACTION_TYPES.UPLOADING,
-        payload: status
-      });
-      if (isCompleted) {
-        dispatch(getContainer(networkPath));
-      }
+      setTimeout(() => {
+        dispatch({
+          type: isCompleted ? ACTION_TYPES.UPLOAD_COMPLETED : ACTION_TYPES.UPLOADING,
+          payload: status
+        });
+        if (isCompleted) {
+          dispatch(getContainer(networkPath));
+        }
+      }, 200);
     };
     const errorCallback = (error) => {
       dispatch({
