@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { I18n } from 'react-redux-i18n';
 import * as Helper from './utils';
 import { FileUploadTask } from './tasks';
+import CONSTANTS from '../constants';
 
 const status = Symbol('status');
 const errorCb = Symbol('errorCb');
@@ -10,6 +12,7 @@ const progressCb = Symbol('progressCb');
 const networkPath = Symbol('networkPath');
 const dirName = Symbol('dirName');
 const taskQueue = Symbol('taskQueue');
+const currentTask = Symbol('currentTask');
 
 export default class Uploader {
 
@@ -26,6 +29,7 @@ export default class Uploader {
       errored: false,
       cancelled: false
     };
+    this[currentTask] = undefined;
   }
 
   start() {
@@ -40,8 +44,11 @@ export default class Uploader {
         this[status].completed.files += taskStatus.isFile ? 1 : 0;
         this[status].completed.directories += taskStatus.isFile ? 0 : 1;
       }
+
       this[status].completed.size += taskStatus ? taskStatus.size : 0;
+
       const progress = Math.floor((this[status].completed.size / this[status].total.size) * 100);
+
       return this[progressCb]({
         total: this[status].total,
         completed: this[status].completed,
@@ -56,17 +63,29 @@ export default class Uploader {
       this[taskQueue].run();
     } else {
       const fileName = path.basename(this[localPath]);
-      const task = new FileUploadTask(this[localPath], `${this[networkPath]}/${fileName}`);
+      this[currentTask] = new FileUploadTask(this[localPath], `${this[networkPath]}/${fileName}`);
       this[status].total = new Helper.DirStats();
       this[status].total.size = fs.statSync(this[localPath]).size;
       this[status].completed = new Helper.DirStats();
       this[status].total.files = 1;
-      task.execute(callback);
+      if (this[status].total.size > CONSTANTS.MAX_FILE_SIZE) {
+        callback(new Error(I18n.t('messages.restrictedFileSize', { size: (CONSTANTS.MAX_FILE_SIZE / 1000000) })))
+        return this[progressCb]({
+          total: 0,
+          completed: 0,
+          progress: 0
+        }, true);
+      }
+      this[currentTask].execute(callback);
     }
   }
 
   cancel() {
-    this[taskQueue].cancel();
+    if(this[taskQueue]) {
+      this[taskQueue].cancel();
+    } else {
+      this[currentTask].cancelled = true;
+    }
     this[status].cancelled = true;
   }
 
