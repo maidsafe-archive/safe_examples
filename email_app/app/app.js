@@ -12,14 +12,19 @@ const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 
 let menu = Menu.getApplicationMenu();
-menu.items[4].submenu.append(new MenuItem({ label: 'Error Logs', click() {
-  const state = store.getState();
-  state.initializer.app.logPath()
-  .then((path) => {
-    console.log('Log file located at: ', path);
-    shell.openExternal(path);
-  })
-} }))
+menu.items.map((item) => {
+  if (item.label == "Help") {
+    console.log(item);
+    item.submenu.append(new MenuItem({ label: 'Error Logs', click() {
+      const state = store.getState();
+      state.initializer.app.logPath()
+      .then((path) => {
+        console.log('Log file located at: ', path);
+        shell.openExternal(path);
+      })
+    } }))
+  }
+})
 
 ipc.on('auth-response', (event, response) => {
   if (response && response.indexOf('safe-') == 0) {

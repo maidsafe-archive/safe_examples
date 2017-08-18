@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react';
-import { remote, ipcRenderer as ipc } from 'electron';
+import { ipcRenderer as ipc, remote, shell } from 'electron';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router, hashHistory } from 'react-router';
@@ -18,6 +18,7 @@ import './app.global.css';
 
 const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
+const { Menu, MenuItem } = remote;
 
 let locale = remote.app.getLocale();
 let translationConfig = loadLocale(locale);
@@ -25,6 +26,22 @@ if (!translationConfig) {
   locale = 'en';
   translationConfig = loadLocale(locale);
 }
+
+let menu = Menu.getApplicationMenu();
+menu.items.map((item) => {
+  if (item.label == "Help") {
+    console.log(item);
+    console.log(MenuItem);
+    item.submenu.append(new MenuItem({ label: 'Error Logs', click() {
+      const state = store.getState();
+      state.initializer.app.logPath()
+      .then((path) => {
+        console.log('Log file located at: ', path);
+        shell.openExternal(path);
+      })
+    } }))
+  }
+})
 
 syncTranslationWithStore(store);
 store.dispatch(loadTranslations(translationConfig));
