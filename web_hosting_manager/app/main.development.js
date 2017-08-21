@@ -314,9 +314,9 @@ app.on('ready', async () => {
         }
       });
     }
-    
+
     menu = Menu.buildFromTemplate(template);
-    mainWindow.setMenu(menu);
+    Menu.setApplicationMenu(menu);
   }
 });
 

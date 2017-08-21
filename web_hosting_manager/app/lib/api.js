@@ -53,6 +53,7 @@ class SafeApi {
         }
         nwStateChangeCb(CONSTANTS.NETWORK_STATE.CONNECTED);
         this.app = app;
+        return app.logPath().then((path) => path);
       })
       .catch((err) => {
         if (err[0] === CONSTANTS.AUTH_RES_TYPE.CONTAINERS) {
@@ -251,7 +252,7 @@ class SafeApi {
       .then((hashedPubName) => this.app.mutableData.newPublic(hashedPubName, CONSTANTS.TAG_TYPE.DNS))
       .then((md) => this._removeFromMData(md, serviceName));
   }
-  
+
   createServiceContainer(path, meta) {
     const metaName = `Service Root Directory for: ${meta}`;
     const metaDesc = `Has the files hosted for the service: ${meta}`;

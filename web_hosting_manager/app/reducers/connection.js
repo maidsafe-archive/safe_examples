@@ -9,7 +9,8 @@ const initialState = {
   isConnecting: false,
   reconnecting: false,
   networkState: null,
-  error: null
+  error: null,
+  logPath: null
 };
 
 const connection = (state: Object = initialState, action: Object) => {
@@ -32,7 +33,8 @@ const connection = (state: Object = initialState, action: Object) => {
       state = {
         ...state,
         isConnecting: false,
-        isConnected: true
+        isConnected: true,
+        logPath: action.payload
       };
       break;
 

@@ -27,20 +27,21 @@ if (!translationConfig) {
   translationConfig = loadLocale(locale);
 }
 
-let menu = Menu.getApplicationMenu();
-menu.items.map((item) => {
-  if (item.label == "Help") {
-    console.log(item);
-    console.log(MenuItem);
-    item.submenu.append(new MenuItem({ label: 'Error Logs', click() {
-      const state = store.getState();
-      state.initializer.app.logPath()
-      .then((path) => {
-        console.log('Log file located at: ', path);
-        shell.openExternal(path);
-      })
-    } }))
+let currentState = store.getState();
+
+store.subscribe(() => {
+  let newState = store.getState();
+  if(currentState.connection.logPath !== newState.connection.logPath) {
+    let menu = Menu.getApplicationMenu();
+    menu.items.map((item) => {
+      if (item.label == "Help") {
+        item.submenu.append(new MenuItem({ label: 'Error Logs', click() {
+          shell.openExternal(newState.connection.logPath);
+        } }))
+      }
+    })
   }
+  currentState = newState;
 })
 
 syncTranslationWithStore(store);
