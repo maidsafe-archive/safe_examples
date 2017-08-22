@@ -31,12 +31,12 @@ let currentState = store.getState();
 
 store.subscribe(() => {
   let newState = store.getState();
-  if(currentState.connection.logPath !== newState.connection.logPath) {
+  if(currentState.auth.logPath !== newState.auth.logPath) {
     let menu = Menu.getApplicationMenu();
     menu.items.map((item) => {
       if (item.label == "Help") {
         item.submenu.append(new MenuItem({ label: 'Error Logs', click() {
-          shell.openExternal(newState.connection.logPath);
+          shell.openExternal(newState.auth.logPath);
         } }))
       }
     })

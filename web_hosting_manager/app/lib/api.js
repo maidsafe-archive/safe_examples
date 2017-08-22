@@ -29,8 +29,11 @@ class SafeApi {
       return authInfo;
     }
     return safeApp.initializeApp(this.APP_INFO.data)
-      .then((app) => app.auth.genAuthUri(this.APP_INFO.permissions, this.APP_INFO.opt))
-      .then((res) => utils.openExternal(res.uri));
+      .then((app) => app.logPath().then((path) => {
+        return app.auth.genAuthUri(this.APP_INFO.permissions, this.APP_INFO.opt)
+        .then((res) => utils.openExternal(res.uri)).then((res) => res ? path : false)
+        })
+      )
   }
 
   /**

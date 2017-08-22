@@ -8,7 +8,8 @@ const initialState = {
     isAuthorised: false,
     isAuthorising: false,
     error: null,
-    isRevoked: false
+    isRevoked: false,
+    logPath: null
 };
 
 const auth = (state: Object = initialState, action: Object) => {
@@ -25,6 +26,15 @@ const auth = (state: Object = initialState, action: Object) => {
         ...state,
         isAuthorising: true,
         isRevoked: false
+      };
+      break;
+
+    case `${ACTION_TYPES.AUTH_REQUEST_SENT}_FULFILLED`:
+      state = {
+        ...state,
+        isAuthorising: false,
+        isRevoked: false,
+        logPath: action.payload
       };
       break;
 

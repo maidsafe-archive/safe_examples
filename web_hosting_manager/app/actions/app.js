@@ -7,9 +7,11 @@ import CONSTANTS from '../constants';
 import * as utils from '../lib/utils';
 
 const sendAuthRequest = () => {
-  const action = api.authorise() ? ACTION_TYPES.AUTH_REQUEST_SENT : ACTION_TYPES.AUTH_REQUEST_SEND_FAILED;
+  const returnValue = api.authorise();
+  const action = returnValue ? ACTION_TYPES.AUTH_REQUEST_SENT : ACTION_TYPES.AUTH_REQUEST_SEND_FAILED;
   return {
-    type: action
+    type: action,
+    payload: returnValue
   };
 };
 
