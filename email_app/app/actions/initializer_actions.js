@@ -48,7 +48,7 @@ export const authoriseApplication = () => {
     return dispatch({
       type: ACTION_TYPES.AUTHORISE_APP,
       payload: new Promise((resolve, reject) => {
-        authApp(newNetStatusCallback(dispatch))
+        authApp(newNetStatusCallback(dispatch), dispatch)
           .then(resolve)
           .catch(reject);
       })

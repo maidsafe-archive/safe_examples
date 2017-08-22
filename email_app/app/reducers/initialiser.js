@@ -18,11 +18,20 @@ const initialState = {
     saved: []
   },
   inboxSize: 0,
-  savedSize: 0
+  savedSize: 0,
+  logPath: null
 };
 
 const initializer = (state = initialState, action) => {
   switch (action.type) {
+    case `${ACTION_TYPES.LOG_PATH}_ERROR`:
+    case `${ACTION_TYPES.LOG_PATH}_SUCCESS`:
+      return {
+        ...state,
+        logPath: action.payload
+      }
+      break;
+
     case ACTION_TYPES.SET_INITIALIZER_TASK: {
       const tasks = state.tasks.slice();
       tasks.push(action.task);

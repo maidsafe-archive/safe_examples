@@ -1,4 +1,5 @@
 import { shell } from 'electron';
+import ACTION_TYPES from './actions/actionTypes';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from 'safe-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
@@ -40,17 +41,21 @@ const requestShareMdAuth = (app, mdPermissions) => {
     });
 }
 
-const requestAuth = () => {
+const requestAuth = (dispatch) => {
   return initializeApp(APP_INFO.info)
     .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
       .then((resp) => {
         shell.openExternal(parseUrl(resp.uri));
+        dispatch({
+          type: ACTION_TYPES.LOG_PATH,
+          payload: app.logPath()
+        })
         return null;
       })
     );
 }
 
-export const authApp = (netStatusCallback) => {
+export const authApp = (netStatusCallback, dispatch) => {
   if (process.env.SAFE_FAKE_AUTH) {
     return initializeApp(APP_INFO.info)
       .then((app) => app.auth.loginForTest(APP_INFO.permissions));
@@ -65,11 +70,11 @@ export const authApp = (netStatusCallback) => {
       .catch((err) => {
         console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
         clearAuthData();
-        return requestAuth();
+        return requestAuth(dispatch);
       });
   }
 
-  return requestAuth();
+  return requestAuth(dispatch);
 }
 
 export const connect = (uri, netStatusCallback) => {
