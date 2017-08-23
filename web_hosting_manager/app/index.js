@@ -36,7 +36,8 @@ store.subscribe(() => {
     menu.items.map((item) => {
       if (item.label == "Help") {
         item.submenu.append(new MenuItem({ label: 'Error Logs', click() {
-          shell.openExternal(newState.auth.logPath);
+          // shell.openExternal(newState.auth.logPath);
+          shell.openItem(newState.auth.logPath);
         } }))
       }
     })

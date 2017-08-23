@@ -20,7 +20,8 @@ store.subscribe(() => {
     menu.items.map((item) => {
       if (item.label == "Help") {
         item.submenu.append(new MenuItem({ label: 'Error Logs', click() {
-          shell.openExternal(newState.initializer.logPath);
+          // shell.openExternal(newState.initializer.logPath);
+          shell.openItem(newState.initializer.logPath);
         } }))
       }
     })
