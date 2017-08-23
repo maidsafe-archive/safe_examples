@@ -1,8 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let template;
+let menu;
 
 const sendResponse = (res) => {
   mainWindow.webContents.send('auth-response', res ? res : '');
@@ -21,7 +23,7 @@ const createWindow = () => {
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
@@ -51,6 +53,70 @@ const createWindow = () => {
   if (shouldQuit) {
     app.quit();
   }
+
+  template = [{
+    label: '&File',
+    submenu: [{
+      label: '&Close',
+      accelerator: 'Ctrl+W',
+      click() {
+        mainWindow.close();
+      }
+    }]
+  }, {
+    label: '&View',
+    submenu: (process.env.NODE_ENV === 'development') ? [{
+        label: '&Reload',
+        accelerator: 'Ctrl+R',
+        click() {
+          mainWindow.webContents.reload();
+        }
+      }, {
+        label: 'Toggle &Full Screen',
+        accelerator: 'F11',
+        click() {
+          mainWindow.setFullScreen(!mainWindow.isFullScreen());
+        }
+      }, {
+        label: 'Toggle &Developer Tools',
+        accelerator: 'Alt+Ctrl+I',
+        click() {
+          mainWindow.toggleDevTools();
+        }
+      }] : [{
+        label: 'Toggle &Full Screen',
+        accelerator: 'F11',
+        click() {
+          mainWindow.setFullScreen(!mainWindow.isFullScreen());
+        }
+      }]
+  }, {
+    label: 'Help',
+    submenu: [{
+      label: 'Learn More',
+      click() {
+        shell.openExternal('https://maidsafe.net');
+      }
+    }, {
+      label: 'Documentation',
+      click() {
+        shell.openExternal('https://github.com/maidsafe/safe_examples/tree/master/email_app/README.md');
+      }
+    }, {
+      label: 'Community Discussions',
+      click() {
+        shell.openExternal('https://forum.safedev.org');
+      }
+    }, {
+      label: 'Search Issues',
+      click() {
+        shell.openExternal('https://github.com/maidsafe/safe_examples/issues');
+      }
+    }]
+  }];
+
+  menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 
 };
 
