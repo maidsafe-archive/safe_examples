@@ -19,7 +19,7 @@
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./main.development",
     "package": "electron-forge package",
     "package-all": "npm run package -- --all",
-    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
+    "postinstall": "concurrently \"npm install https://s3.eu-west-2.amazonaws.com/safe-app-nodejs/safe-app-0.2.0.tgz\" \"node node_modules/fbjs-scripts/node/check-dev-engines.js package.json\"",
     "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
     "make": "electron-forge make"
   },
@@ -123,7 +123,6 @@
     "redux-axios-middleware": "^2.0.0",
     "redux-promise-middleware": "^4.2.0",
     "redux-thunk": "^2.1.0",
-    "safe-app": "git+https://github.com/maidsafe/safe_app_nodejs/",
     "source-map-support": "^0.4.2",
     "urlsafe-base64": "^1.0.0"
   },
