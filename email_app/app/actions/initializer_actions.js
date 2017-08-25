@@ -99,6 +99,7 @@ export const storeNewAccount = (account) => {
 
 export const refreshEmail = (account) => {
   return function (dispatch, getState) {
+    let spaceUsed;
     let app = getState().initializer.app;
     return dispatch({
       type: ACTION_TYPES.REFRESH_EMAIL,
@@ -109,13 +110,17 @@ export const refreshEmail = (account) => {
                         payload: inboxEntry
                       });
                 })
-                .then(() => readArchivedEmails(app, account,
-                    (archiveEntry) => {
-                      dispatch({
-                        type: ACTION_TYPES.PUSH_TO_ARCHIVE,
-                        payload: archiveEntry
+                .then((len) => {
+                  spaceUsed = len;
+                  return readArchivedEmails(app, account,
+                      (archiveEntry) => {
+                        dispatch({
+                          type: ACTION_TYPES.PUSH_TO_ARCHIVE,
+                          payload: archiveEntry
+                        });
                       });
-                }))
+                })
+                .then(() => spaceUsed)
     });
   };
 };

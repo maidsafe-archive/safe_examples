@@ -9,6 +9,7 @@ const mapStateToProps = state => {
     coreData: state.initializer.coreData,
     inboxSize: state.initializer.inboxSize,
     savedSize: state.initializer.savedSize,
+    spaceUsed: state.initializer.spaceUsed,
     app: state.initializer.app,
     account: state.initializer.account
   };
