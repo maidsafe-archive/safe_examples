@@ -45,8 +45,11 @@ class TaskQueue {
       } else {
         this.queue[this.index].cancelled = true;
       }
+      if (status && !status.isCompleted) {
+        return;
+      }
       this.index += 1;
-      if (this.queue.length === this.index) {
+      if (this.queue.length === (this.index - 1)) {
         const taskStatus = {
           isFile: true,
           isCompleted: true,

@@ -6,6 +6,8 @@ import ACTION_TYPES from './actionTypes';
 import CONSTANTS from '../constants';
 import * as utils from '../lib/utils';
 
+let isUploadCancelled = false ;
+
 const sendAuthRequest = () => {
   const action = api.authorise() ? ACTION_TYPES.AUTH_REQUEST_SENT : ACTION_TYPES.AUTH_REQUEST_SEND_FAILED;
   return {
@@ -172,17 +174,21 @@ export const getContainer = (containerPath: string) => {
 };
 
 export const upload = (localPath: string, networkPath: string) => {
-  return (dispatch) => {
-    const progressCallback = (status, isCompleted) => {
-      setTimeout(() => {
-        dispatch({
-          type: isCompleted ? ACTION_TYPES.UPLOAD_COMPLETED : ACTION_TYPES.UPLOADING,
-          payload: status
-        });
-        if (isCompleted) {
-          dispatch(getContainer(networkPath));
-        }
-      }, 200);
+  // reset upload cancelled flag
+  isUploadCancelled = false;
+  return (dispatch, getState) => {
+    let progressCallback = (status, isCompleted) => {
+      if (isUploadCancelled) {
+        progressCallback = null;
+        return;
+      }
+      dispatch({
+        type: isCompleted ? ACTION_TYPES.UPLOAD_COMPLETED : ACTION_TYPES.UPLOADING,
+        payload: status
+      });
+      if (isCompleted) {
+        dispatch(getContainer(networkPath));
+      }
     };
     const errorCallback = (error) => {
       dispatch({
@@ -198,6 +204,8 @@ export const upload = (localPath: string, networkPath: string) => {
 };
 
 export const cancelUpload = () => {
+  // set upload cancelled flag
+  isUploadCancelled = true;
   api.cancelFileUpload();
   const err = new Error(I18n.t('messages.uploadCancelled'));
   return {
