@@ -35,10 +35,21 @@ export default class Uploader {
   start() {
     this[status].uploading = true;
     const stat = fs.statSync(this[localPath]);
+    const baseDir = path.basename( this[localPath] );
+
     const callback = (error, taskStatus) => {
       if (error) {
         this[status].errored = true;
-        return this[errorCb](error);
+        this[errorCb](error);
+        if (error.code === CONSTANTS.ERROR_CODE.TOO_MANY_ENTRIES) {
+          this.cancel();
+          return this[progressCb]({
+            total: 0,
+            completed: 0,
+            progress: 0
+          }, true);
+        }
+        return;
       }
       if (taskStatus && taskStatus.isCompleted) {
         this[status].completed.files += taskStatus.isFile ? 1 : 0;
@@ -48,7 +59,6 @@ export default class Uploader {
       this[status].completed.size += taskStatus ? taskStatus.size : 0;
 
       const progress = Math.floor((this[status].completed.size / this[status].total.size) * 100);
-
       return this[progressCb]({
         total: this[status].total,
         completed: this[status].completed,
@@ -59,7 +69,7 @@ export default class Uploader {
       this[status].total = Helper.getDirectoryStats(this[localPath]);
       this[status].completed = new Helper.DirStats();
       this[taskQueue] = Helper.generateUploadTaskQueue(this[localPath],
-        this[networkPath], callback);
+        this[networkPath], callback, baseDir );
       this[taskQueue].run();
     } else {
       const fileName = path.basename(this[localPath]);
