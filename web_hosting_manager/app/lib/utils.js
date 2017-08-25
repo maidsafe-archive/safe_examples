@@ -107,23 +107,36 @@ export const getDirectoryStats = (localPath) => {
   return stats;
 };
 
-export const generateUploadTaskQueue = (localPath, networkPath, callback) => {
+export const generateUploadTaskQueue = (localPath, networkPath, callback, baseDir ) => {
   let stat;
   let tempPath;
   const taskQueue = callback instanceof TaskQueue ? callback : new TaskQueue(callback);
   let nextDir = null;
   const contents = fs.readdirSync(localPath);
+
+  let updatedLocation = networkPath;
+
+  if( baseDir )
+  {
+    updatedLocation = `${networkPath}/${baseDir}`;
+  }
+
+  tempPath = `${localPath}`;
+
   for (let i = 0; i < contents.length; i += 1) {
+
     if (!contents[i]) {
       return;
     }
+
     tempPath = `${localPath}/${contents[i]}`;
     stat = fs.statSync(tempPath);
+
     if (stat.isDirectory()) {
-      nextDir = `${networkPath}/${contents[i]}`;
+      nextDir = `${updatedLocation}/${contents[i]}`;
       generateUploadTaskQueue(tempPath, nextDir, taskQueue);
     } else {
-      taskQueue.add(new Task.FileUploadTask(tempPath, `${networkPath}/${contents[i]}`));
+      taskQueue.add(new Task.FileUploadTask(tempPath, `${updatedLocation}/${contents[i]}`));
     }
   }
   return taskQueue;

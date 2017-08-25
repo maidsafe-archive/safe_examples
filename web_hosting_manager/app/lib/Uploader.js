@@ -35,6 +35,8 @@ export default class Uploader {
   start() {
     this[status].uploading = true;
     const stat = fs.statSync(this[localPath]);
+    const baseDir = path.basename( this[localPath] );
+
     const callback = (error, taskStatus) => {
       if (error) {
         this[status].errored = true;
@@ -59,7 +61,7 @@ export default class Uploader {
       this[status].total = Helper.getDirectoryStats(this[localPath]);
       this[status].completed = new Helper.DirStats();
       this[taskQueue] = Helper.generateUploadTaskQueue(this[localPath],
-        this[networkPath], callback);
+        this[networkPath], callback, baseDir );
       this[taskQueue].run();
     } else {
       const fileName = path.basename(this[localPath]);
