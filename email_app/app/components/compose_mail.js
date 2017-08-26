@@ -64,7 +64,11 @@ export default class ComposeMail extends Component {
   }
 
   render() {
-    const { error, processing } = this.props;
+    const { error, processing, location } = this.props;
+    // email id to reply to and subject are set in the location: '/compose_mail?<email id>&<subject>'
+    const params = location.search.slice(1).split('&');
+    const replyTo = params[0];
+    let subject = params[1] ? `Re: ${params[1].replace(/^Re: /g, '')}` : '';
 
     return (
       <div className="compose-mail">
@@ -74,19 +78,19 @@ export default class ComposeMail extends Component {
             <div className="inp-grp">
               <input type="text" name="mailTo" id="mailTo" onKeyUp={this.handleMailToLimit} ref={c => {
                 this.mailTo = c;
-              }} required="required" autoFocus="autoFocus"/>
+              }} required="required" autoFocus={replyTo ? '' : 'autoFocus'} defaultValue={replyTo}/>
               <label htmlFor="mailTo">To</label>
             </div>
             <div className="inp-grp">
               <input type="text" name="mailSub" id="mailSub" onKeyUp={this.handleSubLimit} ref={c => {
                 this.mailSub = c;
-              }} required="required"/>
+              }} required="required" defaultValue={subject}/>
               <label htmlFor="mailSub">Subject</label>
             </div>
             <div className="inp-grp">
               <textarea name="mailContent" onKeyUp={this.handleTextLimit} ref={c => {
                 this.mailContent = c;
-              }} required="required" defaultValue="" />
+              }} required="required" defaultValue="" autoFocus={replyTo ? 'autoFocus' : ''}/>
               <div className="limit">
                 Only { CONSTANTS.MAIL_CONTENT_LIMIT } characters allowed (this restriction is to reduce the number of chunks managed by the tutorial).
               </div>
