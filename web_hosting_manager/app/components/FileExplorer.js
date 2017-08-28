@@ -36,6 +36,7 @@ export default class FileExplorer extends Component {
       notification.error({
         description: this.props.fileError
       });
+      this.props.clearNotification();
     }
   }
 
@@ -186,7 +187,7 @@ export default class FileExplorer extends Component {
             `${this.props.uploadStatus.completed.files}/${this.props.uploadStatus.total.files}` : ''}
           </p>
           <Progress percent={this.props.uploadStatus ? this.props.uploadStatus.progress : 0} />
-          <Button type="primary" onClick={() => {this.props.cancelUpload()}}>
+          <Button type="primary" onClick={() => {this.props.cancelUploadAndReloadContainer(this.containerPath)}}>
             {I18n.t('label.cancel')}
           </Button>
         </div>
