@@ -13,6 +13,7 @@ export default class MailList extends Component {
     this.handleDeleteFromInbox = this.handleDeleteFromInbox.bind(this);
     this.handleDeleteSaved = this.handleDeleteSaved.bind(this);
     this.handleSave = this.handleSave.bind(this);
+    this.handleReply = this.handleReply.bind(this);
   }
 
   refreshEmail(account) {
@@ -56,6 +57,13 @@ export default class MailList extends Component {
         .then(() => this.refreshEmail(account))
   }
 
+  handleReply(e) {
+    e.preventDefault();
+    let replyTo = e.target.dataset.from;
+    let subject = e.target.dataset.subject;
+    this.context.router.push(`/compose_mail?${replyTo}&${subject}`);
+  }
+
   render() {
     const self = this;
     const { coreData, error, inboxSize, inbox, savedSize, saved } = this.props;
@@ -84,7 +92,10 @@ export default class MailList extends Component {
                   </div>
                   <div className="opt">
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="add" onClick={this.handleSave}><i className="material-icons" data-index={key}>save</i></button>
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={mail.from} data-subject={mail.subject}>reply</i></button>
+                    </div>
+                    <div className="opt-i">
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="save" onClick={this.handleSave}><i className="material-icons" data-index={key}>save</i></button>
                     </div>
                     <div className="opt-i">
                       <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteFromInbox}><i className="material-icons" data-index={key}>delete</i></button>
@@ -122,6 +133,9 @@ export default class MailList extends Component {
                     <p className="context">{mail.body}</p>
                   </div>
                   <div className="opt">
+                    <div className="opt-i">
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={mail.from} data-subject={mail.subject}>reply</i></button>
+                    </div>
                     <div className="opt-i">
                       <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteSaved}><i className="material-icons" data-index={key}>delete</i></button>
                     </div>

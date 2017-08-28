@@ -18,7 +18,8 @@ const initialState = {
     saved: []
   },
   inboxSize: 0,
-  savedSize: 0
+  savedSize: 0,
+  spaceUsed: 0
 };
 
 const initializer = (state = initialState, action) => {
@@ -110,6 +111,11 @@ const initializer = (state = initialState, action) => {
       };
       break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
+      return { ...state,
+        spaceUsed: action.payload,
+        processing: { state: false, msg: null }
+      };
+      break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_ERROR`:
       return { ...state, processing: { state: false, msg: null } };
       break;

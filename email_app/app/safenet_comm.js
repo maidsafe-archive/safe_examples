@@ -200,6 +200,7 @@ export const readInboxEmails = (app, account, cb) => {
           return decryptEmail(app, account, key, value.buf, cb);
         }
       })
+      .then(() => entries.len())
     );
 }
 
