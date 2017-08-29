@@ -60,12 +60,14 @@ export default class FileExplorer extends Component {
   open(onlyFile) {
     remote.dialog.showOpenDialog({
       title: I18n.t(onlyFile ? 'label.selectFile' : 'label.selectDirectory'),
-      properties: onlyFile ? ['openFile'] : ['openDirectory']
+      properties: onlyFile ? ['openFile', 'multiSelections'] : ['openDirectory', 'multiSelections']
     }, (selection) => {
       if (!selection || selection.length === 0) {
         return;
       }
-      this.props.upload(selection[0], this.currentPath);
+      selection.forEach((filePath) => {
+        this.props.upload(filePath, this.currentPath);
+      });
     });
   }
 
