@@ -214,6 +214,13 @@ export const cancelUpload = () => {
   };
 };
 
+export const cancelUploadAndReloadContainer = (networkPath: string) => {
+  return (dispatch) => {
+    dispatch(cancelUpload());
+    dispatch(getContainer(networkPath));
+  };
+};
+
 export const download = (networkPath: string) => {
   return (dispatch) => {
     dispatch({

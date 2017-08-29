@@ -294,6 +294,19 @@ class SafeApi {
       containerKey = containerKey.slice(1);
     }
 
+    const deleteFiles = (nfs, files) => {
+      if (files.length === 0) {
+        return;
+      }
+      const file = files[0]
+      return nfs.fetch(file.key)
+        .then((f) => nfs.delete(file.key, f.version + 1))
+        .then(() => {
+          files.shift();
+          return deleteFiles(nfs, files);
+        });
+    };
+
     return this.getPublicContainer()
       .then((pubMd) => {
         // delete file
@@ -312,19 +325,20 @@ class SafeApi {
           .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
           .then((dirMd) => {
             const fileKeys = [];
-            // const nameOfDir = netPath.split('/').slice(-1).toString();
             return dirMd.getEntries()
               .then((entries) => entries.forEach((key, val) => {
                 const keyStr = key.toString();
-                if (keyStr.indexOf(containerKey) !== 0) {
+                if ((keyStr.indexOf(containerKey) !== 0) || keyStr === CONSTANTS.MD_META_KEY) {
+                  return;
+                }
+                if (val.buf.length === 0) {
                   return;
                 }
                 fileKeys.push({ key: keyStr, version: val.version });
-              }).then(() => Promise.all(fileKeys.map((file) => {
+              }).then(() => {
                 const nfs = dirMd.emulateAs('NFS');
-                return nfs.fetch(file.key)
-                  .then((f) => nfs.delete(file.key, f.version + 1));
-              }))));
+                return deleteFiles(nfs, fileKeys);
+              }));
           });
       });
   }
