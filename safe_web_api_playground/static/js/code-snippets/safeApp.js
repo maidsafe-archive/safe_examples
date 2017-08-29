@@ -49,34 +49,12 @@ module.exports = {
       });
     },
 
-    // authoriseShareMd: () => {
-    //   /*  [
-    //   *    { type_tag: 15001,   // request for MD with tag 15001
-    //   *      name: 'XoRname1',  // request for MD located at address 'XoRname1'
-    //   *      perms: ['Insert'], // request for inserting into the referenced MD
-    //   *    },
-    //   *    { type_tag: 15020,   // request for MD with tag 15020
-    //   *      name: 'XoRname2',  // request for MD located at address 'XoRname2'
-    //   *      perms: ['Insert', `Update`], // request for updating and inserting into the referenced MD
-    //   *    }
-    //   *  ]
-    //   */
-    //
-    //   let permissions = [
-    //     {
-    //       type_tag: 15001,
-    //       name: mdName,
-    //       perms: ['Insert']
-    //     }
-    //   ]
-    //
-    //   return window.safeApp.authoriseShareMd(appHandle, permissions)
-    //   .then((res) => {
-    //     console.log(res);
-    //     authUri = res;
-    //     return 'App was authorised with permissions for specified Mutable Data structures. Returns auth uri: ' + res;
-    //   })
-    // },
+    connect: () => {
+      return window.safeApp.connect(appHandle)
+      .then(appHandle => {
+        return 'Unregistered session created. App token returned: ' + appHandle;
+      });
+    },
 
     connectAuthorised: () => {
       return window.safeApp.connectAuthorised(appHandle, authUri)
@@ -97,11 +75,33 @@ module.exports = {
         });
     },
 
-    connect: () => {
-      return window.safeApp.connect(appHandle)
-      .then(appHandle => {
-        return 'Unregistered session created. App token returned: ' + appHandle;
-      });
+    authoriseShareMd: () => {
+      /*  [
+      *    { type_tag: 15001,   // request for MD with tag 15001
+      *      name: 'XoRname1',  // request for MD located at address 'XoRname1'
+      *      perms: ['Insert'], // request for inserting into the referenced MD
+      *    },
+      *    { type_tag: 15020,   // request for MD with tag 15020
+      *      name: 'XoRname2',  // request for MD located at address 'XoRname2'
+      *      perms: ['Insert', `Update`], // request for updating and inserting into the referenced MD
+      *    }
+      *  ]
+      */
+
+      let permissions = [
+        {
+          type_tag: 15001,
+          name: mdName,
+          perms: ['Insert']
+        }
+      ]
+
+      return window.safeApp.authoriseShareMd(appHandle, permissions)
+      .then((res) => {
+        console.log(res);
+        authUri = res;
+        return 'App was authorised with permissions for specified Mutable Data structures. Returns auth uri: ' + res;
+      })
     },
 
     webFetch: () => {
