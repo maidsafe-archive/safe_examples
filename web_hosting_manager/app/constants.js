@@ -12,7 +12,7 @@ const CONSTANTS = {
     data: {
       id: pkg.identifier,
       scope: null,
-      name: pkg.name,
+      name: pkg.productName,
       vendor: pkg.author.name
     },
     opt: {
