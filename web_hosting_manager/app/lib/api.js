@@ -82,7 +82,7 @@ class SafeApi {
     .then((xorName) => this.sendMDReq([{
       type_tag: CONSTANTS.TAG_TYPE.DNS,
       name: xorName,
-      perms: ['Insert', `Update`]
+      perms: ['Insert', 'Update', 'Delete']
     }]))
   }
 
