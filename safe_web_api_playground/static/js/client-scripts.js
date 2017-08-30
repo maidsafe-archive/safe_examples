@@ -101,8 +101,11 @@ function updateVariableValues() {
 }
 
 function handleSubmit() {
+  if(document.getElementById('loader')) {
+    document.getElementById('loader').parentNode.removeChild(document.getElementById('loader'));
+  }
   let loader = document.createElement('div');
-  loader.setAttribute('class', 'loader');
+  loader.setAttribute('id', 'loader');
   document.getElementById('rightside').appendChild(loader);
 
   let el = document.getElementById('code');
