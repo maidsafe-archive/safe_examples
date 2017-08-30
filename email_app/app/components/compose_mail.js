@@ -19,7 +19,7 @@ export default class ComposeMail extends Component {
 
     e.preventDefault();
     const mailTo = this.mailTo.value.trim();
-    const mailSub = this.mailSub.value.trim();
+    const mailSub = this.mailSub.value.trim().substring(0, CONSTANTS.MAIL_SUBJECT_LIMIT + 3);
     const mailContent = this.mailContent.value.trim();
     if (!mailTo || !mailSub || !mailContent) {
       return;
