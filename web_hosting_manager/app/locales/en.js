@@ -88,9 +88,9 @@ const en = {
     tooManyEntries: 'Mutable data has reached its maximum entries',
     noMoreService: 'No more services allowed for current public ID',
     noMoreFiles: 'No more files can be added to current service',
-    mdAuthReqTitle: 'Mutable Data Authourisation',
-    mdAuthReqDesc: '%{name} can not be modified. Will require authorisation to be provided for modifying the contents in the container. Send authorisation request now?',
-    mdAuthorisedTitle: 'Mutable Data Authourisation',
+    mdAuthReqTitle: 'Mutable Data Authorisation',
+    mdAuthReqDesc: '%{name} cannot be modified and will require you to authorise altering the contents of the container. Send authorisation request now?',
+    mdAuthorisedTitle: 'Mutable Data Authorisation',
     mdAuthorisedDesc: '%{name} has been granted permission!'
   }
 };

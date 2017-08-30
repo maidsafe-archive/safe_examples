@@ -1,10 +1,10 @@
 {
   "name": "safe-mail-tutorial",
-  "productName": "SAFE-Mail-Tutorial",
+  "productName": "SAFE Mail Tutorial",
   "version": "0.2.2",
   "description": "Mailing application tutorial using SAFE Network",
   "identifier": "net.maidsafe.examples.mailtutorial",
-  "vendor": "MaidSafe",
+  "vendor": "MaidSafe.net Ltd",
   "main": "app/index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
