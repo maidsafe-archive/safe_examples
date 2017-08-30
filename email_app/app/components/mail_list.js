@@ -74,31 +74,30 @@ export default class MailList extends Component {
       container = (
         <div>
           {
-            inboxSize === 0 ? <li className="mdl-card" title="No data in inbox mutableData">Inbox empty</li> : Object.keys(coreData.inbox).map((key) => {
-              let mail = coreData.inbox[key];
-              if (!self.listColors.hasOwnProperty(mail.from)) {
-                self.listColors[mail.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
+            inboxSize === 0 ? <li className="mdl-card" title="No data in inbox mutableData">Inbox empty</li> : coreData.inbox.map((email) => {
+              if (!self.listColors.hasOwnProperty(email.from)) {
+                self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
               }
               return (
-                <li className="mdl-card" key={key}>
+                <li className="mdl-card" key={email.id}>
                   <div className="icon">
-                    <span className={self.listColors[mail.from]}>{mail.from[0]}</span>
+                    <span className={self.listColors[email.from]}>{email.from[0]}</span>
                   </div>
                   <div className="cntx">
-                    <h3 className="from">{mail.from}</h3>
-                    <h4 className="date">{dateformat(new Date(mail.time), CONSTANTS.DATE_FORMAT)}</h4>
-                    <p className="subject">{mail.subject}</p>
-                    <p className="context">{mail.body}</p>
+                    <h3 className="from">{email.from}</h3>
+                    <h4 className="date">{dateformat(new Date(email.time), CONSTANTS.DATE_FORMAT)}</h4>
+                    <p className="subject">{email.subject}</p>
+                    <p className="context">{email.body}</p>
                   </div>
                   <div className="opt">
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={mail.from} data-subject={mail.subject}>reply</i></button>
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={email.from} data-subject={email.subject}>reply</i></button>
                     </div>
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="save" onClick={this.handleSave}><i className="material-icons" data-index={key}>save</i></button>
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="save" onClick={this.handleSave}><i className="material-icons" data-index={email.id}>save</i></button>
                     </div>
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteFromInbox}><i className="material-icons" data-index={key}>delete</i></button>
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteFromInbox}><i className="material-icons" data-index={email.id}>delete</i></button>
                     </div>
                   </div>
                 </li>
@@ -113,31 +112,27 @@ export default class MailList extends Component {
       container = (
         <div>
           {
-            savedSize === 0 ? <li className="mdl-card">Saved empty</li> : Object.keys(coreData.saved).map((key) => {
-              let mail = coreData.saved[key];
-              if (!mail) {
-                return;
-              }
-              if (!self.listColors.hasOwnProperty(mail.from)) {
-                self.listColors[mail.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
+            savedSize === 0 ? <li className="mdl-card">Saved empty</li> : coreData.saved.map((email) => {
+              if (!self.listColors.hasOwnProperty(email.from)) {
+                self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
               }
                return (
-                <li className="mdl-card" key={key}>
+                <li className="mdl-card" key={email.id}>
                   <div className="icon">
-                    <span className={this.listColors[mail.from]}>{mail.from[0]}</span>
+                    <span className={this.listColors[email.from]}>{email.from[0]}</span>
                   </div>
                   <div className="cntx">
-                    <h3 className="from">{mail.from}</h3>
-                    <h4 className="date">{dateformat(new Date(mail.time), CONSTANTS.DATE_FORMAT)}</h4>
-                    <p className="subject">{mail.subject}</p>
-                    <p className="context">{mail.body}</p>
+                    <h3 className="from">{email.from}</h3>
+                    <h4 className="date">{dateformat(new Date(email.time), CONSTANTS.DATE_FORMAT)}</h4>
+                    <p className="subject">{email.subject}</p>
+                    <p className="context">{email.body}</p>
                   </div>
                   <div className="opt">
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={mail.from} data-subject={mail.subject}>reply</i></button>
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={email.from} data-subject={email.subject}>reply</i></button>
                     </div>
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteSaved}><i className="material-icons" data-index={key}>delete</i></button>
+                      <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteSaved}><i className="material-icons" data-index={email.id}>delete</i></button>
                     </div>
                   </div>
                 </li>

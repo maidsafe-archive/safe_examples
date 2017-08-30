@@ -187,7 +187,7 @@ const decryptEmail = (app, account, key, value, cb) => {
       .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
         .then((immData) => immData.read())
         .then((content) => decrypt(app, content, account.encSk, account.encPk)
-          .then(decryptedEmail => cb({ [key]: JSON.parse(decryptedEmail) }))
+          .then(decryptedEmail => cb({ id: key, email: JSON.parse(decryptedEmail) }))
         )
       )
   }
