@@ -58,7 +58,10 @@ export default class Uploader {
 
       this[status].completed.size += taskStatus ? taskStatus.size : 0;
 
-      const progress = Math.floor((this[status].completed.size / this[status].total.size) * 100);
+      const completedSize = this[status].completed.size || 1;
+      const totalSize = this[status].total.size || 1;
+
+      const progress = Math.floor((completedSize / totalSize) * 100);
       return this[progressCb]({
         total: this[status].total,
         completed: this[status].completed,
