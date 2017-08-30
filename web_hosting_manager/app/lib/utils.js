@@ -61,7 +61,10 @@ class TaskQueue {
         this.queue[this.index].execute(next);
       }
     };
-    this.queue[this.index].execute(next);
+
+    if (this.queue[this.index]) {
+      this.queue[this.index].execute(next);
+    }
   }
 
   cancel() {
