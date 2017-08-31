@@ -251,7 +251,7 @@ class SafeApi {
       .then((hashedPubName) => this.app.mutableData.newPublic(hashedPubName, CONSTANTS.TAG_TYPE.DNS))
       .then((md) => this._removeFromMData(md, serviceName));
   }
-  
+
   createServiceContainer(path, meta) {
     const metaName = `Service Root Directory for: ${meta}`;
     const metaDesc = `Has the files hosted for the service: ${meta}`;
@@ -376,13 +376,13 @@ class SafeApi {
             return Promise.all(files.map((file) => {
               return nfs.fetch(file)
                 .then((f) => nfs.open(f, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
-                .then((f) => f.read(CONSTANTS.FILE_READ.FROM_START, CONSTANTS.FILE_READ.TILL_END))
-                .then((co) => {
+                .then((f) => f.size())
+                .then((size) => {
                   const dirName = path.split('/').slice(3).join('/');
                   result.unshift({
                     isFile: true,
                     name: dirName ? file.substr(dirName.length + 1) : file,
-                    size: co.length
+                    size: size
                   });
                 });
             })).then(() => result);
