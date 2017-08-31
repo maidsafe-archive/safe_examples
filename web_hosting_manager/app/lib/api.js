@@ -309,18 +309,6 @@ class SafeApi {
 
     return this.getPublicContainer()
       .then((pubMd) => {
-        // delete file
-        if (path.extname(netPath)) {
-          return this.getMDataValueForKey(pubMd, containerName)
-            .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
-            .then((md) => {
-              const nfs = md.emulateAs('NFS');
-              return nfs.fetch(containerKey)
-                .then((file) => nfs.delete(containerKey, file.version + 1));
-            });
-        }
-
-        // delete directory
         return this.getMDataValueForKey(pubMd, containerName)
           .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
           .then((dirMd) => {
