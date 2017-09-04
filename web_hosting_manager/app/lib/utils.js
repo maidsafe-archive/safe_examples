@@ -145,6 +145,12 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback, baseDi
       taskQueue.add(new Task.FileUploadTask(tempPath, `${updatedLocation}/${contents[i]}`));
     }
   }
+
+  if( baseDir && contents.length === 0 )
+  {
+    taskQueue.add(new Task.EmptyDirTask());
+  }
+
   return taskQueue;
 };
 

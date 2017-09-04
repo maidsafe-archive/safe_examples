@@ -26,6 +26,14 @@ class Task {
   }
 }
 
+export class EmptyDirTask {
+  execute(callback) {
+    const error = new Error(I18n.t('messages.noEmptyDirs'));
+    error.code = CONSTANTS.ERROR_CODE.EMPTY_DIR;
+    callback(error, { isFile: false, isCompleted: true, size: 1 });
+  }
+}
+
 export class FileUploadTask extends Task {
 
   constructor(localPath, networkPath) {

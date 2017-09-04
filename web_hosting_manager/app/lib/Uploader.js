@@ -36,7 +36,10 @@ export default class Uploader {
     this[status].uploading = true;
     const stat = fs.statSync(this[localPath]);
     const baseDir = path.basename( this[localPath] );
-    const cancelUploadErrArr = [CONSTANTS.ERROR_CODE.TOO_MANY_ENTRIES, CONSTANTS.ERROR_CODE.LOW_BALANCE];
+    const cancelUploadErrArr = [
+      CONSTANTS.ERROR_CODE.TOO_MANY_ENTRIES,
+      CONSTANTS.ERROR_CODE.LOW_BALANCE
+    ];
     const callback = (error, taskStatus) => {
       if (error) {
         this[status].errored = true;
