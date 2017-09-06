@@ -196,10 +196,10 @@ export const upload = (localPath: string, networkPath: string) => {
         payload: error
       });
     };
-    api.fileUpload(localPath, networkPath, progressCallback, errorCallback);
     dispatch({
       type: ACTION_TYPES.UPLOAD_STARTED
     });
+    api.fileUpload(localPath, networkPath, progressCallback, errorCallback);
   };
 };
 
