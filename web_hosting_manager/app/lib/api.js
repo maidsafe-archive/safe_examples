@@ -482,9 +482,9 @@ class SafeApi {
     return nfsHandle.fetch(serviceKeys[i])
     .then((file) => {
       conosle.log('This log does not fire');
-      
+
       console.log("file: ", file);
-      return nfsHandle.delete(serviceKeys[i], file.version);
+      return nfsHandle.delete(serviceKeys[i], file.version + 1);
     })
     .then(() => _deleteQueue(nfsHandle, serviceKeys, i + 1));
   }
