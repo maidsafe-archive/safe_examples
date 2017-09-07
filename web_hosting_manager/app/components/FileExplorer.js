@@ -36,6 +36,7 @@ export default class FileExplorer extends Component {
       notification.error({
         description: this.props.fileError
       });
+      this.props.clearNotification();
     }
   }
 
@@ -59,12 +60,14 @@ export default class FileExplorer extends Component {
   open(onlyFile) {
     remote.dialog.showOpenDialog({
       title: I18n.t(onlyFile ? 'label.selectFile' : 'label.selectDirectory'),
-      properties: onlyFile ? ['openFile'] : ['openDirectory']
+      properties: onlyFile ? ['openFile', 'multiSelections'] : ['openDirectory', 'multiSelections']
     }, (selection) => {
       if (!selection || selection.length === 0) {
         return;
       }
-      this.props.upload(selection[0], this.currentPath);
+      selection.forEach((filePath) => {
+        this.props.upload(filePath, this.currentPath);
+      });
     });
   }
 
@@ -186,7 +189,7 @@ export default class FileExplorer extends Component {
             `${this.props.uploadStatus.completed.files}/${this.props.uploadStatus.total.files}` : ''}
           </p>
           <Progress percent={this.props.uploadStatus ? this.props.uploadStatus.progress : 0} />
-          <Button type="primary" onClick={() => {this.props.cancelUpload()}}>
+          <Button type="primary" onClick={() => {this.props.cancelUploadAndReloadContainer(this.containerPath)}}>
             {I18n.t('label.cancel')}
           </Button>
         </div>

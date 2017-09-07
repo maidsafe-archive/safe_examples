@@ -12,7 +12,7 @@ const CONSTANTS = {
     data: {
       id: pkg.identifier,
       scope: null,
-      name: pkg.name,
+      name: pkg.productName,
       vendor: pkg.author.name
     },
     opt: {
@@ -47,7 +47,10 @@ const CONSTANTS = {
     ACCESS_DENIED: -100,
     NO_SUCH_ENTRY: -106,
     ENTRY_EXISTS: -107,
-    INVALID_SIGN_KEY_HANDLE: -1011
+    TOO_MANY_ENTRIES: -108,
+    LOW_BALANCE: -113,
+    INVALID_SIGN_KEY_HANDLE: -1011,
+    EMPTY_DIR: -1029
   },
   MAX_FILE_SIZE: 20 * 1024 * 1024,
   NETWORK_STATE: {

@@ -33,7 +33,7 @@ module.exports = {
         console.log(key + ': ' + value);
 
       }).then(_ => {
-        return 'Interation complete' + _;
+        return 'Iteration complete' + _;
       })
     },
 

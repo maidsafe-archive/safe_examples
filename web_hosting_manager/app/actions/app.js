@@ -6,6 +6,8 @@ import ACTION_TYPES from './actionTypes';
 import CONSTANTS from '../constants';
 import * as utils from '../lib/utils';
 
+let isUploadCancelled = false ;
+
 const sendAuthRequest = () => {
   const returnValue = api.authorise();
   const action = returnValue ? ACTION_TYPES.AUTH_REQUEST_SENT : ACTION_TYPES.AUTH_REQUEST_SEND_FAILED;
@@ -174,17 +176,21 @@ export const getContainer = (containerPath: string) => {
 };
 
 export const upload = (localPath: string, networkPath: string) => {
-  return (dispatch) => {
-    const progressCallback = (status, isCompleted) => {
-      setTimeout(() => {
-        dispatch({
-          type: isCompleted ? ACTION_TYPES.UPLOAD_COMPLETED : ACTION_TYPES.UPLOADING,
-          payload: status
-        });
-        if (isCompleted) {
-          dispatch(getContainer(networkPath));
-        }
-      }, 200);
+  // reset upload cancelled flag
+  isUploadCancelled = false;
+  return (dispatch, getState) => {
+    let progressCallback = (status, isCompleted) => {
+      if (isUploadCancelled) {
+        progressCallback = null;
+        return;
+      }
+      dispatch({
+        type: isCompleted ? ACTION_TYPES.UPLOAD_COMPLETED : ACTION_TYPES.UPLOADING,
+        payload: status
+      });
+      if (isCompleted) {
+        dispatch(getContainer(networkPath));
+      }
     };
     const errorCallback = (error) => {
       dispatch({
@@ -192,19 +198,28 @@ export const upload = (localPath: string, networkPath: string) => {
         payload: error
       });
     };
-    api.fileUpload(localPath, networkPath, progressCallback, errorCallback);
     dispatch({
       type: ACTION_TYPES.UPLOAD_STARTED
     });
+    api.fileUpload(localPath, networkPath, progressCallback, errorCallback);
   };
 };
 
 export const cancelUpload = () => {
+  // set upload cancelled flag
+  isUploadCancelled = true;
   api.cancelFileUpload();
   const err = new Error(I18n.t('messages.uploadCancelled'));
   return {
     type: ACTION_TYPES.UPLOAD_FAILED,
     payload: err
+  };
+};
+
+export const cancelUploadAndReloadContainer = (networkPath: string) => {
+  return (dispatch) => {
+    dispatch(cancelUpload());
+    dispatch(getContainer(networkPath));
   };
 };
 

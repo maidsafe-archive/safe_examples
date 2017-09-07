@@ -56,6 +56,7 @@ const en = {
   },
   messages: {
     emptyServiceName: 'Service name must be filled',
+    noEmptyDirs: 'Cannot upload empty directories',
     emptyContainerName: 'Container name must be filled',
     serviceNameInvalid: 'Service name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
     publicNameInvalid: 'Public name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
@@ -88,9 +89,9 @@ const en = {
     tooManyEntries: 'Mutable data has reached its maximum entries',
     noMoreService: 'No more services allowed for current public ID',
     noMoreFiles: 'No more files can be added to current service',
-    mdAuthReqTitle: 'Mutable Data Authourisation',
-    mdAuthReqDesc: '%{name} can not be modified. Will require authorisation to be provided for modifying the contents in the container. Send authorisation request now?',
-    mdAuthorisedTitle: 'Mutable Data Authourisation',
+    mdAuthReqTitle: 'Mutable Data Authorisation',
+    mdAuthReqDesc: '%{name} cannot be modified and will require you to authorise altering the contents of the container. Send authorisation request now?',
+    mdAuthorisedTitle: 'Mutable Data Authorisation',
     mdAuthorisedDesc: '%{name} has been granted permission!'
   }
 };

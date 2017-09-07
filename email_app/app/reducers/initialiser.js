@@ -19,8 +19,22 @@ const initialState = {
   },
   inboxSize: 0,
   savedSize: 0,
+  spaceUsed: 0,
   logPath: null
 };
+
+const pushEmailSorted = (list, item) => {
+  let index = list.findIndex((elem) => {
+    return elem.time <= item.email.time;
+  });
+  item.email.id = item.id;
+  if (index < 0) {
+    list.push(item.email);
+  } else {
+    list.splice(index, 0, item.email);
+  }
+  return list;
+}
 
 const initializer = (state = initialState, action) => {
   switch (action.type) {
@@ -119,6 +133,11 @@ const initializer = (state = initialState, action) => {
       };
       break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
+      return { ...state,
+        spaceUsed: action.payload,
+        processing: { state: false, msg: null }
+      };
+      break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_ERROR`:
       return { ...state, processing: { state: false, msg: null } };
       break;
@@ -130,18 +149,20 @@ const initializer = (state = initialState, action) => {
       return { ...state, processing: { state: false, msg: null } };
       break;
     case ACTION_TYPES.PUSH_TO_INBOX: {
-      let inbox = Object.assign({}, state.coreData.inbox, action.payload);
+      let inbox = state.coreData.inbox.slice();
+      pushEmailSorted(inbox, action.payload);
       return { ...state,
         coreData: { ...state.coreData, inbox },
-        inboxSize: Object.keys(inbox).length
+        inboxSize: inbox.length
       };
       break;
     }
     case ACTION_TYPES.PUSH_TO_ARCHIVE: {
-      let saved = Object.assign({}, state.coreData.saved, action.payload);
+      let saved = state.coreData.saved.slice();
+      pushEmailSorted(saved, action.payload);
       return { ...state,
         coreData: { ...state.coreData, saved },
-        savedSize: Object.keys(saved).length
+        savedSize: saved.length
       };
       break;
     }

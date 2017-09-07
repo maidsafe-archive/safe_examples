@@ -86,7 +86,7 @@ class SafeApi {
     .then((xorName) => this.sendMDReq([{
       type_tag: CONSTANTS.TAG_TYPE.DNS,
       name: xorName,
-      perms: ['Insert', `Update`]
+      perms: ['Insert', 'Update', 'Delete']
     }]))
   }
 
@@ -298,37 +298,39 @@ class SafeApi {
       containerKey = containerKey.slice(1);
     }
 
+    const deleteFiles = (nfs, files) => {
+      if (files.length === 0) {
+        return;
+      }
+      const file = files[0]
+      return nfs.fetch(file.key)
+        .then((f) => nfs.delete(file.key, f.version + 1))
+        .then(() => {
+          files.shift();
+          return deleteFiles(nfs, files);
+        });
+    };
+
     return this.getPublicContainer()
       .then((pubMd) => {
-        // delete file
-        if (path.extname(netPath)) {
-          return this.getMDataValueForKey(pubMd, containerName)
-            .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
-            .then((md) => {
-              const nfs = md.emulateAs('NFS');
-              return nfs.fetch(containerKey)
-                .then((file) => nfs.delete(containerKey, file.version + 1));
-            });
-        }
-
-        // delete directory
         return this.getMDataValueForKey(pubMd, containerName)
           .then((val) => this.app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
           .then((dirMd) => {
             const fileKeys = [];
-            // const nameOfDir = netPath.split('/').slice(-1).toString();
             return dirMd.getEntries()
               .then((entries) => entries.forEach((key, val) => {
                 const keyStr = key.toString();
-                if (keyStr.indexOf(containerKey) !== 0) {
+                if ((keyStr.indexOf(containerKey) !== 0) || keyStr === CONSTANTS.MD_META_KEY) {
+                  return;
+                }
+                if (val.buf.length === 0) {
                   return;
                 }
                 fileKeys.push({ key: keyStr, version: val.version });
-              }).then(() => Promise.all(fileKeys.map((file) => {
+              }).then(() => {
                 const nfs = dirMd.emulateAs('NFS');
-                return nfs.fetch(file.key)
-                  .then((f) => nfs.delete(file.key, f.version + 1));
-              }))));
+                return deleteFiles(nfs, fileKeys);
+              }));
           });
       });
   }
@@ -378,13 +380,13 @@ class SafeApi {
             return Promise.all(files.map((file) => {
               return nfs.fetch(file)
                 .then((f) => nfs.open(f, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
-                .then((f) => f.read(CONSTANTS.FILE_READ.FROM_START, CONSTANTS.FILE_READ.TILL_END))
-                .then((co) => {
+                .then((f) => f.size())
+                .then((size) => {
                   const dirName = path.split('/').slice(3).join('/');
                   result.unshift({
                     isFile: true,
                     name: dirName ? file.substr(dirName.length + 1) : file,
-                    size: co.length
+                    size: size
                   });
                 });
             })).then(() => result);
