@@ -472,12 +472,41 @@ class SafeApi {
             .then(() => md.applyEntriesMutation(mut)))));
   }
 
+  _deleteQueue(nfsHandle, serviceKeys, i) {
+    if (i === serviceKeys.length) {
+      return new Promise((resolve, reject) => {
+        return resolve("Files deleted");
+      });
+    }
+    console.log('This logs fires');
+    return nfsHandle.fetch(serviceKeys[i])
+    .then((file) => {
+      conosle.log('This log does not fire');
+      
+      console.log("file: ", file);
+      return nfsHandle.delete(serviceKeys[i], file.version);
+    })
+    .then(() => _deleteQueue(nfsHandle, serviceKeys, i + 1));
+  }
+
   _removeFromMData(md, key) {
+    let serviceKeys = [];
     return md.getEntries()
-      .then((entries) => entries.get(key)
-        .then((value) => entries.mutate()
-          .then((mut) => mut.remove(key, value.version + 1)
-            .then(() => md.applyEntriesMutation(mut)))));
+    .then((entries) => entries.get(key)
+      .then((value) => {
+          return this.app.mutableData.newPublic(value.buf, 15002)
+          .then((serviceHandle) => serviceHandle.getKeys()
+            .then((keys) => keys.forEach((k) => { serviceKeys.push(String.fromCharCode.apply(null, k)) }))
+            .then(() => serviceHandle.emulateAs('NFS'))
+            .then((nfsHandle) => this._deleteQueue(nfsHandle, serviceKeys, 0))
+            .then(() => entries.mutate()
+              .then((mut) => mut.remove(key, value.version + 1)
+                .then(() => md.applyEntriesMutation(mut)))
+            )
+          )
+        }
+      )
+    );
   }
 
   _insertToMData(md, key, val, toEncrypt) {
