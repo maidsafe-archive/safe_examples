@@ -1,7 +1,7 @@
 {
   "name": "web-hosting-manager",
   "productName": "Web Hosting Manager",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Application to manage web hosting in SAFE Network",
   "identifier": "net.maidsafe.webhostingmanager",
   "main": "./main.js",
@@ -13,6 +13,6 @@
   "license": "MIT",
   "dependencies": {
     "classnames": "^2.2.5",
-    "safe-app": "https://s3.eu-west-2.amazonaws.com/safe-app-nodejs/safe-app-0.2.0.tgz"
+    "safe-app": "https://s3.eu-west-2.amazonaws.com/safe-app-nodejs/safe-app-0.2.1.tgz"
   }
 }

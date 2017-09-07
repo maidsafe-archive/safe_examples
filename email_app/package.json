@@ -123,7 +123,7 @@
     "redux-axios-middleware": "^2.0.0",
     "redux-promise-middleware": "^4.2.0",
     "redux-thunk": "^2.1.0",
-    "safe-app": "https://s3.eu-west-2.amazonaws.com/safe-app-nodejs/safe-app-0.2.0.tgz",
+    "safe-app": "https://s3.eu-west-2.amazonaws.com/safe-app-nodejs/safe-app-0.2.1.tgz",
     "source-map-support": "^0.4.2",
     "urlsafe-base64": "^1.0.0"
   },
