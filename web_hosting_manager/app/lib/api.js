@@ -472,39 +472,36 @@ class SafeApi {
             .then(() => md.applyEntriesMutation(mut)))));
   }
 
-  _deleteQueue(nfsHandle, serviceKeys, i) {
-    if (i === serviceKeys.length) {
+  _deleteQueue(nfsHandle, serviceFileEntryKeys, i) {
+    if (i === serviceFileEntryKeys.length) {
       return new Promise((resolve, reject) => {
         return resolve("Files deleted");
       });
     }
-    console.log('This logs fires');
-    return nfsHandle.fetch(serviceKeys[i])
-    .then((file) => {
-      conosle.log('This log does not fire');
 
-      console.log("file: ", file);
-      return nfsHandle.delete(serviceKeys[i], file.version + 1);
+    return nfsHandle.fetch(serviceFileEntryKeys[i])
+    .then((file) => {
+      return nfsHandle.delete(serviceFileEntryKeys[i], file.version + 1);
     })
-    .then(() => _deleteQueue(nfsHandle, serviceKeys, i + 1));
+    .then(() => this._deleteQueue(nfsHandle, serviceFileEntryKeys, i + 1));
   }
 
   _removeFromMData(md, key) {
-    let serviceKeys = [];
+    let serviceFileEntryKeys = [];
     return md.getEntries()
     .then((entries) => entries.get(key)
-      .then((value) => {
-          return this.app.mutableData.newPublic(value.buf, 15002)
-          .then((serviceHandle) => serviceHandle.getKeys()
-            .then((keys) => keys.forEach((k) => { serviceKeys.push(String.fromCharCode.apply(null, k)) }))
-            .then(() => serviceHandle.emulateAs('NFS'))
-            .then((nfsHandle) => this._deleteQueue(nfsHandle, serviceKeys, 0))
-            .then(() => entries.mutate()
-              .then((mut) => mut.remove(key, value.version + 1)
-                .then(() => md.applyEntriesMutation(mut)))
-            )
+      .then((value) => this.app.mutableData.newPublic(value.buf, 15002)
+        .then((serviceHandle) => serviceHandle.getKeys()
+          .then((keys) => keys.forEach((k) => { serviceFileEntryKeys.push(String.fromCharCode.apply(null, k)) }))
+          .then(() => serviceHandle.emulateAs('NFS'))
+          .then((nfsHandle) => this._deleteQueue(nfsHandle, serviceFileEntryKeys.filter((key) => key !== "_metadata"), 0))
+          .then((res) => {
+              return entries.mutate()
+                .then((mut) => mut.remove(key, value.version + 1)
+                  .then(() => md.applyEntriesMutation(mut)))
+            }
           )
-        }
+        )
       )
     );
   }
