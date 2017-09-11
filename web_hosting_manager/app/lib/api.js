@@ -474,11 +474,8 @@ class SafeApi {
 
   _deleteQueue(nfsHandle, serviceFileEntryKeys, i) {
     if (i === serviceFileEntryKeys.length) {
-      return new Promise((resolve, reject) => {
-        return resolve("Files deleted");
-      });
+      return Promise.resolve("Files deleted");
     }
-
     return nfsHandle.fetch(serviceFileEntryKeys[i])
     .then((file) => {
       return nfsHandle.delete(serviceFileEntryKeys[i], file.version + 1);
@@ -490,7 +487,7 @@ class SafeApi {
     let serviceFileEntryKeys = [];
     return md.getEntries()
     .then((entries) => entries.get(key)
-      .then((value) => this.app.mutableData.newPublic(value.buf, 15002)
+      .then((value) => this.app.mutableData.newPublic(value.buf, CONSTANTS.TAG_TYPE.WWW)
         .then((serviceHandle) => serviceHandle.getKeys()
           .then((keys) => keys.forEach((k) => { serviceFileEntryKeys.push(String.fromCharCode.apply(null, k)) }))
           .then(() => serviceHandle.emulateAs('NFS'))
