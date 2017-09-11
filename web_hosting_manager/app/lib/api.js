@@ -2,7 +2,7 @@
  * SafeApi class expose all api requested for web hosting manager.
  */
 import path from 'path';
-import safeApp from 'safe-app';
+import safeApp from '@maidsafe/safe-node-app';
 import { I18n } from 'react-redux-i18n';
 
 import Uploader from './Uploader';
