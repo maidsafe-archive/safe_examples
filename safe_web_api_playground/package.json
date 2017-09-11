@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/hunterlester/safe_dom_api_playground#readme",
   "devDependencies": {
-    "safe-app": "https://github.com/maidsafe/safe_app_nodejs.git"
+	  "@maidsafe/safe-node-app": "^0.2.1-4",
   },
   "dependencies": {
     "babelify": "^7.3.0",
