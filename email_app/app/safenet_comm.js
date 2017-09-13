@@ -1,6 +1,6 @@
 import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
-import { initializeApp, fromAuthURI } from 'safe-app';
+import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
          splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
 import pkg from '../package.json';

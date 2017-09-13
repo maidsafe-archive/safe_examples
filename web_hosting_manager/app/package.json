@@ -12,7 +12,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "classnames": "^2.2.5",
-    "safe-app": "https://s3.eu-west-2.amazonaws.com/safe-app-nodejs/safe-app-0.2.1.tgz"
+    "@maidsafe/safe-node-app": "0.2.1",
+    "classnames": "^2.2.5"
   }
 }
