@@ -10,6 +10,9 @@ const initialState = {
 
 const createAccount = (state = initialState, action) => {
   switch (action.type) {
+    case `${ACTION_TYPES.CREATE_ACCOUNT_RESET}_LOADING`:
+      return initialState;
+      break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_ERROR`:
       return { ...state, error: action.payload };
       break;

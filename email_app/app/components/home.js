@@ -12,6 +12,7 @@ export default class Home extends Component {
     super();
 
     this.reconnect = this.reconnect.bind(this);
+    this.handleBack = this.handleBack.bind(this);
   }
 
   reconnect() {
@@ -19,6 +20,14 @@ export default class Home extends Component {
     return reconnectApplication()
       .then(() => refreshEmail(account),
             (err) => 'failed reconnecting');
+  }
+
+  handleBack(e) {
+    e.preventDefault();
+    const { resetCurrentAccount, getEmailIds } = this.props;
+    return resetCurrentAccount()
+      .then(() => getEmailIds())
+      .then(() => this.context.router.push(`/create_account`));
   }
 
   render() {
@@ -67,9 +76,13 @@ export default class Home extends Component {
           </div>
           <header className="home-head">
             <div className="lt-sec">
+              <button className="mdl-button mdl-js-button mdl-button--icon" title="Switch email ID" onClick={this.handleBack}>
+                <i className="material-icons">keyboard_arrow_left</i>
+              </button>
+            </div>
+            <div className="rt-sec text-left">
               <h3 className="title heading-md"><span className="bold">Email ID: </span>{coreData.id}</h3>
             </div>
-            <div className="rt-sec text-right"></div>
           </header>
           <div className="home-cnt mdl-layout mdl-js-layout">
             <div className="home-nav mdl-list">
