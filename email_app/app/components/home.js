@@ -76,7 +76,9 @@ export default class Home extends Component {
           </div>
           <header className="home-head">
             <div className="lt-sec">
-              <button className="mdl-button mdl-js-button mdl-button--icon mdl-button--primary" name="back" onClick={this.handleBack}><i className="material-icons">back</i></button>
+              <button className="mdl-button mdl-js-button mdl-button--icon" title="Switch email ID" onClick={this.handleBack}>
+                <i className="material-icons">keyboard_arrow_left</i>
+              </button>
             </div>
             <div className="rt-sec text-left">
               <h3 className="title heading-md"><span className="bold">Email ID: </span>{coreData.id}</h3>
