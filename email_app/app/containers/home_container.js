@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import Home from '../components/home';
-import { reconnectApplication, refreshEmail } from '../actions/initializer_actions';
+import { reconnectApplication, refreshEmail, getEmailIds } from '../actions/initializer_actions';
+import { resetCurrentAccount } from '../actions/create_account_actions';
 
 const mapStateToProps = state => {
   return {
@@ -17,6 +18,8 @@ const mapDispatchToProps = dispatch => {
   return {
     reconnectApplication: () => (dispatch(reconnectApplication())),
     refreshEmail: (account) => (dispatch(refreshEmail(account))),
+    getEmailIds: () => (dispatch(getEmailIds())),
+    resetCurrentAccount: () => (dispatch(resetCurrentAccount()))
   };
 };
 

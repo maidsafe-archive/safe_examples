@@ -11,6 +11,11 @@ export const createAccount = (emailId) => {
   };
 };
 
+export const resetCurrentAccount = () => ({
+    type: ACTION_TYPES.CREATE_ACCOUNT_RESET,
+    payload: Promise.resolve()
+});
+
 export const createAccountError = (error) => ({
   type: ACTION_TYPES.CREATE_ACCOUNT,
   payload: Promise.reject(error)
