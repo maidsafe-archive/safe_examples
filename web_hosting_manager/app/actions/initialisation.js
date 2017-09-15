@@ -43,12 +43,12 @@ export const initialiseApp = () => {
       dispatch({
         type: `${ACTION_TYPES.INITIALISE_APP}_REJECTED`,
         error: new Error('Application not authorised.')
-      })
+      });
       return;
     }
     return dispatch({
       type: ACTION_TYPES.INITIALISE_APP,
-      payload: api.connect(state.authorisation.authRes, nwStateCallback)
+      payload: api.connect(state.authorisation.authRes, nwStateCallback(dispatch))
         .then(() => {
           dispatch(connected());
           // check access container permission

@@ -29,6 +29,7 @@ export default class ManageFiles extends Component {
     const containerPath = decodeURIComponent(this.props.match.params.containerPath);
     return (
       <Base
+        nwState={this.props.nwState}
         processing={this.props.processing}
         error={this.props.error}
         processDesc={this.props.processDesc}

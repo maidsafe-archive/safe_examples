@@ -98,7 +98,9 @@ export default class NewWebSite extends Component {
 
   render() {
     return (
-      <Base>
+      <Base
+        nwState={this.props.nwState}
+      >
         <div>
           <WizardNav history={this.props.history} />
           <div className="card">

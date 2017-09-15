@@ -1,8 +1,10 @@
 import ACTION_TYPE from '../actions/action_types';
 
 import { parseErrorMsg } from '../utils/app';
+import CONSTANTS from '../constants';
 
 const initState = {
+  nwState: CONSTANTS.NETWORK_STATE.UNKNOWN,
   connected: false,
   fetchedAccessInfo: false,
   fetchedPublicNames: false,
@@ -12,8 +14,14 @@ const initState = {
   error: null
 };
 
-export default function authorisation(state = initState, action) {
+export default function initialisation(state = initState, action) {
   switch (action.type) {
+    case ACTION_TYPE.NW_STATUS_CHANGED:
+      return {
+        ...state,
+        nwState: action.state
+      };
+
     case `${ACTION_TYPE.INITIALISE_APP}_PENDING`:
       return {
         ...state,

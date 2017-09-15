@@ -8,6 +8,7 @@ import * as commonAction from '../actions/common';
 
 function mapStateToProps(state) {
   return {
+    nwState: state.initialisation.nwState,
     uploading: state.fileManager.uploading,
     uploadStatus: state.fileManager.uploadStatus,
     containerInfo: state.fileManager.containerInfo,

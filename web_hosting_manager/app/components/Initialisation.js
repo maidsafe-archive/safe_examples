@@ -48,7 +48,7 @@ export default class Initialisation extends Component {
     this.setState({
       showPopup: false
     });
-    
+
     // move to authorisation page after error popup
     this.props.history.replace('/');
   }
@@ -90,9 +90,10 @@ export default class Initialisation extends Component {
 
     return (
       <Base
-        showPopup={this.state.showPopup} 
-        popupType={this.state.popupType} 
-        popupDesc={this.state.popupDesc} 
+        nwState={this.props.nwState}
+        showPopup={this.state.showPopup}
+        popupType={this.state.popupType}
+        popupDesc={this.state.popupDesc}
         popupOkCb={this.popupOkCb.bind(this)}
       >
         <div className="card">

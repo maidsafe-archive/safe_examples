@@ -68,6 +68,7 @@ export default class WithTemplate extends Component {
 
     return (
       <Base
+        nwState={this.props.nwState}
         processing={this.props.processing}
         error={this.props.error}
         processDesc={this.props.processDesc}

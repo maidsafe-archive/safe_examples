@@ -127,6 +127,7 @@ export default class PublicNames extends Component {
 
     return (
       <Base
+        nwState={this.props.nwState}
         scrollableContainer={!hasPublicNames}
         showHeaderOpts
         processing={this.props.processing}

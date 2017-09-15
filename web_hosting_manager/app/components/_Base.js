@@ -21,7 +21,7 @@ export default class Base extends Component {
       (error ? CONSTANTS.UI.POPUP_TYPES.ERROR : CONSTANTS.UI.POPUP_TYPES.LOADING);
     return (
       <div className="root-b">
-        <Header showOpt={this.props.showHeaderOpts}/>
+        <Header nwState={this.props.nwState} showOpt={this.props.showHeaderOpts} />
         <div className="root-container">
           <div className={rootContainerCn}>
             {this.props.children}
@@ -47,5 +47,6 @@ Base.propTypes = {
   processing: PropTypes.bool,
   error: PropTypes.string,
   processDesc: PropTypes.string,
-  popupCancelCb: PropTypes.func
+  popupCancelCb: PropTypes.func,
+  nwState: PropTypes.string
 };

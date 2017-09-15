@@ -96,6 +96,7 @@ export default class CreateService extends Component {
     const publicName = this.props.match.params.publicName;
     return (
       <Base
+        nwState={this.props.nwState}
         showAuthReq={this.props.sendAuthReq}
         processing={this.props.processing}
         error={this.props.error}

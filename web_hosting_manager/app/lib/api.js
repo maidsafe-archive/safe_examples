@@ -53,10 +53,6 @@ class SafeApi {
     }
     return safeApp.fromAuthURI(this.APP_INFO.data, authInfo, nwStateChangeCb)
       .then((app) => {
-        // store Auth response
-        if (uri) {
-          utils.localAuthInfo.save(uri);
-        }
         nwStateChangeCb(CONSTANTS.NETWORK_STATE.CONNECTED);
         this.app = app;
       })

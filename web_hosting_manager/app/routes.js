@@ -11,10 +11,7 @@ import CreateServiceContainerPage from './containers/CreateServiceContainerPage'
 import CreateServicePage from './containers/CreateServicePage';
 import WithTemplatePage from './containers/WithTemplatePage';
 import ManageFilesPage from './containers/ManageFilesPage';
-
-// static components
-import NewWebSitePage from './components/NewWebSite';
-
+import NewWebSitePage from './containers/NewWebSitePage';
 
 export default () => (
   <App>

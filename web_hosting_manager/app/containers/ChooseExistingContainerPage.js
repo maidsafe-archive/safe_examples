@@ -8,6 +8,7 @@ import * as commonAction from '../actions/common';
 
 function mapStateToProps(state) {
   return {
+    nwState: state.initialisation.nwState,
     serviceContainers: state.publicNames.serviceContainers,
     error: state.publicNames.error || state.fileManager.error,
     processing: state.publicNames.processing || state.fileManager.processing,

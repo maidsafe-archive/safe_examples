@@ -8,6 +8,7 @@ import * as commonAction from '../actions/common';
 
 function mapStateToProps(state) {
   return {
+    nwState: state.initialisation.nwState,
     error: state.publicNames.error || state.services.error,
     processing: state.publicNames.processing || state.services.processing,
     processDesc: state.publicNames.processDesc || state.services.processDesc,
