@@ -1,0 +1,112 @@
+.public-id-ls
+  width: cntr-wight
+  margin: 0 auto
+  padding: 60px 0
+  .public-id-ls-b
+    display: block
+  .i
+    &:not(:last-child)
+      margin-bottom: 24px
+    .i-h
+      background-color: #e0ebf7
+      height: public-id-ls-item-height
+      line-height: public-id-ls-item-height
+      padding-left: 70px
+      position: relative
+      cursor: pointer
+      &:before
+        content: ""
+        width: 10px
+        height: 14px
+        background-image: url(url-accordion-arrow)
+        background-repeat: no-repeat
+        background-size: contain
+        background-position: center
+        display: block
+        position: absolute
+        top: 50%
+        left: 14px
+        transform: translate(0, -50%)
+      &:after
+        content: ""
+        width: 30px
+        height: 30px
+        display: block
+        background-image: url(url-public-id-icon)
+        position: absolute
+        top: 50%
+        left: 40px
+        transform: translate(0, -50%)
+      &.expand
+        &:before
+          transform: rotate3d(0, 0, 1, 90deg) translate(0, -50%);
+          transform-origin: 50% 0;
+        & ~ .i-cnt
+          display: block
+      .i-name
+        width: 65%
+        padding-left: 15px
+        font-size: 20px
+        color: color-common-text
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+      .i-new-btn
+        width: 250px
+        height: 100%
+        position: absolute;
+        top: 0
+        right: 0
+        padding-right: 20px
+    .i-cnt
+      display: none
+      background-color: #f4f3f3
+      padding: 18px 26px 34px
+      .i-cnt-h
+        padding-right: 90px
+        border-bottom: 2px solid #ffffff 
+        .i-cnt-h-b
+          clearfix()
+          .name
+          .location
+            display: inline-block
+            width: 50%
+            float: left
+            font-size: 14px
+            color: color-common-text
+            line-height: 26px
+      .i-cnt-ls
+        padding-top: 30px
+        .i-cnt-ls-i
+          position: relative
+          padding-right: 90px
+          line-height: 30px
+          &:not(:last-child)
+            margin-bottom: 35px
+          .i-cnt-ls-i-b
+            clearfix()
+            .name
+            .location
+              width: 50%
+              float: left
+              display: inline-block
+              font-size: 20px
+              font-weight: 600
+              a
+                color: color-pr-blue
+                text-decoration: none
+                &:hover
+                  text-decoration: underline
+
+          .opt
+            width: 90px
+            height: 100%
+            position: absolute
+            top: 0
+            right: 0
+            clearfix()
+            .opt-i
+              display: inline-block
+              float: left
+              &:not(:last-child)
+                margin-right: 30px

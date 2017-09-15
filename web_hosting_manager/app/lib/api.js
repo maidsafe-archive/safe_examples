@@ -1,6 +1,7 @@
 /**
  * SafeApi class expose all api requested for web hosting manager.
  */
+import { shell } from 'electron';
 import path from 'path';
 import safeApp from '@maidsafe/safe-node-app';
 import { I18n } from 'react-redux-i18n';
@@ -19,15 +20,22 @@ class SafeApi {
     this.downloader = null;
   }
 
+  mockRes(err) {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        if (err) {
+          return rej(new Error(err))
+        }
+        res()
+      }, 2000);
+    });
+  }
+
   /**
    * Authorise with SAFE Authenticator
    * @return {Promise}
    */
-  authorise() {
-    const authInfo = utils.localAuthInfo.get();
-    if (authInfo) {
-      return authInfo;
-    }
+  sendAuthReq() {
     return safeApp.initializeApp(this.APP_INFO.data)
       .then((app) => app.auth.genAuthUri(this.APP_INFO.permissions, this.APP_INFO.opt))
       .then((res) => utils.openExternal(res.uri));
@@ -39,11 +47,9 @@ class SafeApi {
    * @return {*}
    */
   connect(uri, nwStateChangeCb) {
-    const authInfo = uri || JSON.parse(utils.localAuthInfo.get());
+    const authInfo = uri;
     if (!authInfo) {
-      // FIXME shankar - handle from action
-      // return Promise.reject(new Error('Missing Authorisation information.'));
-      return this.authorise();
+      return Promise.reject(new Error('Missing Authorisation information.'));
     }
     return safeApp.fromAuthURI(this.APP_INFO.data, authInfo, nwStateChangeCb)
       .then((app) => {
@@ -91,6 +97,13 @@ class SafeApi {
       .then((res) => {
         console.log('connected with MD');
       });
+  }
+
+  openLogFile() {
+    if (!this.app) {
+      return;
+    }
+    this.app.logPath().then(shell.openItem);
   }
 
   /**
@@ -477,30 +490,30 @@ class SafeApi {
       return Promise.resolve("Files deleted");
     }
     return nfsHandle.fetch(serviceFileEntryKeys[i])
-    .then((file) => {
-      return nfsHandle.delete(serviceFileEntryKeys[i], file.version + 1);
-    })
-    .then(() => this._deleteQueue(nfsHandle, serviceFileEntryKeys, i + 1));
+      .then((file) => {
+        return nfsHandle.delete(serviceFileEntryKeys[i], file.version + 1);
+      })
+      .then(() => this._deleteQueue(nfsHandle, serviceFileEntryKeys, i + 1));
   }
 
   _removeFromMData(md, key) {
     let serviceFileEntryKeys = [];
     return md.getEntries()
-    .then((entries) => entries.get(key)
-      .then((value) => this.app.mutableData.newPublic(value.buf, CONSTANTS.TAG_TYPE.WWW)
-        .then((serviceHandle) => serviceHandle.getKeys()
-          .then((keys) => keys.forEach((k) => { serviceFileEntryKeys.push(String.fromCharCode.apply(null, k)) }))
-          .then(() => serviceHandle.emulateAs('NFS'))
-          .then((nfsHandle) => this._deleteQueue(nfsHandle, serviceFileEntryKeys.filter((key) => key !== "_metadata"), 0))
-          .then((res) => {
-              return entries.mutate()
-                .then((mut) => mut.remove(key, value.version + 1)
-                  .then(() => md.applyEntriesMutation(mut)))
-            }
+      .then((entries) => entries.get(key)
+        .then((value) => this.app.mutableData.newPublic(value.buf, CONSTANTS.TAG_TYPE.WWW)
+          .then((serviceHandle) => serviceHandle.getKeys()
+            .then((keys) => keys.forEach((k) => { serviceFileEntryKeys.push(String.fromCharCode.apply(null, k)) }))
+            .then(() => serviceHandle.emulateAs('NFS'))
+            .then((nfsHandle) => this._deleteQueue(nfsHandle, serviceFileEntryKeys.filter((key) => key !== "_metadata"), 0))
+            .then((res) => {
+                return entries.mutate()
+                  .then((mut) => mut.remove(key, value.version + 1)
+                    .then(() => md.applyEntriesMutation(mut)))
+              }
+            )
           )
         )
-      )
-    );
+      );
   }
 
   _insertToMData(md, key, val, toEncrypt) {

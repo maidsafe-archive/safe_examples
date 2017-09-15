@@ -2,17 +2,23 @@
   "name": "web-hosting-manager",
   "productName": "Web Hosting Manager",
   "version": "0.2.2",
-  "description": "Application to manage web hosting in SAFE Network",
-  "identifier": "net.maidsafe.webhostingmanager",
-  "main": "./main.js",
+  "description": "Application to host web files in the SAFE Network",
+  "identifier": "net.maidsafe.examples.webhostingmanager",
+  "main": "./main.prod.js",
   "author": {
-    "name": "MaidSafe.net Ltd",
+    "name": "MaidSafe",
     "email": "dev@maidsafe.net",
     "url": "https://maidsafe.net"
   },
+  "scripts": {
+    "postinstall": "npm rebuild --runtime=electron --target=1.6.6 --disturl=https://atom.io/download/atom-shell --build-from-source"
+  },
   "license": "MIT",
   "dependencies": {
+    "classnames": "^2.2.5",
+    "lodash": "^4.17.4",
+    "npm-font-open-sans": "^1.0.3",
     "@maidsafe/safe-node-app": "0.2.2",
-    "classnames": "^2.2.5"
+    "temp": "^0.8.3"
   }
 }

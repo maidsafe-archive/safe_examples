@@ -1,17 +1,26 @@
 {
-  "presets": ["es2015", "stage-0", "react"],
-  "plugins": ["babel-plugin-transform-decorators-legacy", "add-module-exports"],
+  "presets": [
+    ["env", {
+      "targets": { "node": 7 },
+      "useBuiltIns": true
+    }],
+    "stage-0",
+    "react"
+  ],
+  "plugins": ["add-module-exports", "dynamic-import-webpack"],
   "env": {
     "production": {
       "presets": ["react-optimize"],
       "plugins": ["babel-plugin-dev-expression"]
     },
     "development": {
-      "presets": ["react-hmre"]
-    },
-    "test": {
       "plugins": [
-        ["webpack-loaders", { "config": "webpack.config.test.js", "verbose": false }]
+        "transform-class-properties",
+        "transform-es2015-classes",
+        ["flow-runtime", {
+          "assert": true,
+          "annotate": true
+        }]
       ]
     }
   }

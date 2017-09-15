@@ -16,13 +16,13 @@ $ git clone https://github.com/maidsafe/safe_examples && cd safe_examples/web_ho
 And then install Node.js dependencies.
 
 ```bash
-$ npm i
+$ yarn
 ```
 
 Finally, rebuild the native modules
 
 ```bash
-$ npm run rebuild
+$ yarn run rebuild
 ```
 
 ## Run
@@ -30,14 +30,14 @@ $ npm run rebuild
 Run these two commands __simultaneously__ in different console tabs.
 
 ```bash
-$ npm run hot-server
-$ npm run start-hot
+$ yarn run hot-server
+$ yarn run start-hot
 ```
 
 or run two servers with one command
 
 ```bash
-$ npm run dev
+$ yarn run dev
 ```
 
 ## Packaging
@@ -45,19 +45,7 @@ $ npm run dev
 To package apps for the local platform:
 
 ```bash
-$ npm run package
-```
-
-To package apps for all platforms:
-
-```bash
-$ npm run package-all
-```
-
-To package apps with options:
-
-```bash
-$ npm run package -- --[option]
+$ yarn run package
 ```
 
 ## Further commands
@@ -65,8 +53,8 @@ $ npm run package -- --[option]
 To run the application without packaging run
 
 ```bash
-$ npm run build
-$ npm start
+$ yarn run build
+$ yarn start
 ```
 #### Clear Access Data
 #####macOs
