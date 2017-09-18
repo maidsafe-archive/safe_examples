@@ -1,5 +1,15 @@
-import ACTION_TYPE from './action_types';
+// @flow
+
+import ACTION_TYPES from './action_types';
+import api from '../lib/api';
 
 export const reset = () => ({
-  type: ACTION_TYPE.RESET
+  type: ACTION_TYPES.RESET
 });
+
+export const reconnect = () => {
+  return {
+    type: ACTION_TYPES.RECONNECT,
+    payload: api.reconnect()
+  }
+};

@@ -126,6 +126,7 @@ export default class CreateServiceContainer extends Component {
     const serviceName = params.serviceName;
     return (
       <Base
+        reconnect={this.props.reconnect}
         nwState={this.props.nwState}
         processing={this.props.processing}
         error={this.props.error}

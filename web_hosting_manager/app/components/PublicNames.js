@@ -127,6 +127,7 @@ export default class PublicNames extends Component {
 
     return (
       <Base
+        reconnect={this.props.reconnect}
         nwState={this.props.nwState}
         scrollableContainer={!hasPublicNames}
         showHeaderOpts

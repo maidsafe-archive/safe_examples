@@ -42,7 +42,8 @@ class SafeApi {
     }
     return safeApp.fromAuthURI(this.APP_INFO.data, authInfo, nwStateChangeCb)
       .then((app) => {
-        nwStateChangeCb(CONSTANTS.NETWORK_STATE.CONNECTED);
+        // nwStateChangeCb(CONSTANTS.NETWORK_STATE.CONNECTED);
+        nwStateChangeCb(CONSTANTS.NETWORK_STATE.DISCONNECTED);
         this.app = app;
       })
       .catch((err) => {

@@ -49,6 +49,7 @@ export default class NewPublicName extends Component {
   render() {
     return (
       <Base
+        reconnect={this.props.reconnect}
         nwState={this.props.nwState}
         processing={this.props.processing}
         error={this.props.error}

@@ -141,3 +141,12 @@ export const downloadFile = (networkPath) => {
     });
   };
 };
+
+export const cancelDownload = () => {
+  api.cancelFileDownload();
+  const err = new Error(I18n.t('messages.downloadCancelled'));
+  return {
+    type: ACTION_TYPES.DOWNLOAD_FAILED,
+    payload: err
+  };
+};

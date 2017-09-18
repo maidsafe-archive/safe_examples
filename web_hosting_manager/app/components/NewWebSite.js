@@ -99,6 +99,7 @@ export default class NewWebSite extends Component {
   render() {
     return (
       <Base
+        reconnect={this.props.reconnect}
         nwState={this.props.nwState}
       >
         <div>

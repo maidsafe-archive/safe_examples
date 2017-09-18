@@ -10,6 +10,8 @@ function mapStateToProps(state) {
     nwState: state.initialisation.nwState,
     uploading: state.fileManager.uploading,
     uploadStatus: state.fileManager.uploadStatus,
+    downloading: state.fileManager.downloading,
+    downloadStatus: state.fileManager.downloadStatus,
     error: state.fileManager.error,
     processing: state.fileManager.processing,
     processDesc: state.fileManager.processDesc,

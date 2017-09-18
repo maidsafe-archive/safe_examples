@@ -68,6 +68,8 @@ const CONSTANTS = {
     TILL_END: 0
   },
   MD_META_KEY: '_metadata',
+  DOWNLOAD_CHUNK_SIZE: 1000000,
+  UPLOAD_CHUNK_SIZE: 1000000,
   UI: {
     POPUP_TYPES: {
       LOADING: 'LOADING',

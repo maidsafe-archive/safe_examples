@@ -16,6 +16,16 @@ const initState = {
 
 export default function initialisation(state = initState, action) {
   switch (action.type) {
+    case `${ACTION_TYPE.RECONNECT_APP}_PENDING`:
+      return {
+        ...state,
+        nwState: CONSTANTS.NETWORK_STATE.INIT
+      };
+    case `${ACTION_TYPE.RECONNECT_APP}_REJECTED`:
+      return {
+        ...state,
+        nwState: CONSTANTS.NETWORK_STATE.DISCONNECTED
+      };
     case ACTION_TYPE.NW_STATUS_CHANGED:
       return {
         ...state,

@@ -49,8 +49,8 @@ export default function fileManager(state = initState, action) {
         ...state,
         downloading: true,
         downloadStatus: null,
-        processing: true,
-        processDesc: CONSTANTS.UI.MSG.DOWNLOADING_FILE
+        // processing: true,
+        // processDesc: CONSTANTS.UI.MSG.DOWNLOADING_FILE
       };
     case ACTION_TYPES.DOWNLOADING:
       return {
@@ -63,8 +63,8 @@ export default function fileManager(state = initState, action) {
         ...state,
         downloading: false,
         downloadStatus: null,
-        processing: false,
-        processDesc: null,
+        // processing: false,
+        // processDesc: null,
         error: action.payload.message
       };
     case ACTION_TYPES.DOWNLOAD_COMPLETED:

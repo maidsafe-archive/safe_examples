@@ -180,23 +180,61 @@ export default class FileExplorer extends Component {
     );
   }
 
+  getDownloadContainer() {
+    if (!this.props.downloading && !this.props.downloadStatus) {
+      return (<span>{''}</span>);
+    }
+    return (
+      <div className="download">
+        <span className="load">{''}</span>
+        <span className="title">Downloading file</span>
+        <span className="percentage">{this.props.downloadStatus}</span>
+        <span className="opt">
+          <button
+            type="button"
+            className="btn"
+            onClick={(e) => {
+              e.preventDefault();
+              this.props.cancelDownload();
+            }}
+          >Cancel</button>
+        </span>
+      </div>
+    )
+  }
+
   getNav() {
     let levelBackBtn = null;
+
+    const getRelativePath = () => {
+      const currentPath = this.getCurrentPath();
+      if (currentPath === this.props.rootPath) {
+        return './';
+      }
+      return `.${currentPath.substr(this.props.rootPath.length)}`;
+    };
+
     if (!this.isRootFolder()) {
       levelBackBtn = (
         <button
           type="button"
-          className="btn"
+          className="file-back-btn"
           onClick={(e) => {
             e.preventDefault();
             this.levelBack();
           }}
-        >back</button>
+        >{''}</button>
       );
     }
+
     return (
-      <div className="cntr-nav">
-        { levelBackBtn }
+      <div className="fe-nav">
+        <div className="sec-1">
+          { levelBackBtn }
+        </div>
+        <div className="sec-2">
+          <h3 className="current-path">{getRelativePath()}</h3>
+        </div>
       </div>
     );
   }
@@ -205,6 +243,7 @@ export default class FileExplorer extends Component {
     return (
       <div className="file-explorer">
         <div className="b">
+          {this.getNav()}
           <div className="h">
             <div className="h-b">
               <div className="h-cntr">
@@ -215,7 +254,6 @@ export default class FileExplorer extends Component {
           </div>
           <div className="cntr">
             <div className="cntr-b">
-              {this.getNav()}
               {
                 this.props.containerInfo ? this.props.containerInfo.map((item, index) => {
                     if (item.isFile) {
@@ -227,6 +265,7 @@ export default class FileExplorer extends Component {
             </div>
             { this.props.uploading ? (<div className="uploading"></div>) : null }
             {this.getUploadBtn()}
+            {this.getDownloadContainer()}
           </div>
           {this.props.uploading ? this.getStatus() : this.getStatus()}
         </div>

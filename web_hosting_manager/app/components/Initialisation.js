@@ -90,6 +90,7 @@ export default class Initialisation extends Component {
 
     return (
       <Base
+        reconnect={this.props.reconnect}
         nwState={this.props.nwState}
         showPopup={this.state.showPopup}
         popupType={this.state.popupType}

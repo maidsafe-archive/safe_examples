@@ -328,10 +328,31 @@
 .file-explorer
   > .b
     padding-bottom: 40px
+    .fe-nav
+      height: 27px
+      background-color: bg-file-explorer-nav
+      position: relative
+      .sec-1
+        width: 20%
+        position: absolute
+        top: 0
+        left: 0
+        padding: 0 0 0 11px
+        button
+          margin: 5.5px 0
+      .sec-2
+        width: 100%
+        text-align: center
+        .current-path
+          font-size: 14px
+          line-height: 27px
+          font-weight: normal
+          color: color-common-text
     .h
       padding-left: 14px
       padding-right: 14px
       background-color: bg-file-explorer-head
+      border-bottom: 1px solid pr-pale-brown-3
       .h-b
         width: 100%
         line-height: 27px
@@ -368,9 +389,6 @@
         left: 0
         background-color: bg-uploading
         z-index: 1
-      .cntr-nav
-        height: 30px
-        margin-bottom: 8px
       .cntr-b
         height: inherit
         overflow: auto
@@ -416,6 +434,39 @@
           right: 5px
         &:hover
           background-color: bg-file-explorer-item-hover
+      > .download
+        position: absolute
+        display: inline-block
+        top: 100%
+        right: 0
+        margin-top: 11px
+        .load
+          width: 20px
+          height: 20px
+          float: left
+          background-image: url(download-loader-brand)
+          background-repeat: no-repeat
+          background-size: 14px
+          background-position: center
+          display: inline-block
+          margin-right: 8px
+          animation: rotate-clockwise .5s linear infinite
+        .title
+        .percentage
+          float: left
+          font-size: 14px
+          font-weight: bold
+          line-height: 20px
+          margin-right: 8px
+        .opt
+          display: inline-block
+          float: left
+          line-height: 20px
+          button
+            line-height: inherit
+            float: left;
+            font-size: 14px
+            color: color-common-text
       > .upload
         width: 100%
         height: 40px
@@ -543,3 +594,10 @@
       border: 1px solid #EEEEEE
       outline: 0
       padding: 8px
+
+
+@keyframes rotate-clockwise
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(360deg)

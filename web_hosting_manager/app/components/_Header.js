@@ -19,11 +19,12 @@ export default class Header extends Component {
   }
 
   render() {
-    const { showOpt, nwState } = this.props;
+    const { showOpt, nwState, reconnect } = this.props;
 
     const newPublicIdBtn = showOpt ? this.getPublicIdBtn() : null;
     const connectCn = classNames('connection-status', {
-      reconnect: (nwState === CONSTANTS.NETWORK_STATE.DISCONNECTED)
+      reconnect: (nwState === CONSTANTS.NETWORK_STATE.DISCONNECTED),
+      connecting: (nwState === CONSTANTS.NETWORK_STATE.INIT)
     });
 
     return (
@@ -32,7 +33,13 @@ export default class Header extends Component {
           <div className="brand">
             <span className="brand-i">{''}</span>
             <div className={connectCn}>
-              <button type="button">{''}</button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  reconnect();
+                }}
+              >{''}</button>
             </div>
           </div>
         </div>
