@@ -20,17 +20,6 @@ class SafeApi {
     this.downloader = null;
   }
 
-  mockRes(err) {
-    return new Promise((res, rej) => {
-      setTimeout(() => {
-        if (err) {
-          return rej(new Error(err))
-        }
-        res()
-      }, 2000);
-    });
-  }
-
   /**
    * Authorise with SAFE Authenticator
    * @return {Promise}
