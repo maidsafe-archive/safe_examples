@@ -11,6 +11,8 @@ function mapStateToProps(state) {
     nwState: state.initialisation.nwState,
     uploading: state.fileManager.uploading,
     uploadStatus: state.fileManager.uploadStatus,
+    downloading: state.fileManager.downloading,
+    downloadStatus: state.fileManager.downloadStatus,
     containerInfo: state.fileManager.containerInfo,
     published: state.fileManager.published,
     error: state.publicNames.error || state.fileManager.error,

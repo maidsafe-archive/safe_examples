@@ -43,6 +43,14 @@ export default class CreateServiceContainer extends Component {
     }
   }
 
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.error !== CONSTANTS.UI.ERROR_MSG.NO_SUCH_ENTRY) {
+      return true;
+    }
+    this.props.reset();
+    return false;
+  }
+
   getServicePathContainer() {
     const handleChange = (e) => {
       const value = e.target.value;
@@ -100,6 +108,7 @@ export default class CreateServiceContainer extends Component {
         <button
           type="button"
           className="btn"
+          style={{display: "none"}}
           onClick={(e) => {
             e.preventDefault();
             this.setState({
