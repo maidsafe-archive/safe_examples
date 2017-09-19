@@ -58,3 +58,11 @@ export const sendMDAuthReq = (publicName) => {
   }
 };
 
+export const remapService = (publicName, service, containerPath) => {
+  return {
+    type: ACTION_TYPES.REMAP_SERVICE,
+    payload: api.remapService(publicName, service, containerPath)
+      .then(() => api.fetchServices())
+  };
+};
+

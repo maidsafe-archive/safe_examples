@@ -18,6 +18,8 @@ export default class FileExplorer extends Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.isRootFolder = this.isRootFolder.bind(this);
     this.getStatus = this.getStatus.bind(this);
+    this.cancelUpload = this.cancelUpload.bind(this);
+    this.cancelDownload = this.cancelDownload.bind(this);
   }
 
   getCurrentPath() {
@@ -63,6 +65,14 @@ export default class FileExplorer extends Component {
     });
   }
 
+  cancelUpload() {
+    return this.props.cancelUploadAndReloadContainer(this.getCurrentPath());
+  }
+
+  cancelDownload() {
+    this.props.cancelDownload();
+  }
+
   getUploadBtn() {
     const progress = `${this.props.uploadStatus ? this.props.uploadStatus.progress : 0}%`;
 
@@ -93,7 +103,7 @@ export default class FileExplorer extends Component {
             onClick={(e) => {
               e.preventDefault();
               if (this.props.uploading) {
-                return this.props.cancelUploadAndReloadContainer(this.getCurrentPath());
+                return this.cancelUpload(this);
               }
               this.setState({
                 showUploadMenu: !this.state.showUploadMenu
@@ -195,7 +205,7 @@ export default class FileExplorer extends Component {
             className="btn"
             onClick={(e) => {
               e.preventDefault();
-              this.props.cancelDownload();
+              this.cancelDownload();
             }}
           >Cancel</button>
         </span>
@@ -237,6 +247,18 @@ export default class FileExplorer extends Component {
         </div>
       </div>
     );
+  }
+
+  componentWillUnmount() {
+    // cancel uploading on component destroy
+    if (this.props.uploading) {
+      this.cancelUpload();
+    }
+
+    // cancel downloading on component destroy
+    if (this.props.downloading) {
+      this.cancelDownload();
+    }
   }
 
   render() {

@@ -41,7 +41,7 @@ export default class PublicNames extends Component {
     return (
       <div className="i-cnt-ls-i" key={index}>
         <div className="i-cnt-ls-i-b">
-          <h3 className="name"><a href={`safe://${publicName}.${service}`}>{service}</a></h3>
+          <h3 className="name"><a href={`safe://${service}.${publicName}`}>{service}</a></h3>
           <h3 className="location"><Link to={`manageFiles/${encodeURIComponent(path)}`}>{path}</Link></h3>
         </div>
         <div className="opt">
@@ -55,7 +55,16 @@ export default class PublicNames extends Component {
               }}
             >{''}</button>
           </div>
-          <div className="opt-i"><button type="button" disabled="disabled" className="remap-btn">{''}</button></div>
+          <div className="opt-i">
+            <button
+              type="button"
+              className="remap-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                this.props.history.push(`/remap/${publicName}/${service}/${path}`);
+              }}
+            >{''}</button>
+          </div>
         </div>
       </div>
     );

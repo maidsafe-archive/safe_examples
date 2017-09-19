@@ -13,7 +13,7 @@ export default class WizardNav extends Component {
               className="go-back-btn"
               onClick={(e) => {
                 e.preventDefault();
-                this.props.history.goBack();
+                this.props.history.go(-1);
               }}
             >{''}</button>
           </div>

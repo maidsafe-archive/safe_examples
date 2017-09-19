@@ -12,10 +12,12 @@ import CreateServicePage from './containers/CreateServicePage';
 import WithTemplatePage from './containers/WithTemplatePage';
 import ManageFilesPage from './containers/ManageFilesPage';
 import NewWebSitePage from './containers/NewWebSitePage';
+import RemapPage from './containers/RemapPage';
 
 export default () => (
   <App>
     <Switch>
+      <Route path="/remap/:publicName/:service/:containerPath" component={RemapPage} />
       <Route path="/manageFiles/:containerPath" component={ManageFilesPage} />
       <Route path="/withTemplate/:publicName/:serviceName" component={WithTemplatePage} />
       <Route path="/createServiceContainer/:publicName/:serviceName" component={CreateServiceContainerPage} />

@@ -8,6 +8,7 @@ const initState = {
   serviceExists: false,
   sendAuthReq: false,
   authorisingMD: false,
+  remapped: false,
   ...CONSTANTS.UI.COMMON_STATE
 };
 
@@ -118,12 +119,33 @@ export default function services(state = initState, action) {
         sendAuthReq: false
       };
 
+    case `${ACTION_TYPES.REMAP_SERVICE}_PENDING`:
+      return {
+        ...state,
+        processing: true,
+        processDesc: CONSTANTS.UI.MSG.REMAPPING_SERVICE
+      };
+    case `${ACTION_TYPES.REMAP_SERVICE}_FULFILLED`:
+      return {
+        ...state,
+        processing: false,
+        processDesc: null,
+        remapped: true
+      };
+    case `${ACTION_TYPES.REMAP_SERVICE}_REJECTED`:
+      return {
+        ...state,
+        processing: false,
+        processDesc: null,
+        error: parseErrorMsg(action.payload)
+      };
     case ACTION_TYPES.RESET:
       return {
         ...state,
         ...CONSTANTS.UI.COMMON_STATE,
         checkedServiceExists: false,
-        serviceExists: false
+        serviceExists: false,
+        remapped: false
       };
     default:
       return state;

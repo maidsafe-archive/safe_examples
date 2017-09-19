@@ -89,7 +89,7 @@ export default class NewPublicName extends Component {
                   className="btn flat"
                   onClick={(e) => {
                     e.preventDefault();
-                    this.props.history.goBack();
+                    this.props.history.go(-1);
                   }}
                 >Cancel</button>
               </div>

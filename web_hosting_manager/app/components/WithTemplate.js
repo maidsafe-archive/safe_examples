@@ -15,7 +15,7 @@ export default class WithTemplate extends Component {
       editTitle: false,
       editDesc: false,
       title: 'Safe Network sample site',
-      description: 'This is a sample website to at Safe Network'
+      description: 'This is a sample website to host at Safe Network'
     };
   }
 
