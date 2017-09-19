@@ -12,7 +12,6 @@ export default class ChooseExistingContainer extends Component {
   constructor() {
     super();
     this.state = {
-      // ...CONSTANTS.UI.POPUP_STATES,
       selectedContainer: null,
       selectedContainerExpanded: false
     };

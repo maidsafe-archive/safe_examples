@@ -100,7 +100,8 @@ const CONSTANTS = {
       PUBLISHING_WEB: 'Publishing website',
       DELETING_FILES: 'Deleting file or folder',
       DOWNLOADING_FILE: 'Downloading file',
-      REMAPPING_SERVICE: 'Remapping service'
+      REMAPPING_SERVICE: 'Remapping service',
+      UPLOADING_TEMPLATE: 'Uploading template'
     },
     ERROR_MSG: {
       LOW_BALANCE: 'Network operation is not possible as there is insufficient account balance',

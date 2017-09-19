@@ -10,7 +10,7 @@ export default class MenuBuilder {
   }
 
   buildMenu() {
-    // this.mainWindow.openDevTools();
+    this.mainWindow.openDevTools();
     if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
       this.setupDevelopmentEnvironment();
     }
@@ -48,7 +48,7 @@ export default class MenuBuilder {
 
   buildSimulationMenuItems() {
     const simulateMockResponse = () => {
-      this.mainWindow.webContents.send('auth-response', 'safe-bmv0lm1hawrzywzllmv4yw1wbgvzlndlymhvc3rpbmdtyw5hz2vy:AQAAAEbubREAAAAAAAAAACAAAAAAAAAAY1KG05oUJ7cesgH46pUFf7jdQCBDcptRaFObvukIMvMgAAAAAAAAAL2cYgwdo5EAowqFPFjkgmqhGe2xHfxni9hUTmZT55ppIAAAAAAAAABooIk1hBeGNPfF7JFuseHDGQ0qGGfzWb9A_ef0T3xRnUAAAAAAAAAAGlQt1FjkyPV54nso-pg34EDV1dDJHcHdJWyicpswnWVooIk1hBeGNPfF7JFuseHDGQ0qGGfzWb9A_ef0T3xRnSAAAAAAAAAAJfT55Xkgq3JoGvz7-rixTwL-2IhAArtu0PvYa8kKzEAgAAAAAAAAAKw4dQ3D0DWa5ryWyOKsKB1srDDbjZ7qp8lfbsimq-nxAAAAAAAAAAAAAAAAAAAAAIJv6QzOHtHi6GqfEVRkSiHnl8ExR-dWxeEPqPEnaYN4mDoAAAAAAAAYAAAAAAAAAHlMX0hqeCP5yqgmp5LB_i2Pdtratf8coQ==');
+      this.mainWindow.webContents.send('auth-response', 'safe-bmV0Lm1haWRzYWZlLmV4YW1wbGVzLndlYmhvc3RpbmdtYW5hZ2Vy:AQAAAFxPkAkAAAAAAAAAACAAAAAAAAAA1GzmAreeWhsAvth8YBmD4z-1-p43uhfFTws09Y1vjiggAAAAAAAAAJ4qsLOJ4_ry3Gn0A_bbcjri6lZ5GnkakIGKG3s6bLGtIAAAAAAAAACHUYfr-kRJyZ1qx2hxQfn7S29faXEPAEpQyOeXCc9u9UAAAAAAAAAAkXZ3KKuWblOs090jotV7P6KF-cEYGj7A6Hj6b1_LuT2HUYfr-kRJyZ1qx2hxQfn7S29faXEPAEpQyOeXCc9u9SAAAAAAAAAAUUccuNUJGTHZAnN_EXZZkXe_nu5nO3CbAiFQF5m0NHQgAAAAAAAAAI3WDkbycQmsU-FUdvWqDIV5BlS6HfGAcmf5MBEttFgZAAAAAAAAAAAAAAAAAAAAAC7AQ924C8XTmdxrZrenqXAAWXaQG0jQYtKBM9EDMqNrmDoAAAAAAAAYAAAAAAAAAMN63L0cES9UnVioWUHDGq97HCG-fyFCeg==');
     };
     let menu = null;
 

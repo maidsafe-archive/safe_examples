@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import Base from './_Base';
+import { decodeURI } from '../utils/app';
 
 export default class Remap extends Component {
   constructor() {
@@ -22,7 +23,7 @@ export default class Remap extends Component {
   }
 
   getSelectedContainer() {
-    return this.state.selectedContainer || this.props.match.params.containerPath;
+    return this.state.selectedContainer || decodeURI(this.props.match.params.containerPath);
   }
 
   reloadContainers(e) {
@@ -83,7 +84,7 @@ export default class Remap extends Component {
 
   render() {
     const { service, publicName, containerPath } = this.props.match.params;
-
+    
     return (
       <Base
         reconnect={this.props.reconnect}
@@ -129,6 +130,7 @@ export default class Remap extends Component {
                 <button
                   type="button"
                   className="btn flat primary"
+                  disabled={this.getSelectedContainer() === decodeURI(this.props.match.params.containerPath)}
                   onClick={(e) => {
                     e.preventDefault();
                     this.props.remapService(publicName, service, this.getSelectedContainer());

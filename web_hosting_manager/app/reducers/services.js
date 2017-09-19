@@ -8,6 +8,7 @@ const initState = {
   serviceExists: false,
   sendAuthReq: false,
   authorisingMD: false,
+  authorisedMD: false,
   remapped: false,
   ...CONSTANTS.UI.COMMON_STATE
 };
@@ -95,6 +96,7 @@ export default function services(state = initState, action) {
       };
     case ACTION_TYPES.SEND_MD_REQ:
       return {
+        ...state,
         sendAuthReq: false,
         authorisingMD: true,
         processing: true,
@@ -102,12 +104,15 @@ export default function services(state = initState, action) {
       };
     case `${ACTION_TYPES.MD_AUTHORISED}_FULFILLED`:
       return {
+        ...state,
         authorisingMD: false,
+        authorisedMD: true,
         processing: false,
         processDesc: null
       };
     case `${ACTION_TYPES.MD_AUTHORISED}_REJECTED`:
       return {
+        ...state,
         authorisingMD: false,
         processing: false,
         processDesc: null,
@@ -145,7 +150,8 @@ export default function services(state = initState, action) {
         ...CONSTANTS.UI.COMMON_STATE,
         checkedServiceExists: false,
         serviceExists: false,
-        remapped: false
+        remapped: false,
+        authorisedMD: false
       };
     default:
       return state;

@@ -31,16 +31,14 @@ export default class WithTemplate extends Component {
 
     const publicName = params.publicName;
     const serviceName = params.serviceName;
-    console.log('process', process.env.NODE_ENV);
     const templateDir = process.env.NODE_ENV === 'production' ? `${__dirname}/dist/template` : `${__dirname}/template`;
     const templateFilePath = `${templateDir}/_index.html`;
     const indexFilePath = `${templateDir}/index.html`;
     try {
       const indexFile = fs.readFileSync(templateFilePath);
       const updatedContent = indexFile.toString().replace('%pt', this.state.title).replace('%t', this.state.title).replace('%d', this.state.description);
-      console.log('index', updatedContent);
       fs.writeFileSync(indexFilePath, updatedContent);
-
+      
       const filesToUpload = [
         indexFilePath,
         `${templateDir}/main.css`
