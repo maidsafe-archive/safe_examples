@@ -1,252 +1,165 @@
+// @flow
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, Input, Select, Icon } from 'antd';
-import { I18n } from 'react-redux-i18n';
-import { domainCheck } from '../utils/app_utils';
-import Alert from './Alert';
-import CONSTANTS from '../constants';
+import classNames from 'classnames';
 
-import Nav from './Nav';
+import CONSTANTS from '../constants';
+import Base from './_Base';
+import WizardNav from './WizardNav';
+import ErrorComp from './_Error';
+import * as utils from '../utils/app';
 
 export default class CreateService extends Component {
-  constructor(props) {
-    super(props);
-    this.containerName = '';
+  constructor() {
+    super();
     this.state = {
-      serviceName: '',
-      containerName: '',
-      isCreatingContainerAndService: false,
-      serviceError: '',
-      containerError: '',
-      showAlert: false,
-      alertTitle: null,
-      alertDesc: null,
-      isMDAuthorisedAck: false
+      error: null
     };
-    this.hideAlert = this.hideAlert.bind(this);
+  }
+  componentWillMount() {
+    this.props.canAccessPublicName(this.props.match.params.publicName);
   }
 
   componentDidMount() {
-    this.refs.serviceName.refs.input.focus();
-    this.containerName = this.props.publicContainers[0];
-  }
-
-  componentWillUpdate(nextProps) {
-    if (nextProps.isRevoked) {
-      nextProps.router.replace('/');
+    if (this.serviceName) {
+      this.serviceName.focus();
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.creatingService && !nextProps.creatingService && nextProps.serviceError) {
-      if (nextProps.serviceErrorCode === CONSTANTS.ERROR_CODE.INVALID_SIGN_KEY_HANDLE) {
-        this.setState({
-          showAlert: true,
-          alertTitle: I18n.t('messages.mdAuthReqTitle'),
-          alertDesc: I18n.t('messages.mdAuthReqDesc', {name: this.props.params.publicId})
-        });
+  componentDidUpdate() {
+    const { params } = this.props.match;
+    const publicName = params.publicName;
+    const option = params.option;
+    const serviceName = this.serviceName.value.trim();
+
+    if (this.props.checkedServiceExists) {
+      if (this.props.serviceExists) {
+        return;
       }
-      this.setState({
-        isCreatingContainerAndService: false
-      });
-    } else if (this.props.creatingService && !nextProps.creatingService) {
-      const servicePath = this.state.isCreatingContainerAndService ? `_public/${this.props.params.publicId}/${this.state.containerName}` : this.containerName;
-      this.props.router.replace(`files/${this.state.serviceName}/${this.props.params.publicId}/${encodeURIComponent(servicePath)}`);
-    }
-    if (nextProps.isMDAuthorised && !nextProps.isMDAuthorisedAck) {
-      this.setState({
-        showAlert: true,
-        alertTitle: I18n.t('messages.mdAuthorisedTitle'),
-        alertDesc: I18n.t('messages.mdAuthorisedDesc', {name: this.props.params.publicId})
-      });
+      // if service not exist navigate, go next step
+      switch(option) {
+        case CONSTANTS.UI.NEW_WEBSITE_OPTIONS.CHOOSE_EXISTING:
+          return this.props.history.push(`/chooseExistingContainer/${publicName}/${serviceName}`);
+        case CONSTANTS.UI.NEW_WEBSITE_OPTIONS.FROM_SCRATCH:
+          return this.props.history.push(`/createServiceContainer/${publicName}/${serviceName}`);
+        case CONSTANTS.UI.NEW_WEBSITE_OPTIONS.TEMPLATE:
+          return this.props.history.push(`/withTemplate/${publicName}/${serviceName}`);
+        default:
+          console.error('Unknown option provided for creating service');
+      }
     }
   }
+
+  handleNext(e) {
+    e.preventDefault();
+    const { params } = this.props.match;
+    const publicName = params.publicName;
+    const serviceName = this.serviceName.value.trim();
+
+    if(!serviceName) {
+      return;
+    }
+
+    if (!utils.domainCheck(serviceName)) {
+      return this.setState({
+        error: 'Service name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters'
+      });
+    }
+    this.setState({ error: null });
+
+    this.props.checkServiceExists(publicName, serviceName);
+  }
+
+  popupOkCb() {
+    if (this.props.sendAuthReq) {
+      this.props.sendMDAuthReq(this.props.match.params.publicName);
+      return;
+    }
+    this.props.reset();
+  }
+
+  popupCancelCb() {
+    const publicName = this.props.match.params.publicName;
+
+    if (this.props.sendAuthReq) {
+      this.props.cancelMDReq();
+      return this.props.history.push(`/newWebSite/${publicName}`);
+    }
+  }
+
 
   componentWillUnmount() {
-    this.props.clearNotification();
-  }
-
-  validate() {
-    let valid = true;
-    const serviceErrorMsg = I18n.t('messages.emptyServiceName');
-    const containerNameErrorMsg = I18n.t('messages.emptyConatinerName');
-    if (!this.state.serviceName && !this.state.containerName) {
-      this.setState({
-        serviceError: serviceErrorMsg,
-        containerError: containerNameErrorMsg
-      });
-      valid = false;
-    } else if (!this.state.serviceName) {
-      this.setState({
-        serviceError: serviceErrorMsg
-      });
-      valid = false;
-    } else if (!this.state.containerName) {
-      this.setState({
-        containerError: containerNameErrorMsg
-      });
-      valid = false;
-    } else if(!domainCheck(this.state.serviceName)) {
-      this.setState({
-        serviceError: I18n.t('messages.serviceNameInvalid')
-      });
-      valid = false;
-    }
-    return valid;
-  }
-
-  createContainerAndService() {
-    if (!this.validate()) {
-      return;
-    }
-    this.setState({
-      isCreatingContainerAndService: true
-    });
-    this.props.createContainerAndService(this.props.params.publicId, this.state.serviceName,
-      this.state.containerName, '_public');
-  }
-
-  createService() {
-    if (!this.state.serviceName) {
-      return this.setState({
-        serviceError: I18n.t('messages.emptyServiceName')
-      });
-    }
-    this.props.createService(this.props.params.publicId, this.state.serviceName,
-      this.containerName, '_public');
-  }
-
-  onContainerChanged(key) {
-    this.containerName = key;
-  }
-
-  watchServiceName(event) {
-    this.setState({
-      serviceName: event.target.value,
-      containerName: event.target.value ? `${event.target.value}-root` : event.target.value
-    });
-  }
-
-  watchContainerName(event) {
-    this.setState({
-      containerName: event.target.value.trim()
-    });
-  }
-
-  hideAlert() {
-    if (this.props.isMDAuthorised) {
-      this.props.ackMDConnect();
-    }
-    this.setState({showAlert: false, alertDesc: null, alertTitle: null});
-  }
-
-  onClickAlertOk() {
-    if (!this.props.isMDAuthorised) {
-      return this.props.authoriseMD(this.props.params.publicId);
-    }
-    this.hideAlert();
-  }
-
-  onClickAlertCancel() {
-    if (this.props.isMDAuthorising) {
-      return;
-    }
-    this.hideAlert();
+    this.props.reset();
   }
 
   render() {
-    const Option = Select.Option;
-    const publicContainers = this.props.publicContainers.map((containerName) => {
-      return (
-        <Option value={containerName} key={containerName}>{containerName}</Option>
-      );
-    });
+    const publicName = this.props.match.params.publicName;
     return (
-      <div>
-        <Nav title={I18n.t('messages.createService')} back={this.props.router.goBack}></Nav>
-        <div className="wrapper custom-card create-service">
-          <Card className="create-service-b">
-            <div className="create-service-input">
-              <Input size="large" ref="serviceName" addonBefore="safe://" addonAfter={`.${this.props.params.publicId}`}
-                     placeholder={I18n.t('messages.serviceNamePlaceholder')}
-                     onChange={this.watchServiceName.bind(this)}
-                     value={this.state.serviceName}/>
-              <div className="error-msg">
-                {!this.props.creatingService &&
-                (this.state.serviceError || this.props.serviceError)}
-              </div>
-            </div>
-            <div className="split-cntr">
-              <div className="split-cntr-i">
-                <h3>{I18n.t('label.createNewContainer')}</h3>
-                <Input ref="containerName" placeholder={I18n.t('messages.containerNamePlaceholder')}
-                       value={this.state.containerName}
-                       onChange={this.watchContainerName.bind(this)}
-                />
-                <div className="error-msg">{this.state.containerError}</div>
-                <Button
-                  type="primary"
-                  loading={this.state.isCreatingContainerAndService && this.props.creatingService}
-                  onClick={this.createContainerAndService.bind(this)}
-                  disabled={!this.state.containerName}
-                >
-                  {I18n.t('label.createService')}
-                </Button>
-              </div>
-              <div className="split-cntr-divider">
-                <b><i>{I18n.t('label.or')}</i></b>
-              </div>
-              <div className="split-cntr-i">
-                <h3>{I18n.t('label.selectContainer')}</h3>
-                <div className="custom-btn-grp">
-                  <Select ref="containerDropdown"
-                          defaultValue={this.props.publicContainers[0]}
-                          onChange={this.onContainerChanged.bind(this)}
-                          placeholder={I18n.t('messages.noContainerPlaceHolder')}
-                  >
-                    { publicContainers }
-                  </Select>
-                  <Button
-                    disabled={(this.props.publicContainers.length === 0) || (this.state.isCreatingContainerAndService && this.props.creatingService)}
-                    onClick={() => this.props.getPublicContainers()}
-                  ><Icon type="reload"/></Button>
+      <Base
+        reconnect={this.props.reconnect}
+        nwState={this.props.nwState}
+        showAuthReq={this.props.sendAuthReq}
+        processing={this.props.processing}
+        error={this.props.error}
+        processDesc={this.props.processDesc}
+        popupOkCb={this.popupOkCb.bind(this)}
+        popupCancelCb={this.popupCancelCb.bind(this)}
+      >
+        <div>
+          <WizardNav history={this.props.history} />
+          <div className="card">
+            <div className="card-b">
+              <h3 className="h">Choose a name for your service (website):</h3>
+              <div className="cntr">
+                <div className="create-service">
+                  <div className="b">
+                    <div className="protocol">safe://</div>
+                    <div className="inpt">
+                      <input
+                        type="text"
+                        name="service-name"
+                        placeholder="Service Name"
+                        onKeyPress={(e) => {
+                          if (e.charCode === 13) {
+                            this.handleNext(e);
+                          }
+                        }}
+                        ref={(c) => {this.serviceName = c;}}
+                      />
+                    </div>
+                    <div className="public-id">.{publicName}</div>
+                  </div>
+                  {
+                    this.state.error ?  ErrorComp(<span className="err-msg">{this.state.error}</span>) : null
+                  }
                 </div>
-                <Button
-                  type="primary" disabled={(this.props.publicContainers.length === 0) || (this.state.isCreatingContainerAndService && this.props.creatingService)}
-                  onClick={this.createService.bind(this)}
-                  loading={!this.state.isCreatingContainerAndService && this.props.creatingService}
-                >
-                  {I18n.t('label.createService')}
-                </Button>
+              </div>
+              <div className="opts">
+                <div className="opt">
+                  <button
+                    type="button"
+                    className="btn flat"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.props.history.push(`/newWebSite/${publicName}`);
+                    }}
+                  >Cancel</button>
+                </div>
+                <div className="opt">
+                  <button
+                    type="button"
+                    className="btn flat primary"
+                    onClick={this.handleNext.bind(this)}
+                  >Next</button>
+                </div>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
-        {this.state.showAlert ? 
-          <Alert 
-            title={this.state.alertTitle}
-            desc={this.state.alertDesc}
-            loading={this.props.isMDAuthorising}
-            onSuccess={this.onClickAlertOk.bind(this)}
-            onCancel={this.onClickAlertCancel.bind(this)}
-          /> : null}
-      </div>
+      </Base>
     );
   }
 }
 
 CreateService.propTypes = {
-  isConnecting: PropTypes.bool.isRequired,
-  isConnected: PropTypes.bool.isRequired,
-  connectionError: PropTypes.string,
-  creatingService: PropTypes.bool.isRequired,
-  serviceError: PropTypes.string,
-  fetchingPublicContainers: PropTypes.bool.isRequired,
-  publicContainers: PropTypes.array.isRequired,
-  publicContainersError: PropTypes.string,
-  params: PropTypes.object.isRequired,
-  router: PropTypes.object.isRequired,
-  createContainerAndService: PropTypes.func.isRequired,
-  createService: PropTypes.func.isRequired,
-  getPublicContainers: PropTypes.func.isRequired,
 };

@@ -1,70 +1,53 @@
-// @flow
-
-import React from 'react';
 import { remote, ipcRenderer as ipc } from 'electron';
+import React from 'react';
 import { render } from 'react-dom';
-import { Provider } from 'react-redux';
-import { Router, hashHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
+import { AppContainer } from 'react-hot-loader';
 import { loadTranslations, setLocale, syncTranslationWithStore } from 'react-redux-i18n';
 
-
-import { initTempFolder } from './lib/temp';
-import routes from './routes';
-import configureStore from './store/configureStore';
+import Root from './containers/Root';
+import { configureStore, history } from './store/configureStore';
 import loadLocale from './locales/loader';
-import { connect, onAuthSuccess, onAuthFailure, clearAccessData } from './actions/app';
-import './app.global.css';
+import { initTempFolder } from './lib/temp';
+import './stylus/main.styl';
+
+import { receiveResponse } from './actions/authorisation';
 
 const store = configureStore();
-const history = syncHistoryWithStore(hashHistory, store);
 
+initTempFolder();
+
+// setup i18n
 let locale = remote.app.getLocale();
 let translationConfig = loadLocale(locale);
 if (!translationConfig) {
   locale = 'en';
   translationConfig = loadLocale(locale);
 }
-
 syncTranslationWithStore(store);
 store.dispatch(loadTranslations(translationConfig));
 store.dispatch(setLocale(locale));
 
-initTempFolder();
-
-const listenForAuthReponse = (event, response) => {
-  if (response) {
-    store.dispatch(onAuthSuccess());
-    store.dispatch(connect(response));
-  } else {
-    store.dispatch(onAuthFailure(new Error('Authorisation failed')));
-  }
-};
-
-
-
-ipc.on('auth-response', listenForAuthReponse);
-
-ipc.on('clear-access-data', (event, res) => {
-  if (res) {
-    store.dispatch(clearAccessData());
-  }
+// handle auth response
+ipc.on('auth-response', (event, response) => {
+  store.dispatch(receiveResponse(response));
 });
-
-// disable drag and drop
-window.document.addEventListener('drop', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-});
-window.document.addEventListener('dragover', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-});
-
 
 render(
-  <Provider store={store}>
-    <Router history={history} routes={routes} />
-  </Provider>,
-  document.getElementById('root')
+  <AppContainer>
+    <Root store={store} history={history} />
+  </AppContainer>,
+  document.getElementById('App')
 );
+
+if (module.hot) {
+  module.hot.accept('./containers/Root', () => {
+    const NextRoot = require('./containers/Root');
+    render(
+      <AppContainer>
+        <NextRoot store={store} history={history} />
+      </AppContainer>,
+      document.getElementById('App')
+    );
+  });
+}
+
