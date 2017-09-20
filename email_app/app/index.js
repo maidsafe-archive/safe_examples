@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron';
+var path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -14,7 +15,8 @@ const createWindow = () => {
     show: false,
     resizable: false,
     width: 1024,
-    height: 728
+    height: 728,
+    icon: path.join(__dirname, 'app.png')
   });
 
   // and load the index.html of the app.
