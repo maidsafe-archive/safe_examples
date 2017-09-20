@@ -149,7 +149,8 @@
         "name": "safe-mail-tutorial",
         "appBundleId": "net.maidsafe.examples.mailtutorial",
         "appCategoryType": "public.app-category.tools",
-        "dir": "./"
+        "dir": "./",
+        "icon": "app/app.icns"
       },
       "electronWinstallerConfig": {
         "name": ""
