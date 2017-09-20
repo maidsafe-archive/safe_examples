@@ -28,7 +28,7 @@ class Task {
 
 export class EmptyDirTask {
   execute(callback) {
-    const error = new Error(I18n.t('messages.noEmptyDirs'));
+    const error = new Error('Uploading empty folders is not supported/allowed');
     error.code = CONSTANTS.ERROR_CODE.EMPTY_DIR;
     callback(error, { isFile: false, isCompleted: true, size: 1 });
   }

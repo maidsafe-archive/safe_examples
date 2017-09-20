@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import Base from './_Base';
 import ErrorComp from './_Error';
 import * as utils from '../utils/app';
+import CONSTANTS from '../constants'
 
 export default class NewPublicName extends Component {
   constructor() {
@@ -32,7 +33,7 @@ export default class NewPublicName extends Component {
     const newPublicId = this.newPublicId.value.trim();
 
     if (!utils.domainCheck(newPublicId)) {
-      return this.setState({ error: 'Public name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters' });
+      return this.setState({ error: CONSTANTS.UI.ERROR_MSG.INVALID_PUBLIC_NAME });
     }
 
     this.props.createPublicName(newPublicId);

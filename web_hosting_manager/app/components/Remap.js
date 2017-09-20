@@ -100,7 +100,7 @@ export default class Remap extends Component {
             <div className="cntr">
               <div className="choose-existing-cntr">
                 <div className="b">
-                  <p className="p">This folder content will be added to the SAFE Network and will be publicly viewable using the URL This folder should contain an index.html file.</p>
+                  <p className="p">Select the container to be mapped with the service. The contents of the mapped container will be served for safe://{service}.{publicName}</p>
                   <div className="select-inpt">
                     { this.getServiceContainersList() }
                     <div className="opt">
