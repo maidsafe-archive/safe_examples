@@ -10,6 +10,10 @@ export default class Downloader {
     this.path = networkPath;
     this.callback = callback;
     this.cancelled = false;
+    this.totalSize = 0;
+    this.sizeRead = 0;
+    this.byteLen = CONSTANTS.DOWNLOAD_CHUNK_SIZE;
+    this.filePath = null;
   }
 
   start() {
@@ -19,7 +23,7 @@ export default class Downloader {
       file: this.path.split('/').slice(3).join('/')
     };
     const tokens = this.path.split('/');
-    const filePath = path.join(getPath(), tokens.pop());
+    this.filePath = path.join(getPath(), tokens.pop());
 
     return safeApi.getPublicContainer()
       .then((md) => safeApi.getMDataValueForKey(md, containerPath.dir))
@@ -28,23 +32,52 @@ export default class Downloader {
         const nfs = mdata.emulateAs('NFS');
         return nfs.fetch(containerPath.file)
           .then((file) => nfs.open(file, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
-          .then((f) => f.size().then((size) => f.read(0, size)));
-      })
-      .then((data) => {
-        return new Promise((resolve) => {
-          fs.writeFile(filePath, data, () => {
-            this.callback(undefined, {
-              progress: 100,
-              completed: true
+          .then((f) => f.size().then((totalSize) => {
+            this.totalSize = totalSize;
+            let readWriteFile = null;
+            return new Promise((resolve, reject) => {
+              const writeCb = (err) => {
+                if (err) {
+                  return reject(err);
+                }
+                this.callback(null, {
+                  progress: Math.floor((this.sizeRead / this.totalSize) * 100),
+                  completed: false
+                });
+                if (this.byteLen < CONSTANTS.DOWNLOAD_CHUNK_SIZE) {
+                  return resolve();
+                }
+                this.sizeRead = this.sizeRead + CONSTANTS.DOWNLOAD_CHUNK_SIZE;
+                return readWriteFile();
+              };
+
+              // read file in chunk
+              readWriteFile = () => {
+                if (this.cancelled) {
+                  return resolve();
+                }
+                const restBytes = this.totalSize - this.sizeRead;
+                this.byteLen = (restBytes < CONSTANTS.DOWNLOAD_CHUNK_SIZE) ?  restBytes : CONSTANTS.DOWNLOAD_CHUNK_SIZE;
+                return f.read(this.sizeRead, this.byteLen)
+                  .then((data) => {
+                    if (this.sizeRead === 0) {
+                      return fs.writeFile(this.filePath, data, writeCb);
+                    }
+                    return fs.appendFile(this.filePath, data, writeCb);
+                  }).catch(reject);
+              };
+              return readWriteFile();
             });
-            shell.showItemInFolder(filePath);
-            resolve();
-          });
+          }));
+      })
+      .then(() => {
+        shell.showItemInFolder(this.filePath);
+        this.callback(null, {
+          progress: 100,
+          completed: true
         });
       })
-      .catch((err) => {
-        this.callback(err);
-      });
+      .catch(this.callback);
   }
 
   cancel() {

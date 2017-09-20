@@ -62,8 +62,8 @@ export class FileUploadTask extends Task {
                      const fd = fs.openSync(this.localPath, 'r');
                      let offset = 0;
                      const size = fileStats.size;
-                     let chunkSize = 1000000;
-                     let buffer = null;
+                    let chunkSize = CONSTANTS.UPLOAD_CHUNK_SIZE;
+                    let buffer = null;
                      const writeFile = (remainingBytes) => {
 
                         if(this.cancelled) {
@@ -87,7 +87,7 @@ export class FileUploadTask extends Task {
                                           isFile: true,
                                           isCompleted: false,
                                           size: chunkSize
-                                        })
+                                        });
                                         return file.close().then(() => resolve(file));
                                       } else {
                                         callback(null, {

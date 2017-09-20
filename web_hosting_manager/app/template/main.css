@@ -1,0 +1,39 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.template .banner {
+  display: block;
+  width: 100%;
+  height: 300px;
+  background-color: #b5d1ef;
+}
+.template .banner .title {
+  text-align: center;
+  line-height: 300px;
+  font-size: 24px;
+  color: #555555;
+}
+.template .banner .title input {
+  font-size: inherit;
+  border: 0;
+  outline: 0;
+  padding: 8px;
+}
+.template .context {
+  width: 600px;
+  text-align: center;
+  line-height: 150px;
+  font-size: 16px;
+  margin: 0 auto;
+  color: #555555;
+}
+.template .context input {
+  width: 100%;
+  font-size: inherit;
+  border: 1px solid #eee;
+  outline: 0;
+  padding: 8px;
+}
