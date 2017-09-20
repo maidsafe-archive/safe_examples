@@ -39,7 +39,8 @@ export default class CreateAccount extends Component {
   handleCreateAccount(e) {
     e.preventDefault();
     const { createAccount, createAccountError } = this.props;
-    const emailId = this.emailId.value;
+    // Restrict the email id to lower case
+    const emailId = this.emailId.value.toLowerCase();
     if (!emailId.trim()) {
       return;
     }

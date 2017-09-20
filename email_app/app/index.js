@@ -14,7 +14,8 @@ const createWindow = () => {
     show: false,
     resizable: false,
     width: 1024,
-    height: 728
+    height: 728,
+    icon: __dirname + '/app.ico'
   });
 
   // and load the index.html of the app.
