@@ -42,7 +42,7 @@ export default class PublicNames extends Component {
       <div className="i-cnt-ls-i" key={index}>
         <div className="i-cnt-ls-i-b">
           <h3 className="name"><a href={`safe://${service}.${publicName}`}>{service}</a></h3>
-          <h3 className="location"><Link to={`manageFiles/${encodeURIComponent(path)}`}>{path}</Link></h3>
+          <h3 className="location"><Link to={`manageFiles/${publicName}/${service}/${encodeURIComponent(path)}`}>{path}</Link></h3>
         </div>
         <div className="opt">
           <div className="opt-i">
@@ -61,7 +61,7 @@ export default class PublicNames extends Component {
               className="remap-btn"
               onClick={(e) => {
                 e.preventDefault();
-                this.props.history.push(`/remap/${publicName}/${service}/${path}`);
+                this.props.history.push(`/remap/${publicName}/${service}/${encodeURIComponent(path)}`);
               }}
             >{''}</button>
           </div>

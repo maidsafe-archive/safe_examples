@@ -173,6 +173,7 @@ export default class CreateServiceContainer extends Component {
                   <button
                     type="button"
                     className="btn flat primary"
+                    disabled={!this.props.containerInfo || (this.props.containerInfo.length === 0)}
                     onClick={(e) => {
                       e.preventDefault();
                       this.props.publish(publicName, serviceName, this.state.rootPath);

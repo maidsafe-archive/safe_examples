@@ -15,6 +15,22 @@ export default class NewWebSite extends Component {
     };
   }
 
+  gotoCreateService(selectedOpt) {
+    this.props.history.push(`/createService/${selectedOpt}/${this.props.match.params.publicName}`);
+  }
+
+  goNext(e) {
+    e.preventDefault();
+    this.gotoCreateService(this.state.selectedOpt);
+  }
+
+  handleDoubleClick(option) {
+    if (!option) {
+      return;
+    }
+    this.gotoCreateService(option);
+  }
+
   getOptions() {
     const template = () => {
       const option = CONSTANTS.UI.NEW_WEBSITE_OPTIONS.TEMPLATE;
@@ -29,6 +45,10 @@ export default class NewWebSite extends Component {
             this.setState({
               selectedOpt: option
             });
+          }}
+          onDoubleClick={(e) => {
+            e.preventDefault();
+            this.handleDoubleClick(option);
           }}
         >
           <div className={baseCn}>
@@ -54,6 +74,10 @@ export default class NewWebSite extends Component {
               selectedOpt: option
             });
           }}
+          onDoubleClick={(e) => {
+            e.preventDefault();
+            this.handleDoubleClick(option);
+          }}
         >
           <div className={baseCn}>
             <span className="icon from-scratch"></span>
@@ -77,6 +101,10 @@ export default class NewWebSite extends Component {
             this.setState({
               selectedOpt: option
             });
+          }}
+          onDoubleClick={(e) => {
+            e.preventDefault();
+            this.handleDoubleClick(option);
           }}
         >
           <div className={baseCn}>
@@ -109,7 +137,7 @@ export default class NewWebSite extends Component {
               <h3 className="h">Add Content</h3>
               <div className="cntr">
                 <div className="create-website">
-                  <p className="p">This folder content will be added to the SAFE Network and will be publicly viewable using the URL <a href="#">safe://servicename.safenet</a></p>
+                  <p className="p">This folder content will be added to the SAFE Network and will be publicly viewable using the URL <b>safe://servicename.publicname</b></p>
                   { this.getOptions() }
                 </div>
               </div>
@@ -128,10 +156,8 @@ export default class NewWebSite extends Component {
                   <button
                     type="button"
                     className="btn flat primary"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      this.props.history.push(`/createService/${this.state.selectedOpt}/${this.props.match.params.publicName}`);
-                    }}
+                    disabled={!this.state.selectedOpt}
+                    onClick={this.goNext.bind(this)}
                   >Next</button>
                 </div>
               </div>

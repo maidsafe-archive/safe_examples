@@ -4,6 +4,8 @@ import ACTION_TYPES from './action_types';
 import api from '../lib/api';
 import CONSTANTS from '../constants';
 
+import { canAccessPublicName } from './public_names';
+
 let isUploadCancelled = false;
 export const upload = (localPath, networkPath, done) => {
   isUploadCancelled = false;
@@ -50,12 +52,10 @@ export const upload = (localPath, networkPath, done) => {
   };
 };
 
-
 export const getContainerInfo = (path) => ({
   type: ACTION_TYPES.GET_CONTAINER_INFO,
   payload: api.getServiceContainer(path)
 });
-
 
 export const publish = (publicId, serviceName, serviceContainerPath) => ({
   type: ACTION_TYPES.PUBLISH,
@@ -69,24 +69,23 @@ export const resetContainerInfo = () => ({
 
 export const publishTemplate = (publicId, serviceName, containerPath, files) => {
   return (dispatch) => {
+    dispatch({ type: ACTION_TYPES.UPLOADING_TEMPLATE });
     let filesDone = 0;
     let uploadFile = null;
     const done = () => {
       filesDone += 1;
-      console.log('file uploaded', files[filesDone]);
       if (filesDone < files.length) {
         uploadFile();
         return;
       }
       if (filesDone === files.length) {
-        console.log('published', filesDone);
+        dispatch({ type: ACTION_TYPES.UPLOADED_TEMPLATE });
         dispatch(publish(publicId, serviceName, containerPath));
       }
     };
 
     uploadFile = () => {
       const fileToUpload = files[filesDone];
-      console.log('uploading file', fileToUpload);
       dispatch(upload(fileToUpload, containerPath, done));
     };
 
@@ -148,5 +147,17 @@ export const cancelDownload = () => {
   return {
     type: ACTION_TYPES.DOWNLOAD_FAILED,
     payload: err
+  };
+};
+
+export const checkAndFetchContainer = (publicName, path) => {
+  return (dispatch) => {
+    const canAccessPublicNameAction = canAccessPublicName(publicName);
+    dispatch({
+      type: canAccessPublicNameAction.type,
+      payload: canAccessPublicNameAction.payload.then(() => {
+        return dispatch(getContainerInfo(path));
+      })
+    })
   };
 };

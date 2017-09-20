@@ -49,3 +49,7 @@ export const parseErrorMsg = (err, target) => {
       return trimErrorMsg(err.message);
   }
 };
+
+export const decodeURI = (uri) => (
+  decodeURIComponent(uri)
+);

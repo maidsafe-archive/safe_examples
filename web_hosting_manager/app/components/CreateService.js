@@ -62,7 +62,7 @@ export default class CreateService extends Component {
 
     if (!utils.domainCheck(serviceName)) {
       return this.setState({
-        error: 'Service name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters'
+        error: CONSTANTS.UI.ERROR_MSG.INVALID_SERVICE_NAME
       });
     }
     this.setState({ error: null });

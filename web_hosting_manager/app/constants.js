@@ -100,13 +100,16 @@ const CONSTANTS = {
       PUBLISHING_WEB: 'Publishing website',
       DELETING_FILES: 'Deleting file or folder',
       DOWNLOADING_FILE: 'Downloading file',
-      REMAPPING_SERVICE: 'Remapping service'
+      REMAPPING_SERVICE: 'Remapping service',
+      UPLOADING_TEMPLATE: 'Uploading template'
     },
     ERROR_MSG: {
       LOW_BALANCE: 'Network operation is not possible as there is insufficient account balance',
       NO_SUCH_ENTRY: 'Data not found',
       ENTRY_EXISTS: 'Data already exists',
-      NO_SUCH_KEY: 'Unable to fetch data'
+      NO_SUCH_KEY: 'Unable to fetch data',
+      INVALID_PUBLIC_NAME: 'Public ID must contain only lowercase alphanumeric characters. Should contain a min of 3 characters and a max of 62 characters',
+      INVALID_SERVICE_NAME: 'Service name must contain only lowercase alphanumeric characters. Should contain a min of 3 characters and a max of 62 characters'
     }
   }
 };

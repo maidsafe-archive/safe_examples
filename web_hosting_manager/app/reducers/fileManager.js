@@ -15,6 +15,18 @@ const initState = {
 
 export default function fileManager(state = initState, action) {
   switch (action.type) {
+    case ACTION_TYPES.UPLOADING_TEMPLATE:
+      return {
+        ...state,
+        processing: true,
+        processDesc: CONSTANTS.UI.MSG.UPLOADING_TEMPLATE
+      };
+    case ACTION_TYPES.UPLOADED_TEMPLATE:
+      return {
+        ...state,
+        processing: false,
+        processDesc: null
+      };
     case ACTION_TYPES.UPLOAD_STARTED:
       return {
         ...state,
@@ -140,6 +152,14 @@ export default function fileManager(state = initState, action) {
       return {
         ...state,
         containerInfo: null
+      };
+
+    case ACTION_TYPES.SEND_MD_REQ:
+      return {
+        ...state,
+        processing: false,
+        processDesc: null,
+        error: null
       };
 
     case ACTION_TYPES.RESET:
