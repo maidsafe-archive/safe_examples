@@ -10,10 +10,10 @@ export default class Header extends Component {
   getPublicIdBtn() {
     return (
       <div className="new-public-id">
-        <button
+        <NavLink to="newPublicName"><button
           className="btn-with-add-icon"
           type="button"
-          ><NavLink to="newPublicName">New public ID</NavLink></button>
+        >New public ID</button></NavLink>
       </div>
     );
   }

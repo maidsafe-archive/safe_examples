@@ -68,13 +68,42 @@ class SafeApi {
   }
 
   authoriseMD(publicName) {
+    const reqArr = [];
     return this.getPublicNamesContainer()
     .then((md) => this.getMDataValueForKey(md, publicName))
-    .then((xorName) => this.sendMDReq([{
-      type_tag: CONSTANTS.TAG_TYPE.DNS,
-      name: xorName,
-      perms: ['Insert', 'Update', 'Delete']
-    }]))
+    // .then((xorName) => this.sendMDReq([{
+    //   type_tag: CONSTANTS.TAG_TYPE.DNS,
+    //   name: xorName,
+    //   perms: ['Insert', 'Update', 'Delete']
+    // }]));
+    .then((pubXORName) => {
+      console.log('pubXORName', pubXORName)
+      // add publicname MD to request array
+      reqArr.push({
+        type_tag: CONSTANTS.TAG_TYPE.DNS,
+        name: pubXORName,
+        perms: ['Insert', 'Update', 'Delete']
+      });
+
+      return this.app.mutableData.newPublic(pubXORName, CONSTANTS.TAG_TYPE.DNS)
+        .then((publicMd) => publicMd.getEntries())
+        .then((entries) => entries.forEach((key, val) => {
+          const service = key.toString();
+          // check service is not an email or deleted
+          if ((service.indexOf('@email') !== -1) || (val.buf.length === 0) || service === CONSTANTS.MD_META_KEY) {
+            return;
+          }
+          reqArr.push({
+            type_tag: CONSTANTS.TAG_TYPE.WWW,
+            name: val.buf,
+            perms: ['Insert', 'Update', 'Delete']
+          });
+        }))
+        .then(() => {
+          console.log('res arr', reqArr);
+          this.sendMDReq(reqArr);
+        })
+    })
   }
 
   connectSharedMD(resURI) {

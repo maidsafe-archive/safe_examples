@@ -56,7 +56,7 @@ const en = {
   },
   messages: {
     emptyServiceName: 'Service name must be filled',
-    noEmptyDirs: 'Cannot upload empty directories',
+    noEmptyDirs: 'Uploading empty folders is not supported/allowed',
     emptyContainerName: 'Container name must be filled',
     serviceNameInvalid: 'Service name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
     publicNameInvalid: 'Public name must contain only lowercase alphanumeric characters or - and should contain a min of 3 characters and a max of 62 characters',
