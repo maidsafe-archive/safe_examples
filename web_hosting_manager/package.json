@@ -44,14 +44,17 @@
       "package.json"
     ],
     "win": {
-      "target": "dir"
+      "target": "dir",
+      "icon": "app/app"
     },
     "linux": {
-      "target": "dir"
+      "target": "dir",
+      "icon": "app/app"
     },
     "mac": {
       "category": "public.app-category.utilities",
-      "target": "dir"
+      "target": "dir",
+      "icon": "app/app"
     },
     "directories": {
       "buildResources": "resources",
