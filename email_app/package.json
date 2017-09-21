@@ -1,7 +1,7 @@
 {
   "name": "safe-mail-tutorial",
   "productName": "SAFE Mail Tutorial",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Mailing application tutorial using SAFE Network",
   "identifier": "net.maidsafe.examples.mailtutorial",
   "vendor": "MaidSafe.net Ltd",
@@ -98,7 +98,7 @@
     "webpack-merge": "^0.14.1"
   },
   "dependencies": {
-    "@maidsafe/safe-node-app": "0.2.2",
+    "@maidsafe/safe-node-app": "0.3.0",
     "axios": "^0.14.0",
     "babel-plugin-transform-class-properties": "^6.23.0",
     "buffer-stream-reader": "^0.1.1",
