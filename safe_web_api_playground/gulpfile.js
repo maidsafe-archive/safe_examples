@@ -1,18 +1,12 @@
 var envfile = require('envfile'),
   gulp = require('gulp'),
   concat = require('gulp-concat'),
-  gulpif = require('gulp-if'),
-  jshint = require('gulp-jshint'),
   nodemon = require('gulp-nodemon'),
-  sourcemaps = require('gulp-sourcemaps'),
-  uglify = require('gulp-uglify'),
   watch = require('gulp-watch'),
   image = require('gulp-image'),
   browserify = require('browserify'),
   source = require('vinyl-source-stream'),
-  buffer = require('vinyl-buffer'),
-  babelify = require('babelify'),
-  rename = require('gulp-rename');
+  babelify = require('babelify');
 
 gulp.task('image', function () {
   gulp.src('./static/images/*')

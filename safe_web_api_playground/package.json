@@ -28,20 +28,11 @@
     "envfile": "^2.1.1",
     "express": "^4.15.3",
     "gulp": "^3.9.1",
-    "gulp-amd-optimizer": "^0.6.0",
     "gulp-concat": "^2.6.1",
-    "gulp-if": "^2.0.2",
     "gulp-image": "^2.9.0",
-    "gulp-jshint": "^2.0.4",
     "gulp-nodemon": "^2.2.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-requirejs": "^1.0.0-rc2",
-    "gulp-sourcemaps": "^2.6.0",
-    "gulp-uglify": "^3.0.0",
     "gulp-watch": "^4.3.11",
     "jquery": "^3.2.1",
-    "jshint": "^2.9.4",
-    "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }
 }
