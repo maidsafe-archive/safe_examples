@@ -1,5 +1,11 @@
 # MaidSafe Email Tutorial App Change Log
 
+## [0.4.0]
+
+- Ability to switch between multiple Id
+- Compatible with Safe Browser 0.6.0
+- Uses safe-app-nodejs 0.3.0
+
 ## [0.1.2]
 - Unversioned Tag Type Corrected
 - Compatible with launcher version 0.9.2
