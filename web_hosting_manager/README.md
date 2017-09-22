@@ -40,6 +40,38 @@ or run two servers with one command
 $ yarn run dev
 ```
 
+### Authorising against Mock
+
+To simplify the auth process, as web-hosting can't received a response when running in dev mode, authorise the application via the safe playground, using the applications own app object (below). You can then add the `authUri` to the [webhosting app](https://github.com/maidsafe/safe_examples/blob/master/web_hosting_manager/app/menu.js#L51). 
+
+Finally, run the app, and in the main menu, select `Simluate Mock Response`, and you're good to go.
+
+```js
+let appInfo = {
+      id: 'net.maidsafe.examples.webhostingmanager',
+      name: 'Web Hosting Manager',
+      vendor: 'MaidSafe',
+      scope: null,
+      opt: {
+            own_container: false
+          },
+      permissions: {
+        _public: [
+          'Read',
+          'Insert',
+          'Update',
+          'Delete'
+        ],
+        _publicNames: [
+          'Read',
+          'Insert',
+          'Update',
+          'Delete'
+        ]
+      }
+    };
+```
+
 ## Packaging
 
 To package apps for the local platform:
