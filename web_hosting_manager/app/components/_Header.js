@@ -12,6 +12,7 @@ export default class Header extends Component {
       <div className="new-public-id">
         <NavLink to="newPublicName"><button
           className="btn-with-add-icon"
+          title={CONSTANTS.UI.TOOLTIPS.ADD_PUBLIC_NAME}
           type="button"
         >New public ID</button></NavLink>
       </div>
@@ -57,4 +58,3 @@ export default class Header extends Component {
 Header.propTypes = {
   showOpt: PropTypes.bool
 };
-

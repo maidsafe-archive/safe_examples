@@ -49,6 +49,7 @@ export default class PublicNames extends Component {
             <button
               type="button"
               className="delete-btn"
+              title={CONSTANTS.UI.TOOLTIPS.DELETE_SERVICE}
               onClick={(e) => {
                 e.preventDefault();
                 this.props.deleteService(publicName, service);
@@ -58,6 +59,7 @@ export default class PublicNames extends Component {
           <div className="opt-i">
             <button
               type="button"
+              title={CONSTANTS.UI.TOOLTIPS.REMAP_SERVICE}
               className="remap-btn"
               onClick={(e) => {
                 e.preventDefault();
@@ -89,6 +91,7 @@ export default class PublicNames extends Component {
               <button
                 className="btn-with-add-icon"
                 type="button"
+                title={CONSTANTS.UI.TOOLTIPS.ADD_WEBSITE}
                 onClick={(e) => {
                   e.stopPropagation();
                   this.props.history.push(`/newWebSite/${publicName}`);

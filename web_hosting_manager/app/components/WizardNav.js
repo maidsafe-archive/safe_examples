@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import CONSTANTS from '../constants';
 
 export default class WizardNav extends Component {
   render() {
@@ -11,6 +12,7 @@ export default class WizardNav extends Component {
             <button
               type="button"
               className="go-back-btn"
+              title={CONSTANTS.UI.TOOLTIPS.BACK}
               onClick={(e) => {
                 e.preventDefault();
                 this.props.history.go(-1);
@@ -21,6 +23,7 @@ export default class WizardNav extends Component {
             <button
               type="button"
               className="go-home-btn"
+              title={CONSTANTS.UI.TOOLTIPS.HOME}
               onClick={(e) => {
                 e.preventDefault();
                 this.props.history.push('/publicNames');
