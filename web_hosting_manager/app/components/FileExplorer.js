@@ -4,7 +4,7 @@ import { remote } from 'electron';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
+import CONSTANTS from '../constants';
 import {bytesToSize} from '../utils/app';
 
 export default class FileExplorer extends Component {
@@ -99,6 +99,7 @@ export default class FileExplorer extends Component {
         <div className={uploadBaseCn}>
           <button
             type="button"
+            title={CONSTANTS.UI.TOOLTIPS.UPLOAD}
             className="upload-btn"
             onClick={(e) => {
               e.preventDefault();
@@ -135,6 +136,7 @@ export default class FileExplorer extends Component {
           <button
             type="button"
             className="delete-btn"
+            title={CONSTANTS.UI.TOOLTIPS.DELETE_FILE}
             onClick={(e) => {
               e.preventDefault();
               this.handleDelete(name);
@@ -166,6 +168,7 @@ export default class FileExplorer extends Component {
           <button
             type="button"
             className="delete-btn"
+            title={CONSTANTS.UI.TOOLTIPS.DELETE_FOLDER}
             onClick={(e) => {
               e.preventDefault();
               this.handleDelete(name);
@@ -229,6 +232,7 @@ export default class FileExplorer extends Component {
         <button
           type="button"
           className="file-back-btn"
+          title={CONSTANTS.UI.TOOLTIPS.BACK}
           onClick={(e) => {
             e.preventDefault();
             this.levelBack();

@@ -76,6 +76,18 @@ const CONSTANTS = {
       ERROR: 'ERROR',
       AUTH_REQ: 'AUTH_REQ'
     },
+    TOOLTIPS: {
+      DELETE_SERVICE: 'Delete service',
+      REMAP_SERVICE: 'Remap service',
+      DELETE_FILE: 'Delete file',
+      DELETE_FOLDER: 'Delete folder',
+      UPLOAD: 'Upload files or folders',
+      BACK: 'Go back',
+      HOME: 'Go home',
+      ADD_PUBLIC_NAME: 'Add public name',
+      ADD_WEBSITE: 'Add website'
+
+    },
     COMMON_STATE: {
       error: null,
       processing: false,
