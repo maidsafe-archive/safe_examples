@@ -150,7 +150,10 @@
         "appBundleId": "net.maidsafe.examples.mailtutorial",
         "appCategoryType": "public.app-category.tools",
         "dir": "./",
-        "icon": "app/app.icns"
+        "icon": "app/app.icns",
+		"asar" : {
+			"unpackDir" : "**/@maidsafe/**/*"
+		}
       },
       "electronWinstallerConfig": {
         "name": ""
