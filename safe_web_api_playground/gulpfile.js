@@ -78,7 +78,7 @@ gulp.task('serve', function () {
   nodemon({
     script: './index.js',
     ext: 'html js',
-    ignore: ['build/**/*.*', 'static/**/*.*'],
+    ignore: ['build/**/*.*', 'static/**/*.*', 'node_modules'],
     tasks: [],
     env: env
   }).on('restart', function () {
