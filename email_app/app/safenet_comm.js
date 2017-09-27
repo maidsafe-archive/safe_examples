@@ -130,116 +130,107 @@ export const fetchEmailIds = (app) => {
     .then(() => emailIds);
 }
 
-export const readConfig = (app, emailId) => {
+export const readConfig = async (app, emailId) => {
   let account = {id: emailId};
-  let storedAccount = {}
 
-  return app.auth.getOwnContainer()
-    .then((md) => md.encryptKey(emailId).then((key) => md.get(key))
-      .then((value) => md.decrypt(value.buf).then((decrypted) => storedAccount = JSON.parse(decrypted)))
-      .then(() => app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX]))
-      .then((inboxMd) => account.inboxMd = inboxMd)
-      .then(() => app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE]))
-      .then((archiveMd) => account.archiveMd = archiveMd)
-      .then(() => account.encSk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY])
-      .then(() => account.encPk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY])
-    )
-    .then(() => account);
+  const md = await app.auth.getOwnContainer();
+  const value = await md.encryptKey(emailId).then((key) => md.get(key));
+  const decrypted = await md.decrypt(value.buf);
+  const storedAccount = JSON.parse(decrypted);
+  const inboxMd = await app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX]);
+  account.inboxMd = inboxMd;
+  const archiveMd = await app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE]);
+  account.archiveMd = archiveMd;
+  account.encSk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY];
+  account.encPk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]
+  return account;
 }
 
-const insertEncrypted = (md, mut, key, value) => {
-  return md.encryptKey(key)
-    .then((encryptedKey) => md.encryptValue(value)
-      .then((encryptedValue) => mut.insert(encryptedKey, encryptedValue))
-    );
+const insertEncrypted = async (md, mut, key, value) => {
+  const encryptedKey = await md.encryptKey(key);
+  const encryptedValue = await md.encryptValue(value);
+  return mut.insert(encryptedKey, encryptedValue);
 }
 
-export const writeConfig = (app, account) => {
+export const writeConfig = async (app, account) => {
   let emailAccount = {
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ID]: account.id,
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY]: account.encSk,
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]: account.encPk
   };
 
-  return account.inboxMd.serialise()
-    .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX] = serial)
-    .then(() => account.archiveMd.serialise())
-    .then((serial) => emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE] = serial)
-    .then(() => app.auth.getOwnContainer())
-    .then((md) => app.mutableData.newMutation()
-      .then((mut) => insertEncrypted(md, mut, account.id, JSON.stringify(emailAccount))
-        .then(() => md.applyEntriesMutation(mut))
-      ))
-    .then(() => account);
+  const serialisedInbox = await account.inboxMd.serialise();
+  emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_INBOX] = serialisedInbox;
+  const serialisedArchive = await account.archiveMd.serialise();
+  emailAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE] = serialisedArchive;
+  const md = await app.auth.getOwnContainer();
+  const mut = await app.mutableData.newMutation();
+  await insertEncrypted(md, mut, account.id, JSON.stringify(emailAccount));
+  await md.applyEntriesMutation(mut);
+  return account;
 }
 
-const decryptEmail = (app, account, key, value, cb) => {
+const decryptEmail = async (app, account, key, value, cb) => {
   if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-    return decrypt(app, value, account.encSk, account.encPk)
-      .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
-        .then((immData) => immData.read())
-        .then((content) => decrypt(app, content, account.encSk, account.encPk)
-          .then(decryptedEmail => cb({ id: key, email: JSON.parse(decryptedEmail) }))
-        )
-      )
+    const entryValue = await decrypt(app, value, account.encSk, account.encPk);
+    const immData = await app.immutableData.fetch(deserialiseArray(entryValue));
+    const content = await immData.read();
+    const decryptedEmail = await decrypt(app, content, account.encSk, account.encPk);
+    return cb({ id: key, email: JSON.parse(decryptedEmail) });
   }
 }
 
-export const readInboxEmails = (app, account, cb) => {
-  return account.inboxMd.getEntries()
-    .then((entries) => entries.forEach((key, value) => {
-        if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
-          return decryptEmail(app, account, key, value.buf, cb);
-        }
-      })
-      .then(() => entries.len())
-    );
+export const readInboxEmails = async (app, account, cb) => {
+  const entries = await account.inboxMd.getEntries();
+  await entries.forEach((key, value) => {
+    if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
+      return decryptEmail(app, account, key, value.buf, cb);
+    }
+  });
+  return entries.len();
 }
 
-export const readArchivedEmails = (app, account, cb) => {
-  return account.archiveMd.getEntries()
-    .then((entries) => entries.forEach((key, value) => {
-        return decryptEmail(app, account, key, value.buf, cb);
-      })
-    );
+export const readArchivedEmails = async (app, account, cb) => {
+  const entries = await account.archiveMd.getEntries();
+  await entries.forEach((key, value) => {
+    return decryptEmail(app, account, key, value.buf, cb);
+  })
 }
 
-const createInbox = (app, encPk) => {
+const createInbox = async (app, encPk) => {
   let baseInbox = {
     [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: encPk
   };
-  let inboxMd;
-  let permSet;
 
-  return app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_INBOX)
-    .then((md) => md.quickSetup(baseInbox))
-    .then((md) => inboxMd = md)
-    .then(() => app.mutableData.newPermissionSet())
-    .then((pmSet) => permSet = pmSet)
-    .then(() => permSet.setAllow('Insert'))
-    .then(() => inboxMd.setUserPermissions(null, permSet, 1))
-    .then(() => inboxMd);
+  const inboxMd = await app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_INBOX)
+  await inboxMd.quickSetup(baseInbox);
+  const permSet = await app.mutableData.newPermissionSet();
+  await permSet.setAllow('Insert');
+  await inboxMd.setUserPermissions(null, permSet, 1);
+  return inboxMd;
 }
 
-const createArchive = (app) => {
-  return app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE)
-    .then((md) => md.quickSetup());
+const createArchive = async (app) => {
+  const md = await app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE)
+  return md.quickSetup();
 }
 
-const createPublicIdAndEmailService = (app, pubNamesMd,
-                                       serviceInfo, inboxSerialised) => {
-  const metadata = {...CONSTANTS.SERVICE_METADATA,
+const createPublicIdAndEmailService = async (
+  app, pubNamesMd, serviceInfo, inboxSerialised
+) => {
+  const metadata = {
+    ...CONSTANTS.SERVICE_METADATA,
     name: `${CONSTANTS.SERVICE_METADATA.name}: '${serviceInfo.publicId}'`,
     description: `${CONSTANTS.SERVICE_METADATA.description}: '${serviceInfo.publicId}'`
   };
 
-  return app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
-    .then((md) => md.quickSetup({ [serviceInfo.serviceName]: inboxSerialised },
-                                  metadata.name, metadata.description))
-    .then((_) => app.mutableData.newMutation()
-      .then((mut) => insertEncrypted(pubNamesMd, mut, serviceInfo.publicId, serviceInfo.serviceAddr)
-        .then(() => pubNamesMd.applyEntriesMutation(mut))
-      ));
+  const md = await app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
+  await md.quickSetup(
+    { [serviceInfo.serviceName]: inboxSerialised }, metadata.name, metadata.description
+  );
+  const mut = await app.mutableData.newMutation();
+  await insertEncrypted(pubNamesMd, mut, serviceInfo.publicId, serviceInfo.serviceAddr);
+  return pubNamesMd.applyEntriesMutation(mut);
 }
 
 const genNewAccount = (app, id) => {
@@ -254,20 +245,14 @@ const genNewAccount = (app, id) => {
     );
 }
 
-const registerEmailService = (app, serviceToRegister) => {
-  let inboxSerialised;
-  let newAccount;
-  return genNewAccount(app, serviceToRegister.emailId)
-    .then((account) => newAccount = account)
-    .then(() => newAccount.inboxMd.serialise())
-    .then((serialised) => inboxSerialised = serialised)
-    .then(() => app.mutableData.newPublic(serviceToRegister.servicesXorName, CONSTANTS.TAG_TYPE_DNS))
-    .then((md) => app.mutableData.newMutation()
-      .then((mut) => mut.insert(serviceToRegister.serviceName, inboxSerialised)
-        .then(() => md.applyEntriesMutation(mut))
-      )
-    )
-    .then(() => newAccount);
+const registerEmailService = async (app, serviceToRegister) => {
+  const newAccount = await genNewAccount(app, serviceToRegister.emailId);
+  const inboxSerialised = await newAccount.inboxMd.serialise();
+  const md = await app.mutableData.newPublic(serviceToRegister.servicesXorName, CONSTANTS.TAG_TYPE_DNS);
+  const mut = await app.mutableData.newMutation();
+  await mut.insert(serviceToRegister.serviceName, inboxSerialised);
+  await md.applyEntriesMutation(mut);
+  return newAccount;
 }
 
 export const createEmailService = (app, servicesXorName, serviceInfo) => {
@@ -314,22 +299,18 @@ export const setupAccount = (app, emailId) => {
     );
 }
 
-export const connectWithSharedMd = (app, uri, serviceToRegister) => {
-  let inboxSerialised;
-  let newAccount;
-  return app.auth.loginFromURI(uri)
-    .then(() => app.auth.refreshContainersPermissions())
-    .then(() => registerEmailService(app, serviceToRegister));
+export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
+  await app.auth.loginFromURI(uri);
+  await app.auth.refreshContainersPermissions();
+  return registerEmailService(app, serviceToRegister);
 }
 
-const writeEmailContent = (app, email, pk) => {
-  return encrypt(app, JSON.stringify(email), pk)
-    .then(encryptedEmail => app.immutableData.create()
-       .then((email) => email.write(encryptedEmail)
-         .then(() => app.cipherOpt.newPlainText())
-         .then((cipherOpt) => email.close(cipherOpt))
-       )
-    )
+const writeEmailContent = async (app, email, pk) => {
+  const encryptedEmail = await encrypt(app, JSON.stringify(email), pk);
+  const emailWriter = await app.immutableData.create();
+  await emailWriter.write(encryptedEmail);
+  const cipherOpt = await app.cipherOpt.newPlainText();
+  return emailWriter.close(cipherOpt);
 }
 
 export const storeEmail = (app, email, to) => {
