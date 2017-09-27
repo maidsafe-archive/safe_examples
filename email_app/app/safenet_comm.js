@@ -23,31 +23,24 @@ const APP_INFO = {
   }
 };
 
-const genServiceInfo = (app, emailId) => {
+const genServiceInfo = async (app, emailId) => {
   let serviceInfo = splitPublicIdAndService(emailId);
-  return app.crypto.sha3Hash(serviceInfo.publicId)
-    .then((hashed) => {
-      serviceInfo.serviceAddr = hashed;
-      return serviceInfo;
-    });
+  const hashed = await app.crypto.sha3Hash(serviceInfo.publicId);
+  serviceInfo.serviceAddr = hashed;
+  return serviceInfo;
 }
 
-const requestShareMdAuth = (app, mdPermissions) => {
-  return app.auth.genShareMDataUri(mdPermissions)
-    .then((resp) => {
-      shell.openExternal(parseUrl(resp.uri));
-      return null;
-    });
+const requestShareMdAuth = async (app, mdPermissions) => {
+  const resp = await app.auth.genShareMDataUri(mdPermissions);
+  shell.openExternal(parseUrl(resp.uri));
+  return null;
 }
 
-const requestAuth = () => {
-  return initializeApp(APP_INFO.info)
-    .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
-      .then((resp) => {
-        shell.openExternal(parseUrl(resp.uri));
-        return null;
-      })
-    );
+const requestAuth = async () => {
+  const app = await initializeApp(APP_INFO.info);
+  const resp = app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
+  shell.openExternal(parseUrl(resp.uri));
+  return null;
 }
 
 export const authApp = (netStatusCallback) => {
@@ -72,13 +65,12 @@ export const authApp = (netStatusCallback) => {
   return requestAuth();
 }
 
-export const connect = (uri, netStatusCallback) => {
-  let registeredApp;
-  return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
-    .then((app) => registeredApp = app)
-    .then(() => saveAuthData(uri))
-    .then(() => registeredApp.auth.refreshContainersPermissions())
-    .then(() => registeredApp);
+export const connect = async (uri, netStatusCallback) => {
+  const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback);
+  // synchronous
+  saveAuthData(uri);
+  await registeredApp.auth.refreshContainersPermissions();
+  return registeredApp;
 }
 
 export const reconnect = (app) => {
