@@ -2,6 +2,7 @@
 "application/javascript": {
   "presets": [
     ["env", { "targets": { "electron": "1.6.0" } }],
+    "babel-polyfill",
     "es2015",
     "stage-0",
     "react"
