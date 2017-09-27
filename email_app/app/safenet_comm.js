@@ -211,7 +211,7 @@ const createInbox = async (app, encPk) => {
 }
 
 const createArchive = async (app) => {
-  const md = await app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE)
+  const md = await app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE);
   return md.quickSetup();
 }
 
@@ -233,16 +233,13 @@ const createPublicIdAndEmailService = async (
   return pubNamesMd.applyEntriesMutation(mut);
 }
 
-const genNewAccount = (app, id) => {
-  let inboxMd;
-  return genKeyPair(app)
-    .then((keyPair) => createInbox(app, keyPair.publicKey)
-      .then((md) => inboxMd = md)
-      .then(() => createArchive(app))
-      .then((archiveMd) => ({id, inboxMd, archiveMd,
-                            encSk: keyPair.privateKey,
-                            encPk: keyPair.publicKey}))
-    );
+const genNewAccount = async (app, id) => {
+  const keyPair = await genKeyPair(app);
+  const inboxMd = await createInbox(app, keyPair.publicKey);
+  const archiveMd = await createArchive(app);
+  return {id, inboxMd, archiveMd,
+                        encSk: keyPair.privateKey,
+                        encPk: keyPair.publicKey};
 }
 
 const registerEmailService = async (app, serviceToRegister) => {
@@ -334,56 +331,44 @@ export const storeEmail = (app, email, to) => {
         )));
 }
 
-export const removeEmail = (app, container, key) => {
-  return app.mutableData.newMutation()
-    .then((mut) => mut.remove(key, 1)
-      .then(() => container.applyEntriesMutation(mut))
-    )
+export const removeEmail = async (app, container, key) => {
+  const mut = await app.mutableData.newMutation();
+  await mut.remove(key, 1);
+  return container.applyEntriesMutation(mut);
 }
 
-export const archiveEmail = (app, account, key) => {
+export const archiveEmail = async (app, account, key) => {
   let newEntryKey = genRandomEntryKey();
-  return account.inboxMd.get(key)
-    .then((xorName) => app.mutableData.newMutation()
-      .then((mut) => mut.insert(newEntryKey, xorName.buf)
-        .then(() => account.archiveMd.applyEntriesMutation(mut))
-      )
-    )
-    .then(() => app.mutableData.newMutation())
-    .then((mut) => mut.remove(key, 1)
-      .then(() => account.inboxMd.applyEntriesMutation(mut))
-    )
+  const xorName = await account.inboxMd.get(key);
+  let mut = await app.mutableData.newMutation();
+  await mut.insert(newEntryKey, xorName.buf);
+  await account.archiveMd.applyEntriesMutation(mut);
+  mut = await app.mutableData.newMutation();
+  await mut.remove(key, 1);
+  return account.inboxMd.applyEntriesMutation(mut);
 }
 
-const genKeyPair = (app) => {
+const genKeyPair = async (app) => {
   let rawKeyPair = {};
-  return app.crypto.generateEncKeyPair()
-    .then(keyPair => keyPair.pubEncKey.getRaw()
-      .then(rawPubEncKey => {
-        rawKeyPair.publicKey = rawPubEncKey.buffer.toString('hex');
-        return;
-      })
-      .then(() => keyPair.secEncKey.getRaw())
-      .then(rawSecEncKey => {
-        rawKeyPair.privateKey = rawSecEncKey.buffer.toString('hex');
-        return rawKeyPair;
-      })
-    )
+  const keyPair = await app.crypto.generateEncKeyPair();
+  const rawPubEncKey = await keyPair.pubEncKey.getRaw();
+  rawKeyPair.publicKey = rawPubEncKey.buffer.toString('hex');
+  const rawSecEncKey = await keyPair.secEncKey.getRaw();
+  rawKeyPair.privateKey = rawSecEncKey.buffer.toString('hex');
+  return rawKeyPair;
 }
 
-const encrypt = (app, input, pk) => {
+const encrypt = async (app, input, pk) => {
   if(Array.isArray(input)) {
     input = input.toString();
   }
-
-  let stringToBuffer = Buffer.from(pk, 'hex');
-
-  return app.crypto.pubEncKeyKeyFromRaw(stringToBuffer)
-    .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
+  const stringToBuffer = Buffer.from(pk, 'hex');
+  const pubEncKeyAPI = await app.crypto.pubEncKeyKeyFromRaw(stringToBuffer);
+  return pubEncKeyAPI.encryptSealed(input);
 };
 
-const decrypt = (app, cipherMsg, sk, pk) => {
-  return app.crypto.generateEncKeyPairFromRaw(Buffer.from(pk, 'hex'), Buffer.from(sk, 'hex'))
-    .then(keyPair => keyPair.decryptSealed(cipherMsg))
-    .then((decrypted) => decrypted.toString())
+const decrypt = async (app, cipherMsg, sk, pk) => {
+  const keyPair = await app.crypto.generateEncKeyPairFromRaw(Buffer.from(pk, 'hex'), Buffer.from(sk, 'hex'));
+  const decrypted = await keyPair.decryptSealed(cipherMsg);
+  return decrypted.toString();
 };
