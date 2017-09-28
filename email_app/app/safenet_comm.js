@@ -43,25 +43,24 @@ const requestAuth = async () => {
   return null;
 }
 
-export const authApp = (netStatusCallback) => {
+export const authApp = async (netStatusCallback) => {
   if (process.env.SAFE_FAKE_AUTH) {
-    return initializeApp(APP_INFO.info)
-      .then((app) => app.auth.loginForTest(APP_INFO.permissions));
+    const app = await initializeApp(APP_INFO.info);
+    return app.auth.loginForTest(APP_INFO.permissions);
   }
 
-  let uri = getAuthData();
+  const uri = getAuthData();
   if (uri) {
-    return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
-      .then((registeredApp) => registeredApp.auth.refreshContainersPermissions()
-        .then(() => registeredApp)
-      )
-      .catch((err) => {
-        console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
-        clearAuthData();
-        return requestAuth();
-      });
+    try {
+      const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback);
+      await registeredApp.auth.refreshContainersPermissions();
+      return registeredApp;
+    } catch (err) {
+      console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
+      clearAuthData();
+      return requestAuth();
+    }
   }
-
   return requestAuth();
 }
 
@@ -77,57 +76,55 @@ export const reconnect = (app) => {
   return app.reconnect();
 }
 
-const fetchPublicIds = (app) => {
+const fetchPublicIds = async (app) => {
   let rawEntries = [];
   let publicIds = [];
-  return app.auth.getContainer(APP_INFO.containers.publicNames)
-    .then((pubNamesMd) => pubNamesMd.getEntries()
-      .then((entries) => entries.forEach((key, value) => {
-          rawEntries.push({key, value});
-        })
-        .then(() => Promise.all(rawEntries.map((entry) => {
-          if (entry.value.buf.length === 0) { //FIXME: this condition is a work around for a limitation in safe_core
-            return Promise.resolve();
-          }
+  const pubNamesMd = await app.auth.getContainer(APP_INFO.containers.publicNames);
+  const entries = await pubNamesMd.getEntries();
+  await entries.forEach((key, value) => {
+    rawEntries.push({key, value});
+  });
 
-          return pubNamesMd.decrypt(entry.key)
-            .then((decKey) => {
-              const id = decKey.toString();
-              if (id === CONSTANTS.MD_META_KEY) { // Skip the metadata entry
-                return Promise.resolve();
-              }
-              return pubNamesMd.decrypt(entry.value.buf)
-                .then((service) => publicIds.push({ id, service }));
-            });
-        })))
-      ))
-    .then(() => publicIds);
+  await Promise.all(rawEntries.map( async (entry) => {
+    if (entry.value.buf.length === 0) { //FIXME: this condition is a work around for a limitation in safe_core
+      return Promise.resolve();
+    }
+
+    const decKey = await pubNamesMd.decrypt(entry.key);
+    const id = decKey.toString();
+    if (id === CONSTANTS.MD_META_KEY) { // Skip the metadata entry
+      return Promise.resolve();
+    }
+    const service = await pubNamesMd.decrypt(entry.value.buf);
+    publicIds.push({ id, service });
+  }));
+
+  return publicIds;
 }
 
-export const fetchEmailIds = (app) => {
+export const fetchEmailIds = async (app) => {
   let emailIds = [];
 
-  return fetchPublicIds(app)
-    .then((publicIds) => Promise.all(publicIds.map((publicId) => {
-        let rawEmailIds = [];
-        return app.mutableData.newPublic(publicId.service, CONSTANTS.TAG_TYPE_DNS)
-            .then((servicesMd) => servicesMd.getKeys())
-            .then((keys) => keys.forEach((key) => {
-                rawEmailIds.push(key.toString());
-              })
-              .then(() => Promise.all(rawEmailIds.map((emailId) => {
-                // Let's filter out the services which are not email services,
-                // i.e. those which don't have the `@email` postfix.
-                // This will filter out the MD metadata entry also.
-                const regex = new RegExp('.*(?=' + CONSTANTS.SERVICE_NAME_POSTFIX +'$)', 'g');
-                let res = regex.exec(emailId);
-                if (res) {
-                  emailIds.push(res[0] + ((res[0].length > 0) ? '.' : '') + publicId.id);
-                }
-              })))
-            );
-    })))
-    .then(() => emailIds);
+  const publicIds = await fetchPublicIds(app);
+  await Promise.all(publicIds.map( async (publicId) => {
+      let rawEmailIds = [];
+      const servicesMd = await app.mutableData.newPublic(publicId.service, CONSTANTS.TAG_TYPE_DNS);
+      const keys = await servicesMd.getKeys();
+      await keys.forEach((key) => {
+        rawEmailIds.push(key.toString());
+      });
+      await Promise.all(rawEmailIds.map((emailId) => {
+        // Let's filter out the services which are not email services,
+        // i.e. those which don't have the `@email` postfix.
+        // This will filter out the MD metadata entry also.
+        const regex = new RegExp('.*(?=' + CONSTANTS.SERVICE_NAME_POSTFIX +'$)', 'g');
+        let res = regex.exec(emailId);
+        if (res) {
+          emailIds.push(res[0] + ((res[0].length > 0) ? '.' : '') + publicId.id);
+        }
+      }))
+  }));
+  return emailIds;
 }
 
 export const readConfig = async (app, emailId) => {
@@ -252,24 +249,27 @@ const registerEmailService = async (app, serviceToRegister) => {
   return newAccount;
 }
 
-export const createEmailService = (app, servicesXorName, serviceInfo) => {
+export const createEmailService = async (app, servicesXorName, serviceInfo) => {
   const emailService = {
     servicesXorName,
     emailId: serviceInfo.emailId,
     serviceName: serviceInfo.serviceName
   };
 
-  return app.crypto.getAppPubSignKey()
-    .then((appSignKey) => app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS)
-      .then((md) => md.getUserPermissions(appSignKey)) // FIXME: the permissions it has could not be enough
-      .then(() => registerEmailService(app, emailService).then((newAccount) => ({ newAccount }))
-        , (err) => requestShareMdAuth(app,
-            [{ type_tag: CONSTANTS.TAG_TYPE_DNS,
-               name: servicesXorName,
-               perms: ['Insert']
-             }] )
-          .then(() => emailService)
-      ));
+  const appSignKey = await app.crypto.getAppPubSignKey();
+  const md = await app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS);
+  // QUESTION: What is the purpose of this line?
+  await md.getUserPermissions(appSignKey) // FIXME: the permissions it has could not be enough
+  try {
+    const newAccount = await registerEmailService(app, emailService);
+    return { newAccount };
+  } catch (err) {
+    await requestShareMdAuth(
+      app,
+      [{ type_tag: CONSTANTS.TAG_TYPE_DNS, name: servicesXorName, perms: ['Insert'] }]
+    );
+    return emailService;
+  }
 }
 
 export const setupAccount = (app, emailId) => {
@@ -310,25 +310,19 @@ const writeEmailContent = async (app, email, pk) => {
   return emailWriter.close(cipherOpt);
 }
 
-export const storeEmail = (app, email, to) => {
-  let serviceInfo;
-  return genServiceInfo(app, to)
-    .then((info) => serviceInfo = info)
-    .then(() => app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS))
-    .then((md) => md.get(serviceInfo.serviceName))
-    .catch((err) => {throw MESSAGES.EMAIL_ID_NOT_FOUND})
-    .then((service) => app.mutableData.fromSerial(service.buf))
-    .then((inboxMd) => inboxMd.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY)
-      .then((pk) => writeEmailContent(app, email, pk.buf.toString())
-        .then((emailAddr) => app.mutableData.newMutation()
-          .then((mut) => {
-            let entryKey = genRandomEntryKey();
-            return encrypt(app, emailAddr, pk.buf.toString())
-              .then(entryValue => mut.insert(entryKey, entryValue)
-                .then(() => inboxMd.applyEntriesMutation(mut))
-              )
-          })
-        )));
+export const storeEmail = async (app, email, to) => {
+  const serviceInfo = await genServiceInfo(app, to);
+  const md = await app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS);
+  const service = await md.get(serviceInfo.serviceName);
+  if(!service) { throw MESSAGES.EMAIL_ID_NOT_FOUND }
+  const inboxMd = await app.mutableData.fromSerial(service.buf);
+  const pk = await inboxMd.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY);
+  const emailAddr = await writeEmailContent(app, email, pk.buf.toString());
+  const mut = await app.mutableData.newMutation();
+  const entryKey = genRandomEntryKey();
+  const entryValue = await encrypt(app, emailAddr, pk.buf.toString());
+  await mut.insert(entryKey, entryValue);
+  return inboxMd.applyEntriesMutation(mut);
 }
 
 export const removeEmail = async (app, container, key) => {
