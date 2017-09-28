@@ -199,7 +199,8 @@
     "redux": "^3.7.1",
     "redux-promise-middleware": "^4.4.1",
     "redux-thunk": "^2.2.0",
-    "source-map-support": "^0.4.15"
+    "source-map-support": "^0.4.15",
+    "temp-write": "^3.3.0"
   },
   "devEngines": {
     "node": ">=7.x",
