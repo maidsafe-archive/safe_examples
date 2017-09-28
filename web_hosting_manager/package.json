@@ -16,6 +16,7 @@
     "lint-styles": "stylelint app/*.css app/components/*.css --syntax scss",
     "lint-styles-fix": "stylefmt -r app/*.css app/components/*.css",
     "package": "npm run build && build --publish never",
+    "post-package": "node ../post-packaging.js",
     "package-all": "npm run build && build -mwl",
     "package-linux": "npm run build && build --linux",
     "package-win": "npm run build && build --win --x64",
@@ -182,6 +183,7 @@
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {
+    "archiver": "^2.0.3",
     "copy-webpack-plugin": "^4.0.1",
     "devtron": "^1.4.0",
     "electron-debug": "^1.2.0",
