@@ -55,10 +55,6 @@ export const showSuccess = (title, message) => {
   }, _ => {});
 };
 
-export const parseUrl = (url) => (
-  (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
-);
-
 export const deserialiseArray = (strOrBuffer) => {
   let arrItems = strOrBuffer.split(',');
   return Uint8Array.from(arrItems);

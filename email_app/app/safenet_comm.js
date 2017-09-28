@@ -1,8 +1,7 @@
-import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
-         splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
+         splitPublicIdAndService, deserialiseArray } from './utils/app_utils';
 import pkg from '../package.json';
 
 const APP_INFO = {
@@ -35,17 +34,17 @@ const genServiceInfo = (app, emailId) => {
 const requestShareMdAuth = (app, mdPermissions) => {
   return app.auth.genShareMDataUri(mdPermissions)
     .then((resp) => {
-      shell.openExternal(parseUrl(resp.uri));
-      return null;
-    });
+      return app.auth.openUri(resp.uri)
+        .then(() => { return null; });
+    })
 }
 
 const requestAuth = () => {
   return initializeApp(APP_INFO.info)
     .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
       .then((resp) => {
-        shell.openExternal(parseUrl(resp.uri));
-        return null;
+        return app.auth.openUri(resp.uri)
+          .then(() => { return null; });
       })
     );
 }

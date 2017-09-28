@@ -29,7 +29,6 @@ export const receiveResponse = (uri) => {
     // handle MD auth request
     const isMDAuthorising = currentState.services.authorisingMD;
     if (isMDAuthorising) {
-      console.log('MD auth res', uri);
       return dispatch(mdAuthorised(uri));
     }
     // handle app auth request
