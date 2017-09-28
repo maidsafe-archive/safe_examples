@@ -272,28 +272,22 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
   }
 }
 
-export const setupAccount = (app, emailId) => {
-  let serviceInfo;
-  return genServiceInfo(app, emailId)
-    .then((info) => serviceInfo = info)
-    .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
-    .then((pubNamesMd) => pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key))
-      // If service container already exists, try to add email service
-      .then((encryptedAddr) => pubNamesMd.decrypt(encryptedAddr.buf)
-        .then((servicesXorName) => createEmailService(app, servicesXorName, serviceInfo))
-      , (err) => { // ...if not then create it
-        if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
-          throw err;
-        }
-        // The public ID doesn't exist in _publicNames
-        return genNewAccount(app, serviceInfo.emailId)
-          .then((newAccount) => newAccount.inboxMd.serialise()
-            .then((inboxSerialised) => createPublicIdAndEmailService(app,
-                                pubNamesMd, serviceInfo, inboxSerialised))
-            .then(() => ({ newAccount }))
-          )
-      })
-    );
+export const setupAccount = async (app, emailId) => {
+
+  const serviceInfo = await genServiceInfo(app, emailId);
+  const pubNamesMd = await app.auth.getContainer(APP_INFO.containers.publicNames);
+  try { // If service container already exists, try to add email service
+    const encryptedAddr = await pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key));
+  } catch (err) { // ...if not then create it
+    if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
+      throw err;
+    }
+    // The public ID doesn't exist in _publicNames
+    const newAccount = await genNewAccount(app, serviceInfo.emailId);
+    const inboxSerialised = await newAccount.inboxMd.serialise();
+    await createPublicIdAndEmailService(app,pubNamesMd, serviceInfo, inboxSerialised);
+    return { newAccount };
+  }
 }
 
 export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
