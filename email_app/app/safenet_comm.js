@@ -4,6 +4,7 @@ import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
          splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
 import pkg from '../package.json';
+import 'babel-polyfill';
 
 const APP_INFO = {
   info: {
@@ -38,7 +39,7 @@ const requestShareMdAuth = async (app, mdPermissions) => {
 
 const requestAuth = async () => {
   const app = await initializeApp(APP_INFO.info);
-  const resp = app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
+  const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
   shell.openExternal(parseUrl(resp.uri));
   return null;
 }
