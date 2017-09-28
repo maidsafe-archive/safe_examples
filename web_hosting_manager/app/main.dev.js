@@ -115,4 +115,3 @@ app.on('ready', async () => {
 app.on('open-url', function (e, url) {
   handleIPCResponse(url);
 });
-

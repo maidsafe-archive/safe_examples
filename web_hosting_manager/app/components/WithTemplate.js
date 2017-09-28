@@ -2,6 +2,7 @@
 import fs from 'fs';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import tempWrite from 'temp-write';
 
 import CONSTANTS from '../constants';
 import Base from './_Base';
@@ -37,12 +38,13 @@ export default class WithTemplate extends Component {
     try {
       const indexFile = fs.readFileSync(templateFilePath);
       const updatedContent = indexFile.toString().replace('%pt', this.state.title).replace('%t', this.state.title).replace('%d', this.state.description);
-      fs.writeFileSync(indexFilePath, updatedContent);
-      
+      const tempFile = tempWrite.sync(updatedContent);
+
       const filesToUpload = [
-        indexFilePath,
+        tempFile,
         `${templateDir}/main.css`
       ];
+
       const containerPath = `_public/${publicName}/${utils.defaultServiceContainerName(serviceName)}`;
       this.props.publishTemplate(publicName, serviceName, containerPath, filesToUpload);
     } catch (e) {
