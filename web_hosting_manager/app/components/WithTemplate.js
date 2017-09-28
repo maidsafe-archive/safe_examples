@@ -38,7 +38,7 @@ export default class WithTemplate extends Component {
     try {
       const indexFile = fs.readFileSync(templateFilePath);
       const updatedContent = indexFile.toString().replace('%pt', this.state.title).replace('%t', this.state.title).replace('%d', this.state.description);
-      const tempFile = tempWrite.sync(updatedContent);
+      const tempFile = tempWrite.sync(updatedContent, 'index.html');
 
       const filesToUpload = [
         tempFile,
