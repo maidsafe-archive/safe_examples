@@ -2,7 +2,7 @@ import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
-         splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
+         splitPublicIdAndService, deserialiseArray, parseUrl, showError } from './utils/app_utils';
 import pkg from '../package.json';
 import 'babel-polyfill';
 
@@ -38,10 +38,15 @@ const requestShareMdAuth = async (app, mdPermissions) => {
 }
 
 const requestAuth = async () => {
-  const app = await initializeApp(APP_INFO.info);
-  const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
-  shell.openExternal(parseUrl(resp.uri));
-  return null;
+  try {
+    const app = await initializeApp(APP_INFO.info);
+    const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
+    shell.openExternal(parseUrl(resp.uri));
+    return null;
+  } catch (err) {
+    console.error(err);
+    showError();
+  }
 }
 
 export const authApp = async (netStatusCallback) => {
