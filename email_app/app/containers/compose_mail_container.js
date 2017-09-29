@@ -4,8 +4,8 @@ import { cancelCompose, sendEmail } from '../actions/mail_actions';
 
 const mapStateToProps = state => {
   return {
-    app: state.initializer.app,
-    fromMail: state.initializer.coreData.id,
+    app: state.initialiser.app,
+    fromMail: state.initialiser.coreData.id,
     error: state.mail.error
   };
 };

@@ -54,7 +54,7 @@ export const SAFE_APP_ERROR_CODES = {
 }
 
 export const MESSAGES = {
-  INITIALIZE: {
+  INITIALISE: {
     AUTHORISE_APP: 'Authorising Application',
     CHECK_CONFIGURATION: 'Checking configuration',
     FETCH_EMAIL_IDS: 'Fetching owned email Ids'

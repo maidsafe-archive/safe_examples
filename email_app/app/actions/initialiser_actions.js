@@ -3,8 +3,8 @@ import { APP_STATUS } from '../constants';
 import { authApp, connect, reconnect, connectWithSharedMd, fetchEmailIds, readConfig,
           writeConfig, readInboxEmails, readArchivedEmails } from '../safenet_comm';
 
-export const setInitializerTask = (task) => ({
-  type: ACTION_TYPES.SET_INITIALIZER_TASK,
+export const setInitialiserTask = (task) => ({
+  type: ACTION_TYPES.SET_INITIALISER_TASK,
   task
 });
 
@@ -26,14 +26,14 @@ const newNetStatusCallback = (dispatch) => {
 
 export const receiveResponse = (uri) => {
   return function (dispatch, getState) {
-    let appStatus = getState().initializer.appStatus;
+    let appStatus = getState().initialiser.appStatus;
     if (appStatus === APP_STATUS.AUTHORISED) {
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_APP,
         payload: connect(uri, newNetStatusCallback(dispatch))
       });
     } else {
-      let app = getState().initializer.app;
+      let app = getState().initialiser.app;
       let serviceToRegister = getState().createAccount.serviceToRegister;
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_SHARE_MD,
@@ -59,7 +59,7 @@ export const authoriseApplication = () => {
 
 export const reconnectApplication = () => {
   return function (dispatch, getState) {
-    let app = getState().initializer.app;
+    let app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.RECONNECT_APP,
       payload: reconnect(app)
@@ -69,7 +69,7 @@ export const reconnectApplication = () => {
 
 export const getEmailIds = () => {
   return function (dispatch, getState) {
-    let app = getState().initializer.app;
+    let app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.FETCH_EMAIL_IDS,
       payload: fetchEmailIds(app)
@@ -79,7 +79,7 @@ export const getEmailIds = () => {
 
 export const refreshConfig = (emailId) => {
   return function (dispatch, getState) {
-    let app = getState().initializer.app;
+    let app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.GET_CONFIG,
       payload: readConfig(app, emailId)
@@ -89,7 +89,7 @@ export const refreshConfig = (emailId) => {
 
 export const storeNewAccount = (account) => {
   return function (dispatch, getState) {
-    let app = getState().initializer.app;
+    let app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.STORE_NEW_ACCOUNT,
       payload: writeConfig(app, account)
@@ -100,7 +100,7 @@ export const storeNewAccount = (account) => {
 export const refreshEmail = (account) => {
   return function (dispatch, getState) {
     let spaceUsed;
-    let app = getState().initializer.app;
+    let app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.REFRESH_EMAIL,
       payload: readInboxEmails(app, account,

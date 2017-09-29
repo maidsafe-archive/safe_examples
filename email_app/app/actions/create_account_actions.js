@@ -3,7 +3,7 @@ import { setupAccount } from '../safenet_comm';
 
 export const createAccount = (emailId) => {
   return function (dispatch, getState) {
-    let app = getState().initializer.app;
+    let app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.CREATE_ACCOUNT,
       payload: setupAccount(app, emailId)
