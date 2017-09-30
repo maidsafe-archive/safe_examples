@@ -27,7 +27,7 @@ export default class Initializer extends Component {
 
   readEmailIds() {
     const { setInitialiserTask, getEmailIds } = this.props;
-    setInitialiserTask(MESSAGES.INITIALIZE.FETCH_EMAIL_IDS);
+    setInitialiserTask(MESSAGES.INITIALISE.FETCH_EMAIL_IDS);
 
     return getEmailIds()
         .then((_) => this.context.router.push('/create_account'));

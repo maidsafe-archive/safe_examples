@@ -1,14 +1,9 @@
 import ACTION_TYPES from '../../actions/actionTypes';
+import { APP_STATUS } from '../../constants';
 
 const initialState = {
   error: {},
-  emailIds: [],
   account: [],
-  coreData: {
-    id: '',
-    inbox: [],
-    saved: []
-  },
   inboxSize: 0,
   savedSize: 0,
   spaceUsed: 0,
@@ -16,7 +11,12 @@ const initialState = {
     state: false,
     msg: null
   },
-  appStatus: null
+  appStatus: null,
+  coreData: {
+    id: '',
+    inbox: [],
+    saved: []
+  }
 };
 
 const pushEmailSorted = (list, item) => {
@@ -34,18 +34,6 @@ const pushEmailSorted = (list, item) => {
 
 const mail = (state = initialState, action) => {
   switch (action.type) {
-    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_LOADING`:
-      return { ...state, appStatus: APP_STATUS.FETCHING_EMAIL_IDS };
-      break;
-    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_SUCCESS`:
-      return { ...state, emailIds: action.payload };
-      break;
-    case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
-      return { ...state,
-        appStatus: APP_STATUS.READING_CONFIG,
-        processing: { state: true, msg: 'Reading emails...' }
-      };
-      break;
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
       return { ...state,
         account: action.payload,

@@ -1,16 +1,38 @@
 import ACTION_TYPES from '../../actions/actionTypes';
-import { ACC_STATUS, SAFE_APP_ERROR_CODES } from '../../constants';
+import { ACC_STATUS, SAFE_APP_ERROR_CODES, APP_STATUS } from '../../constants';
 
 const initialState = {
   accStatus: null,
   error: {},
+  coreData: {
+    id: '',
+    inbox: [],
+    saved: []
+  },
+  emailIds: [],
   account: [],
   newAccount: null,
-  serviceToRegister: null
+  serviceToRegister: null,
+  processing: {
+    state: false,
+    msg: null
+  },
 };
 
 const createAccount = (state = initialState, action) => {
   switch (action.type) {
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_LOADING`:
+      return { ...state, appStatus: APP_STATUS.FETCHING_EMAIL_IDS };
+      break;
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_SUCCESS`:
+      return { ...state, emailIds: action.payload };
+      break;
+    case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
+      return { ...state,
+        appStatus: APP_STATUS.READING_CONFIG,
+        processing: { state: true, msg: 'Reading emails...' }
+      };
+      break;
     case `${ACTION_TYPES.CREATE_ACCOUNT_RESET}_LOADING`:
       return initialState;
       break;

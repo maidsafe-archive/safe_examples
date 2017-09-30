@@ -6,12 +6,12 @@ import { refreshEmail } from '../actions/initialiser_actions';
 const mapStateToProps = state => {
   return {
     error: state.mail.error,
-    coreData: state.initialiser.coreData,
-    inboxSize: state.initialiser.inboxSize,
-    savedSize: state.initialiser.savedSize,
-    spaceUsed: state.initialiser.spaceUsed,
+    coreData: Object.assign({}, state.createAccount.coreData, state.mail.coreData),
+    inboxSize: state.mail.inboxSize,
+    savedSize: state.mail.savedSize,
+    spaceUsed: state.mail.spaceUsed,
     app: state.initialiser.app,
-    account: state.initialiser.account
+    account: state.createAccount.account
   };
 };
 

@@ -53,7 +53,7 @@ export const authoriseApplication = () => {
           .catch(reject);
       })
     })
-    .catch(_ => {});
+    .catch((err) => {console.log("Error1: ", err)});
   };
 };
 
