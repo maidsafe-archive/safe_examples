@@ -5,11 +5,11 @@ import { refreshEmail } from '../actions/initialiser_actions';
 
 const mapStateToProps = state => {
   return {
-    coreData: Object.assign({}, state.createAccount.coreData, state.mail.coreData),
-    processing: state.mail.processing,
-    error: state.mail.error,
+    coreData: state.emailApp.coreData,
+    processing: state.emailApp.processing,
+    error: state.emailApp.error,
     app: state.initialiser.app,
-    account: state.createAccount.account
+    account: state.emailApp.account
   };
 };
 

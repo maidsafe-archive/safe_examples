@@ -5,12 +5,12 @@ import { storeNewAccount, refreshConfig } from '../actions/initialiser_actions';
 
 const mapStateToProps = state => {
   return {
-    accStatus: state.createAccount.accStatus,
-    error: state.createAccount.error,
-    processing: state.createAccount.processing,
-    emailIds: state.createAccount.emailIds,
-    newAccount: state.createAccount.newAccount,
-    coreData: state.createAccount.coreData
+    accStatus: state.emailApp.accStatus,
+    error: state.emailApp.error,
+    processing: state.emailApp.processing,
+    emailIds: state.emailApp.emailIds,
+    newAccount: state.emailApp.newAccount,
+    coreData: state.emailApp.coreData
   };
 };
 

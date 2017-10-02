@@ -5,12 +5,12 @@ import { resetCurrentAccount } from '../actions/create_account_actions';
 
 const mapStateToProps = state => {
   return {
-    coreData: state.createAccount.coreData,
-    account: state.mail.account,
-    inboxSize: state.mail.inboxSize,
-    savedSize: state.mail.savedSize,
+    coreData: state.emailApp.coreData,
+    account: state.emailApp.account,
+    inboxSize: state.emailApp.inboxSize,
+    savedSize: state.emailApp.savedSize,
     networkStatus: state.initialiser.networkStatus,
-    processing: state.mail.processing
+    processing: state.emailApp.processing
   };
 };
 

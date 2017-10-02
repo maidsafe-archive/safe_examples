@@ -5,13 +5,13 @@ import { refreshEmail } from '../actions/initialiser_actions';
 
 const mapStateToProps = state => {
   return {
-    error: state.mail.error,
-    coreData: Object.assign({}, state.createAccount.coreData, state.mail.coreData),
-    inboxSize: state.mail.inboxSize,
-    savedSize: state.mail.savedSize,
-    spaceUsed: state.mail.spaceUsed,
+    error: state.emailApp.error,
+    coreData: state.emailApp.coreData,
+    inboxSize: state.emailApp.inboxSize,
+    savedSize: state.emailApp.savedSize,
+    spaceUsed: state.emailApp.spaceUsed,
     app: state.initialiser.app,
-    account: state.createAccount.account
+    account: state.emailApp.account
   };
 };
 
