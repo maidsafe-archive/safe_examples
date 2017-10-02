@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import ComposeMail from '../components/compose_mail';
-import { cancelCompose, sendEmail } from '../actions/mail_actions';
+import { cancelCompose, sendEmail } from '../actions';
 
 const mapStateToProps = state => {
   return {

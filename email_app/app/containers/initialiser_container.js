@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Initializer from '../components/initialiser';
-import { setInitialiserTask, authoriseApplication, getEmailIds } from '../actions/initialiser_actions';
+import { setInitialiserTask, authoriseApplication, getEmailIds } from '../actions';
 
 const mapStateToProps = state => {
   return {

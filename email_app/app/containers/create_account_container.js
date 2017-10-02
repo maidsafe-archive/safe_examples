@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 import CreateAccount from '../components/create_account';
-import { createAccount, createAccountError } from '../actions/create_account_actions';
-import { storeNewAccount, refreshConfig } from '../actions/initialiser_actions';
+import { createAccount, createAccountError, storeNewAccount, refreshConfig } from '../actions';
 
 const mapStateToProps = state => {
   return {

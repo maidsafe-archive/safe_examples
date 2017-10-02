@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 import Home from '../components/home';
-import { reconnectApplication, refreshEmail, getEmailIds } from '../actions/initialiser_actions';
-import { resetCurrentAccount } from '../actions/create_account_actions';
+import { reconnectApplication, refreshEmail, getEmailIds, resetCurrentAccount } from '../actions';
 
 const mapStateToProps = state => {
   return {

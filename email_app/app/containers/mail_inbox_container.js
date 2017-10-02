@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
-import { refreshInbox, deleteEmail, saveEmail } from '../actions/mail_actions';
-import { refreshEmail } from '../actions/initialiser_actions';
+import { refreshInbox, deleteEmail, saveEmail, refreshEmail } from '../actions';
 
 const mapStateToProps = state => {
   return {

@@ -1,7 +1,6 @@
 import ACTION_TYPES from './actionTypes';
 import { APP_STATUS } from '../constants';
-import { authApp, connect, reconnect, connectWithSharedMd, fetchEmailIds, readConfig,
-          writeConfig, readInboxEmails, readArchivedEmails } from '../safenet_comm';
+import { authApp, connect, reconnect, connectWithSharedMd } from '../safenet_comm';
 
 export const setInitialiserTask = (task) => ({
   type: ACTION_TYPES.SET_INITIALISER_TASK,
@@ -63,64 +62,6 @@ export const reconnectApplication = () => {
     return dispatch({
       type: ACTION_TYPES.RECONNECT_APP,
       payload: reconnect(app)
-    });
-  };
-};
-
-export const getEmailIds = () => {
-  return function (dispatch, getState) {
-    let app = getState().initialiser.app;
-    return dispatch({
-      type: ACTION_TYPES.FETCH_EMAIL_IDS,
-      payload: fetchEmailIds(app)
-    });
-  };
-};
-
-export const refreshConfig = (emailId) => {
-  return function (dispatch, getState) {
-    let app = getState().initialiser.app;
-    return dispatch({
-      type: ACTION_TYPES.GET_CONFIG,
-      payload: readConfig(app, emailId)
-    });
-  };
-};
-
-export const storeNewAccount = (account) => {
-  return function (dispatch, getState) {
-    let app = getState().initialiser.app;
-    return dispatch({
-      type: ACTION_TYPES.STORE_NEW_ACCOUNT,
-      payload: writeConfig(app, account)
-    });
-  };
-};
-
-export const refreshEmail = (account) => {
-  return function (dispatch, getState) {
-    let spaceUsed;
-    let app = getState().initialiser.app;
-    return dispatch({
-      type: ACTION_TYPES.REFRESH_EMAIL,
-      payload: readInboxEmails(app, account,
-                    (inboxEntry) => {
-                      dispatch({
-                        type: ACTION_TYPES.PUSH_TO_INBOX,
-                        payload: inboxEntry
-                      });
-                })
-                .then((len) => {
-                  spaceUsed = len;
-                  return readArchivedEmails(app, account,
-                      (archiveEntry) => {
-                        dispatch({
-                          type: ACTION_TYPES.PUSH_TO_ARCHIVE,
-                          payload: archiveEntry
-                        });
-                      });
-                })
-                .then(() => spaceUsed)
     });
   };
 };
