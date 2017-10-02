@@ -1,4 +1,4 @@
-import ACTION_TYPES from './actionTypes';
+import ACTION_TYPES from './action_types';
 import { setupAccount, storeEmail, removeEmail, archiveEmail,
   fetchEmailIds, readConfig, writeConfig,
   readInboxEmails, readArchivedEmails } from '../safenet_comm';

@@ -1,4 +1,4 @@
-import ACTION_TYPES from '../actions/actionTypes';
+import ACTION_TYPES from '../actions/action_types';
 import { MESSAGES, APP_STATUS, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
 
 const initialState = {

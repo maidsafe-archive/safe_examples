@@ -1,4 +1,4 @@
-import ACTION_TYPES from './actionTypes';
+import ACTION_TYPES from './action_types';
 import { APP_STATUS } from '../constants';
 import { authApp, connect, reconnect, connectWithSharedMd } from '../safenet_comm';
 
