@@ -1,94 +1,12 @@
 import { shell } from 'electron';
-import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
-import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
-import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
-         splitPublicIdAndService, deserialiseArray, parseUrl } from './utils/app_utils';
-import pkg from '../package.json';
-
-const APP_INFO = {
-  info: {
-    id: pkg.identifier,
-    scope: null,
-    name: pkg.productName,
-    vendor: pkg.vendor
-  },
-  opts: {
-    own_container: true
-  },
-  containers: {
-    publicNames: '_publicNames'
-  },
-  permissions: {
-    _publicNames: ['Read', 'Insert']
-  }
-};
-
-const genServiceInfo = (app, emailId) => {
-  let serviceInfo = splitPublicIdAndService(emailId);
-  return app.crypto.sha3Hash(serviceInfo.publicId)
-    .then((hashed) => {
-      serviceInfo.serviceAddr = hashed;
-      return serviceInfo;
-    });
-}
-
-const requestShareMdAuth = (app, mdPermissions) => {
-  return app.auth.genShareMDataUri(mdPermissions)
-    .then((resp) => {
-      shell.openExternal(parseUrl(resp.uri));
-      return null;
-    });
-}
-
-const requestAuth = () => {
-  return initializeApp(APP_INFO.info)
-    .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
-      .then((resp) => {
-        shell.openExternal(parseUrl(resp.uri));
-        return null;
-      })
-    );
-}
-
-export const authApp = (netStatusCallback) => {
-  if (process.env.SAFE_FAKE_AUTH) {
-    return initializeApp(APP_INFO.info)
-      .then((app) => app.auth.loginForTest(APP_INFO.permissions));
-  }
-
-  let uri = getAuthData();
-  if (uri) {
-    return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
-      .then((registeredApp) => registeredApp.auth.refreshContainersPermissions()
-        .then(() => registeredApp)
-      )
-      .catch((err) => {
-        console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
-        clearAuthData();
-        return requestAuth();
-      });
-  }
-
-  return requestAuth();
-}
-
-export const connect = (uri, netStatusCallback) => {
-  let registeredApp;
-  return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
-    .then((app) => registeredApp = app)
-    .then(() => saveAuthData(uri))
-    .then(() => registeredApp.auth.refreshContainersPermissions())
-    .then(() => registeredApp);
-}
-
-export const reconnect = (app) => {
-  return app.reconnect();
-}
+import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from '../constants';
+import {  genRandomEntryKey, deserialiseArray } from '../utils/app_utils';
+import * as netFns from './network.js';
 
 const fetchPublicIds = (app) => {
   let rawEntries = [];
   let publicIds = [];
-  return app.auth.getContainer(APP_INFO.containers.publicNames)
+  return app.auth.getContainer(netFns.APP_INFO.containers.publicNames)
     .then((pubNamesMd) => pubNamesMd.getEntries()
       .then((entries) => entries.forEach((key, value) => {
           rawEntries.push({key, value});
@@ -183,10 +101,10 @@ export const writeConfig = (app, account) => {
 
 const decryptEmail = (app, account, key, value, cb) => {
   if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
-    return decrypt(app, value, account.encSk, account.encPk)
+    return netFns.decrypt(app, value, account.encSk, account.encPk)
       .then(entryValue => app.immutableData.fetch(deserialiseArray(entryValue))
         .then((immData) => immData.read())
-        .then((content) => decrypt(app, content, account.encSk, account.encPk)
+        .then((content) => netFns.decrypt(app, content, account.encSk, account.encPk)
           .then(decryptedEmail => cb({ id: key, email: JSON.parse(decryptedEmail) }))
         )
       )
@@ -252,7 +170,7 @@ const createPublicIdAndEmailService = (app, pubNamesMd,
 
 const genNewAccount = (app, id) => {
   let inboxMd;
-  return genKeyPair(app)
+  return netFns.genKeyPair(app)
     .then((keyPair) => createInbox(app, keyPair.publicKey)
       .then((md) => inboxMd = md)
       .then(() => createArchive(app))
@@ -289,7 +207,7 @@ export const createEmailService = (app, servicesXorName, serviceInfo) => {
     .then((appSignKey) => app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS)
       .then((md) => md.getUserPermissions(appSignKey)) // FIXME: the permissions it has could not be enough
       .then(() => registerEmailService(app, emailService).then((newAccount) => ({ newAccount }))
-        , (err) => requestShareMdAuth(app,
+        , (err) => netFns.requestShareMdAuth(app,
             [{ type_tag: CONSTANTS.TAG_TYPE_DNS,
                name: servicesXorName,
                perms: ['Insert']
@@ -300,9 +218,9 @@ export const createEmailService = (app, servicesXorName, serviceInfo) => {
 
 export const setupAccount = (app, emailId) => {
   let serviceInfo;
-  return genServiceInfo(app, emailId)
+  return netFns.genServiceInfo(app, emailId)
     .then((info) => serviceInfo = info)
-    .then(() => app.auth.getContainer(APP_INFO.containers.publicNames))
+    .then(() => app.auth.getContainer(netFns.APP_INFO.containers.publicNames))
     .then((pubNamesMd) => pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key))
       // If service container already exists, try to add email service
       .then((encryptedAddr) => pubNamesMd.decrypt(encryptedAddr.buf)
@@ -331,7 +249,7 @@ export const connectWithSharedMd = (app, uri, serviceToRegister) => {
 }
 
 const writeEmailContent = (app, email, pk) => {
-  return encrypt(app, JSON.stringify(email), pk)
+  return netFns.encrypt(app, JSON.stringify(email), pk)
     .then(encryptedEmail => app.immutableData.create()
        .then((email) => email.write(encryptedEmail)
          .then(() => app.cipherOpt.newPlainText())
@@ -342,7 +260,7 @@ const writeEmailContent = (app, email, pk) => {
 
 export const storeEmail = (app, email, to) => {
   let serviceInfo;
-  return genServiceInfo(app, to)
+  return netFns.genServiceInfo(app, to)
     .then((info) => serviceInfo = info)
     .then(() => app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS))
     .then((md) => md.get(serviceInfo.serviceName))
@@ -353,7 +271,7 @@ export const storeEmail = (app, email, to) => {
         .then((emailAddr) => app.mutableData.newMutation()
           .then((mut) => {
             let entryKey = genRandomEntryKey();
-            return encrypt(app, emailAddr, pk.buf.toString())
+            return netFns.encrypt(app, emailAddr, pk.buf.toString())
               .then(entryValue => mut.insert(entryKey, entryValue)
                 .then(() => inboxMd.applyEntriesMutation(mut))
               )
@@ -381,36 +299,3 @@ export const archiveEmail = (app, account, key) => {
       .then(() => account.inboxMd.applyEntriesMutation(mut))
     )
 }
-
-const genKeyPair = (app) => {
-  let rawKeyPair = {};
-  return app.crypto.generateEncKeyPair()
-    .then(keyPair => keyPair.pubEncKey.getRaw()
-      .then(rawPubEncKey => {
-        rawKeyPair.publicKey = rawPubEncKey.buffer.toString('hex');
-        return;
-      })
-      .then(() => keyPair.secEncKey.getRaw())
-      .then(rawSecEncKey => {
-        rawKeyPair.privateKey = rawSecEncKey.buffer.toString('hex');
-        return rawKeyPair;
-      })
-    )
-}
-
-const encrypt = (app, input, pk) => {
-  if(Array.isArray(input)) {
-    input = input.toString();
-  }
-
-  let stringToBuffer = Buffer.from(pk, 'hex');
-
-  return app.crypto.pubEncKeyKeyFromRaw(stringToBuffer)
-    .then(pubEncKeyAPI => pubEncKeyAPI.encryptSealed(input))
-};
-
-const decrypt = (app, cipherMsg, sk, pk) => {
-  return app.crypto.generateEncKeyPairFromRaw(Buffer.from(pk, 'hex'), Buffer.from(sk, 'hex'))
-    .then(keyPair => keyPair.decryptSealed(cipherMsg))
-    .then((decrypted) => decrypted.toString())
-};
