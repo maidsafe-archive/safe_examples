@@ -78,7 +78,7 @@ const RELEASE_FOLDER_NAME = `${pkgName}-v${pkg.version}-${PLATFORM_NAME}-x64`;
 
 
 // Add log where it's needed
-fs.copySync(LOG_TOML, `${dirForLog}/log.toml`);
+fs.copySync(LOG_TOML, `${dirForLog}/log.toml`, { overwrite: true } );
 
 //add version file
 fs.outputFileSync(path.resolve(releaseFolder, 'version'), pkg.version);
@@ -93,7 +93,7 @@ removalArray.forEach( ( file) =>
 
 console.log("Renaming package to:", path.resolve( targetDir,`${RELEASE_FOLDER_NAME}` ));
 //rename release folder
-fs.moveSync( releaseFolder, path.resolve( targetDir,`${RELEASE_FOLDER_NAME}` ) );
+fs.moveSync( releaseFolder, path.resolve( targetDir,`${RELEASE_FOLDER_NAME}` ), { overwrite: true } );
 
 
 // create a file to stream archive data to.
