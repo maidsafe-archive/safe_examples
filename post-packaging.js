@@ -45,7 +45,7 @@ if (platform === OSX) {
 
   dirForLog = path.resolve(releaseFolder, `${pkgName}.app/Contents/Frameworks/${pkgName} Helper.app/Contents/Resources`);
   PLATFORM_NAME = 'osx';
-  fs.ensureDir(dirForLog);
+  fs.ensureDirSync(dirForLog);
 }
 
 if (platform === LINUX ) {
@@ -58,7 +58,7 @@ if (platform === LINUX ) {
 
   dirForLog = releaseFolder;
   PLATFORM_NAME = LINUX;
-  fs.ensureDir(dirForLog);
+  fs.ensureDirSync(dirForLog);
 }
 
 if (platform === WINDOWS ) {
@@ -70,7 +70,7 @@ if (platform === WINDOWS ) {
 
   dirForLog = releaseFolder;
   PLATFORM_NAME = 'win';
-  fs.ensureDir(dirForLog);
+  fs.ensureDirSync(dirForLog);
 }
 
 const RELEASE_FOLDER_NAME = `${pkgName}-v${pkg.version}-${PLATFORM_NAME}-x64`;
