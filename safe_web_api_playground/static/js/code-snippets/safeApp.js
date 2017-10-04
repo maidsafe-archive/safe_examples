@@ -129,7 +129,7 @@ module.exports = {
     },
 
     canAccessContainer: () => {
-      let container = '_public';
+      let container = '_public'
       let permissions = ['Read']
       return window.safeApp.canAccessContainer(appHandle, container, permissions)
         .then((r) => {
