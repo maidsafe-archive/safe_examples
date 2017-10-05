@@ -24,6 +24,17 @@ const APP_INFO = {
   }
 };
 
+const DEVELOPMENT = 'dev';
+const nodeEnv = process.env.NODE_ENV || DEVELOPMENT
+
+let libPath;
+
+if (nodeEnv === DEVELOPMENT) {
+  libPath = CONSTANTS.DEV_LIB_PATH;
+} else {
+  libPath = CONSTANTS.ASAR_LIB_PATH;
+}
+
 const genServiceInfo = async (app, emailId) => {
   try {
     let serviceInfo = splitPublicIdAndService(emailId);
@@ -47,7 +58,7 @@ const requestShareMdAuth = async (app, mdPermissions) => {
 
 const requestAuth = async () => {
   try {
-    const app = await initializeApp(APP_INFO.info);
+    const app = await initializeApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
     shell.openExternal(parseUrl(resp.uri));
     return null;
@@ -59,14 +70,14 @@ const requestAuth = async () => {
 
 export const authApp = async (netStatusCallback) => {
   if (process.env.SAFE_FAKE_AUTH) {
-    const app = await initializeApp(APP_INFO.info);
+    const app = await initializeApp(APP_INFO.info, null, { libPath });
     return app.auth.loginForTest(APP_INFO.permissions);
   }
 
   const uri = getAuthData();
   if (uri) {
     try {
-      const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback);
+      const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
       await registeredApp.auth.refreshContainersPermissions();
       return registeredApp;
     } catch (err) {
@@ -80,7 +91,7 @@ export const authApp = async (netStatusCallback) => {
 
 export const connect = async (uri, netStatusCallback) => {
   try {
-    const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback);
+    const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
     // synchronous
     saveAuthData(uri);
     await registeredApp.auth.refreshContainersPermissions();

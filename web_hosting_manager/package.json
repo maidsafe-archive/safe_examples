@@ -16,6 +16,7 @@
     "lint-styles": "stylelint app/*.css app/components/*.css --syntax scss",
     "lint-styles-fix": "stylefmt -r app/*.css app/components/*.css",
     "package": "npm run build && build --publish never",
+    "post-package": "node ../post-packaging.js",
     "package-all": "npm run build && build -mwl",
     "package-linux": "npm run build && build --linux",
     "package-win": "npm run build && build --win --x64",
@@ -182,6 +183,7 @@
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {
+    "archiver": "^2.0.3",
     "copy-webpack-plugin": "^4.0.1",
     "devtron": "^1.4.0",
     "electron-debug": "^1.2.0",
@@ -199,7 +201,8 @@
     "redux": "^3.7.1",
     "redux-promise-middleware": "^4.4.1",
     "redux-thunk": "^2.2.0",
-    "source-map-support": "^0.4.15"
+    "source-map-support": "^0.4.15",
+    "temp-write": "^3.3.0"
   },
   "devEngines": {
     "node": ">=7.x",

@@ -1,4 +1,5 @@
 let initSnippets = require('./init_snippets.js');
+require('./code_test.js');
 
 let apiVariables = [
   'appHandle',

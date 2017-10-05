@@ -4,9 +4,18 @@
   "description": "SAFE Network example applications",
   "main": "index.js",
   "repository": "git@github.com:maidsafe/safe_examples.git",
-  "scripts" : {
-	  "update-email-safe-deps": "cd email_app && npm install @maidsafe/safe-node-app@latest --save",
-	  "update-webhosting-safe-deps": "cd web_hosting_manager/app && npm install @maidsafe/safe-node-app@latest --save",
-	  "update-safe-deps": "yarn update-webhosting-safe-deps && yarn update-email-safe-deps"
+  "scripts": {
+    "update-email-safe-deps": "cd email_app && npm install @maidsafe/safe-node-app@latest --save",
+    "update-webhosting-safe-deps": "cd web_hosting_manager/app && npm install @maidsafe/safe-node-app@latest --save",
+    "update-safe-deps": "yarn update-webhosting-safe-deps && yarn update-email-safe-deps",
+    "pack:webhosting": "cd web_hosting_manager && yarn package && yarn post-package -e web_hosting_manager",
+    "post-pack:webhosting": "cd web_hosting_manager && yarn post-package -e web_hosting_manager",
+    "pack:email": "cd email_app && yarn package && yarn post-package -e email_app",
+    "post-pack:email": "cd email_app && yarn post-package -e email_app"
+  },
+  "dependencies": {
+    "archiver": "^2.0.3",
+    "command-line-args": "^4.0.7",
+    "fs-extra": "^4.0.2"
   }
 }
