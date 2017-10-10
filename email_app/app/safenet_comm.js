@@ -359,15 +359,21 @@ export const setupAccount = async (app, emailId) => {
   const pubNamesMd = await app.auth.getContainer(APP_INFO.containers.publicNames);
   try { // If service container already exists, try to add email service
     const encryptedAddr = await pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key));
+    const servicesXorName = await pubNamesMd.decrypt(encryptedAddr.buf);
+    return createEmailService(app, servicesXorName, serviceInfo);
   } catch (err) { // ...if not then create it
     if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
       console.error(err);
     }
-    // The public ID doesn't exist in _publicNames
-    const newAccount = await genNewAccount(app, serviceInfo.emailId);
-    const inboxSerialised = await newAccount.inboxMd.serialise();
-    await createPublicIdAndEmailService(app,pubNamesMd, serviceInfo, inboxSerialised);
-    return { newAccount };
+    try {
+      // The public ID doesn't exist in _publicNames
+      const newAccount = await genNewAccount(app, serviceInfo.emailId);
+      const inboxSerialised = await newAccount.inboxMd.serialise();
+      await createPublicIdAndEmailService(app,pubNamesMd, serviceInfo, inboxSerialised);
+      return { newAccount };
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 
