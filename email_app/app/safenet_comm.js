@@ -398,7 +398,6 @@ export const storeEmail = async (app, email, to) => {
     const serviceInfo = await genServiceInfo(app, to);
     const md = await app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS);
     const service = await md.get(serviceInfo.serviceName);
-    if(!service) { throw MESSAGES.EMAIL_ID_NOT_FOUND }
     const inboxMd = await app.mutableData.fromSerial(service.buf);
     const pk = await inboxMd.get(CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY);
     const emailAddr = await writeEmailContent(app, email, pk.buf.toString());
@@ -409,6 +408,7 @@ export const storeEmail = async (app, email, to) => {
     return inboxMd.applyEntriesMutation(mut);
   } catch (err) {
     console.error(err);
+    throw MESSAGES.EMAIL_ID_NOT_FOUND
   }
 }
 
