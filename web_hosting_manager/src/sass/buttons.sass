@@ -1,0 +1,114 @@
+button.btn-with-add-icon
+  +btnDefault()
+  line-height: 30px
+  font-size: 20px
+  font-weight: bold
+  color: $color-common-text
+  padding: 0 0 0 46px
+  white-space: nowrap
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  a
+    text-decoration: none
+    color: inherit
+  &:before
+    content: ""
+    width: 30px
+    height: 30px
+    display: block
+    background-image: url($url-new-public-id)
+    position: absolute
+    top: 0
+    left: 0
+  &:hover
+    color: $color-pr-blue
+    &:before
+      background-image: url($url-new-public-id-hover)
+
+.btn
+  +btnDefault()
+  &.flat
+    line-height: 55px
+    font-size: 20px
+    color: $color-common-text
+    background-color: $bg-default-flat-btn
+    font-weight: bold
+    &:hover
+      background-color: $bg-default-flat-btn-hover
+  &:disabled
+    background-color: $bg-default-flat-btn !important
+    &:hover
+      background-color: $bg-default-flat-btn !important
+  &.primary
+    background-color: $bg-primary-flat-btn
+    &:hover
+      background-color: $bg-primary-flat-btn-hover
+
+.delete-btn
+  +btnDefault()
+  width: 30px
+  height: 30px
+  background-image: url($url-delete-icon)
+  background-repeat: no-repeat
+  background-position: center
+  background-size: contain
+  &:hover
+    background-image: url($url-delete-icon-hover)
+
+.remap-btn
+  +btnDefault()
+  width: 30px
+  height: 30px
+  background-image: url($url-remap-icon)
+  background-repeat: no-repeat
+  background-position: center
+  background-size: contain
+  &:hover
+    background-image: url($url-remap-icon-hover)
+
+.go-back-btn
+  +btnDefault()
+  width: 30px
+  height: 30px
+  background-image: url($url-back-icon)
+  background-repeat: no-repeat
+  background-position: center
+  background-size: contain
+  &:hover
+    background-image: url($url-back-icon-hover)
+
+.go-home-btn
+  +btnDefault()
+  width: 30px
+  height: 30px
+  background-image: url($url-home-icon)
+  background-repeat: no-repeat
+  background-position: center
+  background-size: contain
+  &:hover
+    background-image: url($url-home-icon-hover)
+
+.upload-btn
+  +btnDefault()
+  width: 30px
+  height: 30px
+  background-image: url($url-upload-icon)
+  background-repeat: no-repeat
+  background-position: center
+  background-size: contain
+  &:hover
+    background-image: url($url-upload-icon-hover)
+
+.file-back-btn
+  +btnDefault()
+  width: 16px
+  height: 16px
+  background-image: url($url-back-icon)
+  background-repeat: no-repeat
+  background-position: center
+  background-size: contain
+  &:hover
+    background-image: url($url-back-icon-hover)
+    
