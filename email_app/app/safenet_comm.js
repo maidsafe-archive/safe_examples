@@ -43,6 +43,7 @@ const genServiceInfo = async (app, emailId) => {
     return serviceInfo;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -53,6 +54,7 @@ const requestShareMdAuth = async (app, mdPermissions) => {
     return null;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -98,6 +100,7 @@ export const connect = async (uri, netStatusCallback) => {
     return registeredApp;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -132,6 +135,7 @@ const fetchPublicIds = async (app) => {
     return publicIds;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -161,6 +165,7 @@ export const fetchEmailIds = async (app) => {
     return emailIds;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -181,6 +186,7 @@ export const readConfig = async (app, emailId) => {
     return account;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -191,6 +197,7 @@ const insertEncrypted = async (md, mut, key, value) => {
     return mut.insert(encryptedKey, encryptedValue);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -213,6 +220,7 @@ export const writeConfig = async (app, account) => {
     return account;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -226,6 +234,7 @@ const decryptEmail = async (app, account, key, value, cb) => {
       return cb({ id: key, email: JSON.parse(decryptedEmail) });
     } catch (err) {
       console.error(err);
+      throw err;
     }
   }
 }
@@ -241,6 +250,7 @@ export const readInboxEmails = async (app, account, cb) => {
     return entries.len();
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -252,6 +262,7 @@ export const readArchivedEmails = async (app, account, cb) => {
     })
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -269,6 +280,7 @@ const createInbox = async (app, encPk) => {
     return inboxMd;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -278,6 +290,7 @@ const createArchive = async (app) => {
     return md.quickSetup();
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -300,6 +313,7 @@ const createPublicIdAndEmailService = async (
     return pubNamesMd.applyEntriesMutation(mut);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -313,6 +327,7 @@ const genNewAccount = async (app, id) => {
                           encPk: keyPair.publicKey};
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -327,6 +342,7 @@ const registerEmailService = async (app, serviceToRegister) => {
     return newAccount;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -337,10 +353,10 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
     serviceName: serviceInfo.serviceName
   };
 
-  const appSignKey = await app.crypto.getAppPubSignKey();
   const md = await app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS);
+  // const appSignKey = await app.crypto.getAppPubSignKey();
   // QUESTION: What is the purpose of this line?
-  await md.getUserPermissions(appSignKey) // FIXME: the permissions it has could not be enough
+  // await md.getUserPermissions(appSignKey) // FIXME: the permissions it has could not be enough
   try {
     const newAccount = await registerEmailService(app, emailService);
     return { newAccount };
@@ -364,6 +380,7 @@ export const setupAccount = async (app, emailId) => {
   } catch (err) { // ...if not then create it
     if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
       console.error(err);
+      throw err;
     }
     try {
       // The public ID doesn't exist in _publicNames
@@ -373,6 +390,7 @@ export const setupAccount = async (app, emailId) => {
       return { newAccount };
     } catch (err) {
       console.error(err);
+      throw err;
     }
   }
 }
@@ -384,6 +402,7 @@ export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
     return registerEmailService(app, serviceToRegister);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -396,6 +415,7 @@ const writeEmailContent = async (app, email, pk) => {
     return emailWriter.close(cipherOpt);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -425,6 +445,7 @@ export const removeEmail = async (app, container, key) => {
     return container.applyEntriesMutation(mut);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -440,6 +461,7 @@ export const archiveEmail = async (app, account, key) => {
     return account.inboxMd.applyEntriesMutation(mut);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -454,6 +476,7 @@ const genKeyPair = async (app) => {
     return rawKeyPair;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 }
 
@@ -467,6 +490,7 @@ const encrypt = async (app, input, pk) => {
     return pubEncKeyAPI.encryptSealed(input);
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 
@@ -477,5 +501,6 @@ const decrypt = async (app, cipherMsg, sk, pk) => {
     return decrypted.toString();
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
