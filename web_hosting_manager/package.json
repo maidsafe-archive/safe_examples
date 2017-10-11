@@ -46,7 +46,7 @@
           ]
         },
         "electronPackagerConfig": {
-          "name": "web-hosting-manager",
+          "name": "Web Hosting Manager",
           "appBundleId": "net.maidsafe.examples.webhostingmanager",
           "appCategoryType": "public.app-category.utilities",
           "dir": "./",
