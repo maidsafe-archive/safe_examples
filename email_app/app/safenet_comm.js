@@ -47,6 +47,12 @@ const genServiceInfo = async (app, emailId) => {
   }
 }
 
+/*
+* A request to share access to a Mutable Data structure becomes necessary when\
+* that structure was created by the same user, however, in a foreign application
+*
+* This function will cause a shared MD auth popup to appear in SAFE Browser
+*/
 const requestShareMdAuth = async (app, mdPermissions) => {
   try {
     const resp = await app.auth.genShareMDataUri(mdPermissions);
@@ -70,6 +76,10 @@ const requestAuth = async () => {
   }
 }
 
+/*
+* Handles whether or not to request authorisation, to use already generated/
+* auth data, or to use fake auth for development purposes.
+*/
 export const authApp = async (netStatusCallback) => {
   if (process.env.SAFE_FAKE_AUTH) {
     const app = await initializeApp(APP_INFO.info, null, { libPath });
@@ -91,6 +101,10 @@ export const authApp = async (netStatusCallback) => {
   return requestAuth();
 }
 
+/*
+* Once this app's authorisation has been approved, it will then use the connect/
+* function to create a registered session with the network.
+*/
 export const connect = async (uri, netStatusCallback) => {
   try {
     const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
@@ -190,6 +204,10 @@ export const readConfig = async (app, emailId) => {
   }
 }
 
+/*
+* Helper function to encrypt a key and a value, and insert them into/
+* a given mutation object, later to be applied
+*/
 const insertEncrypted = async (md, mut, key, value) => {
   try {
     const encryptedKey = await md.encryptKey(key);
@@ -201,6 +219,9 @@ const insertEncrypted = async (md, mut, key, value) => {
   }
 }
 
+/*
+* Stores new account information in app's private container
+*/
 export const writeConfig = async (app, account) => {
   let emailAccount = {
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ID]: account.id,
@@ -266,6 +287,13 @@ export const readArchivedEmails = async (app, account, cb) => {
   }
 }
 
+/*
+* creates an inbox composed of a Mutable Data structure and permissions/
+* on that strucuture for anyone to be able to insert emailService.
+*
+* Initially saved with a single entry, representing the receiving account's/
+* public encryption key
+*/
 const createInbox = async (app, encPk) => {
   let baseInbox = {
     [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: encPk
@@ -284,6 +312,10 @@ const createInbox = async (app, encPk) => {
   }
 }
 
+/*
+* Archive is created as a place to store saved emails, composed of a private/
+* Mutable Data structure
+*/
 const createArchive = async (app) => {
   try {
     const md = await app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE);
@@ -294,6 +326,10 @@ const createArchive = async (app) => {
   }
 }
 
+/*
+* This function will be called when an email service is created, for which/
+* a public ID does not already exist.
+*/
 const createPublicIdAndEmailService = async (
   app, pubNamesMd, serviceInfo, inboxSerialised
 ) => {
@@ -346,6 +382,15 @@ const registerEmailService = async (app, serviceToRegister) => {
   }
 }
 
+/*
+* When a new email ID is created, in the case where a public ID already
+* exists for it, a new service is simply created.
+*
+* In the case that the public ID for the service does exist, however,/
+* was created by a foreign app, a request will be made to share that/
+* public ID, which is simply a public Mutable Data structure, with this app
+*
+*/
 export const createEmailService = async (app, servicesXorName, serviceInfo) => {
   const emailService = {
     servicesXorName,
@@ -369,6 +414,11 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
   }
 }
 
+/*
+* Overarching starting point to create a new account. With two cases:/
+* Either a public ID for the requested email ID already exists/
+* or it needs to be created
+*/
 export const setupAccount = async (app, emailId) => {
 
   const serviceInfo = await genServiceInfo(app, emailId);
@@ -395,6 +445,10 @@ export const setupAccount = async (app, emailId) => {
   }
 }
 
+/*
+* Once authorisation to share an MD with this app has been approved/
+* email service is inserted into public ID MD.
+*/
 export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
   try {
     await app.auth.loginFromURI(uri);
@@ -419,6 +473,9 @@ const writeEmailContent = async (app, email, pk) => {
   }
 }
 
+/*
+* Sends an email to a recipient
+*/
 export const storeEmail = async (app, email, to) => {
   try {
     const serviceInfo = await genServiceInfo(app, to);
@@ -449,6 +506,9 @@ export const removeEmail = async (app, container, key) => {
   }
 }
 
+/*
+* Inserts email in archive MD
+*/
 export const archiveEmail = async (app, account, key) => {
   try {
     let newEntryKey = genRandomEntryKey();
