@@ -1,4 +1,3 @@
-import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,

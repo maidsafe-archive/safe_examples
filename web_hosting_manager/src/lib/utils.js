@@ -80,10 +80,6 @@ export class DirStats {
   }
 }
 
-const parseUrl = (url) => (
-  (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
-);
-
 export const getDirectoryStats = (localPath) => {
   let stat;
   let tempStat;
@@ -153,9 +149,5 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback, baseDi
 
   return taskQueue;
 };
-
-export const openExternal = (url) => (
-  shell.openExternal(parseUrl(url))
-);
 
 export const localAuthInfo = new LocalAuthInfo();

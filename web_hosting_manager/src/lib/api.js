@@ -38,7 +38,7 @@ class SafeApi {
   sendAuthReq() {
     return safeApp.initializeApp(this.APP_INFO.data, null, { libPath })
       .then((app) => app.auth.genAuthUri(this.APP_INFO.permissions, this.APP_INFO.opt))
-      .then((res) => utils.openExternal(res.uri));
+      .then((res) => app.auth.openUri(res.uri));
   }
 
   /**
@@ -89,7 +89,7 @@ class SafeApi {
 
   sendMDReq(mdPermissions) {
     return this.app.auth.genShareMDataUri(mdPermissions)
-      .then((res) => utils.openExternal(res.uri));
+      .then((res) => this.app.auth.openUri(res.uri));
   }
 
   authoriseMD(publicName) {
