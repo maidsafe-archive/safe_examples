@@ -22,11 +22,11 @@ export default function authorisation(state = initState, action) {
         error: action.payload.message
       };
     case actionTypes.AUTHORISED:
-      const authRes = action.res.search('safe-') === 0 ? action.res : null;
+      const authRes = ((action.res.search('safe-') === 0) && !(action.res.search('safe-auth') === 0)) ? action.res : null;
       return {
         ...state,
         processing: false,
-        authorised: true,
+        authorised: !!authRes,
         error: null,
         authRes
       };
