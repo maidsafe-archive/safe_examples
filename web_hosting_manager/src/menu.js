@@ -240,7 +240,7 @@ export default class MenuBuilder {
 
     const simulationMenuItems = this.buildSimulationMenuItems();
     if (simulationMenuItems) {
-      templateDefault.submenu = simulationMenuItems.concat(templateDefault.submenu);
+      templateDefault[0].submenu = simulationMenuItems.concat(templateDefault[0].submenu);
     }
 
     return templateDefault;
