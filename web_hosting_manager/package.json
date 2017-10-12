@@ -75,7 +75,7 @@
       }
     },
     "dependencies": {
-      "@maidsafe/safe-node-app": "^0.3.0",
+      "@maidsafe/safe-node-app": "^0.4.0",
       "babel-plugin-add-module-exports": "^0.2.1",
       "classnames": "^2.2.5",
       "electron-compile": "^6.4.2",
@@ -111,4 +111,4 @@
       "electron-prebuilt-compile": "1.7.8"
     }
   }
-  
+

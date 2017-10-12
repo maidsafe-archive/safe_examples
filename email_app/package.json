@@ -99,7 +99,7 @@
     "webpack-merge": "^0.14.1"
   },
   "dependencies": {
-    "@maidsafe/safe-node-app": "0.3.0",
+    "@maidsafe/safe-node-app": "^0.4.0",
     "axios": "^0.14.0",
     "babel-plugin-transform-class-properties": "^6.23.0",
     "buffer-stream-reader": "^0.1.1",
