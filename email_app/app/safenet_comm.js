@@ -2,7 +2,7 @@ import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
-         splitPublicIdAndService, deserialiseArray, parseUrl, showError } from './utils/app_utils';
+         splitPublicIdAndService, deserialiseArray, showError } from './utils/app_utils';
 import pkg from '../package.json';
 import 'babel-polyfill';
 
@@ -56,7 +56,7 @@ const genServiceInfo = async (app, emailId) => {
 const requestShareMdAuth = async (app, mdPermissions) => {
   try {
     const resp = await app.auth.genShareMDataUri(mdPermissions);
-    shell.openExternal(parseUrl(resp.uri));
+    await app.auth.openUri(resp.uri);
     return null;
   } catch (err) {
     console.error(err);
@@ -68,7 +68,7 @@ const requestAuth = async () => {
   try {
     const app = await initializeApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
-    shell.openExternal(parseUrl(resp.uri));
+    await app.auth.openUri(resp.uri);
     return null;
   } catch (err) {
     console.error(err);
@@ -406,6 +406,10 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
     const newAccount = await registerEmailService(app, emailService);
     return { newAccount };
   } catch (err) {
+    if(err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
+      console.error(err);
+      throw err;
+    }
     await requestShareMdAuth(
       app,
       [{ type_tag: CONSTANTS.TAG_TYPE_DNS, name: servicesXorName, perms: ['Insert'] }]
@@ -429,6 +433,9 @@ export const setupAccount = async (app, emailId) => {
     return createEmailService(app, servicesXorName, serviceInfo);
   } catch (err) { // ...if not then create it
     if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
+      console.error(err);
+      throw err;
+    } else if (err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
       console.error(err);
       throw err;
     }
