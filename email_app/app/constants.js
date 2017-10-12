@@ -1,3 +1,5 @@
+import path from 'path';
+
 export const CONSTANTS = {
   LOCAL_AUTH_DATA_KEY: 'local_auth_data_key',
   TAG_TYPE_DNS: 15001,
@@ -21,7 +23,10 @@ export const CONSTANTS = {
   MAIL_SUBJECT_LIMIT: 50,
   MAIL_CONTENT_LIMIT: 150,
   DATE_FORMAT: 'h:MM-mmm dd',
-  NET_STATUS_CONNECTED: 'Connected'
+  NET_STATUS_CONNECTED: 'Connected',
+  ASAR_LIB_PATH: path.resolve( __dirname, '../..', 'app.asar.unpacked/node_modules/@maidsafe/safe-node-app/src/native'),
+  DEV_LIB_PATH: path.resolve( __dirname, '..', 'node_modules/@maidsafe/safe-node-app/src/native')
+
 };
 
 export const APP_STATUS = {

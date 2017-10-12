@@ -22,6 +22,17 @@ const APP_INFO = {
   }
 };
 
+const DEVELOPMENT = 'dev';
+const nodeEnv = process.env.NODE_ENV || DEVELOPMENT
+
+let libPath;
+
+if (nodeEnv === DEVELOPMENT) {
+  libPath = CONSTANTS.DEV_LIB_PATH;
+} else {
+  libPath = CONSTANTS.ASAR_LIB_PATH;
+}
+
 const genServiceInfo = (app, emailId) => {
   let serviceInfo = splitPublicIdAndService(emailId);
   return app.crypto.sha3Hash(serviceInfo.publicId)
@@ -40,7 +51,7 @@ const requestShareMdAuth = (app, mdPermissions) => {
 }
 
 const requestAuth = () => {
-  return initializeApp(APP_INFO.info)
+  return initializeApp(APP_INFO.info, null, { libPath })
     .then((app) => app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts)
       .then((resp) => {
         return app.auth.openUri(resp.uri)
@@ -51,13 +62,13 @@ const requestAuth = () => {
 
 export const authApp = (netStatusCallback) => {
   if (process.env.SAFE_FAKE_AUTH) {
-    return initializeApp(APP_INFO.info)
+    return initializeApp(APP_INFO.info, null, { libPath })
       .then((app) => app.auth.loginForTest(APP_INFO.permissions));
   }
 
   let uri = getAuthData();
   if (uri) {
-    return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
+    return fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath })
       .then((registeredApp) => registeredApp.auth.refreshContainersPermissions()
         .then(() => registeredApp)
       )
@@ -73,7 +84,7 @@ export const authApp = (netStatusCallback) => {
 
 export const connect = (uri, netStatusCallback) => {
   let registeredApp;
-  return fromAuthURI(APP_INFO.info, uri, netStatusCallback)
+  return fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath })
     .then((app) => registeredApp = app)
     .then(() => saveAuthData(uri))
     .then(() => registeredApp.auth.refreshContainersPermissions())
