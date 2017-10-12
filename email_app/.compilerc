@@ -4,7 +4,8 @@
     ["env", { "targets": { "electron": "1.6.0" } }],
     "es2015",
     "stage-0",
-    "react"
+    "react",
+    "babel-polyfill"
   ],
   "sourceMaps": "none",
   "env": {
