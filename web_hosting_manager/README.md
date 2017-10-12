@@ -1,11 +1,9 @@
 # SAFE Hosting Manager
-
-#### Prerequisites
-> SAFE Hosting Manager uses **[keytar](https://www.npmjs.com/package/keytar)** module as its dependency. Please install the prerequisites mentioned [here](https://www.npmjs.com/package/keytar#installing) based on the platform.
+The tutorial app show cases how to create and manage web services for Public ID on SAFE Network. Demonstrates the usage of MutableData API, NFS API, Authentication APIs.
 
 ## Install
 
-* **Note: requires a node version 6.5.0 and an npm version 3.10.3**
+* **Note: requires a node version 7.10.0 and an npm version 4.2.0**
 
 First, clone the repo via git:
 
@@ -19,58 +17,17 @@ And then install Node.js dependencies.
 $ yarn
 ```
 
-Finally, rebuild the native modules
-
-```bash
-$ yarn run rebuild
-```
-
 ## Run
 
-Run these two commands __simultaneously__ in different console tabs.
-
 ```bash
-$ yarn run hot-server
-$ yarn run start-hot
-```
-
-or run two servers with one command
-
-```bash
-$ yarn run dev
+$ yarn start
 ```
 
 ### Authorising against Mock
 
-To simplify the auth process, as web-hosting can't received a response when running in dev mode, authorise the application via the safe playground, using the applications own app object (below). You can then add the `authUri` to the [webhosting app](https://github.com/maidsafe/safe_examples/blob/master/web_hosting_manager/app/menu.js#L51). 
+To simplify the auth process, as web-hosting can't received a response when running in dev mode.
 
-Finally, run the app, and in the main menu, select `Simluate Mock Response`, and you're good to go.
-
-```js
-let appInfo = {
-      id: 'net.maidsafe.examples.webhostingmanager',
-      name: 'Web Hosting Manager',
-      vendor: 'MaidSafe',
-      scope: null,
-      opt: {
-            own_container: false
-          },
-      permissions: {
-        _public: [
-          'Read',
-          'Insert',
-          'Update',
-          'Delete'
-        ],
-        _publicNames: [
-          'Read',
-          'Insert',
-          'Update',
-          'Delete'
-        ]
-      }
-    };
-```
+Run the app, and in the main menu, select `Simulate Mock Response`, and you're good to go.
 
 ## Packaging
 
@@ -79,20 +36,6 @@ To package apps for the local platform:
 ```bash
 $ yarn run package
 ```
-
-## Further commands
-
-To run the application without packaging run
-
-```bash
-$ yarn run build
-$ yarn start
-```
-#### Clear Access Data
-#####macOs
- Click `SAFE Hosting Manager -> Clear Access Data` from the menu.
-#####Windows and Linux
- Click `File -> Clear Access Data` from the menu.
 
 # License
 
