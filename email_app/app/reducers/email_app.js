@@ -1,26 +1,32 @@
-import ACTION_TYPES from '../actions/actionTypes';
-import { MESSAGES, APP_STATUS, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
+import ACTION_TYPES from '../actions/action_types';
+import { ACC_STATUS, SAFE_APP_ERROR_CODES, APP_STATUS, MESSAGES, CONSTANTS } from '../constants';
 
 const initialState = {
-  appStatus: null,
-  networkStatus: null,
+  error: {},
+  emailIds: [],
+  accStatus: null,
+  newAccount: null,
+  serviceToRegister: null,
+  account: [],
+  inboxSize: 0,
+  savedSize: 0,
+  spaceUsed: 0,
   processing: {
     state: false,
     msg: null
   },
-  app: null,
-  tasks: [],
-  emailIds: [],
-  account: [],
   coreData: {
     id: '',
     inbox: [],
     saved: []
   },
-  inboxSize: 0,
-  savedSize: 0,
-  spaceUsed: 0
+  appStatus: null,
+  networkStatus: null,
+  app: null,
+  tasks: []
 };
+
+
 
 const pushEmailSorted = (list, item) => {
   let index = list.findIndex((elem) => {
@@ -35,14 +41,13 @@ const pushEmailSorted = (list, item) => {
   return list;
 }
 
-const initializer = (state = initialState, action) => {
+const mail = (state = initialState, action) => {
   switch (action.type) {
-    case ACTION_TYPES.SET_INITIALIZER_TASK: {
+    case ACTION_TYPES.SET_INITIALISER_TASK:
       const tasks = state.tasks.slice();
       tasks.push(action.task);
       return { ...state, tasks };
       break;
-    }
     case `${ACTION_TYPES.AUTHORISE_APP}_LOADING`:
       return { ...state, app: null, appStatus: APP_STATUS.AUTHORISING };
       break;
@@ -75,12 +80,6 @@ const initializer = (state = initialState, action) => {
         processing: { state: false, msg: null }
       };
       break;
-    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_LOADING`:
-      return { ...state, appStatus: APP_STATUS.FETCHING_EMAIL_IDS };
-      break;
-    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_SUCCESS`:
-      return { ...state, emailIds: action.payload };
-      break;
     case `${ACTION_TYPES.GET_CONFIG}_LOADING`:
       return { ...state,
         appStatus: APP_STATUS.READING_CONFIG,
@@ -94,26 +93,6 @@ const initializer = (state = initialState, action) => {
         appStatus: APP_STATUS.READY,
         processing: { state: false, msg: null }
       };
-      break;
-    case `${ACTION_TYPES.CREATE_ACCOUNT}_LOADING`:
-      return { ...state, processing: { state: true, msg: 'Creating email ID...' } };
-      break;
-    case `${ACTION_TYPES.CREATE_ACCOUNT}_ERROR`:
-    case `${ACTION_TYPES.CREATE_ACCOUNT}_SUCCESS`:
-      return { ...state, processing: { state: false, msg: null } };
-      break;
-    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_LOADING`:
-      return { ...state, processing: { state: true, msg: 'Storing email info...' } };
-      break;
-    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
-      return { ...state,
-        account: action.payload,
-        coreData: { ...state.coreData, id: action.payload.id },
-        processing: { state: false, msg: null }
-      };
-      break;
-    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_ERROR`:
-      return { ...state, processing: { state: false, msg: null } };
       break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_LOADING`:
       return { ...state,
@@ -157,10 +136,77 @@ const initializer = (state = initialState, action) => {
       };
       break;
     }
+    case ACTION_TYPES.CANCEL_COMPOSE:
+      return { ...state, error: {} };
+      break;
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_LOADING`:
+      return { ...state, appStatus: APP_STATUS.FETCHING_EMAIL_IDS };
+      break;
+    case `${ACTION_TYPES.FETCH_EMAIL_IDS}_SUCCESS`:
+      return { ...state, emailIds: action.payload };
+      break;
+    case `${ACTION_TYPES.CREATE_ACCOUNT_RESET}_LOADING`:
+      return { ...state,
+        accStatus: null,
+        error: {},
+        newAccount: null,
+        serviceToRegister: null
+      };
+      break;
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_LOADING`:
+      return { ...state, processing: { state: true, msg: 'Creating email ID...' } };
+      break;
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_ERROR`:
+      return { ...state, error: action.payload, processing: {state: false, msg: null}};
+      break;
+    case `${ACTION_TYPES.CREATE_ACCOUNT}_SUCCESS`:
+      if (action.payload.newAccount) {
+        return { ...state,
+          newAccount: action.payload.newAccount,
+          accStatus: ACC_STATUS.CREATED
+        };
+      }
+
+      return { ...state,
+        accStatus: ACC_STATUS.AUTHORISING,
+        serviceToRegister: action.payload
+      };
+      break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_LOADING`:
+      return { ...state, processing: { state: true, msg: 'Storing email info...' } };
+      break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
+      return { ...state,
+        account: action.payload,
+        coreData: { ...state.coreData, id: action.payload.id },
+        processing: { state: false, msg: null }
+      };
+      break;
+    case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_ERROR`:
+      return { ...state, error: action.payload };
+      break;
+    case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_ERROR`:
+      status = ACC_STATUS.AUTHORISATION_FAILED;
+      if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_SHARE_MDATA_DENIED) {
+        status = ACC_STATUS.AUTHORISATION_DENIED;
+      }
+      return { ...state,
+        accStatus: status,
+        serviceToRegister: null,
+        error: action.payload
+      };
+      break;
+    case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_SUCCESS`:
+      return { ...state,
+        accStatus: ACC_STATUS.CREATED,
+        newAccount: action.payload,
+        serviceToRegister: null
+      };
+      break;
     default:
       return state;
       break;
   }
 };
 
-export default initializer;
+export default mail;

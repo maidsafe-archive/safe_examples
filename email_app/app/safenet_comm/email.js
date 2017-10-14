@@ -1,132 +1,13 @@
 import { shell } from 'electron';
-import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from './constants';
-import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
-import { getAuthData, saveAuthData, clearAuthData, genRandomEntryKey,
-         splitPublicIdAndService, deserialiseArray, showError } from './utils/app_utils';
-import pkg from '../package.json';
-import 'babel-polyfill';
-
-const APP_INFO = {
-  info: {
-    id: pkg.identifier,
-    scope: null,
-    name: pkg.productName,
-    vendor: pkg.vendor
-  },
-  opts: {
-    own_container: true
-  },
-  containers: {
-    publicNames: '_publicNames'
-  },
-  permissions: {
-    _publicNames: ['Read', 'Insert']
-  }
-};
-
-const DEVELOPMENT = 'dev';
-const nodeEnv = process.env.NODE_ENV || DEVELOPMENT
-
-let libPath;
-
-if (nodeEnv === DEVELOPMENT) {
-  libPath = CONSTANTS.DEV_LIB_PATH;
-} else {
-  libPath = CONSTANTS.ASAR_LIB_PATH;
-}
-
-const genServiceInfo = async (app, emailId) => {
-  try {
-    let serviceInfo = splitPublicIdAndService(emailId);
-    const hashed = await app.crypto.sha3Hash(serviceInfo.publicId);
-    serviceInfo.serviceAddr = hashed;
-    return serviceInfo;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
-
-/*
-* A request to share access to a Mutable Data structure becomes necessary when\
-* that structure was created by the same user, however, in a foreign application
-*
-* This function will cause a shared MD auth popup to appear in SAFE Browser
-*/
-const requestShareMdAuth = async (app, mdPermissions) => {
-  try {
-    const resp = await app.auth.genShareMDataUri(mdPermissions);
-    await app.auth.openUri(resp.uri);
-    return null;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
-
-const requestAuth = async () => {
-  try {
-    const app = await initializeApp(APP_INFO.info, null, { libPath });
-    const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
-    await app.auth.openUri(resp.uri);
-    return null;
-  } catch (err) {
-    console.error(err);
-    showError();
-  }
-}
-
-/*
-* Handles whether or not to request authorisation, to use already generated/
-* auth data, or to use fake auth for development purposes.
-*/
-export const authApp = async (netStatusCallback) => {
-  if (process.env.SAFE_FAKE_AUTH) {
-    const app = await initializeApp(APP_INFO.info, null, { libPath });
-    return app.auth.loginForTest(APP_INFO.permissions);
-  }
-
-  const uri = getAuthData();
-  if (uri) {
-    try {
-      const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
-      await registeredApp.auth.refreshContainersPermissions();
-      return registeredApp;
-    } catch (err) {
-      console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
-      clearAuthData();
-      return requestAuth();
-    }
-  }
-  return requestAuth();
-}
-
-/*
-* Once this app's authorisation has been approved, it will then use the connect/
-* function to create a registered session with the network.
-*/
-export const connect = async (uri, netStatusCallback) => {
-  try {
-    const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
-    // synchronous
-    saveAuthData(uri);
-    await registeredApp.auth.refreshContainersPermissions();
-    return registeredApp;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
-
-export const reconnect = (app) => {
-  return app.reconnect();
-}
+import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from '../constants';
+import {  genRandomEntryKey, deserialiseArray, splitPublicIdAndService } from '../utils/app_utils';
+import * as netFns from './network.js';
 
 const fetchPublicIds = async (app) => {
   let rawEntries = [];
   let publicIds = [];
   try {
-    const pubNamesMd = await app.auth.getContainer(APP_INFO.containers.publicNames);
+    const pubNamesMd = await app.auth.getContainer(netFns.APP_INFO.containers.publicNames);
     const entries = await pubNamesMd.getEntries();
     await entries.forEach((key, value) => {
       rawEntries.push({key, value});
@@ -248,10 +129,10 @@ export const writeConfig = async (app, account) => {
 const decryptEmail = async (app, account, key, value, cb) => {
   if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
     try {
-      const entryValue = await decrypt(app, value, account.encSk, account.encPk);
+      const entryValue = await netFns.decrypt(app, value, account.encSk, account.encPk);
       const immData = await app.immutableData.fetch(deserialiseArray(entryValue));
       const content = await immData.read();
-      const decryptedEmail = await decrypt(app, content, account.encSk, account.encPk);
+      const decryptedEmail = await netFns.decrypt(app, content, account.encSk, account.encPk);
       return cb({ id: key, email: JSON.parse(decryptedEmail) });
     } catch (err) {
       console.error(err);
@@ -355,7 +236,7 @@ const createPublicIdAndEmailService = async (
 
 const genNewAccount = async (app, id) => {
   try {
-    const keyPair = await genKeyPair(app);
+    const keyPair = await netFns.genKeyPair(app);
     const inboxMd = await createInbox(app, keyPair.publicKey);
     const archiveMd = await createArchive(app);
     return {id, inboxMd, archiveMd,
@@ -410,7 +291,7 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
       console.error(err);
       throw err;
     }
-    await requestShareMdAuth(
+    await netFns.requestShareMdAuth(
       app,
       [{ type_tag: CONSTANTS.TAG_TYPE_DNS, name: servicesXorName, perms: ['Insert'] }]
     );
@@ -426,7 +307,7 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
 export const setupAccount = async (app, emailId) => {
 
   const serviceInfo = await genServiceInfo(app, emailId);
-  const pubNamesMd = await app.auth.getContainer(APP_INFO.containers.publicNames);
+  const pubNamesMd = await app.auth.getContainer(netFns.APP_INFO.containers.publicNames);
   try { // If service container already exists, try to add email service
     const encryptedAddr = await pubNamesMd.encryptKey(serviceInfo.publicId).then((key) => pubNamesMd.get(key));
     const servicesXorName = await pubNamesMd.decrypt(encryptedAddr.buf);
@@ -469,7 +350,7 @@ export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
 
 const writeEmailContent = async (app, email, pk) => {
   try {
-    const encryptedEmail = await encrypt(app, JSON.stringify(email), pk);
+    const encryptedEmail = await netFns.encrypt(app, JSON.stringify(email), pk);
     const emailWriter = await app.immutableData.create();
     await emailWriter.write(encryptedEmail);
     const cipherOpt = await app.cipherOpt.newPlainText();
@@ -493,7 +374,7 @@ export const storeEmail = async (app, email, to) => {
     const emailAddr = await writeEmailContent(app, email, pk.buf.toString());
     const mut = await app.mutableData.newMutation();
     const entryKey = genRandomEntryKey();
-    const entryValue = await encrypt(app, emailAddr, pk.buf.toString());
+    const entryValue = await netFns.encrypt(app, emailAddr, pk.buf.toString());
     await mut.insert(entryKey, entryValue);
     return inboxMd.applyEntriesMutation(mut);
   } catch (err) {
@@ -532,42 +413,14 @@ export const archiveEmail = async (app, account, key) => {
   }
 }
 
-const genKeyPair = async (app) => {
+export const genServiceInfo = async (app, emailId) => {
   try {
-    let rawKeyPair = {};
-    const keyPair = await app.crypto.generateEncKeyPair();
-    const rawPubEncKey = await keyPair.pubEncKey.getRaw();
-    rawKeyPair.publicKey = rawPubEncKey.buffer.toString('hex');
-    const rawSecEncKey = await keyPair.secEncKey.getRaw();
-    rawKeyPair.privateKey = rawSecEncKey.buffer.toString('hex');
-    return rawKeyPair;
+    let serviceInfo = splitPublicIdAndService(emailId);
+    const hashed = await app.crypto.sha3Hash(serviceInfo.publicId);
+    serviceInfo.serviceAddr = hashed;
+    return serviceInfo;
   } catch (err) {
     console.error(err);
     throw err;
   }
 }
-
-const encrypt = async (app, input, pk) => {
-  if(Array.isArray(input)) {
-    input = input.toString();
-  }
-  try {
-    const stringToBuffer = Buffer.from(pk, 'hex');
-    const pubEncKeyAPI = await app.crypto.pubEncKeyKeyFromRaw(stringToBuffer);
-    return pubEncKeyAPI.encryptSealed(input);
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-};
-
-const decrypt = async (app, cipherMsg, sk, pk) => {
-  try {
-    const keyPair = await app.crypto.generateEncKeyPairFromRaw(Buffer.from(pk, 'hex'), Buffer.from(sk, 'hex'));
-    const decrypted = await keyPair.decryptSealed(cipherMsg);
-    return decrypted.toString();
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-};

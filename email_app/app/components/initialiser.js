@@ -19,15 +19,15 @@ export default class Initializer extends Component {
   }
 
   componentDidMount() {
-    const { setInitializerTask, authoriseApplication } = this.props;
-    setInitializerTask(MESSAGES.INITIALIZE.AUTHORISE_APP);
+    const { setInitialiserTask, authoriseApplication } = this.props;
+    setInitialiserTask(MESSAGES.INITIALISE.AUTHORISE_APP);
 
     return authoriseApplication();
   }
 
   readEmailIds() {
-    const { setInitializerTask, getEmailIds } = this.props;
-    setInitializerTask(MESSAGES.INITIALIZE.FETCH_EMAIL_IDS);
+    const { setInitialiserTask, getEmailIds } = this.props;
+    setInitialiserTask(MESSAGES.INITIALISE.FETCH_EMAIL_IDS);
 
     return getEmailIds()
         .then((_) => this.context.router.push('/create_account'));
@@ -48,8 +48,8 @@ export default class Initializer extends Component {
     const { tasks } = this.props;
 
     return (
-      <div className="initializer">
-        <div className="initializer-b">
+      <div className="initialiser">
+        <div className="initialiser-b">
           <h3 className="heading-lg text-center">Initialising application</h3>
           <ul>
             {

@@ -32,8 +32,13 @@ export default class CreateAccount extends Component {
   storeCreatedAccount() {
     const { newAccount, storeNewAccount, createAccountError } = this.props;
     return storeNewAccount(newAccount)
-      .then((_) => this.context.router.push('/home'))
-      .catch((e) => createAccountError(new Error(e)));
+      .then((_) => {
+        this.context.router.push('/home')
+      })
+      .catch((e) => {
+        console.log("did not route home: ", e);
+        createAccountError(new Error(e))
+      });
   }
 
   handleCreateAccount(e) {

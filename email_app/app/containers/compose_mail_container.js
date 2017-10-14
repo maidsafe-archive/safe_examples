@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
 import ComposeMail from '../components/compose_mail';
-import { cancelCompose, sendEmail } from '../actions/mail_actions';
+import { cancelCompose, sendEmail } from '../actions';
 
 const mapStateToProps = state => {
   return {
-    app: state.initializer.app,
-    fromMail: state.initializer.coreData.id,
-    error: state.mail.error
+    app: state.emailApp.app,
+    fromMail: state.emailApp.coreData.id,
+    error: state.emailApp.error
   };
 };
 

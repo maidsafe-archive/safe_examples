@@ -1,16 +1,15 @@
 import { connect } from 'react-redux';
 import Home from '../components/home';
-import { reconnectApplication, refreshEmail, getEmailIds } from '../actions/initializer_actions';
-import { resetCurrentAccount } from '../actions/create_account_actions';
+import { reconnectApplication, refreshEmail, getEmailIds, resetCurrentAccount } from '../actions';
 
 const mapStateToProps = state => {
   return {
-    coreData: state.initializer.coreData,
-    account: state.initializer.account,
-    inboxSize: state.initializer.inboxSize,
-    savedSize: state.initializer.savedSize,
-    networkStatus: state.initializer.networkStatus,
-    processing: state.initializer.processing
+    coreData: state.emailApp.coreData,
+    account: state.emailApp.account,
+    inboxSize: state.emailApp.inboxSize,
+    savedSize: state.emailApp.savedSize,
+    networkStatus: state.emailApp.networkStatus,
+    processing: state.emailApp.processing
   };
 };
 

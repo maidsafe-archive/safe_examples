@@ -1,15 +1,14 @@
 import { connect } from 'react-redux';
 import MailSaved from '../components/mail_saved';
-import { deleteEmail } from '../actions/mail_actions';
-import { refreshEmail } from '../actions/initializer_actions';
+import { deleteEmail, refreshEmail } from '../actions';
 
 const mapStateToProps = state => {
   return {
-    coreData: state.initializer.coreData,
-    processing: state.mail.processing,
-    error: state.mail.error,
-    app: state.initializer.app,
-    account: state.initializer.account
+    coreData: state.emailApp.coreData,
+    processing: state.emailApp.processing,
+    error: state.emailApp.error,
+    app: state.emailApp.app,
+    account: state.emailApp.account
   };
 };
 
