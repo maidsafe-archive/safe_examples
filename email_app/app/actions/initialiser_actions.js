@@ -26,18 +26,14 @@ const newNetStatusCallback = (dispatch) => {
 export const receiveResponse = (uri) => {
   return function (dispatch, getState) {
     let appStatus = getState().emailApp.appStatus;
-    console.log('receiveResponse appStatus: ', appStatus);
     if (appStatus === APP_STATUS.AUTHORISED) {
-      console.log('connect to network');
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_APP,
         payload: connect(uri, newNetStatusCallback(dispatch))
       });
     } else {
-      console.log('connecti with share MD??')
       let app = getState().emailApp.app;
       let serviceToRegister = getState().emailApp.serviceToRegister;
-      console.log(serviceToRegister);
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_SHARE_MD,
         payload: connectWithSharedMd(app, uri, serviceToRegister)
@@ -63,7 +59,6 @@ export const authoriseApplication = () => {
 export const reconnectApplication = () => {
   return function (dispatch, getState) {
     let app = getState().emailApp.app;
-    console.log(getState());
     return dispatch({
       type: ACTION_TYPES.RECONNECT_APP,
       payload: reconnect(app)
