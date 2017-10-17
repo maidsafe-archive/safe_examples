@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import CreateAccount from '../components/create_account';
-import { createAccount, createAccountError, storeNewAccount, refreshConfig } from '../actions';
+import { createAccount, createAccountError, storeNewAccount,
+  refreshConfig, setInitialiserTask, getEmailIds } from '../actions';
 
 const mapStateToProps = state => {
   return {
@@ -15,10 +16,12 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    setInitialiserTask: (task) => (dispatch(setInitialiserTask(task))),
     createAccountError: (error) => (dispatch(createAccountError(error))),
     createAccount: (emailId) => (dispatch(createAccount(emailId))),
     storeNewAccount: (account) => (dispatch(storeNewAccount(account))),
-    refreshConfig: (emailId) => (dispatch(refreshConfig(emailId)))
+    refreshConfig: (emailId) => (dispatch(refreshConfig(emailId))),
+    getEmailIds: () => (dispatch(getEmailIds()))
   };
 };
 

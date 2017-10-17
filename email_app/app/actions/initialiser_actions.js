@@ -25,14 +25,14 @@ const newNetStatusCallback = (dispatch) => {
 
 export const receiveResponse = (uri) => {
   return function (dispatch, getState) {
-    let appStatus = getState().emailApp.appStatus;
+    let appStatus = getState().initialiser.appStatus;
     if (appStatus === APP_STATUS.AUTHORISED) {
       return dispatch({
-        type: ACTION_TYPES.AUTHORISE_APP,
+        type: ACTION_TYPES.CONNECT_APP,
         payload: connect(uri, newNetStatusCallback(dispatch))
       });
     } else {
-      let app = getState().emailApp.app;
+      let app = getState().initialiser.app;
       let serviceToRegister = getState().emailApp.serviceToRegister;
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_SHARE_MD,
@@ -58,7 +58,7 @@ export const authoriseApplication = () => {
 
 export const reconnectApplication = () => {
   return function (dispatch, getState) {
-    let app = getState().emailApp.app;
+    let app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.RECONNECT_APP,
       payload: reconnect(app)

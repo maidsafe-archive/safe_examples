@@ -69,7 +69,7 @@ export default class ComposeMail extends Component {
     const params = location.search.slice(1).split('&');
     const replyTo = params[0];
     let subject = params[1] ? `Re: ${params[1].replace(/^Re: /g, '')}` : '';
-
+    let isProcessing = processing.state;
     return (
       <div className="compose-mail">
         <div className="compose-mail-b">
@@ -96,8 +96,8 @@ export default class ComposeMail extends Component {
               </div>
             </div>
             <div className="inp-btn-cnt">
-              <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary btn-eq" disabled={processing}>{processing ? 'Sending' : 'Send'}</button>
-              <button type="button" className="mdl-button mdl-js-button mdl-button--raised btn-eq" disabled={processing ? 'disabled' : ''} onClick={this.handleCancel}>
+              <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary btn-eq" disabled={isProcessing}>{isProcessing ? 'Sending' : 'Send'}</button>
+              <button type="button" className="mdl-button mdl-js-button mdl-button--raised btn-eq" disabled={isProcessing ? 'disabled' : ''} onClick={this.handleCancel}>
                 Cancel
               </button>
             </div>

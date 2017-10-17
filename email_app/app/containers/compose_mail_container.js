@@ -6,7 +6,8 @@ const mapStateToProps = state => {
   return {
     app: state.emailApp.app,
     fromMail: state.emailApp.coreData.id,
-    error: state.emailApp.error
+    error: state.emailApp.error,
+    processing: state.emailApp.processing
   };
 };
 

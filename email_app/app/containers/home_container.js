@@ -8,8 +8,8 @@ const mapStateToProps = state => {
     account: state.emailApp.account,
     inboxSize: state.emailApp.inboxSize,
     savedSize: state.emailApp.savedSize,
-    networkStatus: state.emailApp.networkStatus,
-    processing: state.emailApp.processing
+    networkStatus: state.initialiser.networkStatus,
+    processing: state.initialiser.processing
   };
 };
 

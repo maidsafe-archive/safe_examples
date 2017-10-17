@@ -15,7 +15,6 @@ const showAuthError = (appStatus) => {
 export default class Initializer extends Component {
   constructor() {
     super();
-    this.readEmailIds = this.readEmailIds.bind(this);
   }
 
   componentDidMount() {
@@ -25,22 +24,14 @@ export default class Initializer extends Component {
     return authoriseApplication();
   }
 
-  readEmailIds() {
-    const { setInitialiserTask, getEmailIds } = this.props;
-    setInitialiserTask(MESSAGES.INITIALISE.FETCH_EMAIL_IDS);
-
-    return getEmailIds()
-        .then((_) => this.context.router.push('/create_account'));
-  }
-
   componentDidUpdate(prevProps, prevState) {
-    const { appStatus, app } = this.props;
+    const { appStatus } = this.props;
     if (prevProps.appStatus === APP_STATUS.AUTHORISING
         && (appStatus === APP_STATUS.AUTHORISATION_DENIED
             || appStatus === APP_STATUS.AUTHORISATION_FAILED) ) {
       showAuthError(appStatus);
-    } else if (app && appStatus === APP_STATUS.AUTHORISED) {
-      return this.readEmailIds();
+    } else if (appStatus === APP_STATUS.CONNECTED) {
+      this.context.router.push('/create_account');
     }
   }
 

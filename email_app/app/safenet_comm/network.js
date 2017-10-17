@@ -46,7 +46,7 @@ export const requestShareMdAuth = async (app, mdPermissions) => {
   try {
     const resp = await app.auth.genShareMDataUri(mdPermissions);
     await app.auth.openUri(resp.uri);
-    return null;
+    return;
   } catch (err) {
     console.error(err);
     throw err;
@@ -58,7 +58,7 @@ const requestAuth = async () => {
     const app = await initializeApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
     await app.auth.openUri(resp.uri);
-    return null;
+    return;
   } catch (err) {
     console.error(err);
     showError();
