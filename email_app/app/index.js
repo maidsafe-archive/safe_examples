@@ -22,7 +22,7 @@ const createWindow = () => {
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
-  if (process.env.NODE_ENV === 'dev' || process.env.DEBUG_PROD === 'true') {
+  if (process.env.DEBUG === 'true') {
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
   }
