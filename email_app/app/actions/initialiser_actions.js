@@ -48,8 +48,23 @@ export const authoriseApplication = () => {
       type: ACTION_TYPES.AUTHORISE_APP,
       payload: new Promise((resolve, reject) => {
         authApp(newNetStatusCallback(dispatch))
-          .then(resolve)
-          .catch(reject);
+          .then(res => {
+            resolve(res);
+            if (process.env.SAFE_FAKE_AUTH) {
+              return res;
+            }
+          })
+          .catch(reject)
+          .then((res) => {
+            if (process.env.SAFE_FAKE_AUTH) {
+              dispatch({
+                type: ACTION_TYPES.CONNECT_APP,
+                payload: new Promise((resolve, reject) => {
+                  resolve(res);
+                })
+              });
+            }
+          });
       })
     })
     .catch((err) => {console.log("Error1: ", err)});
