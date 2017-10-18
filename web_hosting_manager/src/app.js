@@ -40,9 +40,11 @@ const renderApp = () => {
     <AppContainer>
       <Root store={store} history={history} />
     </AppContainer>,
-    document.getElementById('App')
+    document.getElementById('App'),
   );
-} 
+};
 renderApp();
 
-if (module.hot) { module.hot.accept(renderApp); }
+if (module.hot) {
+  module.hot.accept(renderApp);
+}

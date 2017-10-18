@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import CONSTANTS from '../constants';
 import Base from './_Base';
@@ -13,7 +12,7 @@ export default class CreateService extends Component {
   constructor() {
     super();
     this.state = {
-      error: null
+      error: '',
     };
   }
   componentWillMount() {
@@ -27,9 +26,7 @@ export default class CreateService extends Component {
   }
 
   componentDidUpdate() {
-    const { params } = this.props.match;
-    const publicName = params.publicName;
-    const option = params.option;
+    const { publicName, option } = this.props.match.params;
     const serviceName = this.serviceName.value.trim();
 
     if (this.props.checkedServiceExists) {
@@ -37,7 +34,7 @@ export default class CreateService extends Component {
         return;
       }
       // if service not exist navigate, go next step
-      switch(option) {
+      switch (option) {
         case CONSTANTS.UI.NEW_WEBSITE_OPTIONS.CHOOSE_EXISTING:
           return this.props.history.push(`/chooseExistingContainer/${publicName}/${serviceName}`);
         case CONSTANTS.UI.NEW_WEBSITE_OPTIONS.FROM_SCRATCH:
@@ -50,22 +47,25 @@ export default class CreateService extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.reset();
+  }
+
   handleNext(e) {
     e.preventDefault();
-    const { params } = this.props.match;
-    const publicName = params.publicName;
+    const { publicName } = this.props.match.params;
     const serviceName = this.serviceName.value.trim();
 
-    if(!serviceName) {
+    if (!serviceName) {
       return;
     }
 
     if (!utils.domainCheck(serviceName)) {
       return this.setState({
-        error: CONSTANTS.UI.ERROR_MSG.INVALID_SERVICE_NAME
+        error: CONSTANTS.UI.ERROR_MSG.INVALID_SERVICE_NAME,
       });
     }
-    this.setState({ error: null });
+    this.setState({ error: '' });
 
     this.props.checkServiceExists(publicName, serviceName);
   }
@@ -79,7 +79,7 @@ export default class CreateService extends Component {
   }
 
   popupCancelCb() {
-    const publicName = this.props.match.params.publicName;
+    const { publicName } = this.props.match.params;
 
     if (this.props.sendAuthReq) {
       this.props.cancelMDReq();
@@ -87,13 +87,8 @@ export default class CreateService extends Component {
     }
   }
 
-
-  componentWillUnmount() {
-    this.props.reset();
-  }
-
   render() {
-    const publicName = this.props.match.params.publicName;
+    const { publicName } = this.props.match.params;
     return (
       <Base
         reconnect={this.props.reconnect}
@@ -124,13 +119,14 @@ export default class CreateService extends Component {
                             this.handleNext(e);
                           }
                         }}
-                        ref={(c) => {this.serviceName = c;}}
+                        ref={(c) => { this.serviceName = c; }}
                       />
                     </div>
                     <div className="public-id">.{publicName}</div>
                   </div>
                   {
-                    this.state.error ?  ErrorComp(<span className="err-msg">{this.state.error}</span>) : null
+                    this.state.error ?
+                      ErrorComp(<span className="err-msg">{this.state.error}</span>) : null
                   }
                 </div>
               </div>
@@ -143,14 +139,16 @@ export default class CreateService extends Component {
                       e.preventDefault();
                       this.props.history.push(`/newWebSite/${publicName}`);
                     }}
-                  >Cancel</button>
+                  >Cancel
+                  </button>
                 </div>
                 <div className="opt">
                   <button
                     type="button"
                     className="btn flat primary"
                     onClick={this.handleNext.bind(this)}
-                  >Next</button>
+                  >Next
+                  </button>
                 </div>
               </div>
             </div>
@@ -162,4 +160,19 @@ export default class CreateService extends Component {
 }
 
 CreateService.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  nwState: PropTypes.string.isRequired,
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  processing: PropTypes.bool.isRequired,
+  sendAuthReq: PropTypes.bool.isRequired,
+  serviceExists: PropTypes.bool.isRequired,
+  checkedServiceExists: PropTypes.bool.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  cancelMDReq: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  sendMDAuthReq: PropTypes.func.isRequired,
+  checkServiceExists: PropTypes.func.isRequired,
+  canAccessPublicName: PropTypes.func.isRequired,
 };

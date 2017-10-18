@@ -5,13 +5,17 @@ import { Link } from 'react-router-dom';
 
 import CONSTANTS from '../constants';
 import Base from './_Base';
-import * as utils from '../utils/app';
+import { genKey } from '../utils/app';
 
 export default class PublicNames extends Component {
   constructor() {
     super();
+    this.noPublicNameCntr = {
+      title: 'Looks like you dont have a Public ID yet!',
+      desc: 'Create one now to start publishing websites on the SAFE Network.',
+    };
     this.state = {
-      ...CONSTANTS.UI.POPUP_STATES
+      ...CONSTANTS.UI.POPUP_STATES,
     };
   }
 
@@ -19,30 +23,26 @@ export default class PublicNames extends Component {
     this.props.fetchServices();
   }
 
-  popupOkCb() {
-    // reset authorisation error
-    this.props.reset();
-    // this.setState(utils.resetPopup());
-  }
-
   getNoPublicNamesContainer() {
     return (
       <div className="no-public-id-cntr">
         <div className="no-public-id-cntr-b">
-          <h3>Looks like you dont have a Public ID yet!</h3>
-          <h4>Create one now to start publishing websites on the SAFE Network.</h4>
+          <h3>{this.noPublicNameCntr.title}</h3>
+          <h4>{this.noPublicNameCntr.desc}</h4>
           <span className="new-public-id-arrow">{''}</span>
         </div>
       </div>
     );
   }
 
-  getServiceItem(publicName, service, path, index) {
+  getServiceItem(publicName, service, path) {
     return (
-      <div className="i-cnt-ls-i" key={index}>
+      <div className="i-cnt-ls-i" key={genKey()}>
         <div className="i-cnt-ls-i-b">
           <h3 className="name"><a href={`safe://${service}.${publicName}`}>{service}</a></h3>
-          <h3 className="location"><Link to={`manageFiles/${publicName}/${service}/${encodeURIComponent(path)}`}>{path}</Link></h3>
+          <h3 className="location">
+            <Link to={`manageFiles/${publicName}/${service}/${encodeURIComponent(path)}`}>{path}</Link>
+          </h3>
         </div>
         <div className="opt">
           <div className="opt-i">
@@ -54,7 +54,8 @@ export default class PublicNames extends Component {
                 e.preventDefault();
                 this.props.deleteService(publicName, service);
               }}
-            >{''}</button>
+            >{''}
+            </button>
           </div>
           <div className="opt-i">
             <button
@@ -65,20 +66,21 @@ export default class PublicNames extends Component {
                 e.preventDefault();
                 this.props.history.push(`/remap/${publicName}/${service}/${encodeURIComponent(path)}`);
               }}
-            >{''}</button>
+            >{''}
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  getPublicNameListItem(publicName, services, index) {
+  getPublicNameListItem(publicName, services) {
     return (
-      <div className="i" key={`publicName-${index}`}>
+      <div className="i" key={`publicName-${genKey()}`}>
         <div
           className="i-h"
           onClick={(e) => {
-            const classList = e.currentTarget.classList;
+            const { classList } = e.currentTarget;
             if (classList.contains('expand')) {
               classList.remove('expand');
               return;
@@ -88,15 +90,16 @@ export default class PublicNames extends Component {
         >
           <div className="i-name" title="Public ID 1">{publicName}</div>
           <div className="i-new-btn">
-              <button
-                className="btn-with-add-icon"
-                type="button"
-                title={CONSTANTS.UI.TOOLTIPS.ADD_WEBSITE}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  this.props.history.push(`/newWebSite/${publicName}`);
-                }}
-              >Create Website</button>
+            <button
+              className="btn-with-add-icon"
+              type="button"
+              title={CONSTANTS.UI.TOOLTIPS.ADD_WEBSITE}
+              onClick={(e) => {
+                e.stopPropagation();
+                this.props.history.push(`/newWebSite/${publicName}`);
+              }}
+            >Create Website
+            </button>
           </div>
         </div>
         <div className="i-cnt">
@@ -108,9 +111,8 @@ export default class PublicNames extends Component {
           </div>
           <div className="i-cnt-ls">
             {
-              Object.keys(services).map((service, i) => {
-                return this.getServiceItem(publicName, service, services[service], i);
-              })
+              Object.keys(services).map(service =>
+                this.getServiceItem(publicName, service, services[service]))
             }
           </div>
         </div>
@@ -123,19 +125,24 @@ export default class PublicNames extends Component {
       <div className="public-id-ls">
         <div className="public-id-ls-b">
           {
-            Object.keys(publicNames).sort().map((publicName, i) => {
-              return this.getPublicNameListItem(publicName, publicNames[publicName], i);
-            })
+            Object.keys(publicNames).sort().map(publicName =>
+              this.getPublicNameListItem(publicName, publicNames[publicName]))
           }
         </div>
       </div>
     );
   }
 
+  popupOkCb() {
+    // reset authorisation error
+    this.props.reset();
+  }
+
   render() {
     const { publicNames } = this.props;
     const hasPublicNames = (Object.keys(publicNames).length !== 0);
-    const container =  hasPublicNames ? this.getPublicNameList(publicNames) : this.getNoPublicNamesContainer();
+    const container = hasPublicNames ?
+      this.getPublicNameList(publicNames) : this.getNoPublicNamesContainer();
 
     return (
       <Base
@@ -155,4 +162,14 @@ export default class PublicNames extends Component {
 }
 
 PublicNames.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  publicNames: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  nwState: PropTypes.string.isRequired,
+  processing: PropTypes.bool.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  deleteService: PropTypes.func.isRequired,
+  fetchServices: PropTypes.func.isRequired,
 };

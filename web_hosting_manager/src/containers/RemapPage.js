@@ -21,7 +21,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...publicNamesAction,
     ...serviceNamesAction,
-    ...commonAction
+    ...commonAction,
   }, dispatch);
 }
 

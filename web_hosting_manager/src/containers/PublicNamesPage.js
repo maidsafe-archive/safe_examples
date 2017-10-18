@@ -12,7 +12,7 @@ function mapStateToProps(state) {
     error: state.publicNames.error || state.services.error,
     processing: state.publicNames.processing || state.services.processing,
     processDesc: state.publicNames.processDesc || state.services.processDesc,
-    publicNames: state.publicNames.publicNames
+    publicNames: state.publicNames.publicNames,
   };
 }
 
@@ -20,7 +20,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...publicNamesAction,
     ...serviceNamesAction,
-    ...commonAction
+    ...commonAction,
   }, dispatch);
 }
 

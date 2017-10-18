@@ -19,7 +19,7 @@ function mapStateToProps(state) {
     processDesc: state.fileManager.processDesc || state.services.processDesc,
     sendAuthReq: state.services.sendAuthReq,
     authorisedMD: state.services.authorisedMD,
-    authorisingMD: state.services.authorisingMD
+    authorisingMD: state.services.authorisingMD,
   };
 }
 
@@ -27,7 +27,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...serviceAction,
     ...commonAction,
-    ...fileMangerAction
+    ...fileMangerAction,
   }, dispatch);
 }
 

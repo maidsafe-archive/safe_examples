@@ -10,14 +10,12 @@ const errorCb = Symbol('errorCb');
 const localPath = Symbol('localPath');
 const progressCb = Symbol('progressCb');
 const networkPath = Symbol('networkPath');
-const dirName = Symbol('dirName');
 const taskQueue = Symbol('taskQueue');
 const currentTask = Symbol('currentTask');
 
 export default class Uploader {
-
-  constructor(path, networkRootPath, progressCallback, errorCallback) {
-    this[localPath] = path;
+  constructor(pathLocal, networkRootPath, progressCallback, errorCallback) {
+    this[localPath] = pathLocal;
     this[errorCb] = errorCallback;
     this[networkPath] = networkRootPath;
     this[progressCb] = progressCallback;
@@ -27,7 +25,7 @@ export default class Uploader {
       uploading: false,
       stopped: false,
       errored: false,
-      cancelled: false
+      cancelled: false,
     };
     this[currentTask] = undefined;
   }
@@ -35,10 +33,10 @@ export default class Uploader {
   start() {
     this[status].uploading = true;
     const stat = fs.statSync(this[localPath]);
-    const baseDir = path.basename( this[localPath] );
+    const baseDir = path.basename(this[localPath]);
     const cancelUploadErrArr = [
       CONSTANTS.ERROR_CODE.TOO_MANY_ENTRIES,
-      CONSTANTS.ERROR_CODE.LOW_BALANCE
+      CONSTANTS.ERROR_CODE.LOW_BALANCE,
     ];
     const callback = (error, taskStatus) => {
       if (error) {
@@ -49,7 +47,7 @@ export default class Uploader {
           return this[progressCb]({
             total: 0,
             completed: 0,
-            progress: 0
+            progress: 0,
           }, true);
         }
         return;
@@ -68,14 +66,18 @@ export default class Uploader {
       return this[progressCb]({
         total: this[status].total,
         completed: this[status].completed,
-        progress
+        progress,
       }, progress === 100);
     };
     if (stat.isDirectory()) {
       this[status].total = Helper.getDirectoryStats(this[localPath]);
       this[status].completed = new Helper.DirStats();
-      this[taskQueue] = Helper.generateUploadTaskQueue(this[localPath],
-        this[networkPath], callback, baseDir );
+      this[taskQueue] = Helper.generateUploadTaskQueue(
+        this[localPath],
+        this[networkPath],
+        callback,
+        baseDir,
+      );
       this[taskQueue].run();
     } else {
       const fileName = path.basename(this[localPath]);
@@ -85,11 +87,11 @@ export default class Uploader {
       this[status].completed = new Helper.DirStats();
       this[status].total.files = 1;
       if (this[status].total.size > CONSTANTS.MAX_FILE_SIZE) {
-        callback(new Error(I18n.t('messages.restrictedFileSize', { size: (CONSTANTS.MAX_FILE_SIZE / 1000000) })))
+        callback(new Error(I18n.t('messages.restrictedFileSize', { size: (CONSTANTS.MAX_FILE_SIZE / 1000000) })));
         return this[progressCb]({
           total: 0,
           completed: 0,
-          progress: 0
+          progress: 0,
         }, true);
       }
       this[currentTask].execute(callback);
@@ -97,12 +99,11 @@ export default class Uploader {
   }
 
   cancel() {
-    if(this[taskQueue]) {
+    if (this[taskQueue]) {
       this[taskQueue].cancel();
     } else {
       this[currentTask].cancelled = true;
     }
     this[status].cancelled = true;
   }
-
 }

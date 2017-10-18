@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { getPath } from './temp';
 import { shell } from 'electron';
+
+import { getPath } from './temp';
 import safeApi from './api';
 import CONSTANTS from '../constants';
 
@@ -17,22 +18,22 @@ export default class Downloader {
   }
 
   start() {
-    const app = safeApi.app;
+    const { app } = safeApi;
     const containerPath = {
       dir: this.path.split('/').slice(0, 3).join('/'),
-      file: this.path.split('/').slice(3).join('/')
+      file: this.path.split('/').slice(3).join('/'),
     };
     const tokens = this.path.split('/');
     this.filePath = path.join(getPath(), tokens.pop());
 
     return safeApi.getPublicContainer()
-      .then((md) => safeApi.getMDataValueForKey(md, containerPath.dir))
-      .then((val) => app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
+      .then(md => safeApi.getMDataValueForKey(md, containerPath.dir))
+      .then(val => app.mutableData.newPublic(val, CONSTANTS.TAG_TYPE.WWW))
       .then((mdata) => {
         const nfs = mdata.emulateAs('NFS');
         return nfs.fetch(containerPath.file)
-          .then((file) => nfs.open(file, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
-          .then((f) => f.size().then((totalSize) => {
+          .then(file => nfs.open(file, CONSTANTS.FILE_OPEN_MODE.OPEN_MODE_READ))
+          .then(f => f.size().then((totalSize) => {
             this.totalSize = totalSize;
             let readWriteFile = null;
             return new Promise((resolve, reject) => {
@@ -42,7 +43,7 @@ export default class Downloader {
                 }
                 this.callback(null, {
                   progress: Math.floor((this.sizeRead / this.totalSize) * 100),
-                  completed: false
+                  completed: false,
                 });
                 if (this.byteLen < CONSTANTS.DOWNLOAD_CHUNK_SIZE) {
                   return resolve();
@@ -57,7 +58,8 @@ export default class Downloader {
                   return resolve();
                 }
                 const restBytes = this.totalSize - this.sizeRead;
-                this.byteLen = (restBytes < CONSTANTS.DOWNLOAD_CHUNK_SIZE) ?  restBytes : CONSTANTS.DOWNLOAD_CHUNK_SIZE;
+                this.byteLen = (restBytes < CONSTANTS.DOWNLOAD_CHUNK_SIZE) ?
+                  restBytes : CONSTANTS.DOWNLOAD_CHUNK_SIZE;
                 return f.read(this.sizeRead, this.byteLen)
                   .then((data) => {
                     if (this.sizeRead === 0) {
@@ -74,7 +76,7 @@ export default class Downloader {
         shell.showItemInFolder(this.filePath);
         this.callback(null, {
           progress: 100,
-          completed: true
+          completed: true,
         });
       })
       .catch(this.callback);

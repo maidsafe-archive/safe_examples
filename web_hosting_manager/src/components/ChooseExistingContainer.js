@@ -3,17 +3,16 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import CONSTANTS from '../constants';
 import Base from './_Base';
 import WizardNav from './WizardNav';
-import * as utils from '../utils/app';
+import { genKey } from '../utils/app';
 
 export default class ChooseExistingContainer extends Component {
   constructor() {
     super();
     this.state = {
       selectedContainer: null,
-      selectedContainerExpanded: false
+      selectedContainerExpanded: false,
     };
     this.getServiceContainersList = this.getServiceContainersList.bind(this);
   }
@@ -28,16 +27,8 @@ export default class ChooseExistingContainer extends Component {
     }
   }
 
-  reloadContainers(e) {
-    e.preventDefault();
-    this.props.getServiceContainers();
-  }
-
-  handleContainersSelect(cont) {
-    this.setState({
-      selectedContainer: cont,
-      selectedContainerExpanded: false
-    });
+  componentWillUnmount() {
+    this.props.reset();
   }
 
   getServiceContainersList() {
@@ -48,48 +39,56 @@ export default class ChooseExistingContainer extends Component {
       );
     }
     const selectClassName = classNames('i', {
-      open: this.state.selectedContainerExpanded
+      open: this.state.selectedContainerExpanded,
     });
 
     return (
       <div className={selectClassName}>
-        <div className="inpt" onClick={() => {
-          this.setState({
-            selectedContainerExpanded: !this.state.selectedContainerExpanded
-          });
-        }}>{this.state.selectedContainer || this.props.serviceContainers[0]}</div>
+        <div
+          className="inpt"
+          onClick={() => {
+            this.setState({
+              selectedContainerExpanded: !this.state.selectedContainerExpanded,
+            });
+          }}
+        >{this.state.selectedContainer || this.props.serviceContainers[0]}
+        </div>
         <ul>
           {
-            serviceContainers.map((cont, i) => {
-              return (
-                <li
-                  key={i}
-                  onClick={() => {
-                    this.handleContainersSelect(cont);
-                  }}
-                >{cont}</li>
-              )
-            })
+            serviceContainers.map(cont => (
+              <li
+                key={genKey()}
+                onClick={() => {
+                  this.handleContainersSelect(cont);
+                }}
+              >{cont}
+              </li>
+            ))
           }
         </ul>
       </div>
     );
   }
 
+  handleContainersSelect(cont) {
+    this.setState({
+      selectedContainer: cont,
+      selectedContainerExpanded: false,
+    });
+  }
+
+  reloadContainers(e) {
+    e.preventDefault();
+    this.props.getServiceContainers();
+  }
+
   popupOkCb() {
     this.props.reset();
   }
 
-  componentWillUnmount() {
-    this.props.reset();
-  }
-
   render() {
-    const { params } = this.props.match;
+    const { publicName, serviceName } = this.props.match.params;
     const { serviceContainers } = this.props;
-
-    const publicName = params.publicName;
-    const serviceName = params.serviceName;
 
     return (
       <Base
@@ -110,7 +109,7 @@ export default class ChooseExistingContainer extends Component {
                   <div className="b">
                     <p className="p">This folder content will be added to the SAFE Network and will be publicly viewable using the URL <b>safe://{serviceName}.{publicName}</b>. This folder should contain an index.html file.</p>
                     <div className="select-inpt">
-                      { this.getServiceContainersList() }
+                      {this.getServiceContainersList()}
                       <div className="opt">
                         <button
                           type="button"
@@ -118,7 +117,8 @@ export default class ChooseExistingContainer extends Component {
                           name="reload-containers"
                           disabled={serviceContainers.length === 0}
                           onClick={this.reloadContainers.bind(this)}
-                        >{''}</button>
+                        >{''}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -133,7 +133,8 @@ export default class ChooseExistingContainer extends Component {
                       e.preventDefault();
                       this.props.history.push(`/newWebSite/${publicName}`);
                     }}
-                  >Cancel</button>
+                  >Cancel
+                  </button>
                 </div>
                 <div className="opt">
                   <button
@@ -146,7 +147,8 @@ export default class ChooseExistingContainer extends Component {
                       }
                       this.props.publish(publicName, serviceName, this.state.selectedContainer);
                     }}
-                  >Publish</button>
+                  >Publish
+                  </button>
                 </div>
               </div>
             </div>
@@ -158,4 +160,16 @@ export default class ChooseExistingContainer extends Component {
 }
 
 ChooseExistingContainer.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  nwState: PropTypes.string.isRequired,
+  processing: PropTypes.bool.isRequired,
+  published: PropTypes.bool.isRequired,
+  serviceContainers: PropTypes.arrayOf(PropTypes.string).isRequired,
+  publish: PropTypes.func.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  getServiceContainers: PropTypes.func.isRequired,
 };

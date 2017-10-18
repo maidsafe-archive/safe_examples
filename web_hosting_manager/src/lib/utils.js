@@ -1,32 +1,11 @@
-import { shell } from 'electron';
-// import keytar from 'keytar';
 import fs from 'fs';
+import { shell } from 'electron';
 import { I18n } from 'react-redux-i18n';
 
 import * as Task from './tasks';
 import CONSTANTS from '../constants';
 
-class LocalAuthInfo {
-  constructor() {
-    this.SERVICE = CONSTANTS.KEY_TAR.SERVICE;
-    this.ACCOUNT = CONSTANTS.KEY_TAR.ACCOUNT;
-  }
-  save(info) {
-    // return keytar.addPassword(this.SERVICE, this.ACCOUNT, JSON.stringify(info));
-    return;
-  }
-  get() {
-    // return keytar.getPassword(this.SERVICE, this.ACCOUNT);
-    return;
-  }
-  clear() {
-    // return keytar.deletePassword(this.SERVICE, this.ACCOUNT);
-    return;
-  }
-}
-
 class TaskQueue {
-
   constructor(callback) {
     this.callback = callback;
     this.queue = [];
@@ -53,9 +32,10 @@ class TaskQueue {
         const taskStatus = {
           isFile: true,
           isCompleted: true,
-          size: 0
+          size: 0,
         };
-        return this.callback(null, taskStatus);
+        this.callback(null, taskStatus);
+        return;
       }
       if (!this.cancelled && this.queue[this.index]) {
         this.queue[this.index].execute(next);
@@ -80,10 +60,6 @@ export class DirStats {
   }
 }
 
-const parseUrl = (url) => (
-  (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
-);
-
 export const getDirectoryStats = (localPath) => {
   let stat;
   let tempStat;
@@ -93,7 +69,7 @@ export const getDirectoryStats = (localPath) => {
   stats.directories += 1;
   for (let i = 0; i < contents.length; i += 1) {
     if (!contents[i]) {
-      return;
+      return false;
     }
     tempPath = `${localPath}/${contents[i]}`;
     stat = fs.statSync(tempPath);
@@ -113,7 +89,7 @@ export const getDirectoryStats = (localPath) => {
   return stats;
 };
 
-export const generateUploadTaskQueue = (localPath, networkPath, callback, baseDir ) => {
+export const generateUploadTaskQueue = (localPath, networkPath, callback, baseDir) => {
   let stat;
   let tempPath;
   const taskQueue = callback instanceof TaskQueue ? callback : new TaskQueue(callback);
@@ -122,19 +98,16 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback, baseDi
 
   let updatedLocation = networkPath;
 
-  if( baseDir )
-  {
+  if (baseDir) {
     updatedLocation = `${networkPath}/${baseDir}`;
   }
 
   tempPath = `${localPath}`;
 
   for (let i = 0; i < contents.length; i += 1) {
-
     if (!contents[i]) {
-      return;
+      return false;
     }
-
     tempPath = `${localPath}/${contents[i]}`;
     stat = fs.statSync(tempPath);
 
@@ -146,16 +119,16 @@ export const generateUploadTaskQueue = (localPath, networkPath, callback, baseDi
     }
   }
 
-  if( baseDir && contents.length === 0 )
-  {
+  if (baseDir && contents.length === 0) {
     taskQueue.add(new Task.EmptyDirTask());
   }
-
   return taskQueue;
 };
 
-export const openExternal = (url) => (
-  shell.openExternal(parseUrl(url))
+const parseUrl = url => (
+  (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
 );
 
-export const localAuthInfo = new LocalAuthInfo();
+export const openExternal = url => (
+  shell.openExternal(parseUrl(url))
+);

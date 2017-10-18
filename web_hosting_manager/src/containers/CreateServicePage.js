@@ -14,7 +14,7 @@ function mapStateToProps(state) {
     processDesc: state.services.processDesc,
     checkedServiceExists: state.services.checkedServiceExists,
     sendAuthReq: state.services.sendAuthReq,
-    serviceExists: state.services.serviceExists
+    serviceExists: state.services.serviceExists,
   };
 }
 
@@ -22,7 +22,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...serviceAction,
     ...commonAction,
-    canAccessPublicName
+    canAccessPublicName,
   }, dispatch);
 }
 

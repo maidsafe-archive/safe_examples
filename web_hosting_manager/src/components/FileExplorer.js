@@ -5,14 +5,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import CONSTANTS from '../constants';
-import {bytesToSize} from '../utils/app';
+import { bytesToSize } from '../utils/app';
 
 export default class FileExplorer extends Component {
   constructor() {
     super();
     this.state = {
       showUploadMenu: false,
-      currentPath: null
+      currentPath: null,
     };
     this.getFolderEle = this.getFolderEle.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
@@ -22,55 +22,20 @@ export default class FileExplorer extends Component {
     this.cancelDownload = this.cancelDownload.bind(this);
   }
 
-  getCurrentPath() {
-    return this.state.currentPath || this.props.rootPath
-  }
-
-  isRootFolder() {
-    return (!this.state.currentPath || (this.state.currentPath === this.props.rootPath));
-  }
-
-  handleDelete(name) {
-    this.props.deleteFileOrDir(this.getCurrentPath(), name);
-  }
-
-  levelBack() {
-    console.log('level back')
-    if (!this.state.currentPath) {
-      return;
+  componentWillUnmount() {
+    // cancel uploading on component destroy
+    if (this.props.uploading) {
+      this.cancelUpload();
     }
-    const pathArr = this.state.currentPath.split('/');
-    pathArr.pop();
-    const previousPath = pathArr.join('/');
-    this.setState({
-      currentPath: previousPath
-    });
-    this.props.getContainerInfo(previousPath);
+
+    // cancel downloading on component destroy
+    if (this.props.downloading) {
+      this.cancelDownload();
+    }
   }
 
-  chooseUploadMenu(onlyFile) {
-    this.setState({
-      showUploadMenu: !this.state.showUploadMenu
-    });
-    remote.dialog.showOpenDialog({
-      title: onlyFile ? 'Select File' : 'Felect Folder',
-      properties: onlyFile ? ['openFile', 'multiSelections'] : ['openDirectory', 'multiSelections']
-    }, (selection) => {
-      if (!selection || selection.length === 0) {
-        return;
-      }
-      selection.forEach((filePath) => {
-        this.props.upload(filePath, this.getCurrentPath());
-      });
-    });
-  }
-
-  cancelUpload() {
-    return this.props.cancelUploadAndReloadContainer(this.getCurrentPath());
-  }
-
-  cancelDownload() {
-    this.props.cancelDownload();
+  getCurrentPath() {
+    return this.state.currentPath || this.props.rootPath;
   }
 
   getUploadBtn() {
@@ -78,19 +43,20 @@ export default class FileExplorer extends Component {
 
     const uploadMenu = this.state.showUploadMenu ? (
       <div className="menu">
-      <div
-        className="menu-i"
-        onClick={() => {this.chooseUploadMenu(true)}}
-      >Upload Files</div>
-      <div
-        className="menu-i"
-        onClick={() => {this.chooseUploadMenu()}}
-      >Upload Folder</div>
-    </div>
-    ) : null;
+        <div
+          className="menu-i"
+          onClick={() => { this.chooseUploadMenu(true); }}
+        >Upload Files
+        </div>
+        <div
+          className="menu-i"
+          onClick={() => { this.chooseUploadMenu(); }}
+        >Upload Folder
+        </div>
+      </div>) : null;
 
     const uploadBaseCn = classNames('upload-btn-b', 'active', {
-      'cancel-btn': this.props.uploading
+      'cancel-btn': this.props.uploading,
     });
 
     return (
@@ -107,14 +73,15 @@ export default class FileExplorer extends Component {
                 return this.cancelUpload(this);
               }
               this.setState({
-                showUploadMenu: !this.state.showUploadMenu
+                showUploadMenu: !this.state.showUploadMenu,
               });
             }}
-          >{''}</button>
+          >{''}
+          </button>
         </div>
-        <span className="progress-bar" style={{width: progress}}>{''}</span>
+        <span className="progress-bar" style={{ width: progress }}>{''}</span>
       </div>
-    )
+    );
   }
 
   getFileEle(name, sizeInBytes, key) {
@@ -141,7 +108,8 @@ export default class FileExplorer extends Component {
               e.preventDefault();
               this.handleDelete(name);
             }}
-          >{''}</button>
+          >{''}
+          </button>
         </div>
       </div>
     );
@@ -155,9 +123,9 @@ export default class FileExplorer extends Component {
         onDoubleClick={(e) => {
           e.preventDefault();
           const path = `${this.getCurrentPath()}/${name}`;
-          this.props.getContainerInfo(path)
+          this.props.getContainerInfo(path);
           this.setState({
-            currentPath: path
+            currentPath: path,
           });
         }}
       >
@@ -173,10 +141,11 @@ export default class FileExplorer extends Component {
               e.preventDefault();
               this.handleDelete(name);
             }}
-          >{''}</button>
+          >{''}
+          </button>
         </div>
       </div>
-    )
+    );
   }
 
   getStatus() {
@@ -210,10 +179,11 @@ export default class FileExplorer extends Component {
               e.preventDefault();
               this.cancelDownload();
             }}
-          >Cancel</button>
+          >Cancel
+          </button>
         </span>
       </div>
-    )
+    );
   }
 
   getNav() {
@@ -237,7 +207,8 @@ export default class FileExplorer extends Component {
             e.preventDefault();
             this.levelBack();
           }}
-        >{''}</button>
+        >{''}
+        </button>
       );
     }
 
@@ -253,16 +224,50 @@ export default class FileExplorer extends Component {
     );
   }
 
-  componentWillUnmount() {
-    // cancel uploading on component destroy
-    if (this.props.uploading) {
-      this.cancelUpload();
-    }
+  chooseUploadMenu(onlyFile) {
+    this.setState({
+      showUploadMenu: !this.state.showUploadMenu,
+    });
+    remote.dialog.showOpenDialog({
+      title: onlyFile ? 'Select File' : 'Felect Folder',
+      properties: onlyFile ? ['openFile', 'multiSelections'] : ['openDirectory', 'multiSelections'],
+    }, (selection) => {
+      if (!selection || selection.length === 0) {
+        return;
+      }
+      selection.forEach((filePath) => {
+        this.props.upload(filePath, this.getCurrentPath());
+      });
+    });
+  }
 
-    // cancel downloading on component destroy
-    if (this.props.downloading) {
-      this.cancelDownload();
+  cancelUpload() {
+    return this.props.cancelUploadAndReloadContainer(this.getCurrentPath());
+  }
+
+  cancelDownload() {
+    this.props.cancelDownload();
+  }
+
+  levelBack() {
+    if (!this.state.currentPath) {
+      return;
     }
+    const pathArr = this.state.currentPath.split('/');
+    pathArr.pop();
+    const previousPath = pathArr.join('/');
+    this.setState({
+      currentPath: previousPath,
+    });
+    this.props.getContainerInfo(previousPath);
+  }
+
+  isRootFolder() {
+    return (!this.state.currentPath || (this.state.currentPath === this.props.rootPath));
+  }
+
+  handleDelete(name) {
+    this.props.deleteFileOrDir(this.getCurrentPath(), name);
   }
 
   render() {
@@ -289,7 +294,7 @@ export default class FileExplorer extends Component {
                   }) : null
               }
             </div>
-            { this.props.uploading ? (<div className="uploading"></div>) : null }
+            { this.props.uploading ? (<div className="uploading">{''}</div>) : null }
             {this.getUploadBtn()}
             {this.getDownloadContainer()}
           </div>
@@ -301,4 +306,25 @@ export default class FileExplorer extends Component {
 }
 
 FileExplorer.propTypes = {
+  downloadStatus: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  uploadStatus: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  containerInfo: PropTypes.arrayOf(PropTypes.shape({
+    isFile: PropTypes.bool.isRequired,
+    name: PropTypes.string.isRequired,
+    size: PropTypes.number,
+  })).isRequired,
+  rootPath: PropTypes.string.isRequired,
+  downloading: PropTypes.bool.isRequired,
+  uploading: PropTypes.bool.isRequired,
+  downloadFile: PropTypes.func.isRequired,
+  cancelDownload: PropTypes.func.isRequired,
+  getContainerInfo: PropTypes.func.isRequired,
+  deleteFileOrDir: PropTypes.func.isRequired,
+  upload: PropTypes.func.isRequired,
+  cancelUploadAndReloadContainer: PropTypes.func.isRequired,
+};
+
+FileExplorer.defaultProps = {
+  downloadStatus: null,
+  uploadStatus: null,
 };

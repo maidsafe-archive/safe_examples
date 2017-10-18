@@ -13,14 +13,14 @@ function mapStateToProps(state) {
     uploadStatus: state.fileManager.uploadStatus,
     error: state.fileManager.error,
     processing: state.fileManager.processing,
-    processDesc: state.fileManager.processDesc
+    processDesc: state.fileManager.processDesc,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...fileMangerAction,
-    ...commonAction
+    ...commonAction,
   }, dispatch);
 }
 

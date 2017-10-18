@@ -1,18 +1,17 @@
 // @flow
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import Base from './_Base';
 import ErrorComp from './_Error';
 import * as utils from '../utils/app';
-import CONSTANTS from '../constants'
+import CONSTANTS from '../constants';
 
 export default class NewPublicName extends Component {
   constructor() {
     super();
     this.state = {
-      error: null
+      error: '',
     };
   }
 
@@ -26,6 +25,10 @@ export default class NewPublicName extends Component {
     if (this.props.createdPublicName && !this.props.processing) {
       return this.props.history.replace('publicNames');
     }
+  }
+
+  componentWillUnmount() {
+    this.props.reset();
   }
 
   createPublicId(e) {
@@ -43,10 +46,6 @@ export default class NewPublicName extends Component {
     this.props.reset();
   }
 
-  componentWillUnmount() {
-    this.props.reset();
-  }
-
   render() {
     return (
       <Base
@@ -60,7 +59,8 @@ export default class NewPublicName extends Component {
         <div className="card">
           <div className="card-b">
             <h3 className="h type-center">
-              The ID you create will be your SAFE Network Public ID.<br/>The Public ID will allow others to access the services/websites hosted.
+              The ID you create will be your SAFE Network Public ID.<br />
+              The Public ID will allow others to access the services/websites hosted.
             </h3>
             <div className="cntr">
               <div className="new-public-id">
@@ -75,11 +75,12 @@ export default class NewPublicName extends Component {
                           this.createPublicId(e);
                         }
                       }}
-                      ref={(c) => {this.newPublicId = c;}}
+                      ref={(c) => { this.newPublicId = c; }}
                     />
                   </div>
                   {
-                    this.state.error ?  ErrorComp(<span className="err-msg">{this.state.error}</span>) : null
+                    this.state.error ?
+                      ErrorComp(<span className="err-msg">{this.state.error}</span>) : null
                   }
                 </div>
               </div>
@@ -92,14 +93,16 @@ export default class NewPublicName extends Component {
                     e.preventDefault();
                     this.props.history.go(-1);
                   }}
-                >Cancel</button>
+                >Cancel
+                </button>
               </div>
               <div className="opt">
                 <button
                   type="button"
                   className="btn flat primary"
                   onClick={this.createPublicId.bind(this)}
-                >Create Public Id</button>
+                >Create Public Id
+                </button>
               </div>
             </div>
           </div>
@@ -110,5 +113,13 @@ export default class NewPublicName extends Component {
 }
 
 NewPublicName.propTypes = {
-
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  createdPublicName: PropTypes.bool.isRequired,
+  processing: PropTypes.bool.isRequired,
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  nwState: PropTypes.string.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  createPublicName: PropTypes.func.isRequired,
 };

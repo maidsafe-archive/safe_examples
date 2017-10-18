@@ -16,7 +16,7 @@ export default class WithTemplate extends Component {
       editTitle: false,
       editDesc: false,
       title: 'Safe Network sample site',
-      description: 'This is a sample website to host at Safe Network'
+      description: 'This is a sample website to host at Safe Network',
     };
   }
 
@@ -26,28 +26,28 @@ export default class WithTemplate extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.reset();
+  }
+
   handlePublish(e) {
     e.preventDefault();
-    const { params } = this.props.match;
-
-    const publicName = params.publicName;
-    const serviceName = params.serviceName;
-    const templateDir = process.env.NODE_ENV === 'development' ? CONSTANTS.DEV_TEMPLATE_PATH : CONSTANTS.ASAR_TEMPLATE_PATH;
+    const { publicName, serviceName } = this.props.match.params;
+    const templateDir = process.env.NODE_ENV === CONSTANTS.DEV_ENV ?
+      CONSTANTS.DEV_TEMPLATE_PATH : CONSTANTS.ASAR_TEMPLATE_PATH;
     const templateFilePath = `${templateDir}/_index.html`;
     try {
       const indexFile = fs.readFileSync(templateFilePath);
       const updatedContent = indexFile.toString().replace('%pt', this.state.title).replace('%t', this.state.title).replace('%d', this.state.description);
       const tempFile = tempWrite.sync(updatedContent, 'index.html');
-      
       const filesToUpload = [
         tempFile,
-        `${templateDir}/main.css`
+        `${templateDir}/main.css`,
       ];
       const containerPath = `_public/${publicName}/${utils.defaultServiceContainerName(serviceName)}`;
       this.props.publishTemplate(publicName, serviceName, containerPath, filesToUpload);
-    } catch (e) {
-      console.error('err', e);
-      // return utils.setError(this, e.message);
+    } catch (err) {
+      console.error('Handle publish error :: ', err);
     }
   }
 
@@ -55,14 +55,8 @@ export default class WithTemplate extends Component {
     this.props.reset();
   }
 
-  componentWillUnmount() {
-    this.props.reset();
-  }
-
   render() {
-    const { params } = this.props.match;
-
-    const publicName = params.publicName;
+    const { publicName } = this.props.match.params;
 
     return (
       <Base
@@ -79,53 +73,63 @@ export default class WithTemplate extends Component {
             <div className="banner">
               <div className="title">
                 {
-                  this.state.editTitle ? (<input
+                  this.state.editTitle ? (
+                    <input
                       type="text"
                       value={this.state.title}
                       onChange={(e) => {
-                        const value = e.target.value;
+                        const { value } = e.target;
                         this.setState({
-                          title: value
-                        })
+                          title: value,
+                        });
                       }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           this.setState({
-                            editTitle: false
+                            editTitle: false,
                           });
                         }
                       }}
-                    />) : (<h3 onClick={(e) => {
-                      this.setState({
-                        editTitle: true
-                      });
-                    }}>{this.state.title}</h3>)
+                    />) : (
+                      <h3
+                        onClick={() => {
+                          this.setState({
+                            editTitle: true,
+                          });
+                        }}
+                      >{this.state.title}
+                      </h3>)
                 }
               </div>
             </div>
             <div className="context">
               {
-                this.state.editDesc ? (<input
+                this.state.editDesc ? (
+                  <input
                     type="text"
                     value={this.state.description}
                     onChange={(e) => {
-                      const value = e.target.value;
+                      const { value } = e.target;
                       this.setState({
-                        description: value
-                      })
+                        description: value,
+                      });
                     }}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         this.setState({
-                          editDesc: false
+                          editDesc: false,
                         });
                       }
                     }}
-                  />) : (<h3 onClick={(e) => {
-                    this.setState({
-                      editDesc: true
-                    });
-                  }}>{this.state.description}</h3>)
+                  />) : (
+                    <h3
+                      onClick={() => {
+                        this.setState({
+                          editDesc: true,
+                        });
+                      }}
+                    >{this.state.description}
+                    </h3>)
               }
             </div>
           </div>
@@ -140,14 +144,16 @@ export default class WithTemplate extends Component {
                       e.preventDefault();
                       this.props.history.push(`/newWebSite/${publicName}`);
                     }}
-                  >Cancel</button>
+                  >Cancel
+                  </button>
                 </div>
                 <div className="opt">
                   <button
                     type="button"
                     className="btn flat primary"
                     onClick={this.handlePublish.bind(this)}
-                  >Publish</button>
+                  >Publish
+                  </button>
                 </div>
               </div>
             </div>
@@ -159,5 +165,14 @@ export default class WithTemplate extends Component {
 }
 
 WithTemplate.propTypes = {
-
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  nwState: PropTypes.string.isRequired,
+  published: PropTypes.bool.isRequired,
+  processing: PropTypes.bool.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  publishTemplate: PropTypes.func.isRequired,
 };

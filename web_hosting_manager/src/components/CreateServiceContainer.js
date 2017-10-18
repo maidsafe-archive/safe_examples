@@ -16,18 +16,18 @@ export default class CreateServiceContainer extends Component {
       ...CONSTANTS.UI.POPUP_STATES,
       serviceContainerPathEditMode: false,
       serviceContainerPath: null,
-      rootPath: null
+      rootPath: null,
     };
   }
 
   componentWillMount() {
-    const publicName = this.props.match.params.publicName;
+    const { publicName } = this.props.match.params;
     const containerPath = utils.defaultServiceContainerName(this.props.match.params.serviceName);
     this.rootFolderName = `${this.rootFolderName}/${publicName}`;
     const fullContainerPath = `${this.rootFolderName}/${containerPath}`;
     this.setState({
       serviceContainerPath: containerPath,
-      rootPath: fullContainerPath
+      rootPath: fullContainerPath,
     });
 
     // reset container info
@@ -35,12 +35,6 @@ export default class CreateServiceContainer extends Component {
 
     // get container info
     this.props.getContainerInfo(fullContainerPath);
-  }
-
-  componentDidUpdate() {
-    if (this.props.published && !this.props.processing) {
-      return this.props.history.push('/publicNames');
-    }
   }
 
   shouldComponentUpdate(nextProps) {
@@ -51,12 +45,22 @@ export default class CreateServiceContainer extends Component {
     return false;
   }
 
+  componentDidUpdate() {
+    if (this.props.published && !this.props.processing) {
+      return this.props.history.push('/publicNames');
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.reset();
+  }
+
   getServicePathContainer() {
     const handleChange = (e) => {
-      const value = e.target.value;
+      const { value } = e.target;
       this.setState({
         serviceContainerPath: value,
-        rootPath: `${this.rootFolderName}/${value}`
+        rootPath: `${this.rootFolderName}/${value}`,
       });
     };
 
@@ -81,10 +85,11 @@ export default class CreateServiceContainer extends Component {
                 onClick={(e) => {
                   e.preventDefault();
                   this.setState({
-                    serviceContainerPathEditMode: false
+                    serviceContainerPathEditMode: false,
                   });
                 }}
-              >Cancel</button>
+              >Cancel
+              </button>
             </div>
             <div className="opt">
               <button
@@ -93,10 +98,11 @@ export default class CreateServiceContainer extends Component {
                 onClick={(e) => {
                   e.preventDefault();
                   this.setState({
-                    serviceContainerPathEditMode: false
+                    serviceContainerPathEditMode: false,
                   });
                 }}
-              >Save</button>
+              >Save
+              </button>
             </div>
           </div>
         </div>
@@ -108,31 +114,25 @@ export default class CreateServiceContainer extends Component {
         <button
           type="button"
           className="btn"
-          style={{display: "none"}}
+          style={{ display: 'none' }}
           onClick={(e) => {
             e.preventDefault();
             this.setState({
-              serviceContainerPathEditMode: true
+              serviceContainerPathEditMode: true,
             });
           }}
-        >Edit</button>
+        >Edit
+        </button>
       </div>
     );
-  };
+  }
 
   popupOkCb() {
     this.props.reset();
   }
 
-  componentWillUnmount() {
-    this.props.reset();
-  }
-
   render() {
-    const { params } = this.props.match;
-
-    const publicName = params.publicName;
-    const serviceName = params.serviceName;
+    const { publicName, serviceName } = this.props.match.params;
     return (
       <Base
         reconnect={this.props.reconnect}
@@ -167,7 +167,8 @@ export default class CreateServiceContainer extends Component {
                       e.preventDefault();
                       this.props.history.push(`/newWebSite/${publicName}`);
                     }}
-                  >Cancel</button>
+                  >Cancel
+                  </button>
                 </div>
                 <div className="opt">
                   <button
@@ -178,7 +179,8 @@ export default class CreateServiceContainer extends Component {
                       e.preventDefault();
                       this.props.publish(publicName, serviceName, this.state.rootPath);
                     }}
-                  >Publish</button>
+                  >Publish
+                  </button>
                 </div>
               </div>
             </div>
@@ -190,4 +192,21 @@ export default class CreateServiceContainer extends Component {
 }
 
 CreateServiceContainer.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  containerInfo: PropTypes.arrayOf(PropTypes.shape({
+    isFile: PropTypes.bool.isRequired,
+    name: PropTypes.string.isRequired,
+    size: PropTypes.number,
+  })).isRequired,
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  nwState: PropTypes.string.isRequired,
+  processing: PropTypes.bool.isRequired,
+  published: PropTypes.bool.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  publish: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  getContainerInfo: PropTypes.func.isRequired,
+  resetContainerInfo: PropTypes.func.isRequired,
 };
