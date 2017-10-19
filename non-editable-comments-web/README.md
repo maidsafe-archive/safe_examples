@@ -68,4 +68,4 @@ After publishing the page, admin must visit the page to enable comments for the 
 Trying to add minor features to the plugin can be a good place to get started. Few simple tasks can be,
 
 - Adding a refresh button to the list.
-- Since the plugin is using HostName to determine the MutableData name, If the users migrates to an other service, comments would be lost. Implement an better workaround for this problem.
+- Since the plugin is using HostName to determine the MutableData name, If admin migrates to an other service, comments would be lost. Implement an better workaround for this problem.
