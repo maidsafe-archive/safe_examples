@@ -68,5 +68,4 @@ After publishing the page, admin must visit the page to enable comments for the 
 Trying to add minor features to the plugin can be a good place to get started. Few simple tasks can be,
 
 - Adding a refresh button to the list.
-- Handling the network connection state. Right now it is left unhanlded. The event must be
-propageted to the UI and provide a reconnect function. Find out the [API](http://docs.maidsafe.net/beaker-plugin-safe-app) for reconnecting on connection lost :smile:
+- Since the plugin is using HostName to determine the MutableData name, If the users migrates to an other service, comments would be lost. Implement an better workaround for this problem.
