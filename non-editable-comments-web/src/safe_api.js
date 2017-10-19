@@ -23,7 +23,7 @@ const APP = {
   info: {
     id: `${hostName}-comment-plugin`,
     name: `${hostName}-comment-plugin`,
-    vendor: 'MaidSafe.net',
+    vendor: 'MaidSafe.net Ltd',
   },
   opts: {},
   containers: {
