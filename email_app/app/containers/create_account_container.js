@@ -1,25 +1,27 @@
 import { connect } from 'react-redux';
 import CreateAccount from '../components/create_account';
-import { createAccount, createAccountError } from '../actions/create_account_actions';
-import { storeNewAccount, refreshConfig } from '../actions/initializer_actions';
+import { createAccount, createAccountError, storeNewAccount,
+  refreshConfig, setInitialiserTask, getEmailIds } from '../actions';
 
 const mapStateToProps = state => {
   return {
-    accStatus: state.createAccount.accStatus,
-    error: state.createAccount.error,
-    processing: state.initializer.processing,
-    emailIds: state.initializer.emailIds,
-    newAccount: state.createAccount.newAccount,
-    coreData: state.initializer.coreData
+    accStatus: state.emailApp.accStatus,
+    error: state.emailApp.error,
+    processing: state.emailApp.processing,
+    emailIds: state.emailApp.emailIds,
+    newAccount: state.emailApp.newAccount,
+    coreData: state.emailApp.coreData
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
+    setInitialiserTask: (task) => (dispatch(setInitialiserTask(task))),
     createAccountError: (error) => (dispatch(createAccountError(error))),
     createAccount: (emailId) => (dispatch(createAccount(emailId))),
     storeNewAccount: (account) => (dispatch(storeNewAccount(account))),
-    refreshConfig: (emailId) => (dispatch(refreshConfig(emailId)))
+    refreshConfig: (emailId) => (dispatch(refreshConfig(emailId))),
+    getEmailIds: () => (dispatch(getEmailIds()))
   };
 };
 

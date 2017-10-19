@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 import App from './containers/App';
-import InitializerPage from './containers/initializer_container';
+import InitializerPage from './containers/initialiser_container';
 import HomePage from './containers/home_container';
 import InboxPage from './containers/mail_inbox_container';
 import SavedPage from './containers/mail_saved_container';

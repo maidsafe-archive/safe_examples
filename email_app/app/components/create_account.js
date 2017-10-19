@@ -27,13 +27,25 @@ export default class CreateAccount extends Component {
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
     this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
     this.handleChooseAccount = this.handleChooseAccount.bind(this);
+    this.readEmailIds = this.readEmailIds.bind(this);
+  }
+
+  readEmailIds() {
+    const { setInitialiserTask, getEmailIds } = this.props;
+    setInitialiserTask(MESSAGES.INITIALISE.FETCH_EMAIL_IDS);
+    return getEmailIds();
   }
 
   storeCreatedAccount() {
     const { newAccount, storeNewAccount, createAccountError } = this.props;
     return storeNewAccount(newAccount)
-      .then((_) => this.context.router.push('/home'))
-      .catch((e) => createAccountError(new Error(e)));
+      .then((_) => {
+        this.context.router.push('/home')
+      })
+      .catch((e) => {
+        console.log("did not route home: ", e);
+        createAccountError(new Error(e))
+      });
   }
 
   handleCreateAccount(e) {
@@ -69,6 +81,10 @@ export default class CreateAccount extends Component {
       .catch((e) => createAccountError(new Error(e)));
   };
 
+  componentWillMount() {
+    return this.readEmailIds();
+  };
+
   componentDidUpdate(prevProps, prevState) {
     const { accStatus, createAccountError } = this.props;
     if (prevProps.accStatus !== ACC_STATUS.CREATED
@@ -83,6 +99,7 @@ export default class CreateAccount extends Component {
       };
     }
   };
+
 
   render() {
     const { emailIds, networkStatus, processing, accStatus, error } = this.props;

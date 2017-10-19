@@ -36,7 +36,10 @@ export const APP_STATUS = {
   AUTHORISED: 'AUTHORISED',
   FETCHING_EMAIL_IDS: 'FETCHING_EMAIL_IDS',
   READING_CONFIG: 'READING_CONFIG',
-  READY: 'READY'
+  READY: 'READY',
+  CONNECTED: 'CONNECTED',
+  CONNECT_FAILED: 'CONNECT_FAILED',
+  CONNECTING: 'CONNECTING'
 }
 
 export const ACC_STATUS = {
@@ -59,7 +62,7 @@ export const SAFE_APP_ERROR_CODES = {
 }
 
 export const MESSAGES = {
-  INITIALIZE: {
+  INITIALISE: {
     AUTHORISE_APP: 'Authorising Application',
     CHECK_CONFIGURATION: 'Checking configuration',
     FETCH_EMAIL_IDS: 'Fetching owned email Ids'

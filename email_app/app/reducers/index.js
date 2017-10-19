@@ -1,13 +1,11 @@
 import { combineReducers } from 'redux';
 import { routerReducer as routing } from 'react-router-redux';
-import initializer from './initialiser';
-import createAccount from './create_account';
-import mail from './mail';
+import emailApp from './email_app';
+import initialiser from './initialiser';
 
 const rootReducer = combineReducers({
-  initializer,
-  createAccount,
-  mail,
+  emailApp,
+  initialiser,
   routing
 });
 

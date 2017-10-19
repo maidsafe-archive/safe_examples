@@ -1,17 +1,16 @@
 import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
-import { refreshInbox, deleteEmail, saveEmail } from '../actions/mail_actions';
-import { refreshEmail } from '../actions/initializer_actions';
+import { refreshInbox, deleteEmail, saveEmail, refreshEmail } from '../actions';
 
 const mapStateToProps = state => {
   return {
-    error: state.mail.error,
-    coreData: state.initializer.coreData,
-    inboxSize: state.initializer.inboxSize,
-    savedSize: state.initializer.savedSize,
-    spaceUsed: state.initializer.spaceUsed,
-    app: state.initializer.app,
-    account: state.initializer.account
+    error: state.emailApp.error,
+    coreData: state.emailApp.coreData,
+    inboxSize: state.emailApp.inboxSize,
+    savedSize: state.emailApp.savedSize,
+    spaceUsed: state.emailApp.spaceUsed,
+    app: state.emailApp.app,
+    account: state.emailApp.account
   };
 };
 

@@ -6,7 +6,7 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import { ipcRenderer as ipc } from 'electron';
 import routes from './routes';
 import configureStore from './store/configureStore';
-import { receiveResponse, onAuthFailure } from "./actions/initializer_actions";
+import { receiveResponse, onAuthFailure } from "./actions/initialiser_actions";
 const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 

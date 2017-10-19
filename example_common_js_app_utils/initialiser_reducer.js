@@ -1,24 +1,25 @@
 import ACTION_TYPES from '../actions/action_types';
-import { SAFE_APP_ERROR_CODES, APP_STATUS, CONSTANTS } from '../constants';
+import { MESSAGES, APP_STATUS, CONSTANTS, SAFE_APP_ERROR_CODES } from '../constants';
 
 const initialState = {
-  tasks: [],
   appStatus: null,
   networkStatus: null,
   processing: {
     state: false,
     msg: null
   },
-  app: null
-}
+  app: null,
+  tasks: []
+};
 
 const initialiser = (state = initialState, action) => {
   switch (action.type) {
-    case ACTION_TYPES.SET_INITIALISER_TASK:
+    case ACTION_TYPES.SET_INITIALIZER_TASK: {
       const tasks = state.tasks.slice();
       tasks.push(action.task);
       return { ...state, tasks };
       break;
+    }
     case `${ACTION_TYPES.AUTHORISE_APP}_LOADING`:
       return { ...state, app: null, appStatus: APP_STATUS.AUTHORISING };
       break;
@@ -36,15 +37,6 @@ const initialiser = (state = initialState, action) => {
       }
       return { ...state, appStatus: status };
       break;
-    case `${ACTION_TYPES.CONNECT_APP}_LOADING`:
-      return { ...state, appStatus: APP_STATUS.CONNECTING };
-      break;
-    case `${ACTION_TYPES.CONNECT_APP}_SUCCESS`:
-      return { ...state, appStatus: APP_STATUS.CONNECTED, app: action.payload };
-      break;
-    case `${ACTION_TYPES.CONNECT_APP}_ERROR`:
-      return { ...state, appStatus: APP_STATUS.CONNECT_FAILED };
-      break;
     case ACTION_TYPES.NET_STATUS_CHANGED:
       return { ...state, networkStatus: action.payload };
       break;
@@ -58,6 +50,24 @@ const initialiser = (state = initialState, action) => {
       return { ...state,
         networkStatus: CONSTANTS.NET_STATUS_CONNECTED,
         processing: { state: false, msg: null }
+      };
+      break;
+    case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_ERROR`:
+      status = ACC_STATUS.AUTHORISATION_FAILED;
+      if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_SHARE_MDATA_DENIED) {
+        status = ACC_STATUS.AUTHORISATION_DENIED;
+      }
+      return { ...state,
+        accStatus: status,
+        serviceToRegister: null,
+        error: action.payload
+      };
+      break;
+    case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_SUCCESS`:
+      return { ...state,
+        accStatus: ACC_STATUS.CREATED,
+        newAccount: action.payload,
+        serviceToRegister: null
       };
       break;
     default:
