@@ -228,16 +228,14 @@ export default class SafeApi {
   postComment(commentModel) {
     return new Promise(async (resolve, reject) => {
       try {
-        const updatedList = this.comments.slice(0);
         const entriesHandle = await window.safeMutableData.getEntries(this.mData);
         const mutationHandle = await window.safeMutableDataEntries.mutate(entriesHandle);
-        updatedList.unshift(commentModel);
         await window.safeMutableDataMutation.insert(mutationHandle, commentModel.id, JSON.stringify(commentModel));
         // Without calling applyEntriesMutation the changes wont we saved in the network
         await window.safeMutableData.applyEntriesMutation(this.mData, mutationHandle);
         window.safeMutableDataMutation.free(mutationHandle);
         window.safeMutableDataEntries.free(entriesHandle);
-        this.comments = updatedList;
+        this.comments = await this.listComments();
         resolve(this.comments);
       } catch (err) {
         reject(err);
@@ -286,7 +284,7 @@ export default class SafeApi {
         await window.safeMutableData.applyEntriesMutation(this.mData, mutationHandle);
         window.safeMutableDataMutation.free(mutationHandle);
         window.safeMutableDataEntries.free(entriesHandle);
-        this.comments.splice(this.comments.indexOf(commentModel), 1);
+        this.comments = await this.listComments();
         resolve(this.comments);
       } catch (err) {
         reject(err);
