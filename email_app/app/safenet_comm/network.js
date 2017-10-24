@@ -1,3 +1,4 @@
+import { shell } from 'electron';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData,
   parseUrl, showError } from '../utils/app_utils';
@@ -45,7 +46,9 @@ if (nodeEnv === DEVELOPMENT) {
 export const requestShareMdAuth = async (app, mdPermissions) => {
   try {
     const resp = await app.auth.genShareMDataUri(mdPermissions);
-    await app.auth.openUri(resp.uri);
+    // commented out until system_uri open issue is solved for osx
+    // await app.auth.openUri(resp.uri);
+    shell.openExternal(parseUrl(resp.uri));
     return;
   } catch (err) {
     console.error(err);
@@ -57,7 +60,9 @@ const requestAuth = async () => {
   try {
     const app = await initializeApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
-    await app.auth.openUri(resp.uri);
+    // commented out until system_uri open issue is solved for osx
+    // await app.auth.openUri(resp.uri);
+    shell.openExternal(parseUrl(resp.uri));
     return;
   } catch (err) {
     console.error(err);
