@@ -3,20 +3,17 @@
     "development": {
       "application/javascript": {
         "presets": [
-          ["env", { "targets": { "electron": "1.6.0" } }],
+          ["env", { "targets": { "electron": "1.7.8" } }],
           "react",
-          "stage-0",
-          "es2017-node7"
+          "stage-0"
         ],
         "plugins": [
-          "add-module-exports", 
-          "transform-async-to-generator", 
-          "transform-object-rest-spread", 
-          "transform-class-properties", 
-          "transform-es2015-classes", 
-          "react-hot-loader/babel",
-          "react-hot-loader/babel",
-          "transform-async-to-generator"
+          "add-module-exports",
+          "transform-async-to-generator",
+          "transform-object-rest-spread",
+          "transform-class-properties",
+          "transform-es2015-classes",
+          "react-hot-loader/babel"
         ],
         "sourceMaps": "inline"
       }
@@ -24,19 +21,17 @@
     "production": {
       "application/javascript": {
         "presets": [
-          ["env", { "targets": { "electron": "1.6.0" } }],
+          ["env", { "targets": { "electron": "1.7.8" } }],
           "react",
-          "stage-0",
-          "es2017-node7"
+          "stage-0"
         ],
         "plugins": [
-          "add-module-exports", 
-          "transform-async-to-generator", 
-          "transform-object-rest-spread", 
-          "transform-class-properties", 
+          "add-module-exports",
+          "transform-async-to-generator",
+          "transform-object-rest-spread",
+          "transform-class-properties",
           "transform-es2015-classes",
-          "react-hot-loader/babel",
-          "transform-async-to-generator"
+          "react-hot-loader/babel"
         ],
         "sourceMaps": "none"
       }

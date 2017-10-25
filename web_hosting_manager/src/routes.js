@@ -18,11 +18,20 @@ export default () => (
   <App>
     <Switch>
       <Route path="/remap/:publicName/:service/:containerPath" component={RemapPage} />
-      <Route path="/manageFiles/:publicName/:serviceName/:containerPath" component={ManageFilesPage} />
+      <Route
+        path="/manageFiles/:publicName/:serviceName/:containerPath"
+        component={ManageFilesPage}
+      />
       <Route path="/withTemplate/:publicName/:serviceName" component={WithTemplatePage} />
-      <Route path="/createServiceContainer/:publicName/:serviceName" component={CreateServiceContainerPage} />
+      <Route
+        path="/createServiceContainer/:publicName/:serviceName"
+        component={CreateServiceContainerPage}
+      />
       <Route path="/createService/:option/:publicName" component={CreateServicePage} />
-      <Route path="/chooseExistingContainer/:publicName/:serviceName" component={ChooseExistingContainerPage} />
+      <Route
+        path="/chooseExistingContainer/:publicName/:serviceName"
+        component={ChooseExistingContainerPage}
+      />
       <Route path="/newWebSite/:publicName" component={NewWebSitePage} />
       <Route path="/newPublicName" component={NewPublicNamePage} />
       <Route path="/publicNames" component={PublicNamesPage} />

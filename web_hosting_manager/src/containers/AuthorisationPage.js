@@ -9,14 +9,16 @@ function mapStateToProps(state) {
   return {
     nwState: state.initialisation.nwState,
     authorised: state.authorisation.authorised,
-    error: state.authorisation.error
+    error: state.authorisation.error,
+    processing: state.authorisation.processing,
+    processDesc: state.authorisation.processDesc,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...authorisationAction,
-    ...commonAction
+    ...commonAction,
   }, dispatch);
 }
 

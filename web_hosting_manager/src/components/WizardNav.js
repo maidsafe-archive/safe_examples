@@ -17,7 +17,8 @@ export default class WizardNav extends Component {
                 e.preventDefault();
                 this.props.history.go(-1);
               }}
-            >{''}</button>
+            >{''}
+            </button>
           </div>
           <div className="i">
             <button
@@ -28,7 +29,8 @@ export default class WizardNav extends Component {
                 e.preventDefault();
                 this.props.history.push('/publicNames');
               }}
-            >{''}</button>
+            >{''}
+            </button>
           </div>
         </div>
       </div>
@@ -37,4 +39,5 @@ export default class WizardNav extends Component {
 }
 
 WizardNav.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
 };

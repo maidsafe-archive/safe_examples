@@ -7,14 +7,21 @@ import { NavLink } from 'react-router-dom';
 import CONSTANTS from '../constants';
 
 export default class Header extends Component {
+  constructor() {
+    super();
+    this.publicIDBtn = 'New public ID';
+  }
   getPublicIdBtn() {
     return (
       <div className="new-public-id">
-        <NavLink to="newPublicName"><button
-          className="btn-with-add-icon"
-          title={CONSTANTS.UI.TOOLTIPS.ADD_PUBLIC_NAME}
-          type="button"
-        >New public ID</button></NavLink>
+        <NavLink to="newPublicName">
+          <button
+            className="btn-with-add-icon"
+            title={CONSTANTS.UI.TOOLTIPS.ADD_PUBLIC_NAME}
+            type="button"
+          >{this.publicIDBtn}
+          </button>
+        </NavLink>
       </div>
     );
   }
@@ -25,7 +32,7 @@ export default class Header extends Component {
     const newPublicIdBtn = showOpt ? this.getPublicIdBtn() : null;
     const connectCn = classNames('connection-status', {
       reconnect: (nwState === CONSTANTS.NETWORK_STATE.DISCONNECTED),
-      connecting: (nwState === CONSTANTS.NETWORK_STATE.INIT)
+      connecting: (nwState === CONSTANTS.NETWORK_STATE.INIT),
     });
 
     return (
@@ -40,7 +47,8 @@ export default class Header extends Component {
                   e.preventDefault();
                   reconnect();
                 }}
-              >{''}</button>
+              >{''}
+              </button>
             </div>
           </div>
         </div>
@@ -56,5 +64,7 @@ export default class Header extends Component {
 }
 
 Header.propTypes = {
-  showOpt: PropTypes.bool
+  showOpt: PropTypes.bool.isRequired,
+  nwState: PropTypes.string.isRequired,
+  reconnect: PropTypes.func.isRequired,
 };

@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import CONSTANTS from '../constants';
 import Base from './_Base';
 
 export default class Authorisation extends Component {
@@ -38,14 +37,13 @@ export default class Authorisation extends Component {
             <div className="cntr">
               <div className="authorise">
                 <p>
-                  Authorisation request sent. Application needs manage access to <b>_publicNames</b> &amp; <b>_public</b> containers. Approve the request from Authenticator to continue.
+                  Authorisation request sent. Application needs manage access
+                  to <b>_publicNames</b> &amp; <b>_public</b> containers.
+                  Approve the request from Authenticator to continue.
                 </p>
                 <p>
-                  The Public ID and Services must be added to the <b>_publicNames</b> container for allowing other applications to collaborate.
-                </p>
-                <p>
-                  Authorisation information will be stored on local keychain. The local data can be manually cleared from the menu option.
-                  <br /><i>File > Clear Access Data</i>
+                  The Public ID and Services must be added to the <b>_publicNames</b>
+                  &nbsp;container for allowing other applications to collaborate.
                 </p>
               </div>
             </div>
@@ -57,5 +55,13 @@ export default class Authorisation extends Component {
 }
 
 Authorisation.propTypes = {
-  authorised: PropTypes.bool
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  authorised: PropTypes.bool.isRequired,
+  processing: PropTypes.bool.isRequired,
+  nwState: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  processDesc: PropTypes.string.isRequired,
+  sendAuthReq: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  reconnect: PropTypes.func.isRequired,
 };

@@ -9,8 +9,8 @@ const initState = {
   uploading: false,
   downloadStatus: null,
   downloading: false,
-  containerInfo: null,
-  published: false
+  containerInfo: [],
+  published: false,
 };
 
 export default function fileManager(state = initState, action) {
@@ -19,13 +19,13 @@ export default function fileManager(state = initState, action) {
       return {
         ...state,
         processing: true,
-        processDesc: CONSTANTS.UI.MSG.UPLOADING_TEMPLATE
+        processDesc: CONSTANTS.UI.MSG.UPLOADING_TEMPLATE,
       };
     case ACTION_TYPES.UPLOADED_TEMPLATE:
       return {
         ...state,
         processing: false,
-        processDesc: null
+        processDesc: '',
       };
     case ACTION_TYPES.UPLOAD_STARTED:
       return {
@@ -38,22 +38,22 @@ export default function fileManager(state = initState, action) {
       return {
         ...state,
         uploading: false,
-        uploadStatus: null
+        uploadStatus: null,
       };
 
     case ACTION_TYPES.UPLOADING:
       return {
         ...state,
         uploading: true,
-        uploadStatus: action.payload
+        uploadStatus: action.payload,
       };
     case ACTION_TYPES.UPLOAD_FAILED:
-      return state = {
+      return {
         ...state,
         uploading: false,
         uploadStatus: null,
         processing: false,
-        error: parseErrorMsg(action.payload)
+        error: parseErrorMsg(action.payload),
       };
 
     case ACTION_TYPES.DOWNLOAD_STARTED:
@@ -61,23 +61,19 @@ export default function fileManager(state = initState, action) {
         ...state,
         downloading: true,
         downloadStatus: null,
-        // processing: true,
-        // processDesc: CONSTANTS.UI.MSG.DOWNLOADING_FILE
       };
     case ACTION_TYPES.DOWNLOADING:
       return {
         ...state,
         downloading: true,
-        downloadStatus: action.payload
+        downloadStatus: action.payload,
       };
     case ACTION_TYPES.DOWNLOAD_FAILED:
       return {
         ...state,
         downloading: false,
         downloadStatus: null,
-        // processing: false,
-        // processDesc: null,
-        error: action.payload.message
+        error: action.payload.message,
       };
     case ACTION_TYPES.DOWNLOAD_COMPLETED:
       return {
@@ -85,81 +81,81 @@ export default function fileManager(state = initState, action) {
         downloading: false,
         downloadStatus: null,
         processing: false,
-        processDesc: null
+        processDesc: '',
       };
 
     case `${ACTION_TYPES.GET_CONTAINER_INFO}_PENDING`:
       return {
         ...state,
         processing: true,
-        processDesc: CONSTANTS.UI.MSG.GETTING_CONT_INFO
+        processDesc: CONSTANTS.UI.MSG.GETTING_CONT_INFO,
       };
     case `${ACTION_TYPES.GET_CONTAINER_INFO}_FULFILLED`:
       return {
         ...state,
         processing: false,
-        containerInfo: action.payload
+        containerInfo: action.payload,
       };
     case `${ACTION_TYPES.GET_CONTAINER_INFO}_REJECTED`:
       return {
         ...state,
         processing: false,
-        error: parseErrorMsg(action.payload)
+        error: parseErrorMsg(action.payload),
       };
 
     case `${ACTION_TYPES.PUBLISH}_PENDING`:
       return {
         ...state,
         processing: false,
-        processDesc: CONSTANTS.UI.MSG.PUBLISHING_WEB
+        processDesc: CONSTANTS.UI.MSG.PUBLISHING_WEB,
       };
     case `${ACTION_TYPES.PUBLISH}_FULFILLED`:
       return {
         ...state,
         processing: false,
-        processDesc: null,
-        published: true
+        processDesc: '',
+        published: true,
       };
     case `${ACTION_TYPES.PUBLISH}_REJECTED`:
       return {
         ...state,
         processing: false,
-        processDesc: null,
-        error: parseErrorMsg(action.payload)
+        processDesc: '',
+        error: parseErrorMsg(action.payload),
       };
 
     case `${ACTION_TYPES.DELETE_FILE_OR_FOLDER}_PENDING`:
       return {
         ...state,
         processing: true,
-        processDesc: CONSTANTS.UI.MSG.DELETING_FILES
+        processDesc: CONSTANTS.UI.MSG.DELETING_FILES,
       };
     case `${ACTION_TYPES.DELETE_FILE_OR_FOLDER}_FULFILLED`:
       return {
         ...state,
         processing: false,
-        processDesc: null
+        processDesc: '',
       };
     case `${ACTION_TYPES.DELETE_FILE_OR_FOLDER}_REJECTED`:
       return {
         ...state,
         processing: false,
-        processDesc: null,
-        error: parseErrorMsg(action.payload)
+        processDesc: '',
+        error: parseErrorMsg(action.payload),
       };
 
     case ACTION_TYPES.RESET_CONTAINER_INFO:
       return {
         ...state,
-        containerInfo: null
+        containerInfo: [],
       };
 
     case ACTION_TYPES.SEND_MD_REQ:
       return {
         ...state,
         processing: false,
-        processDesc: null,
-        error: null
+        processDesc: '',
+        error: '',
       };
 
     case ACTION_TYPES.RESET:
@@ -168,7 +164,7 @@ export default function fileManager(state = initState, action) {
         ...CONSTANTS.UI.COMMON_STATE,
         uploading: false,
         uploadStatus: null,
-        published: false
+        published: false,
       };
     default:
       return state;

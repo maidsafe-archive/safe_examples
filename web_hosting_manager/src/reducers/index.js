@@ -3,8 +3,8 @@ import { combineReducers } from 'redux';
 import { routerReducer as router } from 'react-router-redux';
 import authorisation from './authorisation';
 import initialisation from './initialisation';
-import publicNames from './publicNames';
-import fileManager from './fileManager';
+import publicNames from './public_names';
+import fileManager from './file_manager';
 import services from './services';
 
 const rootReducer = combineReducers({

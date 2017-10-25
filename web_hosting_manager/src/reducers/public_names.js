@@ -5,10 +5,10 @@ import CONSTANTS from '../constants';
 import { parseErrorMsg } from '../utils/app';
 
 const initState = {
-  publicNames: {},
+  publicNames: [],
   serviceContainers: [],
   createdPublicName: false,
-  ...CONSTANTS.UI.COMMON_STATE
+  ...CONSTANTS.UI.COMMON_STATE,
 };
 
 export default function publicNamesList(state = initState, action) {
@@ -16,58 +16,58 @@ export default function publicNamesList(state = initState, action) {
     case actionTypes.SET_PUBLIC_NAMES:
       return {
         ...state,
-        publicNames: lodash.cloneDeep(action.data)
+        publicNames: lodash.cloneDeep(action.data),
       };
     case actionTypes.SET_SERVICE_CONTAINERS:
       return {
         ...state,
-        serviceContainers: lodash.cloneDeep(action.data)
+        serviceContainers: lodash.cloneDeep(action.data),
       };
 
     case `${actionTypes.CREATE_PUBLIC_NAME}_PENDING`:
       return {
         ...state,
         processing: true,
-        processDesc: CONSTANTS.UI.MSG.CREATING_PUBLIC_NAMES
+        processDesc: CONSTANTS.UI.MSG.CREATING_PUBLIC_NAMES,
       };
     case `${actionTypes.CREATE_PUBLIC_NAME}_FULFILLED`:
       return {
         ...state,
         processing: false,
         createdPublicName: true,
-        processDesc: null
+        processDesc: '',
       };
     case `${actionTypes.CREATE_PUBLIC_NAME}_REJECTED`:
       return {
         ...state,
         processing: false,
-        error: parseErrorMsg(action.payload)
+        error: parseErrorMsg(action.payload),
       };
 
     case `${actionTypes.FETCH_SERVICE_CONTAINERS}_PENDING`:
       return {
         ...state,
         processing: true,
-        processDesc: CONSTANTS.UI.MSG.FETCH_SERVICE_CONTAINERS
+        processDesc: CONSTANTS.UI.MSG.FETCH_SERVICE_CONTAINERS,
       };
     case `${actionTypes.FETCH_SERVICE_CONTAINERS}_FULFILLED`:
       return {
         ...state,
         processing: false,
-        processDesc: null
+        processDesc: '',
       };
     case `${actionTypes.FETCH_SERVICE_CONTAINERS}_REJECTED`:
       return {
         ...state,
         processing: false,
-        error: parseErrorMsg(action.payload)
+        error: parseErrorMsg(action.payload),
       };
 
     case actionTypes.RESET:
       return {
         ...state,
         ...CONSTANTS.UI.COMMON_STATE,
-        createdPublicName: false
+        createdPublicName: false,
       };
     default:
       return state;

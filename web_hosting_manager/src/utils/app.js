@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import CONSTANTS from '../constants';
 
 // domain check for public name and service name
@@ -7,9 +8,8 @@ export const domainCheck = (str) => {
 };
 
 // set default prefix for service container name
-export const defaultServiceContainerName = (serviceName) => {
-  return `${CONSTANTS.UI.DEFAULT_SERVICE_CONTAINER_PREFIX}${serviceName}`;
-};
+export const defaultServiceContainerName = serviceName =>
+  `${CONSTANTS.UI.DEFAULT_SERVICE_CONTAINER_PREFIX}${serviceName}`;
 
 // convert bytes to size of other variants
 export const bytesToSize = (bytes) => {
@@ -21,18 +21,18 @@ export const bytesToSize = (bytes) => {
   if (i === 0) {
     return `${bytes} ${sizes[i]}`;
   }
-  const resultStr = (bytes / Math.pow(1024, i)).toFixed(1);
+  const resultStr = (bytes / (1024 ** i)).toFixed(1);
   return `${resultStr} ${sizes[i]}`;
 };
 
 const trimErrorMsg = (msg) => {
   let index = msg.indexOf('->');
   index = (index === -1) ? 0 : index + 2;
-  return msg.slice(index).trim()
+  return msg.slice(index).trim();
 };
 
-export const parseErrorMsg = (err, target) => {
-  switch(err.code) {
+export const parseErrorMsg = (err) => {
+  switch (err.code) {
     case CONSTANTS.ERROR_CODE.NO_SUCH_KEY:
       return CONSTANTS.UI.ERROR_MSG.NO_SUCH_KEY;
 
@@ -50,6 +50,6 @@ export const parseErrorMsg = (err, target) => {
   }
 };
 
-export const decodeURI = (uri) => (
-  decodeURIComponent(uri)
-);
+export const decodeURI = uri => decodeURIComponent(uri);
+
+export const genKey = () => crypto.randomBytes(30).toString('hex');

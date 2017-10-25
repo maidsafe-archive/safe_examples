@@ -13,7 +13,7 @@ function mapStateToProps(state) {
     error: state.publicNames.error || state.fileManager.error,
     processing: state.publicNames.processing || state.fileManager.processing,
     processDesc: state.publicNames.processDesc || state.fileManager.processDesc,
-    published: state.fileManager.published
+    published: state.fileManager.published,
   };
 }
 
@@ -21,7 +21,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...publicNamesAction,
     ...commonAction,
-    publish: fileManagerAction.publish
+    publish: fileManagerAction.publish,
   }, dispatch);
 }
 
