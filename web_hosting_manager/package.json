@@ -7,7 +7,7 @@
   "identifier": "net.maidsafe.examples.webhostingmanager",
   "scripts": {
     "start": "cross-env NODE_ENV=development electron-forge start",
-    "package": "cross-env npm_config_target=1.7.8 npm_config_arch=x64 npm_config_target_arch=x64 npm_config_disturl=https://atom.io/download/electron npm_config_runtime=electron npm_config_build_from_source=true electron-forge package",
+    "package": "cross-env npm_config_target=1.6.2 npm_config_arch=x64 npm_config_target_arch=x64 npm_config_disturl=https://atom.io/download/electron npm_config_runtime=electron npm_config_build_from_source=true electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint src *.js"
@@ -78,7 +78,7 @@
     "@maidsafe/safe-node-app": "^0.4.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "classnames": "^2.2.5",
-    "electron-compile": "^6.4.2",
+    "electron-compile": "^6.2.0",
     "electron-devtools-installer": "^2.0.1",
     "lodash": "^4.17.4",
     "npm-font-open-sans": "^1.1.0",
@@ -107,8 +107,8 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "cross-env": "^5.0.5",
-    "electron-forge": "^4.1.1",
-    "electron-prebuilt-compile": "1.7.8",
+    "electron-forge": "^2.8.3",
+    "electron-prebuilt-compile": "1.6.2",
     "eslint": "^4.8.0",
     "eslint-config-airbnb": "^16.0.0",
     "eslint-plugin-import": "^2.7.0",
