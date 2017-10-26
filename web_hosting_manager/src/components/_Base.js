@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import Header from './_Header';
-import Popup from './Popup';
+import Header from './_header';
+import Popup from './_popup';
 import CONSTANTS from '../constants';
 
 export default class Base extends Component {

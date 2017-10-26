@@ -4,9 +4,9 @@
  * Actions related to Authorisation of Application
  */
 /* eslint-disable import/no-named-as-default-member, import/no-named-as-default */
-import api from '../lib/api';
+import api from '../safenet_comm/api';
 /* eslint-enable import/no-named-as-default-member, import/no-named-as-default */
-import actionTypes from './action_types';
+import ACTION_TYPES from './action_types';
 import CONSTANTS from '../constants';
 
 /**
@@ -14,7 +14,7 @@ import CONSTANTS from '../constants';
  * @param {string} res - received auth response from Authenticator
  */
 const appAuthorised = res => ({
-  type: actionTypes.AUTHORISED,
+  type: ACTION_TYPES.AUTHORISED,
   res,
 });
 
@@ -23,7 +23,7 @@ const appAuthorised = res => ({
  * @param {string} res - received Mutable Data auth response from Authenticator
  */
 const mdAuthorised = res => ({
-  type: actionTypes.MD_AUTHORISED,
+  type: ACTION_TYPES.MD_AUTHORISED,
   payload: api.decodeSharedMD(res),
 });
 
@@ -31,7 +31,7 @@ const mdAuthorised = res => ({
  * Send authorisation request to Authenticator
  */
 export const sendAuthReq = () => ({
-  type: actionTypes.SEND_AUTH_REQUEST,
+  type: ACTION_TYPES.SEND_AUTH_REQUEST,
   payload: api.sendAuthReq(),
 });
 

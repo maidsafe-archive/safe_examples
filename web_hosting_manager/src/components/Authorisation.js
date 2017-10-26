@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import Base from './_Base';
+import Base from './_base';
 
 export default class Authorisation extends Component {
   componentDidMount() {

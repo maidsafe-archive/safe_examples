@@ -1,18 +1,18 @@
 /* eslint flowtype-errors/show-errors: 0 */
 import React from 'react';
 import { Switch, Route } from 'react-router';
-import App from './containers/App';
-import AuthorisationPage from './containers/AuthorisationPage';
-import InitialisePage from './containers/InitialisationPage';
-import PublicNamesPage from './containers/PublicNamesPage';
-import NewPublicNamePage from './containers/NewPublicNamePage';
-import ChooseExistingContainerPage from './containers/ChooseExistingContainerPage';
-import CreateServiceContainerPage from './containers/CreateServiceContainerPage';
-import CreateServicePage from './containers/CreateServicePage';
-import WithTemplatePage from './containers/WithTemplatePage';
-import ManageFilesPage from './containers/ManageFilesPage';
-import NewWebSitePage from './containers/NewWebSitePage';
-import RemapPage from './containers/RemapPage';
+import App from './containers/app';
+import AuthorisationPage from './containers/authorisation';
+import InitialisePage from './containers/initialiser';
+import PublicNamesPage from './containers/public_names';
+import NewPublicNamePage from './containers/new_public_name';
+import ChooseExistingContainerPage from './containers/choose_existing_container';
+import CreateServiceContainerPage from './containers/create_service_container';
+import CreateServicePage from './containers/create_service';
+import WithTemplatePage from './containers/with_template';
+import ManageFilesPage from './containers/manage_files';
+import NewWebSitePage from './containers/new_web_site';
+import RemapPage from './containers/remap';
 
 export default () => (
   <App>

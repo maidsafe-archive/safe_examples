@@ -3,10 +3,10 @@
 /**
  * Actions related to file management
  */
-import ACTION_TYPES from './action_types';
 /* eslint-disable import/no-named-as-default-member, import/no-named-as-default */
-import api from '../lib/api';
+import api from '../safenet_comm/api';
 /* eslint-enable import/no-named-as-default-member, import/no-named-as-default */
+import ACTION_TYPES from './action_types';
 import { canAccessPublicName } from './public_names';
 import CONSTANTS from '../constants';
 

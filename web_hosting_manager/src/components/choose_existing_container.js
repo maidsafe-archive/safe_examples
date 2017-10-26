@@ -4,9 +4,10 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import Base from './_base';
-import { decodeURI, genKey } from '../utils/app';
+import WizardNav from './_wizard_nav';
+import { genKey } from '../utils/app';
 
-export default class Remap extends Component {
+export default class ChooseExistingContainer extends Component {
   constructor() {
     super();
     this.state = {
@@ -16,8 +17,12 @@ export default class Remap extends Component {
     this.getServiceContainersList = this.getServiceContainersList.bind(this);
   }
 
+  componentWillMount() {
+    this.props.getServiceContainers();
+  }
+
   componentDidUpdate() {
-    if (this.props.remapped) {
+    if (this.props.published && !this.props.processing) {
       return this.props.history.push('/publicNames');
     }
   }
@@ -26,13 +31,9 @@ export default class Remap extends Component {
     this.props.reset();
   }
 
-  getSelectedContainer() {
-    return this.state.selectedContainer || decodeURI(this.props.match.params.containerPath);
-  }
-
   getServiceContainersList() {
     const { serviceContainers } = this.props;
-    if (!serviceContainers || serviceContainers.length === 0) {
+    if (serviceContainers.length === 0) {
       return (
         <div className="i"><div className="inpt null">No containers found</div></div>
       );
@@ -86,7 +87,9 @@ export default class Remap extends Component {
   }
 
   render() {
-    const { service, publicName, containerPath } = this.props.match.params;
+    const { publicName, serviceName } = this.props.match.params;
+    const { serviceContainers } = this.props;
+
     return (
       <Base
         reconnect={this.props.reconnect}
@@ -96,51 +99,57 @@ export default class Remap extends Component {
         processDesc={this.props.processDesc}
         popupOkCb={this.popupOkCb.bind(this)}
       >
-        <div className="card">
-          <div className="card-b">
-            <h3 className="h">Remap service - {service}</h3>
-            <div className="cntr">
-              <div className="choose-existing-cntr">
-                <div className="b">
-                  <p className="p">Select the container to be mapped with the service. The contents of the mapped container will be served for safe://{service}.{publicName}</p>
-                  <div className="select-inpt">
-                    { this.getServiceContainersList() }
-                    <div className="opt">
-                      <button
-                        type="button"
-                        className="btn"
-                        name="reload-containers"
-                        onClick={this.reloadContainers.bind(this)}
-                      >{''}
-                      </button>
+        <div>
+          <WizardNav history={this.props.history} />
+          <div className="card">
+            <div className="card-b">
+              <h3 className="h">Choose an Existing Folder</h3>
+              <div className="cntr">
+                <div className="choose-existing-cntr">
+                  <div className="b">
+                    <p className="p">This folder content will be added to the SAFE Network and will be publicly viewable using the URL <b>safe://{serviceName}.{publicName}</b>. This folder should contain an index.html file.</p>
+                    <div className="select-inpt">
+                      {this.getServiceContainersList()}
+                      <div className="opt">
+                        <button
+                          type="button"
+                          className="btn"
+                          name="reload-containers"
+                          disabled={serviceContainers.length === 0}
+                          onClick={this.reloadContainers.bind(this)}
+                        >{''}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="opts">
-              <div className="opt">
-                <button
-                  type="button"
-                  className="btn flat"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.props.history.push('/publicNames');
-                  }}
-                >Cancel
-                </button>
-              </div>
-              <div className="opt">
-                <button
-                  type="button"
-                  className="btn flat primary"
-                  disabled={this.getSelectedContainer() === decodeURI(containerPath)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.props.remapService(publicName, service, this.getSelectedContainer());
-                  }}
-                >Publish
-                </button>
+              <div className="opts">
+                <div className="opt">
+                  <button
+                    type="button"
+                    className="btn flat"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.props.history.push(`/newWebSite/${publicName}`);
+                    }}
+                  >Cancel
+                  </button>
+                </div>
+                <div className="opt">
+                  <button
+                    type="button"
+                    className="btn flat primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!this.state.selectedContainer) {
+                        return;
+                      }
+                      this.props.publish(publicName, serviceName, this.state.selectedContainer);
+                    }}
+                  >Publish
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -150,16 +159,16 @@ export default class Remap extends Component {
   }
 }
 
-Remap.propTypes = {
+ChooseExistingContainer.propTypes = {
   history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   processDesc: PropTypes.string.isRequired,
   error: PropTypes.string.isRequired,
   nwState: PropTypes.string.isRequired,
   processing: PropTypes.bool.isRequired,
-  remapped: PropTypes.bool.isRequired,
+  published: PropTypes.bool.isRequired,
   serviceContainers: PropTypes.arrayOf(PropTypes.string).isRequired,
-  remapService: PropTypes.func.isRequired,
+  publish: PropTypes.func.isRequired,
   reconnect: PropTypes.func.isRequired,
   reset: PropTypes.func.isRequired,
   getServiceContainers: PropTypes.func.isRequired,
