@@ -10,7 +10,7 @@ Instead of having to upload your site to the network every time you want to test
 - clone this repository and `cd` into the respective directory
 - Run `npm install`
 - Run `npm run gulp` to start server
-- Visit `localhost://p:3003` in your SAFE browser to see page
+- Visit `localhost:3003` in your SAFE browser to see page
 
 To upload this site to the network:
  - Run `npm run gulp` and observe the `build` directory that's created
