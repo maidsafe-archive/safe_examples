@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { I18n } from 'react-redux-i18n';
-import * as Helper from './utils';
-import { FileUploadTask } from './tasks';
+import * as Helper from './helpers';
 import CONSTANTS from '../constants';
 
 const _safeApi = Symbol('safeApi');
@@ -11,10 +10,10 @@ const _nwPath = Symbol('nwPath');
 const _status = Symbol('status');
 const _errorCb = Symbol('errorCb');
 const _progressCb = Symbol('progressCb');
-const _taskQueue = Symbol('taskQueue');
+const _dirTasks = Symbol('dirTasks');
+const _fileTask = Symbol('fileTask');
 const _taskCb = Symbol('taskCb');
 const _cancelOnErrs = Symbol('cancelOnErrs');
-const _currentTask = Symbol('currentTask');
 
 export default class Uploader {
   constructor(api, localPath, nwPath, progressCb, errorCb) {
@@ -28,9 +27,9 @@ export default class Uploader {
       completed: new Helper.DirStats(),
       cancelled: false,
     };
-    this[_taskQueue] = undefined;
+    this[_dirTasks] = undefined;
+    this[_fileTask] = undefined;
     this[_taskCb] = undefined;
-    this[_currentTask] = undefined;
     this[_cancelOnErrs] = [
       CONSTANTS.ERROR_CODE.TOO_MANY_ENTRIES,
       CONSTANTS.ERROR_CODE.LOW_BALANCE,
@@ -43,7 +42,7 @@ export default class Uploader {
     this[_taskCb] = (error, taskStatus) => {
       if (error) {
         this[_errorCb](error);
-        if (cancelUploadErrArr.indexOf(error.code) !== -1) {
+        if (this[_cancelOnErrs].indexOf(error.code) !== -1) {
           this.cancel();
           return this[_progressCb]({
             total: 0,
@@ -79,10 +78,10 @@ export default class Uploader {
   }
 
   cancel() {
-    if (this[_taskQueue]) {
-      this[_taskQueue].cancel();
+    if (this[_dirTasks]) {
+      this[_dirTasks].cancel();
     } else {
-      this[_currentTask].cancelled = true;
+      this[_fileTask].cancelled = true;
     }
     this[_status].cancelled = true;
   }
@@ -90,24 +89,17 @@ export default class Uploader {
   _handleDir() {
     const baseDir = path.basename(this[_localPath]);
     this[_status].total = Helper.getDirectoryStats(this[_localPath]);
-    // const taskQ = new TaskQueue(this[_taskCb]);
-    // this[_taskQueue] = Helper.generateUploadTaskQueue(
-    //   this[_safeApi],
-    //   this[_localPath],
-    //   this[_nwPath],
-    //   taskQ,
-    //   baseDir,
-    // );
-    // this[_taskQueue].run();
     const items = Helper.readDir(this[_localPath]).sort().map(item => item.slice(this[_localPath].length + 1));
-    console.log('items', items);
+    this[_dirTasks] = new Helper.TaskQueue(this[_taskCb]);
+    for(const item of items) {
+      this[_dirTasks].add(new Helper.FileUploadTask(this[_safeApi], path.join(this[_localPath], item), path.join(this[_nwPath], item)));
+    }
+    this[_dirTasks].run();
   }
 
   _handleFile() {
     const fileName = path.basename(this[_localPath]);
-    this[_currentTask] = new FileUploadTask(this[_safeApi], this[_localPath], `${this[_nwPath]}/${fileName}`);
     this[_status].total.size = fs.statSync(this[_localPath]).size;
-    this[_status].total.files = 1;
     if (this[_status].total.size > CONSTANTS.MAX_FILE_SIZE) {
       this[_taskCb](new Error(I18n.t('messages.restrictedFileSize', { size: (CONSTANTS.MAX_FILE_SIZE / 1000000) })));
       return this[_progressCb]({
@@ -116,7 +108,8 @@ export default class Uploader {
         progress: 0,
       }, true);
     }
-    this[_currentTask].execute(callback);
+    this[_status].total.files = 1;
+    this[_fileTask] = new Helper.FileUploadTask(this[_safeApi], this[_localPath], `${this[_nwPath]}/${fileName}`);
+    this[_fileTask].execute(this[_taskCb]);
   }
-
 }

@@ -4,7 +4,7 @@ import { shell } from 'electron';
 
 import { getPath } from './temp';
 import CONSTANTS from '../constants';
-import { nodeEnv, parseNetworkPath } from './utils';
+import { nodeEnv, parseNetworkPath } from './helpers';
 
 // private variables
 const _safeApi = Symbol('safeApi');

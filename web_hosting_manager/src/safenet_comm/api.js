@@ -12,7 +12,7 @@ import { I18n } from 'react-redux-i18n';
 import Uploader from './uploader';
 import Downloader from './downloader';
 import makeError from './error';
-import { openExternal, nodeEnv } from './utils';
+import { openExternal, nodeEnv } from './helpers';
 import CONSTANTS from '../constants';
 
 // Private variables
