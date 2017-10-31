@@ -8,8 +8,10 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import merge from 'webpack-merge';
 import BabiliPlugin from 'babili-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
+
 
 CheckNodeEnv('production');
 
@@ -104,6 +106,11 @@ export default merge.smart(baseConfig, {
     ]
   },
 
+  node: {
+    __dirname: false,
+    __filename: false
+  },
+
   plugins: [
     /**
      * Create global constants which can be configured at compile time.
@@ -122,6 +129,13 @@ export default merge.smart(baseConfig, {
      * Babli is an ES6+ aware minifier based on the Babel toolchain (beta)
      */
     new BabiliPlugin(),
+
+    new CopyWebpackPlugin([
+      {
+        from: 'app/template',
+        to: 'template'
+      }
+    ]),
 
     new ExtractTextPlugin('style.css'),
 

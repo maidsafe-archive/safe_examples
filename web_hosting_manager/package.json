@@ -43,15 +43,20 @@
       "main.prod.js.map",
       "package.json"
     ],
+    "asar": true,
+    "asarUnpack": "{dist/template/**/*,**/@maidsafe/**/*}",
     "win": {
-      "target": [
-        "dir"
-      ]
+      "target": "dir",
+      "icon": "app/app"
     },
     "linux": {
-      "target": [
-        "dir"
-      ]
+      "target": "dir",
+      "icon": "app/app"
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": "dir",
+      "icon": "app/app"
     },
     "directories": {
       "buildResources": "resources",
@@ -63,9 +68,9 @@
     "url": "git+https://github.com/maidsafe/safe_examples.git"
   },
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "MaidSafe",
+    "email": "dev@maidsafe.net",
+    "url": "https://maidsafe.net"
   },
   "license": "MIT",
   "bugs": {
@@ -116,6 +121,7 @@
     "babili-webpack-plugin": "^0.1.2",
     "chalk": "^2.0.1",
     "concurrently": "^3.5.0",
+    "copy-webpack-plugin": "^4.2.0",
     "cross-env": "^5.0.0",
     "cross-spawn": "^5.1.0",
     "css-loader": "^0.28.3",

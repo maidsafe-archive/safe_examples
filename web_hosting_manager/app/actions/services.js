@@ -18,8 +18,16 @@ export const checkServiceExists = (publicName, serviceName) => (
       type: ACTION_TYPES.CHECK_SERVICE_EXIST,
       payload: api.fetchServices()
         .then((list) => {
-          if (!list || !list[publicName] || !list[publicName][serviceName]) {
+          if (!list) {
             return;
+          }
+          const pubMatch = list.filter(p => p.name === publicName);
+          if (pubMatch.length !== 0) {
+            if (!pubMatch[0] ||
+              !pubMatch[0].services ||
+              (pubMatch[0].services.filter(s => s.name === serviceName).length === 0)) {
+              return;
+            }
           }
           return true;
         }),
