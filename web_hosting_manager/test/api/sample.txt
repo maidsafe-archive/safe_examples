@@ -1,0 +1,15 @@
+What is the SAFE Network?
+
+The SAFE (Secure Access For Everyone) Network is a new secure way to access apps that put the security of your data above all else. Downloading the free SAFE software will provide access to: messaging, apps, email, social networks, data storage, video conferencing, and much more.
+
+Rather than using data centers and servers which are prone to data theft and surveillance, as is common on today's Internet, the SAFE Network uses advanced peer-to-peer technology that joins together the spare computing capacity of all SAFE users, creating a global network.
+
+The SAFE Network is made up of the unused hard drive space, processing power and data connection of its users. It offers a level of security and privacy not currently available on the existing Internet and turns the tables on companies, putting users in control of their data, rather than trusting it to organizations.
+
+By providing your unused computing resources to SAFE, you will be paid in a network token called safecoin.
+
+What is MaidSafe?
+
+MaidSafe is a company based in Troon, Scotland. They have been working on designing and implementing the SAFE Network since 2006. MaidSafe initially raised $5 million USD in investments from local individuals, friends and family to make the SAFE Network a reality.
+
+In April 2014, MaidSafe announced a 30 day crowdsale for safecoin, the underlying cryptocurrency of the SAFE Network. The goal of the crowdsale was to raise $7 million USD by pre-selling 429,496,729 safecoins (this represents 10% of all the safecoins that can ever be produced) via an intermediary coin called MaidSafeCoin. Although the crowdsale didn't go as planned, MaidSafe is still in a good position to deliver a feature complete network. It's worth noting that the network will be released in iterations as opposed to a single launch event.
