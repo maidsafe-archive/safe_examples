@@ -55,6 +55,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'fonts/[hash].[ext]',
             limit: 10000,
             mimetype: 'application/font-woff',
           }
@@ -66,6 +67,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'fonts/[hash].[ext]',
             limit: 10000,
             mimetype: 'application/font-woff',
           }
@@ -77,6 +79,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'fonts/[hash].[ext]',
             limit: 10000,
             mimetype: 'application/octet-stream'
           }
@@ -85,7 +88,7 @@ export default merge.smart(baseConfig, {
       // EOT Font
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        use: 'file-loader',
+        use: 'file-loader?name=fonts/[hash].[ext]',
       },
       // SVG Font
       {
@@ -93,6 +96,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'imgs/[hash].[ext]',
             limit: 10000,
             mimetype: 'image/svg+xml',
           }
@@ -101,7 +105,7 @@ export default merge.smart(baseConfig, {
       // Common Image Formats
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-        use: 'url-loader',
+        use: 'url-loader?name=imgs/[hash].[ext]',
       }
     ]
   },

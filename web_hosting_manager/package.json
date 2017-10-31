@@ -43,6 +43,15 @@
       "main.prod.js.map",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "./app/dist/fonts",
+        "to": "dist/fonts"
+      }, {
+        "from": "./app/dist/imgs",
+        "to": "dist/imgs"
+      }
+    ],
     "asar": true,
     "asarUnpack": "{dist/template/**/*,**/@maidsafe/**/*}",
     "win": {
