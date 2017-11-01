@@ -3,7 +3,7 @@ The tutorial app show cases how to create and manage web services for Public ID 
 
 ## Install
 
-* **Note: requires a node version 7.10.0 and an npm version 4.2.0**
+* **Note: requires a node version 8.0.0 and an npm version 5.0.0**
 
 First, clone the repo via git:
 
@@ -16,12 +16,15 @@ And then install Node.js dependencies.
 ```bash
 $ yarn
 ```
+Set `NODE_ENV=dev` to use Mock Vault. By deafult it uses Actual Network Or set `NODE_ENV=prod` to use Actual Network.
 
 ## Run
 
 ```bash
 $ yarn start
 ```
+
+To open application on development environment run `yarn dev`
 
 ### Authorising against Mock
 
@@ -34,8 +37,16 @@ Run the app, and in the main menu, select `Simulate Mock Response`, and you're g
 To package apps for the local platform:
 
 ```bash
-$ yarn run package
+$ yarn package
 ```
+
+## Test
+
+```bash
+yarn test
+```
+
+Run `yarn rebuild-test` if there is Node Module Mismatch Error while running test, this will build the native modules for Nodejs. To build it back to Electron run `yarn rebuild`, now you can start the application.
 
 # License
 

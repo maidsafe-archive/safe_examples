@@ -1,0 +1,68 @@
+header
+  width: 100%
+  height: $header-height
+  position: relative
+  .sec-left,
+  .sec-center,
+  .sec-right
+    width: 33.33%
+    height: 100%
+    display: inline-block
+    float: left
+  &:after
+    content: ""
+    width: 100%
+    height: $header-border-bottom-height
+    background-color: $bg-header-border-bottom
+    position: absolute
+    left: 0
+    bottom: 0
+  .title
+    line-height: $header-height
+    font-size: 24px
+    font-weight: bold
+    text-align: center
+  .new-public-id
+    height: $header-height
+    text-align: center
+    position: relative
+
+// brand logo
+.brand
+  height: 100%;
+  position: relative;
+  .brand-i
+    width: $brand-logo-width
+    height: $brand-logo-height
+    position: absolute
+    left: 45px
+    top: 50%
+    transform: translate(0, -50%)
+    background-image: url($url-brand)
+    background-position: center
+    background-size: contain
+    background-repeat: no-repeat
+  .connection-status
+    display: none
+    position: absolute
+    height: 30px
+    top: 50%
+    left: 284px
+    transform: translate(0, -50%)
+    button
+      +btnDefault()
+      width: $connection-status-len
+      height: $connection-status-len
+      background-repeat: no-repeat
+      background-size: contain
+      background-position: left
+    &.reconnect
+      display: inline-block
+      button
+        background-image: url($url-nw-reconnect)
+    &.connecting
+      display: inline-block
+      margin-left: -3px
+      button
+        background-image: url($url-nw-reconnect-anim)
+        cursor: default

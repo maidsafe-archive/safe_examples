@@ -1,0 +1,97 @@
+*
+  margin: 0
+  padding: 0
+  box-sizing: border-box
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+body
+  width: $base-width
+  height: $base-height
+  background-color: $bg-body
+  font-family: 'Open Sans'
+  font-size: 14px
+  font-weight: normal
+  color: $color-common-text
+
+.root
+  background-color: $bg-root
+  position: fixed
+  width: 100%
+  height: 100%
+  top: 0
+  left: 0
+  &-b
+    height: 100%
+    .root-container
+      height: 100%
+      padding-bottom: $header-height
+      &-b
+        overflow: auto
+        height: 100%
+        position: relative
+        &.no-scroll
+          overflow: visible
+
+.card
+  width: $cntr-wight
+  margin: 0 auto
+  padding-top: 60px
+  &-b
+    width: 100%
+    padding-bottom: 20px
+    > .h
+      padding: 15px 30px
+      background-color: $bg-card-head
+      font-size: 20px
+      font-weight: bold
+      &.type-center
+        text-align: center
+        font-weight: normal
+    > .cntr
+      background-color: $bg-card-container
+      padding: 30px 15px 15px
+    > .opts
+      margin-top: 34px
+      +clearfix()
+      .opt
+        display: inline-block
+        float: left
+        width: 50%
+        &:first-child
+          padding-right: 11px
+        &:last-child
+          padding-left: 11px
+        button
+          width: 100%
+
+.wiz-nav
+  width: 100%
+  height: 60px
+  position: absolute
+  top: 0
+  left 0
+  padding: 15px 0
+  .b
+    width: $cntr-wight
+    margin: 0 auto
+    +clearfix()
+    .i
+      display: inline-block
+      float: left
+      &:not(:last-child)
+        padding-right: 20px
+
+@keyframes rotate-clockwise
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(360deg)
+
+@keyframes rotate-anticlockwise
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(-360deg)

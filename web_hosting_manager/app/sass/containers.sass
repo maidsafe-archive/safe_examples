@@ -1,0 +1,575 @@
+.no-public-id-cntr
+  width: $cntr-wight
+  margin: 0 auto
+  text-align: center
+  padding-top: 60px
+  .no-public-id-cntr-b
+    padding: 57px 0 76px
+    background-color: $bg-no-public-id-cntr
+    position: relative
+  h3
+    font-size: 24px
+    font-weight: normal
+  h4
+    margin-top: 36px
+    font-size: 20px
+    font-weight: normal
+  .new-public-id-arrow
+    display: inline-block
+    background-image: url($url-new-public-id-arrow)
+    background-position: center
+    background-color: transparent
+    background-repeat: no-repeat
+    background-size: contain
+    position: absolute
+    top: -90px
+    right: -5px
+    width: 100px
+    height: 100%
+    z-index: 9
+
+.new-public-id
+  .b
+    padding: 0 10px 15px
+    .inpt
+      input
+        width: 100%
+        font-size: 20px
+        padding: 8px 15px
+        outline: 0
+        border: 1px solid #979797
+    .err-msg
+      display: inline-block
+      padding-top: 15px
+      padding-left: 30px
+      font-size: 14px
+      color: err-red
+      position: relative
+      line-height: 20px
+      &:before
+        content: ""
+        width: 20px
+        height: 20px
+        position: absolute
+        top: 15px
+        left: 0
+        background-image: url($url-error-icon)
+        background-position: center
+        background-repeat: no-repeat
+        background-size: contain
+        display: block
+      a
+        color: inherit
+        text-decoration: underline
+
+.create-website
+  .p
+    font-size: 20px
+    font-weight: normal
+    padding: 0 15px
+    a
+      color: inherit
+      font-weight: 600
+      text-decoration: none
+
+  .options
+    margin-top: 26px
+    +clearfix()
+    .option
+      display: inline-block
+      width: 33.33%
+      float: left
+      .b
+        margin: 0 5.5px
+        padding: 0 8px 24px
+        text-align: center
+        background-color: $bg-new-website-option
+        cursor: pointer
+        &:hover
+        &.active
+          background-color: $bg-new-website-option-hover
+          color: #ffffff
+          .icon
+            &.use-template
+              background-image: url($url-use-template-hover)
+            &.from-scratch
+              background-image: url($url-new-website-hover)
+            &.choose-existing
+              background-image: url($url-choose-existing-hover)
+        .icon
+          width: 100%
+          height: 160px
+          display: inline-block
+          background-position: center
+          background-size: 80px
+          background-repeat: no-repeat
+          &.use-template
+            background-image: url($url-use-template)
+          &.from-scratch
+            background-image: url($url-new-website)
+          &.choose-existing
+            background-image: url($url-choose-existing)
+        .title
+          font-size: 20px
+          font-weight: bold
+        .desc
+          font-size: 16px
+          font-weight: normal
+          margin-top: 8px
+
+.choose-existing-cntr
+  .b
+    padding-bottom: 180px
+    .p
+      font-size: 20px
+      font-weight: normal
+      padding: 0 15px
+      a
+        color: inherit
+        font-weight: 600
+        text-decoration: none
+    .select-inpt
+      width: 540px
+      height: 46px
+      margin-top: 30px
+      margin-left: 15px
+      position: relative
+      .i
+        font-size: 18px
+        &.open
+          ul
+            display: block
+        .inpt
+          line-height: 46px
+          padding: 0 18px
+          display: block
+          background-color: #ffffff
+          border: 1px solid #979797
+          position: relative
+          cursor: pointer
+          &.null
+            opacity: 0.5
+            cursor: not-allowed
+            &:after
+              display: none
+          &:after
+            content: ""
+            position: absolute
+            top: 0
+            right: 46px
+            width: 46px
+            height: 46px
+            background-image: url($url-dropdown)
+            background-position: center
+            background-repeat: no-repeat
+            background-size: 20px
+        ul
+          max-height: 195px
+          overflow: auto
+          background-color: #ffffff
+          padding: 8px 0 18px
+          display: none
+          border-width: 0 1px 1px
+          border-style: solid
+          border-color: #979797
+          li
+            list-style: none
+            line-height: 40px
+            cursor: pointer
+            padding: 0 18px
+            &:hover
+              background-color: $pr-pale-blue
+      .opt
+        position: absolute
+        top: 0
+        right: 0
+        border-left: 1px solid #979797
+        height: 100%
+        button
+          width: 46px
+          height: 46px
+          background-image: url($url-reload)
+          background-position: center
+          background-repeat: no-repeat
+          background-size: 20px
+
+.create-service
+  .b
+    padding: 0 15px
+    white-space: nowrap
+    +clearfix()
+
+    .protocol,
+    .inpt,
+    .public-id
+      display: inline-block
+      font-size: 20px
+      float: left
+      line-height: 46px
+    .inpt
+      width: 500px
+      margin: 0 12px
+      input
+        width: 100%
+        line-height: 46px
+        padding: 0 12px
+        font-size: 20px
+        outline: 0
+        border: 1px solid #979797
+    .public-id
+      overflow: hidden
+      width: 155px
+      text-overflow: ellipsis
+  .err-msg
+    display: inline-block
+    margin: 0 15px
+    padding-top: 15px
+    padding-left: 30px
+    font-size: 14px
+    color: err-red
+    position: relative
+    line-height: 20px
+
+    &:before
+      content: ""
+      width: 20px
+      height: 20px
+      position: absolute
+      top: 15px
+      left: 0
+      background-image: url($url-error-icon)
+      background-position: center
+      background-repeat: no-repeat
+      background-size: contain
+      display: block
+    a
+      color: inherit
+      text-decoration: underline
+
+.upload-file-cntr
+  .b
+    .p
+      font-size: 20px
+      font-weight: normal
+      padding: 0 15px
+      a
+        color: inherit
+        font-weight: 600
+        text-decoration: none
+    .service-path
+      margin: 50px 0 8px
+      padding: 0 24px
+      height: 72px
+      background-color: $bg-service-path-edit
+      .preview
+        display: block
+        +clearfix()
+        h4
+          line-height: 72px
+          font-size: 20px
+          font-weight: bold
+          width: 80%
+          display: inline-block
+          float: left
+        button
+          line-height: 30px
+          font-size: 20px
+          font-weight: bold
+          color: $color-pr-blue
+          float: right
+          margin: 21px 0
+      .edit
+        +clearfix()
+        .root-name
+          line-height: 72px
+          font-size: 20px
+          font-weight: bold
+          display: inline-block
+          float: left
+        .inpt
+          display: inline-block
+          float: left
+          margin: 12px
+          input
+            line-height: 46px
+            width: 300px
+            border: solid 1px #979797
+            font-size: 20px
+            padding: 0 12px
+        .opts
+          float: right
+          display: inline-block
+          .opt
+            display: inline-block
+            // float: right
+            &:not(:last-child)
+              margin-right: 30px
+            button
+              line-height: 30px
+              font-size: 20px
+              font-weight: bold
+              float: right
+              margin: 21px 0
+              &.save
+                color: $color-pr-blue
+
+.file-explorer
+  > .b
+    padding-bottom: 40px
+    .fe-nav
+      height: 27px
+      background-color: $bg-file-explorer-nav
+      position: relative
+      .sec-1
+        width: 20%
+        position: absolute
+        top: 0
+        left: 0
+        padding: 0 0 0 11px
+        button
+          margin: 5.5px 0
+      .sec-2
+        width: 100%
+        text-align: center
+        .current-path
+          font-size: 14px
+          line-height: 27px
+          font-weight: normal
+    .h
+      padding-left: 14px
+      padding-right: 14px
+      background-color: $bg-file-explorer-head
+      border-bottom: 1px solid $pr-pale-brown-3
+      .h-b
+        width: 100%
+        line-height: 27px
+        font-size: 14px
+        padding-right: 40px
+        .h-cntr
+          width: 100%
+          +clearfix()
+          .name
+            display: inline-block
+            width: 80%
+            float: left
+            padding-left: 26px
+          .size
+            display: inline-block
+            width: 20%
+            float: left
+    .status
+      font-size: 13px
+      font-weight: 600
+      padding: 8px 0
+    .cntr
+      background-color: #ffffff
+      padding: 16px 14px 40px
+      position: relative
+      height: 340px
+      .uploading
+        position: absolute
+        width: 100%
+        height: 100%
+        top: 0
+        left: 0
+        background-color: $bg-uploading
+        z-index: 1
+      .cntr-b
+        height: inherit
+        overflow: auto
+      .i
+        cursor: pointer
+        line-height: 42px
+        padding-right: 40px
+        position: relative
+        &.file:before
+          background-image: url($url-file-icon)
+        &.dir:before
+          background-image: url($url-dir-icon)
+        &:before
+          content: ""
+          width: 30px
+          height: 30px
+          position: absolute
+          top: 6px
+          left: 26px
+          background-repeat: no-repeat
+          background-position: left
+          background-size: contain
+        .i-b
+          width: 100%
+          display: inline-block
+          font-size: 16px
+          font-weight: bold
+          +clearfix()
+          .name
+            display: inline-block
+            width: 80%
+            float: left
+            padding-left: 70px
+          .size
+            display: inline-block
+            width: 20%
+            float: left
+        .opt
+          display: inline-block
+          position: absolute
+          top: 6px
+          right: 5px
+        &:hover
+          background-color: $bg-file-explorer-item-hover
+      > .download
+        position: absolute
+        display: inline-block
+        top: 100%
+        right: 0
+        margin-top: 11px
+        .load
+          width: 20px
+          height: 20px
+          float: left
+          background-image: url($download-loader-brand)
+          background-repeat: no-repeat
+          background-size: 14px
+          background-position: center
+          display: inline-block
+          margin-right: 8px
+          animation: rotate-clockwise .5s linear infinite
+        .title,
+        .percentage
+          float: left
+          font-size: 14px
+          font-weight: bold
+          line-height: 20px
+          margin-right: 8px
+        .opt
+          display: inline-block
+          float: left
+          line-height: 20px
+          button
+            line-height: inherit
+            float: left;
+            font-size: 14px
+            color: $color-common-text
+      > .upload
+        width: 100%
+        height: 40px
+        position: absolute
+        bottom: 0
+        left: 0
+        transform: translate(0, 50%)
+        z-index: 2
+        .menu
+          width: 200px
+          height: 120px
+          position: absolute
+          top: 0
+          left: 50%
+          background-image: url($url-upload-menu-bg)
+          background-position: center
+          background-repeat: no-repeat
+          background-size: contain
+          transform: translate(-50%, -100%)
+          padding-top: 21px
+          .menu-i
+            display: block
+            font-size: 18px
+            font-weight: bold
+            text-align: center
+            cursor: pointer
+            &:hover
+              color: $color-pr-blue
+            &:not(:last-child)
+              margin-bottom: 11px
+        .upload-btn-b
+          position: absolute
+          left: 50%
+          top: 5px
+          transform: translate(-50%, 0)
+          z-index: 9
+          &.cancel-btn
+            button
+              transform: rotate(45deg)
+          &.active
+            button
+              background-image: url($url-upload-icon-hover)
+        .progress-bar
+          width: 80%
+          height: 7px
+          display: block
+          background-color: $bg-file-explorer-progress
+          position: absolute;
+          top: 50%
+          left: 0
+          transform: translate(0, -100%)
+          z-index: 0
+
+.init-apps
+  .b
+    width: 600px
+    margin: 0 auto
+    padding-bottom: 38px
+    .i
+      font-size: 20px
+      line-height: 30px
+      font-weight: normal
+      position: relative
+      &:after
+        content: ""
+        display: inline-block
+        width: 30px
+        height: 30px
+        background-position: center
+        background-repeat: no-repeat
+        background-size: contain
+        position: absolute
+        top: 0
+        right: 0
+      &.done
+        font-weight: bold
+        &:after
+          background-image: url($url-init-done)
+      &.loading
+        font-weight: bold
+        &:after
+          background-image: url($url-init-loading)
+      &:not(:last-child)
+        margin-bottom: 24px
+
+.authorise
+  width: 100%
+  padding: 20px 35px 35px
+  margin: 0 auto
+  p
+    font-size: 18px
+    &:not(:last-child)
+      padding-bottom: 24px
+
+.template
+  padding: 60px 30px 30px
+  .banner
+    display: block
+    width: 100%
+    height: 200px
+    background-color: $pr-pale-blue
+    .title
+      text-align: center
+      line-height: 200px
+      font-size: 24px
+      input
+        font-size: inherit
+        border: 0
+        outline: 0
+        padding: 8px
+  .context
+    width: 600px
+    text-align: center
+    line-height: 150px
+    font-size: 16px
+    margin: 0 auto
+    input
+      width: 100%
+      font-size: inherit
+      border: 1px solid #EEEEEE
+      outline: 0
+      padding: 8px
