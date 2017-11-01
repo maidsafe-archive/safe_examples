@@ -424,3 +424,10 @@ export const genServiceInfo = async (app, emailId) => {
     throw err;
   }
 }
+
+export const getLogFilePath = (app) => {
+  if (!app) {
+    return Promise.reject(new Error('Application not initialised'));
+  }
+  return app.logPath();
+};

@@ -7,6 +7,7 @@ import InboxPage from './containers/mail_inbox_container';
 import SavedPage from './containers/mail_saved_container';
 import CreateAccountPage from './containers/create_account_container';
 import ComposeMailPage from './containers/compose_mail_container';
+import AppLogs from './containers/app_logs';
 
 let router = () => {
   return (
@@ -19,6 +20,7 @@ let router = () => {
         <Route path="/compose_mail" component={ComposeMailPage} />
       </Route>
       <Route path="/create_account" component={CreateAccountPage} />
+      <Route path="/app_logs" component={AppLogs} />
     </Route>
   );
 };
