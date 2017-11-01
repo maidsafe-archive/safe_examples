@@ -18,6 +18,10 @@ ipc.on('auth-response', (event, response) => {
   }
 });
 
+ipc.on('show-log-file', () => {
+  history.push('/app_logs');
+});
+
 export default class App extends React.Component {
   render() {
     return (<Provider store={store}>

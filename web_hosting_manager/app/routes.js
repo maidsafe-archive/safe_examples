@@ -13,6 +13,7 @@ import WithTemplatePage from './containers/with_template';
 import ManageFilesPage from './containers/manage_files';
 import NewWebSitePage from './containers/new_web_site';
 import RemapPage from './containers/remap';
+import AppLogs from './containers/app_logs';
 
 export default () => (
   <App>
@@ -36,6 +37,7 @@ export default () => (
       <Route path="/newPublicName" component={NewPublicNamePage} />
       <Route path="/publicNames" component={PublicNamesPage} />
       <Route path="/initialise" component={InitialisePage} />
+      <Route path="/appLogs" component={AppLogs} />
       <Route path="/" component={AuthorisationPage} />
     </Switch>
   </App>

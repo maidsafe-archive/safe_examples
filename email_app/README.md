@@ -45,7 +45,7 @@ This starts the app in development mode with hot-reloading.
 If you don't have authenticator set up and want to run the test with randomly generated testing credentials, run it as:
 
 ```bash
-$ NODE_ENV=development SAFE_FAKE_AUTH=1 npm start
+$ NODE_ENV=dev SAFE_FAKE_AUTH=1 npm start
 ```
 
 *Note: requires a node version >= 4 and an npm version >= 2.*

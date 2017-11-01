@@ -84,3 +84,72 @@ body {
 .btn-eq {
 	min-width: 110px;
 }
+
+.app-logs {
+	._title {
+		text-align: center;
+		line-height: 50px;
+		border-bottom: 1px solid #EEE;
+		margin-bottom: 20px;
+		font-size: 20px;
+		color: @primary-blue;
+	}
+	._opts {
+		text-align: center;
+		.clearfix();
+		._opt {
+			display: inline-block;
+			margin: 0 15px;
+			button {
+				background: transparent;
+				font-size: 14px;
+				padding: 0;
+			}
+			&.left {
+				float: left;
+			}
+			&.right {
+				float: right;
+			}
+		}
+	}
+	._error {
+		width: 400px;
+		margin: 24px auto 0;
+		padding: 16px;
+		background-color: @pr-pale-brown-2;
+		h4 {
+			font-size: 14px;
+			color: @red-100;
+			display: inline;
+			margin-right: 16px;
+			font-weight: 600;
+			line-height: 24px;
+		}
+		button {
+			float: right;
+			line-height: 24px;
+			font-weight: 600;
+			background: transparent;
+			font-size: 14px;
+			padding: 0;
+		}
+	}
+	._logs {
+		width: 80%;
+		margin: 24px auto 0;
+		line-height: 24px;
+		height: 450px;
+		overflow: auto;
+		&.default {
+			color: #aaa;
+			text-align: center;
+		}
+	}
+	._loading {
+		margin: 24px auto 0;
+		line-height: 24px;
+		text-align: center;
+		opacity: 0.5;
+	}
+}

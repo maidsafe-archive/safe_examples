@@ -20,3 +20,8 @@ export const reconnect = () => ({
   type: ACTION_TYPES.RECONNECT_APP,
   payload: api.reconnect(),
 });
+
+export const getLogFilePath = () => ({
+  type: ACTION_TYPES.GET_LOG_FILE_PATH,
+  payload: api.getLogFilePath()
+})
