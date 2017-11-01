@@ -11,7 +11,7 @@ import ACTION_TYPES from './action_types';
 const nwStateCallback = dispatch => (
   (state) => {
     dispatch({
-      type: ACTION_TYPES.NW_STATUS_CHANGED,
+      type: ACTION_TYPES.NET_STATUS_CHANGED,
       state,
     });
   }

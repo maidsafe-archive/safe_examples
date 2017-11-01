@@ -12,7 +12,7 @@ import CONSTANTS from '../constants';
  * @param {string} res - received auth response from Authenticator
  */
 const appAuthorised = res => ({
-  type: ACTION_TYPES.AUTHORISED,
+  type: ACTION_TYPES.APP_AUTHORISED,
   res,
 });
 
@@ -29,8 +29,8 @@ const mdAuthorised = res => ({
  * Send authorisation request to Authenticator
  */
 export const sendAuthReq = () => ({
-  type: ACTION_TYPES.SEND_AUTH_REQUEST,
-  payload: api.sendAuthReq(),
+  type: ACTION_TYPES.AUTHORISE_APP,
+  payload: api.requestAuth(),
 });
 
 /**
@@ -51,6 +51,26 @@ export const receiveResponse = uri => (
     if (isAuthorising) {
       return dispatch(appAuthorised(uri));
     }
+  }
+);
+
+/**
+ * Cancel Mutable Data auth request
+ */
+export const cancelMDReq = () => ({
+  type: ACTION_TYPES.CANCEL_MD_AUTH_REQ,
+});
+
+/**
+ * Send Mutable Data auth request
+ * @param publicName - target service container
+ */
+export const sendMDAuthReq = publicName => (
+  (dispatch) => {
+    dispatch({
+      type: ACTION_TYPES.AUTHORISE_SHARE_MD,
+    });
+    api.authoriseSharedMD(publicName);
   }
 );
 

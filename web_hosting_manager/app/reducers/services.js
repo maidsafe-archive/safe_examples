@@ -94,7 +94,7 @@ export default function services(state = initState, action) {
         processing: false,
         error: parseErrorMsg(action.payload),
       };
-    case ACTION_TYPES.SEND_MD_REQ:
+    case ACTION_TYPES.AUTHORISE_SHARE_MD:
       return {
         ...state,
         sendAuthReq: false,
@@ -118,7 +118,7 @@ export default function services(state = initState, action) {
         processDesc: '',
         error: parseErrorMsg(action.payload),
       };
-    case ACTION_TYPES.CANCEL_MD_REQ:
+    case ACTION_TYPES.CANCEL_MD_AUTH_REQ:
       return {
         ...state,
         sendAuthReq: false,

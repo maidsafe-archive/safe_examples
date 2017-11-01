@@ -66,26 +66,6 @@ export const deleteService = (publicName, serviceName) => (
 );
 
 /**
- * Cancel Mutable Data auth request
- */
-export const cancelMDReq = () => ({
-  type: ACTION_TYPES.CANCEL_MD_REQ,
-});
-
-/**
- * Send Mutable Data auth request
- * @param publicName - target service container
- */
-export const sendMDAuthReq = publicName => (
-  (dispatch) => {
-    dispatch({
-      type: ACTION_TYPES.SEND_MD_REQ,
-    });
-    api.authoriseMD(publicName);
-  }
-);
-
-/**
  * Remap existing service to different service container
  * @param publicName
  * @param service

@@ -12,7 +12,7 @@ const CONSTANTS = {
     WWW: 15002,
   },
   APP_INFO: {
-    data: {
+    info: {
       id: pkg.identifier,
       scope: null,
       name: pkg.productName,

@@ -7,7 +7,7 @@ import * as commonAction from '../actions/common';
 
 function mapStateToProps(state) {
   return {
-    nwState: state.initialisation.nwState,
+    nwState: state.initialiser.nwState,
     published: state.fileManager.published,
     uploading: state.fileManager.uploading,
     uploadStatus: state.fileManager.uploadStatus,

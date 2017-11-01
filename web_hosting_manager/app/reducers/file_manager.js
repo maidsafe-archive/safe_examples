@@ -150,7 +150,7 @@ export default function fileManager(state = initState, action) {
         containerInfo: [],
       };
 
-    case ACTION_TYPES.SEND_MD_REQ:
+    case ACTION_TYPES.AUTHORISE_SHARE_MD:
       return {
         ...state,
         processing: false,
