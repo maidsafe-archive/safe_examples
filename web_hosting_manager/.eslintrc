@@ -5,6 +5,20 @@
     "import/no-extraneous-dependencies": 0,
     "import/no-unresolved": [2, { "ignore": ["electron"] }],
     "linebreak-style": 0,
-    "react/prefer-stateless-function": 0
+    "react/prefer-stateless-function": 0,
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "consistent-return": 0,
+    "no-console": ["error", { allow: ["warn", "error"] }],
+    "react/jsx-curly-brace-presence": [0, { props: "never", children: "never" }],
+    "jsx-a11y/click-events-have-key-events": 0,
+    "jsx-a11y/no-noninteractive-element-interactions": 0,
+    "jsx-a11y/no-static-element-interactions": 0,
+    "jsx-a11y/anchor-is-valid": 0,
+    "react/jsx-no-bind": 0,
+    "no-param-reassign": 0
+  },
+  "globals": {
+    "document": true,
+    "window": true
   }
 }

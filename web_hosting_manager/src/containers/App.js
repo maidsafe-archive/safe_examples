@@ -1,17 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import type { Children } from 'react';
+import PropTypes from 'prop-types';
 
 export default class App extends Component {
-  props: {
-    children: Children
-  };
-
   render() {
     return (
-      <div style={{height: "100%"}}>
+      <div style={{ height: '100%' }}>
         {this.props.children}
       </div>
     );
   }
 }
+
+App.propTypes = {
+  children: PropTypes.element.isRequired,
+};

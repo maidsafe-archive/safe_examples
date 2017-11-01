@@ -4,10 +4,10 @@ import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { loadTranslations, setLocale, syncTranslationWithStore } from 'react-redux-i18n';
 
-import Root from './containers/Root';
-import { configureStore, history } from './store/configureStore';
+import Root from './containers/root';
+import { configureStore, history } from './store/configure_store';
 import loadLocale from './locales/loader';
-import { initTempFolder } from './lib/temp';
+import { initTempFolder } from './safenet_comm/temp';
 
 import { receiveResponse, simulateMockRes } from './actions/authorisation';
 
@@ -40,9 +40,11 @@ const renderApp = () => {
     <AppContainer>
       <Root store={store} history={history} />
     </AppContainer>,
-    document.getElementById('App')
+    document.getElementById('App'),
   );
-} 
+};
 renderApp();
 
-if (module.hot) { module.hot.accept(renderApp); }
+if (module.hot) {
+  module.hot.accept(renderApp);
+}

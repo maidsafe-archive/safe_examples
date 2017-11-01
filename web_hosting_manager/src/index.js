@@ -17,7 +17,9 @@ const handleIPCResponse = (res) => {
   mainWindow.webContents.send('auth-response', res);
 };
 
-if (isDevMode) enableLiveReload({strategy: 'react-hmr'});
+if (isDevMode) {
+  enableLiveReload({ strategy: 'react-hmr' });
+}
 
 const createWindow = async () => {
   // Create the browser window.
@@ -26,7 +28,7 @@ const createWindow = async () => {
     width: 1024,
     height: 728,
     fullscreen: false,
-    resizable: false
+    resizable: false,
   });
 
   // and load the index.html of the app.
@@ -49,7 +51,7 @@ const createWindow = async () => {
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
-  const shouldQuit = app.makeSingleInstance(function(commandLine) {
+  const shouldQuit = app.makeSingleInstance((commandLine) => {
     if (commandLine.length >= 2 && commandLine[1]) {
       handleIPCResponse(commandLine[1]);
     }
@@ -100,6 +102,6 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 // receive IPC message for MAC OS
-app.on('open-url', function (e, url) {
+app.on('open-url', (e, url) => {
   handleIPCResponse(url);
 });
