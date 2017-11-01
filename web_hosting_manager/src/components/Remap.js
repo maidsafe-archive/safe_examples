@@ -4,14 +4,14 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import Base from './_Base';
-import { decodeURI } from '../utils/app';
+import { decodeURI, genKey } from '../utils/app';
 
 export default class Remap extends Component {
   constructor() {
     super();
     this.state = {
       selectedContainer: null,
-      selectedContainerExpanded: false
+      selectedContainerExpanded: false,
     };
     this.getServiceContainersList = this.getServiceContainersList.bind(this);
   }
@@ -22,20 +22,12 @@ export default class Remap extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.reset();
+  }
+
   getSelectedContainer() {
     return this.state.selectedContainer || decodeURI(this.props.match.params.containerPath);
-  }
-
-  reloadContainers(e) {
-    e.preventDefault();
-    this.props.getServiceContainers();
-  }
-
-  handleContainersSelect(cont) {
-    this.setState({
-      selectedContainer: cont,
-      selectedContainerExpanded: false
-    });
   }
 
   getServiceContainersList() {
@@ -46,45 +38,55 @@ export default class Remap extends Component {
       );
     }
     const selectClassName = classNames('i', {
-      open: this.state.selectedContainerExpanded
+      open: this.state.selectedContainerExpanded,
     });
 
     return (
       <div className={selectClassName}>
-        <div className="inpt" onClick={() => {
-          this.setState({
-            selectedContainerExpanded: !this.state.selectedContainerExpanded
-          });
-        }}>{this.state.selectedContainer || this.props.serviceContainers[0]}</div>
+        <div
+          className="inpt"
+          onClick={() => {
+            this.setState({
+              selectedContainerExpanded: !this.state.selectedContainerExpanded,
+            });
+          }}
+        >{this.state.selectedContainer || this.props.serviceContainers[0]}
+        </div>
         <ul>
           {
-            serviceContainers.map((cont, i) => {
-              return (
-                <li
-                  key={i}
-                  onClick={() => {
-                    this.handleContainersSelect(cont);
-                  }}
-                >{cont}</li>
-              )
-            })
+            serviceContainers.map(cont => (
+              <li
+                key={genKey()}
+                onClick={() => {
+                  this.handleContainersSelect(cont);
+                }}
+              >{cont}
+              </li>
+            ))
           }
         </ul>
       </div>
     );
   }
 
-  popupOkCb() {
-    this.props.reset();
+  handleContainersSelect(cont) {
+    this.setState({
+      selectedContainer: cont,
+      selectedContainerExpanded: false,
+    });
   }
 
-  componentWillUnmount() {
+  reloadContainers(e) {
+    e.preventDefault();
+    this.props.getServiceContainers();
+  }
+
+  popupOkCb() {
     this.props.reset();
   }
 
   render() {
     const { service, publicName, containerPath } = this.props.match.params;
-    
     return (
       <Base
         reconnect={this.props.reconnect}
@@ -109,7 +111,8 @@ export default class Remap extends Component {
                         className="btn"
                         name="reload-containers"
                         onClick={this.reloadContainers.bind(this)}
-                      >{''}</button>
+                      >{''}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -124,18 +127,20 @@ export default class Remap extends Component {
                     e.preventDefault();
                     this.props.history.push('/publicNames');
                   }}
-                >Cancel</button>
+                >Cancel
+                </button>
               </div>
               <div className="opt">
                 <button
                   type="button"
                   className="btn flat primary"
-                  disabled={this.getSelectedContainer() === decodeURI(this.props.match.params.containerPath)}
+                  disabled={this.getSelectedContainer() === decodeURI(containerPath)}
                   onClick={(e) => {
                     e.preventDefault();
                     this.props.remapService(publicName, service, this.getSelectedContainer());
                   }}
-                >Publish</button>
+                >Publish
+                </button>
               </div>
             </div>
           </div>
@@ -146,4 +151,16 @@ export default class Remap extends Component {
 }
 
 Remap.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  nwState: PropTypes.string.isRequired,
+  processing: PropTypes.bool.isRequired,
+  remapped: PropTypes.bool.isRequired,
+  serviceContainers: PropTypes.arrayOf(PropTypes.string).isRequired,
+  remapService: PropTypes.func.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  getServiceContainers: PropTypes.func.isRequired,
 };

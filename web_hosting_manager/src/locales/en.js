@@ -9,7 +9,7 @@ const en = {
       'line3-2': 'container for allowing other applications to collaborate.',
       line4: 'Authorisation information will be stored on local keychain. The local data can be manually cleared from the menu option.',
       'line5-1': 'File',
-      'line5-2': 'Clear Access Data'
+      'line5-2': 'Clear Access Data',
     },
     initialising: {
       title: 'Initialising Application',
@@ -20,13 +20,13 @@ const en = {
       preparingApp: 'Preparing Application',
       connectionErrorTitle: 'Failed To Connect',
       authErrorTitle: 'Application Initialisation Failed',
-      revoked: 'Application Revoked'
+      revoked: 'Application Revoked',
     },
     networkStatus: {
       connecting: 'Connecting',
       disconnected: 'Disconnected',
       connected: 'Connected',
-      unknown: 'Unknown'
+      unknown: 'Unknown',
     },
     createPublicId: 'Create Public ID',
     noPublicIdText: 'No Public ID found. Create one to begin.',
@@ -52,7 +52,7 @@ const en = {
     downloadingMessage: 'Downloading',
     loading: 'Loading...',
     empty: 'Empty',
-    uploadSomeFiles: 'No files found. Please upload web files'
+    uploadSomeFiles: 'No files found. Please upload web files',
   },
   messages: {
     emptyServiceName: 'Service name must be filled',
@@ -92,8 +92,8 @@ const en = {
     mdAuthReqTitle: 'Mutable Data Authorisation',
     mdAuthReqDesc: '%{name} cannot be modified and will require you to authorise altering the contents of the container. Send authorisation request now?',
     mdAuthorisedTitle: 'Mutable Data Authorisation',
-    mdAuthorisedDesc: '%{name} has been granted permission!'
-  }
+    mdAuthorisedDesc: '%{name} has been granted permission!',
+  },
 };
 
 export default en;

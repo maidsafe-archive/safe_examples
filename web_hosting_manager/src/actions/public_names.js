@@ -1,48 +1,64 @@
 // @flow
 
-import ACTION_TYPES from './action_types';
+/**
+ * Actions handling Public Names
+ */
+/* eslint-disable import/no-named-as-default-member, import/no-named-as-default */
 import api from '../lib/api';
+/* eslint-enable import/no-named-as-default-member, import/no-named-as-default */
+import ACTION_TYPES from './action_types';
 
-export const canAccessPublicName = (publicName) => ({
+/**
+ * check can access service container
+ * @param publicName
+ */
+export const canAccessPublicName = publicName => ({
   type: ACTION_TYPES.CAN_ACCESS_PUBLIC_NAME,
-  payload: api.checkPublicNameAccessible(publicName)
+  payload: api.checkPublicNameAccessible(publicName),
 });
 
-export const setPublicNames = (publicNames) => ({
+/**
+ * Set Public names to application state
+ * @param publicNames
+ */
+export const setPublicNames = publicNames => ({
   type: ACTION_TYPES.SET_PUBLIC_NAMES,
-  data: publicNames
+  data: publicNames,
 });
 
-export const setServiceContainers = (containers) => ({
+/**
+ * Set service container details to application state
+ * @param containers
+ */
+export const setServiceContainers = containers => ({
   type: ACTION_TYPES.SET_SERVICE_CONTAINERS,
-  data: containers
+  data: containers,
 });
 
-export const createPublicName = (publicName) => {
-  return (dispatch) => {
+/**
+ * Create new Public Name
+ * @param publicName
+ */
+export const createPublicName = publicName => (
+  (dispatch) => {
     dispatch({
       type: ACTION_TYPES.CREATE_PUBLIC_NAME,
       payload: api.createPublicName(publicName)
         .then(() => api.fetchPublicNames())
-        .then((publicNames) => dispatch(setPublicNames(publicNames)))
+        .then(publicNames => dispatch(setPublicNames(publicNames))),
     });
-  };
-};
+  }
+);
 
-export const getServiceContainers = () => {
-  return (dispatch) => {
+/**
+ * Get all available service containers
+ */
+export const getServiceContainers = () => (
+  (dispatch) => {
     dispatch({
       type: ACTION_TYPES.FETCH_SERVICE_CONTAINERS,
       payload: api.getPublicContainerKeys()
-        .then((containers) => dispatch(setServiceContainers(containers)))
+        .then(containers => dispatch(setServiceContainers(containers))),
     });
-  };
-};
-
-// export const reset = () => ({
-//   type: ACTION_TYPES.REST_PUBLIC_NAMES
-// });
-
-export const resetServiceContainers = () => ({
-  type: ACTION_TYPES.RESET_SERVICE_CONTAINERS
-});
+  }
+);

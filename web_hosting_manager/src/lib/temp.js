@@ -2,7 +2,7 @@ import temp from 'temp';
 
 const tempTrack = temp.track();
 const tempDirName = String(Date.now());
-let tempDirPath = undefined;
+let tempDirPath = null;
 
 export const initTempFolder = () => {
   tempTrack.mkdir(tempDirName, (err, dirPath) => {
@@ -13,6 +13,4 @@ export const initTempFolder = () => {
   });
 };
 
-export const getPath = () => {
-  return tempDirPath;
-};
+export const getPath = () => tempDirPath;

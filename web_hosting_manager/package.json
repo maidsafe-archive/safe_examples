@@ -1,114 +1,118 @@
 {
-    "name": "web-hosting-manager",
-    "productName": "Web Hosting Manager",
-    "version": "0.4.1",
-    "description": "Application to host web files in the SAFE Network",
-    "main": "src/index.js",
-    "identifier": "net.maidsafe.examples.webhostingmanager",
-    "scripts": {
-      "start": "cross-env NODE_ENV=development electron-forge start",
-      "package": "cross-env npm_config_target=1.7.8 npm_config_arch=x64 npm_config_target_arch=x64 npm_config_disturl=https://atom.io/download/electron npm_config_runtime=electron npm_config_build_from_source=true electron-forge package",
-      "make": "electron-forge make",
-      "publish": "electron-forge publish",
-      "lint": "echo \"No linting configured\""
-    },
-    "author": {
-      "name": "MaidSafe",
-      "email": "dev@maidsafe.net",
-      "url": "https://maidsafe.net"
-    },
-    "license": "MIT",
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/maidsafe/safe_examples.git"
-    },
-    "bugs": {
-      "url": "https://github.com/maidsafe/safe_examples/issues"
-    },
-    "keywords": [
-      "MaidSafe",
-      "DemoApp",
-      "Web hosting manager"
-    ],
-    "homepage": "https://github.com/maidsafe/safe_examples#readme",
-    "config": {
-      "forge": {
-        "make_targets": {
-          "win32": [
-            "squirrel"
-          ],
-          "darwin": [
-            "zip"
-          ],
-          "linux": [
-            "deb",
-            "rpm"
-          ]
+  "name": "web-hosting-manager",
+  "productName": "Web Hosting Manager",
+  "version": "0.4.1",
+  "description": "Application to host web files in the SAFE Network",
+  "main": "src/index.js",
+  "identifier": "net.maidsafe.examples.webhostingmanager",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development electron-forge start",
+    "package": "cross-env npm_config_target=1.6.2 npm_config_arch=x64 npm_config_target_arch=x64 npm_config_disturl=https://atom.io/download/electron npm_config_runtime=electron npm_config_build_from_source=true electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint src *.js"
+  },
+  "author": {
+    "name": "MaidSafe",
+    "email": "dev@maidsafe.net",
+    "url": "https://maidsafe.net"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maidsafe/safe_examples.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maidsafe/safe_examples/issues"
+  },
+  "keywords": [
+    "MaidSafe",
+    "DemoApp",
+    "Web hosting manager"
+  ],
+  "homepage": "https://github.com/maidsafe/safe_examples#readme",
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {
+        "name": "web-hosting-manager",
+        "appBundleId": "net.maidsafe.examples.webhostingmanager",
+        "appCategoryType": "public.app-category.utilities",
+        "dir": "./",
+        "icon": "src/app.icns",
+        "packageManager": "yarn",
+        "asar": {
+          "unpackDir": "{src/template,**/@maidsafe/**/*}"
         },
-        "electronPackagerConfig": {
-          "name": "Web Hosting Manager",
-          "appBundleId": "net.maidsafe.examples.webhostingmanager",
-          "appCategoryType": "public.app-category.utilities",
-          "dir": "./",
-          "icon": "src/app.icns",
-          "packageManager": "yarn",
-          "asar": {
-            "unpackDir": "{src/template,**/@maidsafe/**/*}"
-          },
-          "protocol": [
-            "safe-bmv0lm1hawrzywzllmv4yw1wbgvzlndlymhvc3rpbmdtyw5hz2vy"
-          ]
-        },
-        "electronWinstallerConfig": {
-          "name": "web-hosting-manager"
-        },
-        "electronInstallerDebian": {},
-        "electronInstallerRedhat": {},
-        "github_repository": {
-          "owner": "",
-          "name": ""
-        },
-        "windowsStoreConfig": {
-          "packageName": "",
-          "name": "web-hosting-manager"
-        }
+        "protocol": [
+          "safe-bmv0lm1hawrzywzllmv4yw1wbgvzlndlymhvc3rpbmdtyw5hz2vy"
+        ]
+      },
+      "electronWinstallerConfig": {
+        "name": "web-hosting-manager"
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "",
+        "name": ""
+      },
+      "windowsStoreConfig": {
+        "packageName": "",
+        "name": "web-hosting-manager"
       }
-    },
-    "dependencies": {
-      "@maidsafe/safe-node-app": "^0.3.0",
-      "babel-plugin-add-module-exports": "^0.2.1",
-      "classnames": "^2.2.5",
-      "electron-compile": "^6.4.2",
-      "electron-devtools-installer": "^2.0.1",
-      "lodash": "^4.17.4",
-      "npm-font-open-sans": "^1.1.0",
-      "react": "^15.4.1",
-      "react-dom": "^15.4.1",
-      "react-hot-loader": "next",
-      "react-redux": "^5.0.6",
-      "react-redux-i18n": "^1.9.0",
-      "react-router": "^4.2.0",
-      "react-router-dom": "^4.2.2",
-      "react-router-redux": "^5.0.0-alpha.6",
-      "redux": "^3.7.2",
-      "redux-logger": "^3.0.6",
-      "redux-promise-middleware": "^4.4.1",
-      "redux-thunk": "^2.2.0",
-      "temp": "^0.8.3",
-      "temp-write": "^3.3.0"
-    },
-    "devDependencies": {
-      "babel-plugin-transform-async-to-generator": "^6.24.1",
-      "babel-plugin-transform-class-properties": "^6.24.1",
-      "babel-plugin-transform-es2015-classes": "^6.24.1",
-      "babel-plugin-transform-object-rest-spread": "^6.26.0",
-      "babel-preset-env": "^1.6.0",
-      "babel-preset-es2017-node7": "^0.5.2",
-      "babel-preset-react": "^6.24.1",
-      "babel-preset-stage-0": "^6.24.1",
-      "cross-env": "^5.0.5",
-      "electron-forge": "^4.1.1",
-      "electron-prebuilt-compile": "1.7.8"
     }
+  },
+  "dependencies": {
+    "@maidsafe/safe-node-app": "^0.4.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "classnames": "^2.2.5",
+    "electron-compile": "^6.2.0",
+    "electron-devtools-installer": "^2.0.1",
+    "lodash": "^4.17.4",
+    "npm-font-open-sans": "^1.1.0",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
+    "react-hot-loader": "next",
+    "react-redux": "^5.0.6",
+    "react-redux-i18n": "^1.9.0",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "react-router-redux": "^5.0.0-alpha.6",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-promise-middleware": "^4.4.1",
+    "redux-thunk": "^2.2.0",
+    "temp": "^0.8.3",
+    "temp-write": "^3.3.0"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-classes": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2017-node7": "^0.5.2",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "cross-env": "^5.0.5",
+    "electron-forge": "^2.8.3",
+    "electron-prebuilt-compile": "1.6.2",
+    "eslint": "^4.8.0",
+    "eslint-config-airbnb": "^16.0.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0"
   }
-  
+}

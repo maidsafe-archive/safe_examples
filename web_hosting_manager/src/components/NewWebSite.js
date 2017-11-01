@@ -11,31 +11,15 @@ export default class NewWebSite extends Component {
   constructor() {
     super();
     this.state = {
-      selectedOpt: null
+      selectedOpt: null,
     };
-  }
-
-  gotoCreateService(selectedOpt) {
-    this.props.history.push(`/createService/${selectedOpt}/${this.props.match.params.publicName}`);
-  }
-
-  goNext(e) {
-    e.preventDefault();
-    this.gotoCreateService(this.state.selectedOpt);
-  }
-
-  handleDoubleClick(option) {
-    if (!option) {
-      return;
-    }
-    this.gotoCreateService(option);
   }
 
   getOptions() {
     const template = () => {
       const option = CONSTANTS.UI.NEW_WEBSITE_OPTIONS.TEMPLATE;
       const baseCn = classNames('b', {
-        active: option === this.state.selectedOpt
+        active: option === this.state.selectedOpt,
       });
       return (
         <div
@@ -43,7 +27,7 @@ export default class NewWebSite extends Component {
           onClick={(e) => {
             e.stopPropagation();
             this.setState({
-              selectedOpt: option
+              selectedOpt: option,
             });
           }}
           onDoubleClick={(e) => {
@@ -52,9 +36,9 @@ export default class NewWebSite extends Component {
           }}
         >
           <div className={baseCn}>
-            <span className="icon use-template"></span>
+            <span className="icon use-template">{''}</span>
             <h3 className="title">Use a Template</h3>
-            <p className="desc">Create a simple <br/> example site</p>
+            <p className="desc">Create a simple <br /> example site</p>
           </div>
         </div>
       );
@@ -63,7 +47,7 @@ export default class NewWebSite extends Component {
     const fromScratch = () => {
       const option = CONSTANTS.UI.NEW_WEBSITE_OPTIONS.FROM_SCRATCH;
       const baseCn = classNames('b', {
-        active: option === this.state.selectedOpt
+        active: option === this.state.selectedOpt,
       });
       return (
         <div
@@ -71,7 +55,7 @@ export default class NewWebSite extends Component {
           onClick={(e) => {
             e.stopPropagation();
             this.setState({
-              selectedOpt: option
+              selectedOpt: option,
             });
           }}
           onDoubleClick={(e) => {
@@ -80,7 +64,7 @@ export default class NewWebSite extends Component {
           }}
         >
           <div className={baseCn}>
-            <span className="icon from-scratch"></span>
+            <span className="icon from-scratch">{''}</span>
             <h3 className="title">Start from Scratch</h3>
             <p className="desc">Create a new folder to be mapped and upload web files</p>
           </div>
@@ -91,7 +75,7 @@ export default class NewWebSite extends Component {
     const chooseExisting = () => {
       const option = CONSTANTS.UI.NEW_WEBSITE_OPTIONS.CHOOSE_EXISTING;
       const baseCn = classNames('b', {
-        active: option === this.state.selectedOpt
+        active: option === this.state.selectedOpt,
       });
       return (
         <div
@@ -99,7 +83,7 @@ export default class NewWebSite extends Component {
           onClick={(e) => {
             e.stopPropagation();
             this.setState({
-              selectedOpt: option
+              selectedOpt: option,
             });
           }}
           onDoubleClick={(e) => {
@@ -108,7 +92,7 @@ export default class NewWebSite extends Component {
           }}
         >
           <div className={baseCn}>
-            <span className="icon choose-existing"></span>
+            <span className="icon choose-existing">{''}</span>
             <h3 className="title">Choose Existing</h3>
             <p className="desc">Choose a folder which contains index.html</p>
           </div>
@@ -121,7 +105,23 @@ export default class NewWebSite extends Component {
         {fromScratch()}
         {chooseExisting()}
       </div>
-    )
+    );
+  }
+
+  handleDoubleClick(option) {
+    if (!option) {
+      return;
+    }
+    this.gotoCreateService(option);
+  }
+
+  goNext(e) {
+    e.preventDefault();
+    this.gotoCreateService(this.state.selectedOpt);
+  }
+
+  gotoCreateService(selectedOpt) {
+    this.props.history.push(`/createService/${selectedOpt}/${this.props.match.params.publicName}`);
   }
 
   render() {
@@ -150,7 +150,8 @@ export default class NewWebSite extends Component {
                       e.preventDefault();
                       this.props.history.push('/publicNames');
                     }}
-                  >Cancel</button>
+                  >Cancel
+                  </button>
                 </div>
                 <div className="opt">
                   <button
@@ -158,7 +159,8 @@ export default class NewWebSite extends Component {
                     className="btn flat primary"
                     disabled={!this.state.selectedOpt}
                     onClick={this.goNext.bind(this)}
-                  >Next</button>
+                  >Next
+                  </button>
                 </div>
               </div>
             </div>
@@ -170,4 +172,8 @@ export default class NewWebSite extends Component {
 }
 
 NewWebSite.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  nwState: PropTypes.string.isRequired,
+  reconnect: PropTypes.func.isRequired,
 };

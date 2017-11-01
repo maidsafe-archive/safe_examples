@@ -12,19 +12,20 @@ export default class Popup extends Component {
     this.getErrorContainer = this.getErrorContainer.bind(this);
     this.getAuthRequestContainer = this.getAuthRequestContainer.bind(this);
   }
+
   getLoaderContainer() {
     return (
       <div className="popup-loader">
-        <div className="i"></div>
+        <div className="i">{''}</div>
         <h4 className="desc">{this.props.desc}</h4>
       </div>
-    )
+    );
   }
 
   getErrorContainer() {
     return (
       <div className="popup-error">
-        <div className="icon"></div>
+        <div className="icon">{''}</div>
         {ErrorEle(<div className="desc">{this.props.desc}</div>)}
         <div className="opt">
           <button
@@ -34,17 +35,21 @@ export default class Popup extends Component {
               e.preventDefault();
               this.props.okCb();
             }}
-          >Ok</button>
+          >Ok
+          </button>
         </div>
       </div>
     );
   }
 
   getAuthRequestContainer() {
+    const descStr = 'cannot be modified. Will require authorisation to modify the contents in the container. Send authorisation request now?';
     return (
       <div className="auth-popup">
         <h3>Mutable Data Authorisation</h3>
-        <p className="desc">{this.props.desc} cannot be modified. Will require authorisation to modify the contents in the container. Send authorisation request now?</p>
+        <p className="desc">
+          {`${this.props.desc} ${descStr}`}
+        </p>
         <div className="opts">
           <div className="opt">
             <button
@@ -54,7 +59,8 @@ export default class Popup extends Component {
                 e.preventDefault();
                 this.props.cancelCb();
               }}
-            >Close</button>
+            >Close
+            </button>
           </div>
           <div className="opt">
             <button
@@ -64,7 +70,8 @@ export default class Popup extends Component {
                 e.preventDefault();
                 this.props.okCb();
               }}
-            >Ok</button>
+            >Ok
+            </button>
           </div>
         </div>
       </div>
@@ -74,7 +81,7 @@ export default class Popup extends Component {
   render() {
     const { show, type } = this.props;
     let container = null;
-    switch(type) {
+    switch (type) {
       case CONSTANTS.UI.POPUP_TYPES.LOADING:
         container = this.getLoaderContainer();
         break;
@@ -84,9 +91,11 @@ export default class Popup extends Component {
       case CONSTANTS.UI.POPUP_TYPES.AUTH_REQ:
         container = this.getAuthRequestContainer();
         break;
+      default:
+        throw new Error('Unexpected type of Popup');
     }
     if (!show || !container) {
-      return <span>{''}</span>
+      return <span>{''}</span>;
     }
     return (
       <div className="popup">
@@ -101,7 +110,9 @@ export default class Popup extends Component {
 }
 
 Popup.propTypes = {
-  show: PropTypes.bool,
-  type: PropTypes.string,
-  desc: PropTypes.string
+  show: PropTypes.bool.isRequired,
+  type: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  okCb: PropTypes.func.isRequired,
+  cancelCb: PropTypes.func.isRequired,
 };

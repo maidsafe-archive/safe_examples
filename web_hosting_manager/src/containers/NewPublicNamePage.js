@@ -11,14 +11,14 @@ function mapStateToProps(state) {
     error: state.publicNames.error,
     processing: state.publicNames.processing,
     processDesc: state.publicNames.processDesc,
-    createdPublicName: state.publicNames.createdPublicName
+    createdPublicName: state.publicNames.createdPublicName,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     ...publicNamesAction,
-    ...commonAction
+    ...commonAction,
   }, dispatch);
 }
 

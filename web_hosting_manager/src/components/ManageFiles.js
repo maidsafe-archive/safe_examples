@@ -16,10 +16,13 @@ export default class ManageFiles extends Component {
   componentDidUpdate() {
     if (!this.props.authorisingMD && this.props.authorisedMD) {
       const { containerPath } = this.props.match.params;
-      console.log('manager files - md authorised');
       this.props.reset();
       this.props.getContainerInfo(decodeURI(containerPath));
     }
+  }
+
+  componentWillUnmount() {
+    this.props.reset();
   }
 
   popupOkCb() {
@@ -35,10 +38,6 @@ export default class ManageFiles extends Component {
       this.props.cancelMDReq();
       return this.props.history.push('/publicNames');
     }
-  }
-
-  componentWillUnmount() {
-    this.props.reset();
   }
 
   render() {
@@ -71,4 +70,19 @@ export default class ManageFiles extends Component {
 }
 
 ManageFiles.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  processDesc: PropTypes.string.isRequired,
+  error: PropTypes.string.isRequired,
+  nwState: PropTypes.string.isRequired,
+  processing: PropTypes.bool.isRequired,
+  sendAuthReq: PropTypes.bool.isRequired,
+  authorisingMD: PropTypes.bool.isRequired,
+  authorisedMD: PropTypes.bool.isRequired,
+  reconnect: PropTypes.func.isRequired,
+  cancelMDReq: PropTypes.func.isRequired,
+  sendMDAuthReq: PropTypes.func.isRequired,
+  getContainerInfo: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  checkAndFetchContainer: PropTypes.func.isRequired,
 };
