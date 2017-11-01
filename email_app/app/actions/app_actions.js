@@ -1,7 +1,7 @@
 import ACTION_TYPES from './action_types';
 import { setupAccount, storeEmail, removeEmail, archiveEmail,
   fetchEmailIds, readConfig, writeConfig,
-  readInboxEmails, readArchivedEmails } from '../safenet_comm';
+  readInboxEmails, readArchivedEmails, getLogFilePath } from '../safenet_comm';
 
 export const refreshConfig = (emailId) => {
   return function (dispatch, getState) {
@@ -117,3 +117,14 @@ export const deleteEmail = (container, key) => {
 export const cancelCompose = _ => ({
   type: ACTION_TYPES.CANCEL_COMPOSE
 });
+
+export const getLogPath = _ => {
+  return function (dispatch, getState) {
+    let app = getState().initialiser.app;
+    return dispatch({
+      type: ACTION_TYPES.GET_LOG_FILE_PATH,
+      msg: 'Fetching log file path...',
+      payload: getLogFilePath(app)
+    });
+  };
+};

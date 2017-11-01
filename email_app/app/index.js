@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron';
+import MenuBuilder from './menu';
 var path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -34,6 +35,9 @@ const createWindow = () => {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  const menuBuilder = new MenuBuilder(mainWindow);
+  menuBuilder.buildMenu();
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();

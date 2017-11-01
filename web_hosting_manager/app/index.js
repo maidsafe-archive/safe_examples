@@ -36,6 +36,10 @@ ipc.on('simulate-mock-res', () => {
   store.dispatch(simulateMockRes());
 });
 
+ipc.on('show-log-file', () => {
+  history.push('/appLogs')
+});
+
 render(
   <AppContainer>
     <Root store={store} history={history} />

@@ -8,7 +8,7 @@ export default class MenuBuilder {
 
   buildMenu() {
     // this.mainWindow.openDevTools();
-    if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    if (process.env.NODE_ENV === 'dev' || process.env.DEBUG_PROD === 'true') {
       this.setupDevelopmentEnvironment();
     }
 
@@ -50,7 +50,7 @@ export default class MenuBuilder {
     let menu = null;
 
     // add mock response simulation to menu
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'dev') {
       menu = [];
       menu.unshift(new MenuItem({
         label: '&Simulate Mock Response',
@@ -164,7 +164,7 @@ export default class MenuBuilder {
         {
           label: 'Documentation',
           click() {
-            shell.openExternal('https://github.com/maidsafe/safe_examples/tree/master/web_hosting_manager/README.md');
+            shell.openExternal('https://github.com/maidsafe/safe_examples/tree/master/email_app/README.md');
           },
         },
         {
@@ -182,15 +182,11 @@ export default class MenuBuilder {
       ],
     };
 
-    const subMenuView = process.env.NODE_ENV === 'development'
+    const subMenuView = process.env.NODE_ENV === 'dev'
       ? subMenuViewDev
       : subMenuViewProd;
 
-    const simulationMenuItems = this.buildSimulationMenuItems();
     const appLogsMenuItems = this.buildAppLogsMenuItem();
-    if (simulationMenuItems) {
-      subMenuAbout.submenu = simulationMenuItems.concat(subMenuAbout.submenu);
-    }
     if (appLogsMenuItems) {
       subMenuAbout.submenu = appLogsMenuItems.concat(subMenuAbout.submenu);
     }
@@ -218,7 +214,7 @@ export default class MenuBuilder {
       }],
     }, {
       label: '&View',
-      submenu: (process.env.NODE_ENV === 'development') ? [{
+      submenu: (process.env.NODE_ENV === 'dev') ? [{
         label: '&Reload',
         accelerator: 'Ctrl+R',
         click: () => {
@@ -253,7 +249,7 @@ export default class MenuBuilder {
       }, {
         label: 'Documentation',
         click() {
-          shell.openExternal('https://github.com/maidsafe/safe_examples/tree/master/web_hosting_manager/README.md');
+          shell.openExternal('https://github.com/maidsafe/safe_examples/tree/master/email_app/README.md');
         },
       }, {
         label: 'Community Discussions',
@@ -268,11 +264,7 @@ export default class MenuBuilder {
       }],
     }];
 
-    const simulationMenuItems = this.buildSimulationMenuItems();
     const appLogsMenuItems = this.buildAppLogsMenuItem();
-    if (simulationMenuItems) {
-      templateDefault[0].submenu = simulationMenuItems.concat(templateDefault[0].submenu);
-    }
     if (appLogsMenuItems) {
       templateDefault[0].submenu = appLogsMenuItems.concat(templateDefault[0].submenu);
     }

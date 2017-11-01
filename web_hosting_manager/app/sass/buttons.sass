@@ -37,14 +37,14 @@ button.btn-with-add-icon
     font-weight: bold
     &:hover
       background-color: $bg-default-flat-btn-hover
-  &:disabled
-    background-color: $bg-default-flat-btn !important
-    &:hover
+    &:disabled
       background-color: $bg-default-flat-btn !important
-  &.primary
-    background-color: $bg-primary-flat-btn
-    &:hover
-      background-color: $bg-primary-flat-btn-hover
+      &:hover
+        background-color: $bg-default-flat-btn !important
+    &.primary
+      background-color: $bg-primary-flat-btn
+      &:hover
+        background-color: $bg-primary-flat-btn-hover
 
 .delete-btn
   +btnDefault()
@@ -111,4 +111,3 @@ button.btn-with-add-icon
   background-size: contain
   &:hover
     background-image: url($url-back-icon-hover)
-    
