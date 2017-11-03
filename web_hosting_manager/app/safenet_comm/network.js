@@ -94,7 +94,7 @@ export default class Network {
         'Invalid Shared Mutable Data Auth response'));
     }
     try {
-      await fromAuthURI(this[_appInfo].data, resUri, { libPath: this[_libPath] });
+      await fromAuthURI(this[_appInfo].info, resUri, { libPath: this[_libPath] });
       return;
     } catch (err) {
       throw err;
