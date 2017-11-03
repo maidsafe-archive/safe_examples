@@ -2,13 +2,14 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import ManageFiles from '../components/manage_files';
+import { sendMDAuthReq, cancelMDReq } from '../actions/authorisation';
 import * as serviceAction from '../actions/services';
 import * as fileMangerAction from '../actions/file_manager';
 import * as commonAction from '../actions/common';
 
 function mapStateToProps(state) {
   return {
-    nwState: state.initialisation.nwState,
+    nwState: state.initialiser.nwState,
     uploading: state.fileManager.uploading,
     uploadStatus: state.fileManager.uploadStatus,
     downloading: state.fileManager.downloading,
@@ -28,6 +29,8 @@ function mapDispatchToProps(dispatch) {
     ...serviceAction,
     ...commonAction,
     ...fileMangerAction,
+    sendMDAuthReq,
+    cancelMDReq,
   }, dispatch);
 }
 

@@ -11,7 +11,7 @@ const initState = {
   error: '',
 };
 
-export default function initialisation(state = initState, action) {
+export default function initialiser(state = initState, action) {
   switch (action.type) {
     case `${ACTION_TYPE.RECONNECT_APP}_PENDING`:
       return {
@@ -23,7 +23,7 @@ export default function initialisation(state = initState, action) {
         ...state,
         nwState: CONSTANTS.NETWORK_STATE.DISCONNECTED,
       };
-    case ACTION_TYPE.NW_STATUS_CHANGED:
+    case ACTION_TYPE.NET_STATUS_CHANGED:
       return {
         ...state,
         nwState: action.state,

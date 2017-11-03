@@ -11,26 +11,26 @@ const initState = {
 
 export default function authorisation(state = initState, action) {
   switch (action.type) {
-    case `${actionTypes.SEND_AUTH_REQUEST}_PENDING`:
+    case `${actionTypes.AUTHORISE_APP}_PENDING`:
       return {
         ...state,
         authorising: true,
         processing: true,
       };
-    case `${actionTypes.SEND_AUTH_REQUEST}_FULFILLED`:
+    case `${actionTypes.AUTHORISE_APP}_FULFILLED`:
       return {
         ...state,
         authorising: true,
         processing: false,
       };
-    case `${actionTypes.SEND_AUTH_REQUEST}_REJECTED`:
+    case `${actionTypes.AUTHORISE_APP}_REJECTED`:
       return {
         ...state,
         authorising: false,
         processing: false,
         error: action.payload.message,
       };
-    case actionTypes.AUTHORISED: {
+    case actionTypes.APP_AUTHORISED: {
       const authRes = ((action.res.search('safe-') === 0) && !(action.res.search('safe-auth') === 0)) ? action.res : null;
       return {
         ...state,

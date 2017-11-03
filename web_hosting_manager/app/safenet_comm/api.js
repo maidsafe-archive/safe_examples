@@ -6,208 +6,25 @@
 
 /* eslint-disable no-underscore-dangle */
 import { shell } from 'electron';
-import safeApp from '@maidsafe/safe-node-app';
 
+import Network from './network';
 import Uploader from './uploader';
 import Downloader from './downloader';
 import makeError from './error';
-import { openExternal, nodeEnv } from './helpers';
+import { nodeEnv } from './helpers';
 import CONSTANTS from '../constants';
 
 // Private variables
-const _app = Symbol('app');
 const _publicNames = Symbol('publicNames');
-const _appInfo = Symbol('appInfo');
 const _uploader = Symbol('uploader');
 const _downloader = Symbol('downloader');
-const _libPath = Symbol('libPath');
 
-class SafeApi {
+class SafeApi extends Network {
   constructor() {
-    this[_app] = null;
+    super();
     this[_publicNames] = [];
-    this[_appInfo] = CONSTANTS.APP_INFO;
     this[_uploader] = null;
     this[_downloader] = null;
-    this[_libPath] = CONSTANTS.ASAR_LIB_PATH;
-    if ((nodeEnv === CONSTANTS.ENV.DEV) || (nodeEnv === CONSTANTS.ENV.TEST)) {
-      this[_libPath] = CONSTANTS.DEV_LIB_PATH;
-    }
-  }
-
-  /**
-   * Send Authorisation request to Authenticator.
-   * - Initialise the application object
-   * - Generate Auth request URI
-   * - Send URI to Authenticator
-   */
-  sendAuthReq() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const app = await safeApp.initializeApp(
-          this[_appInfo].data,
-          null,
-          { libPath: this[_libPath] },
-        );
-        const resp = await app.auth.genAuthUri(this[_appInfo].permissions, this[_appInfo].opt);
-        openExternal(resp.uri);
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  /**
-   * Send Shared Mutable Data authorisation request to Authenticator
-   * @param {Array} mdList array of Mutable Data with permissions
-   */
-  sendMDReq(mdList) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const resp = await this[_app].auth.genShareMDataUri(mdList);
-        openExternal(resp.uri);
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  /**
-   * Authorise application for dev environment
-   * This creates a test login for development purpose
-   */
-  authoriseMock() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this[_app] = await safeApp.initializeApp(
-          this[_appInfo].data,
-          null,
-          { libPath: this[_libPath] },
-        );
-        await this[_app].auth.loginForTest(this[_appInfo].permissions);
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  /**
-   * Authorise service containers and all the web services under the given public name
-   * @param {string} publicName the public name
-   */
-  authoriseMD(publicName) {
-    const reqArr = [];
-    return new Promise(async (resolve, reject) => {
-      if (!publicName) {
-        return reject(makeError(CONSTANTS.APP_ERR_CODE.INVALID_PUBLIC_NAME, 'Invalid publicName'));
-      }
-
-      try {
-        const pubNamesCntr = await this.getPublicNamesContainer();
-        const servCntrName = await this.getMDataValueForKey(pubNamesCntr, publicName);
-
-        // Add service container to request array
-        reqArr.push({
-          type_tag: CONSTANTS.TYPE_TAG.DNS,
-          name: servCntrName,
-          perms: ['Insert', 'Update', 'Delete'],
-        });
-
-        const servCntr = await this.getPublicNameMD(servCntrName);
-        const services = await servCntr.getEntries();
-        await services.forEach((key, val) => {
-          const service = key.toString();
-
-          // check service is not an email or deleted
-          if ((service.indexOf(CONSTANTS.MD_EMAIL_PREFIX) !== -1)
-            || (val.buf.length === 0) || service === CONSTANTS.MD_META_KEY) {
-            return;
-          }
-          reqArr.push({
-            type_tag: CONSTANTS.TYPE_TAG.WWW,
-            name: val.buf,
-            perms: ['Insert', 'Update', 'Delete'],
-          });
-        });
-        await this.sendMDReq(reqArr);
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  /**
-   * Connect with SAFE network after receiving response from Authenticator.
-   * This handles auth response, container response, revoked response and deny response.
-   * @param {string} uri safe response URI
-   * @param {*} nwStateChangeCb callback function to handle network state change
-   */
-  connect(uri, nwStateChangeCb) {
-    return new Promise(async (resolve, reject) => {
-      if (!uri) {
-        return reject(makeError(CONSTANTS.APP_ERR_CODE.INVALID_AUTH_RESP, 'Invalid Auth response'));
-      }
-
-      // Handle Mock response
-      if (uri === CONSTANTS.MOCK_RES_URI) {
-        return resolve(true);
-      }
-
-      try {
-        const app = await safeApp.fromAuthURI(
-          this[_appInfo].data,
-          uri,
-          nwStateChangeCb,
-          { libPath: this[_libPath] },
-        );
-
-        // Send network connected state
-        nwStateChangeCb(CONSTANTS.NETWORK_STATE.CONNECTED);
-
-        this[_app] = app;
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  /**
-   * Decode Shared Mutable Data response received from Authenticator
-   * @param {string} resUri the safe response URI of Shared Mutable Data
-   */
-  decodeSharedMD(resUri) {
-    return new Promise(async (resolve, reject) => {
-      if (!resUri) {
-        return reject(makeError(CONSTANTS.APP_ERR_CODE.INVALID_SHARED_MD_RESP,
-          'Invalid Shared Mutable Data Auth response'));
-      }
-      try {
-        await safeApp.fromAuthURI(
-          this[_appInfo].data,
-          resUri,
-          { libPath: this[_libPath] },
-        );
-        resolve(true);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  /**
-   * Reconnect the application with SAFE Network when disconnected
-   */
-  reconnect() {
-    if (!this[_app]) {
-      return Promise.reject(makeError(CONSTANTS.APP_ERR_CODE.APP_NOT_INITIALISED,
-        'Application not initialised'));
-    }
-    return this[_app].reconnect();
   }
 
   /**
@@ -226,15 +43,15 @@ class SafeApi {
    */
   canAccessContainers() {
     return new Promise(async (resolve, reject) => {
-      if (!this[_app]) {
+      if (!this.app) {
         return Promise.reject(makeError(CONSTANTS.APP_ERR_CODE.APP_NOT_INITIALISED,
           'Application not initialised'));
       }
       try {
-        await this[_app].auth.refreshContainersPermissions();
+        await this.app.auth.refreshContainersPermissions();
         const accessContainers = Object.keys(CONSTANTS.ACCESS_CONTAINERS);
         await Promise.all(accessContainers.map(cont =>
-          this[_app].auth.canAccessContainer(CONSTANTS.ACCESS_CONTAINERS[cont])));
+          this.app.auth.canAccessContainer(CONSTANTS.ACCESS_CONTAINERS[cont])));
         resolve(true);
       } catch (err) {
         reject(err);
@@ -346,7 +163,7 @@ class SafeApi {
         const metaName = `Service Root Directory for: ${metaFor}`;
         const metaDesc = `Has the files hosted for the service: ${metaFor}`;
 
-        const servFolder = await this[_app].mutableData.newRandomPublic(CONSTANTS.TYPE_TAG.WWW);
+        const servFolder = await this.app.mutableData.newRandomPublic(CONSTANTS.TYPE_TAG.WWW);
         await servFolder.quickSetup({}, metaName, metaDesc);
         const servFolderInfo = await servFolder.getNameAndTag();
         const pubCntr = await this.getPublicContainer();
@@ -744,7 +561,7 @@ class SafeApi {
       try {
         const publicNamesMd = await this.getPublicNamesContainer();
         const val = await this.getMDataValueForKey(publicNamesMd, publicName);
-        const md = await this[_app].mutableData.newPublic(val, CONSTANTS.TYPE_TAG.DNS);
+        const md = await this.app.mutableData.newPublic(val, CONSTANTS.TYPE_TAG.DNS);
         const value = await md.get(serviceName);
         if (value.buf.length !== 0) {
           return resolve(true);
@@ -802,20 +619,20 @@ class SafeApi {
    * Get _public container mutable data
    */
   getPublicContainer() {
-    if (!this[_app]) {
+    if (!this.app) {
       return Promise.reject(new Error('Application is not connected.'));
     }
-    return this[_app].auth.getContainer(CONSTANTS.ACCESS_CONTAINERS.PUBLIC);
+    return this.app.auth.getContainer(CONSTANTS.ACCESS_CONTAINERS.PUBLIC);
   }
 
   /**
    * Get _publicNames container mutable data
    */
   getPublicNamesContainer() {
-    if (!this[_app]) {
+    if (!this.app) {
       return Promise.reject(new Error('Application is not connected.'));
     }
-    return this[_app].auth.getContainer(CONSTANTS.ACCESS_CONTAINERS.PUBLIC_NAMES);
+    return this.app.auth.getContainer(CONSTANTS.ACCESS_CONTAINERS.PUBLIC_NAMES);
   }
 
   /* eslint-disable class-methods-use-this */
@@ -834,22 +651,22 @@ class SafeApi {
   }
 
   getServiceFolderMD(xorname) {
-    return this[_app].mutableData.newPublic(xorname, CONSTANTS.TYPE_TAG.WWW);
+    return this.app.mutableData.newPublic(xorname, CONSTANTS.TYPE_TAG.WWW);
   }
 
   sha3Hash(name) {
-    return this[_app].crypto.sha3Hash(name);
+    return this.app.crypto.sha3Hash(name);
   }
 
   getPublicNameMD(pubXORName) {
-    return this[_app].mutableData.newPublic(pubXORName, CONSTANTS.TYPE_TAG.DNS);
+    return this.app.mutableData.newPublic(pubXORName, CONSTANTS.TYPE_TAG.DNS);
   }
 
   _checkMDAccessible(md) {
     return new Promise(async (resolve, reject) => {
       try {
         const perm = await md.getPermissions();
-        const signKey = await this[_app].crypto.getAppPubSignKey();
+        const signKey = await this.app.crypto.getAppPubSignKey();
         const result = await perm.getPermissionSet(signKey);
         resolve(result);
       } catch (err) {

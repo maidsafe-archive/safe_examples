@@ -2,17 +2,17 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import Initialiser from '../components/initialiser';
-import * as initialisationAction from '../actions/initialisation';
+import * as initialiserAction from '../actions/initialiser';
 import * as commonAction from '../actions/common';
 
 function mapStateToProps(state) {
   return {
-    ...state.initialisation,
+    ...state.initialiser,
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...initialisationAction, ...commonAction }, dispatch);
+  return bindActionCreators({ ...initialiserAction, ...commonAction }, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Initialiser);
