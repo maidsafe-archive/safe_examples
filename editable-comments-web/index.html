@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Comment plugin example</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "arial", "sans-serif";
+      }
+      .root {
+        width: 800px;
+        margin: 50px auto 0;
+      }
+      .title {
+        font-size: 36px;
+        text-align: center;
+        font-weight: 600;
+        margin-bottom: 48px;
+      }
+      .p {
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: normal;
+        margin-top: 10px;
+      }
+      .sub-title {
+        margin-top: 24px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .sub-sub-title {
+        margin-top: 22px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .code {
+        background-color: #f7f7f7;
+        display: inline-block;
+        white-space: pre-line;
+        padding: 16px;
+        margin: 16px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="root">
+      <h2 class="title">Comments Plugin</h2>
+      <p class="p">This plugin helps post the comments to the blogs or websites in the SAFE Browser. This can be integrated with any webpages. </p>
+      <h3 class="sub-title">How to Use</h3>
+      <p class="p">To use this plugin, upload the build folder to your website using Web Hosting Manager. Add the following <code> script </code> tag to your <b>index.html</b>.</p>
+      <pre class="code">
+          &lt;script src="comment.js"&gt;&lt;/script&gt;
+          &lt;script&gt;
+          &nbsp;&nbsp;window.safeComments('CommentTitle', 'CommentTargetID');
+          &lt;/script&gt;
+      </pre>
+
+      <h3 class="sub-title">Design</h3>
+
+      <h4 class="sub-sub-title">Fetching Comments</h4>
+
+      <p class="p">The Mutable Data is fetched from the network with a deterministic name and tag type. The name of the Mutable Data is computed by hashing it using <code>sha3Hash(window.location.hostname)</code> and defined tag type of <code>15001</code>. </p>
+
+      <p class="p">The topic is fetched as a key from the Mutable Data and its value is fetched as a list of comments which finally gets displayed.</p>
+
+      <h4 class="sub-sub-title">Setting Up Mutable Data</h4>
+
+      <p class="p">The app is authorised with the access for <code>_publicNames</code> and <code>own_container</code>.</p>
+
+      <p class="p">After the authorisation, validating the user is the owner by verifying whether the Public ID is in the user's <code>publicNames</code> container.</p>
+
+      <p class="p">If the Public Id is validated, then get the app's own container and insert the key 'isAdmin' with the value 'true'. Using this value, the app can decide in the future whether the authorised user is an Admin or not </p>
+
+      <p class="p"> Now, the Mutable Data is created with the deterministic Id and tag type. Also set the permission to <code>USER_ANYONE</code> by setting the handle to <code>null</code>. This permission is set to allow all the users to insert data into the Mutable Data</p>
+
+    </div>
+    <div id="comments"></div>
+    <script src="/static/bundle.js"></script>
+    <script type="application/javascript">
+      window.safeComments('CommentsTitle');
+    </script>
+  </body>
+</html>
