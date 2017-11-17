@@ -116,7 +116,7 @@ export const reconnect = (app) => {
   return app.reconnect();
 }
 
-export const genKeyPair = async (app) => {
+export const genEncKeyPair = async (app) => {
   try {
     let rawKeyPair = {};
     const keyPair = await app.crypto.generateEncKeyPair();
@@ -137,8 +137,8 @@ export const encrypt = async (app, input, pk) => {
   }
   try {
     const stringToBuffer = Buffer.from(pk, 'hex');
-    const pubEncKeyAPI = await app.crypto.pubEncKeyKeyFromRaw(stringToBuffer);
-    return pubEncKeyAPI.encryptSealed(input);
+    const pubEncKey = await app.crypto.pubEncKeyFromRaw(stringToBuffer);
+    return pubEncKey.encryptSealed(input);
   } catch (err) {
     console.error(err);
     throw err;

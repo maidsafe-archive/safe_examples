@@ -118,15 +118,10 @@ class SafeApi extends Network {
     return new Promise(async (resolve, reject) => {
       try {
         const pubNamesCntr = await this.getPublicNamesContainer();
-        const pubNames = await pubNamesCntr.getKeys();
-        const pubNamesLen = await pubNames.len();
-        if (pubNamesLen === 0) {
+        const encPubNames = await pubNamesCntr.getKeys();
+        if (encPubNames.length === 0) {
           return resolve([]);
         }
-        const encPubNames = [];
-        await pubNames.forEach((key) => {
-          encPubNames.push(key);
-        });
 
         const decryptPubNamesQ = [];
         for (const encPubName of encPubNames) {
@@ -381,8 +376,7 @@ class SafeApi extends Network {
       try {
         const pubCntr = await this.getPublicContainer();
         const serviceFolders = await pubCntr.getKeys();
-        const serviceFoldersLen = await serviceFolders.len();
-        if (serviceFoldersLen !== 0) {
+        if (serviceFolders.length !== 0) {
           await serviceFolders.forEach((key) => {
             if (!key) {
               return;
