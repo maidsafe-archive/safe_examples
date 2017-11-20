@@ -13,6 +13,7 @@ import Downloader from './downloader';
 import makeError from './error';
 import { nodeEnv } from './helpers';
 import CONSTANTS from '../constants';
+import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 
 // Private variables
 const _publicNames = Symbol('publicNames');
@@ -100,7 +101,7 @@ class SafeApi extends Network {
         try {
           const decPubNameBuf = await pubNamesCntr.decrypt(encPubName);
           const decPubName = decPubNameBuf.toString();
-          if (decPubName !== CONSTANTS.MD_META_KEY) {
+          if (decPubName !== SAFE_CONSTANTS.MD_METADATA_KEY) {
             publicNames.push({
               name: decPubName
             });
@@ -246,7 +247,9 @@ class SafeApi extends Network {
           await services.forEach((key, value) => {
             const service = key.toString();
             // check service is not an email or deleted
-            if ((service.indexOf('@email') !== -1) || (value.buf.length === 0) || service === CONSTANTS.MD_META_KEY) {
+            if ((service.indexOf('@email') !== -1)
+                || (value.buf.length === 0)
+                || service === SAFE_CONSTANTS.MD_METADATA_KEY) {
               return;
             }
             serviceList.push({
@@ -452,7 +455,7 @@ class SafeApi extends Network {
         const filesPath = await servFolder.getEntries();
         await filesPath.forEach((key, val) => {
           const keyStr = key.toString();
-          if ((keyStr.indexOf(containerKey) !== 0) || keyStr === CONSTANTS.MD_META_KEY) {
+          if ((keyStr.indexOf(containerKey) !== 0) || keyStr === SAFE_CONSTANTS.MD_METADATA_KEY) {
             return;
           }
           if (val.buf.length === 0) {
@@ -511,7 +514,7 @@ class SafeApi extends Network {
           }
           const keyStr = key.toString();
           if ((rootPath && (keyStr.indexOf(rootPath) !== 0))
-            || keyStr === CONSTANTS.MD_META_KEY) {
+            || keyStr === SAFE_CONSTANTS.MD_METADATA_KEY) {
             return;
           }
           let keyStrTrimmed = keyStr;
