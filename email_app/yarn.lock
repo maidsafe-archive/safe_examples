@@ -6,9 +6,9 @@
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/7zip/-/7zip-0.0.6.tgz#9cafb171af82329490353b4816f03347aa150a30"
 
-"@maidsafe/safe-node-app@0.4.1-1":
-  version "0.4.1-1"
-  resolved "https://registry.yarnpkg.com/@maidsafe/safe-node-app/-/safe-node-app-0.4.1-1.tgz#fc803fcf33b51a6564ef5cd4c0c3e82128fe1240"
+"@maidsafe/safe-node-app@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@maidsafe/safe-node-app/-/safe-node-app-0.5.0.tgz#3ff561a201e06aaea6168abe193edfc2331cb188"
   dependencies:
     deps_downloader "https://s3.eu-west-2.amazonaws.com/deps-downloader/deps_downloader-0.1.0.tgz"
     enum "^2.3.0"
@@ -135,8 +135,8 @@ ajv@^4.7.0, ajv@^4.9.1:
     json-stable-stringify "^1.0.1"
 
 ajv@^5.1.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.3.0.tgz#4414ff74a50879c208ee5fdc826e32c303549eda"
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.4.0.tgz#32d1cf08dbc80c432f426f12e10b2511f6b46474"
   dependencies:
     co "^4.6.0"
     fast-deep-equal "^1.0.0"
@@ -474,8 +474,8 @@ autoprefixer@^6.3.1:
     postcss-value-parser "^3.2.3"
 
 aws-sdk@^2.9.0:
-  version "2.151.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.151.0.tgz#5e73d778b76514f36183b91400477778ab5e58d8"
+  version "2.154.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.154.0.tgz#bbe9439d31e380a2e3617ffa217432b4fab776d1"
   dependencies:
     buffer "4.9.1"
     crypto-browserify "1.0.9"
@@ -1413,8 +1413,8 @@ big.js@^3.1.3:
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
 
 binary-extensions@^1.0.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.10.0.tgz#9aeb9a6c5e88638aad171e167f5900abe24835d0"
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.11.0.tgz#46aa1751fb6a2f93ee5e689bb1087d4b14c6c205"
 
 "binary@>= 0.3.0 < 1", binary@^0.3.0:
   version "0.3.0"
@@ -1692,12 +1692,12 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.5.0"
 
 caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
-  version "1.0.30000765"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000765.tgz#15555432420baacbb169bc51e5b6de804c9994b4"
+  version "1.0.30000769"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000769.tgz#c230b9c1b9e8db3e1c0d858c96e685741b96cc10"
 
 caniuse-lite@^1.0.30000760:
-  version "1.0.30000765"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000765.tgz#aa1a75019276b48463c0fca2a5257fb9f26a7c9d"
+  version "1.0.30000769"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000769.tgz#d68c5aa0772ea3eac6c97d42e239c9b4d3261b93"
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -1755,6 +1755,10 @@ chalk@^2.0.0, chalk@^2.3.0:
 character-parser@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/character-parser/-/character-parser-1.2.1.tgz#c0dde4ab182713b919b970959a123ecc1a30fcd6"
+
+chardet@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.4.0.tgz#0bbe1355ac44d7a3ed4a925707c4ef70f8190f6c"
 
 cheerio@^0.20.0:
   version "0.20.0"
@@ -3535,11 +3539,11 @@ external-editor@^1.1.0:
     tmp "^0.0.29"
 
 external-editor@^2.0.4:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/external-editor/-/external-editor-2.0.5.tgz#52c249a3981b9ba187c7cacf5beb50bf1d91a6bc"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/external-editor/-/external-editor-2.1.0.tgz#3d026a21b7f95b5726387d4200ac160d372c3b48"
   dependencies:
+    chardet "^0.4.0"
     iconv-lite "^0.4.17"
-    jschardet "^1.4.2"
     tmp "^0.0.33"
 
 extglob@^0.3.1:
@@ -4994,10 +4998,6 @@ js-yaml@~3.7.0:
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
-
-jschardet@^1.4.2:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-1.6.0.tgz#c7d1a71edcff2839db2f9ec30fc5d5ebd3c1a678"
 
 jsdom@^7.0.2:
   version "7.2.2"
@@ -8710,12 +8710,12 @@ void-elements@~2.0.1:
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
 
 vue-hot-reload-api@^2.0.1:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.2.3.tgz#43c8e5506d65a271d2571936d77253019fd3eb17"
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.2.4.tgz#683bd1d026c0d3b3c937d5875679e9a87ec6cd8f"
 
 vue-template-compiler@^2.0.0-alpha.8:
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.5.3.tgz#ab631b0694e211a6aaf0d800102b37836aae36a4"
+  version "2.5.8"
+  resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.5.8.tgz#826ae77e1d5faa7fa5fca554f33872dde38de674"
   dependencies:
     de-indent "^1.0.2"
     he "^1.1.0"
@@ -8750,8 +8750,8 @@ weak@^1.0.1:
     nan "^2.0.5"
 
 webdriverio@^4.8.0:
-  version "4.9.8"
-  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-4.9.8.tgz#907180e715d3b9e16cabe20bad59854bec1e44fa"
+  version "4.9.9"
+  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-4.9.9.tgz#695de325166528e162d5b6d29a7f2c18aafdd3aa"
   dependencies:
     archiver "~2.1.0"
     babel-runtime "^6.26.0"
