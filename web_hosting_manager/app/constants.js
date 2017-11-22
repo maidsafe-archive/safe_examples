@@ -78,7 +78,6 @@ const CONSTANTS = {
     TILL_END: 0,
   },
   MOCK_RES_URI: 'safe-mock-response',
-  MD_META_KEY: '_metadata',
   MD_EMAIL_PREFIX: '@email',
   DOWNLOAD_CHUNK_SIZE: 1000000,
   UPLOAD_CHUNK_SIZE: 1000000,

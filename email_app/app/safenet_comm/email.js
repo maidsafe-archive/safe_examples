@@ -1,6 +1,7 @@
 import { shell } from 'electron';
 import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from '../constants';
-import {  genRandomEntryKey, deserialiseArray, splitPublicIdAndService } from '../utils/app_utils';
+import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
+import { genRandomEntryKey, deserialiseArray, splitPublicIdAndService } from '../utils/app_utils';
 import * as netFns from './network.js';
 
 const fetchPublicIds = async (app) => {
@@ -183,9 +184,8 @@ const createInbox = async (app, encPk) => {
   try {
     const inboxMd = await app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_INBOX)
     await inboxMd.quickSetup(baseInbox);
-    const permSet = await app.mutableData.newPermissionSet();
-    await permSet.setAllow('Insert');
-    await inboxMd.setUserPermissions(null, permSet, 1);
+    const permSet = ['Insert'];
+    await inboxMd.setUserPermissions(SAFE_CONSTANTS.USER_ANYONE, permSet, 1);
     return inboxMd;
   } catch (err) {
     console.error(err);
@@ -236,12 +236,12 @@ const createPublicIdAndEmailService = async (
 
 const genNewAccount = async (app, id) => {
   try {
-    const keyPair = await netFns.genKeyPair(app);
-    const inboxMd = await createInbox(app, keyPair.publicKey);
+    const encKeyPair = await netFns.genEncKeyPair(app);
+    const inboxMd = await createInbox(app, encKeyPair.publicKey);
     const archiveMd = await createArchive(app);
     return {id, inboxMd, archiveMd,
-                          encSk: keyPair.privateKey,
-                          encPk: keyPair.publicKey};
+                          encSk: encKeyPair.privateKey,
+                          encPk: encKeyPair.publicKey};
   } catch (err) {
     console.error(err);
     throw err;
@@ -279,10 +279,6 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
     serviceName: serviceInfo.serviceName
   };
 
-  const md = await app.mutableData.newPublic(servicesXorName, CONSTANTS.TAG_TYPE_DNS);
-  // const appSignKey = await app.crypto.getAppPubSignKey();
-  // QUESTION: What is the purpose of this line?
-  // await md.getUserPermissions(appSignKey) // FIXME: the permissions it has could not be enough
   try {
     const newAccount = await registerEmailService(app, emailService);
     return { newAccount };

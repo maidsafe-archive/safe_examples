@@ -2,6 +2,7 @@ import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 
 import makeError from './error';
 import CONSTANTS from '../constants';
+import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 import { openExternal, nodeEnv } from './helpers';
 
 const _app = Symbol('app');
@@ -94,7 +95,7 @@ export default class Network {
         'Invalid Shared Mutable Data Auth response'));
     }
     try {
-      await fromAuthURI(this[_appInfo].info, resUri, { libPath: this[_libPath] });
+      await this.app.auth.loginFromURI(resUri);
       return;
     } catch (err) {
       throw err;
@@ -140,7 +141,7 @@ export default class Network {
 
         // check service is not an email or deleted
         if ((service.indexOf(CONSTANTS.MD_EMAIL_PREFIX) !== -1)
-          || (val.buf.length === 0) || service === CONSTANTS.MD_META_KEY) {
+          || (val.buf.length === 0) || service === SAFE_CONSTANTS.MD_METADATA_KEY) {
           return;
         }
         mdPermissions.push({
