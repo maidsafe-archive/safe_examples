@@ -2,19 +2,18 @@ let safeApp = require('./code-snippets/safeApp');
 let safeImmutableData = require('./code-snippets/safeImmutableData');
 let safeMutableData = require('./code-snippets/safeMutableData');
 let safeMutableDataEntries = require('./code-snippets/safeMutableDataEntries');
-let safeMutableDataKeys = require('./code-snippets/safeMutableDataKeys');
-let safeMutableDataValues = require('./code-snippets/safeMutableDataValues');
 let safeMutableDataMutation = require('./code-snippets/safeMutableDataMutation');
 let safeMutableDataPermissions = require('./code-snippets/safeMutableDataPermissions');
-let safeMutableDataPermissionsSet = require('./code-snippets/safeMutableDataPermissionsSet');
 let safeNfs = require('./code-snippets/safeNfs');
 let safeNfsFile = require('./code-snippets/safeNfsFile');
 let safeCipherOpt = require('./code-snippets/safeCipherOpt');
 let safeCrypto = require('./code-snippets/safeCrypto');
-let safeCryptoKeyPair = require('./code-snippets/safeCryptoKeyPair');
+let safeCryptoEncKeyPair = require('./code-snippets/safeCryptoEncKeyPair');
 let safeCryptoPubEncKey = require('./code-snippets/safeCryptoPubEncKey');
 let safeCryptoSecEncKey = require('./code-snippets/safeCryptoSecEncKey');
-let safeCryptoSignKey = require('./code-snippets/safeCryptoSignKey');
+let safeCryptoPubSignKey = require('./code-snippets/safeCryptoPubSignKey');
+let safeCryptoSecSignKey = require('./code-snippets/safeCryptoSecSignKey');
+let safeCryptoSignKeypair = require('./code-snippets/safeCryptoSignKeypair');
 // let helpers = require('./code-snippets/helpers');
 
 let codeSnippets = [
@@ -22,20 +21,19 @@ let codeSnippets = [
   safeImmutableData,
   safeMutableData,
   safeMutableDataEntries,
-  safeMutableDataKeys,
-  safeMutableDataValues,
   safeMutableDataMutation,
   safeMutableDataPermissions,
-  safeMutableDataPermissionsSet,
   safeNfs,
   safeNfsFile,
   safeCipherOpt,
   safeCrypto,
-  safeCryptoKeyPair,
+  safeCryptoEncKeyPair,
   safeCryptoPubEncKey,
   safeCryptoSecEncKey,
-  safeCryptoSignKey,
-  // helpers
+  safeCryptoPubSignKey,
+  safeCryptoSecSignKey,
+  safeCryptoSignKeypair
+//  helpers
 ];
 
 function updateCode(string) {

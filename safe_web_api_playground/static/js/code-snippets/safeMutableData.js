@@ -54,16 +54,6 @@ module.exports = {
       });
     },
 
-    newPermissionSet: () => {
-      // This function and it's return value correspond to safeMutableDataPermissionsSet functions
-
-      return window.safeMutableData.newPermissionSet(appHandle)
-      .then((res) => {
-      	permSetHandle = res;
-      	return 'Returns newly created PermissionsSet handle: ' + res;
-      });
-    },
-
     newMutation: () => {
       // This function and it's return value correspond to safeMutableDataMutation functions
 
@@ -82,12 +72,13 @@ module.exports = {
       });
     },
 
-    quickSetup: () => {
-      return window.safeMutableData.quickSetup(mdHandle, {key1: 'value1'})
-      .then((res) => {
-      	mdHandle = res;
-      	return 'Returns original mdHandle: ' + res;
-      });
+    quickSetup: async () => {
+      try {
+        mdHandle = await window.safeMutableData.quickSetup(mdHandle, {key1: 'value1'});
+      } catch (err) {
+        return err;
+      }
+      return `Returns mdHandle: ${mdHandle}`;
     },
 
     encryptKey: () => {
@@ -155,20 +146,14 @@ module.exports = {
       });
     },
 
-    getKeys: () => {
-      return window.safeMutableData.getKeys(mdHandle)
-      .then((res) => {
-      	keysHandle = res;
-      	return 'Returns handle to operate on safeMutableDataKeys functions: ' + res;
-      });
+    getKeys: async () => {
+      const keysArray = await window.safeMutableData.getKeys(mdHandle);
+      return `Returns array of entry keys: ${keysArray}`;
     },
 
     getValues: () => {
-      return window.safeMutableData.getValues(mdHandle)
-      .then((res) => {
-      	valuesHandle = res;
-      	return 'Returns handle to operate on safeMutableDataValues functions: ' + res;
-      });
+      const valuesArray = window.safeMutableData.getValues(mdHandle);
+      return `Returns array of entry values: ${valuesArray}`;
     },
 
     getPermissions: () => {
@@ -237,13 +222,6 @@ module.exports = {
       	nfsHandle = res;
       	return 'Returns nfsHandle: ' + res;
       });
-    },
-
-    free: () => {
-      window.safeMutableData.free(mdHandle);
-      mdHandle = null;
-      return;
-    },
-
+    }
   }
 }

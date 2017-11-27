@@ -1,0 +1,41 @@
+## 2.0.0
+- safeApp
+  - isNetStateInit
+  - isNetStateConnected
+  - isNetStateDisconnected
+  - clearObjectCache
+  - isMockBuild
+
+- safeCrypto
+  - generateSignKeyPair
+  - pubSignKeyFromRaw
+  - secSignKeyFromRaw
+  - generateSignKeyPairFromRaw
+
+- safeCryptoPubSignKey
+  - verify
+
+- safeCryptoSecSignKey
+  - getRaw
+  - sign
+  - free
+
+- safeCryptoSignKeyPair
+  - getPubSignKey
+  - getSecSignKey
+
+- safeMutableDataPermissions
+  - forEach -> listPermissionSets
+  - insertPermissionsSet no longer takes permissionSetHandle, instead takes an array of permissions
+
+- safeMutableData
+  - removes free function
+  - removes newPermissionsSet function
+  - getKeys returns array of mutable data keys
+  - getValues returns array of mutable data values
+
+- removes safeMutableDataValues
+- removes safeMutableDataKeys
+- removes safeMutableDataPermissionsSet
+
+- safeCryptoKeyPair -> safeCryptoEncKeyPair

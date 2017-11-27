@@ -36,17 +36,23 @@ module.exports = {
       });
     },
 
-    getSignKeyFromRaw: () => {
-      return window.safeCrypto.getSignKeyFromRaw(appHandle, rawSignKey)
-      .then((res) => {
-      	signKeyHandle = res;
-
-      	return 'Returns handle to signing key: ' + res;
-      });
+    generateSignKeyPair: async () => {
+      signKeyPairHandle = await window.safeCrypto.generateSignKeyPair(appHandle);
+      return `Returns handle to signing key pair: ${signKeyPairHandle}`;
     },
 
-    pubEncKeyKeyFromRaw: () => {
-      return window.safeCrypto.pubEncKeyKeyFromRaw(appHandle, rawPubEncKey)
+    pubSignKeyFromRaw: async () => {
+      pubSignKeyHandle = await window.safeCrypto.pubSignKeyFromRaw(rawPubSignKey);
+      return `Returns handle to public signing key: ${pubSignKeyHandle}`;
+    },
+
+    secSignKeyFromRaw: async () => {
+     secSignKeyHandle = await window.safeCrypto.secSignKeyFromRaw(rawSecSignKey);
+     return `Returns handle to secret signing key: ${secSignKeyHandle}`;
+    },
+
+    pubEncKeyFromRaw: () => {
+      return window.safeCrypto.pubEncKeyFromRaw(appHandle, rawPubEncKey)
       .then((res) => {
       	pubEncKeyHandle = res;
 
@@ -54,8 +60,8 @@ module.exports = {
       });
     },
 
-    secEncKeyKeyFromRaw: () => {
-      return window.safeCrypto.secEncKeyKeyFromRaw(appHandle, rawSecEncKey)
+    secEncKeyFromRaw: () => {
+      return window.safeCrypto.secEncKeyFromRaw(appHandle, rawSecEncKey)
       .then((res) => {
       	secEncKeyHandle = res;
 
@@ -70,6 +76,11 @@ module.exports = {
 
       	return 'Encryption key pair generated from raw strings: ' + res;
       });
+    },
+
+    generateSignKeyPairFromRaw: async () => {
+      signKeyPairHandle = await window.safeCrypto.generateSignKeyPairFromRaw(rawSignKeyPair);
+      return `Returns handle to sign key pair: ${signKeyPairHandle}`;
     },
 
     generateNonce: () => {

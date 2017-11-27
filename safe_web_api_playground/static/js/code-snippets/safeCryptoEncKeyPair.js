@@ -1,7 +1,7 @@
 module.exports = {
-  safeCryptoKeyPair: {
+  safeCryptoEncKeyPair: {
     getPubEncKey: () => {
-      return window.safeCryptoKeyPair.getPubEncKey(keyPairHandle)
+      return window.safeCryptoEncKeyPair.getPubEncKey(encKeyPairHandle)
       .then((res) => {
       	pubEncKeyHandle = res;
 
@@ -10,7 +10,7 @@ module.exports = {
     },
 
     getSecEncKey: () => {
-      return window.safeCryptoKeyPair.getSecEncKey(keyPairHandle)
+      return window.safeCryptoEncKeyPair.getSecEncKey(encKeyPairHandle)
       .then((res) => {
       	secEncKeyHandle = res;
 
@@ -21,7 +21,7 @@ module.exports = {
     decryptSealed: () => {
       // let cipher = <encrypted data>;
 
-      return window.safeCryptoKeyPair.decryptSealed(keyPairHandle, cipher)
+      return window.safeCryptoEncKeyPair.decryptSealed(encKeyPairHandle, cipher)
       .then(data => {
 
       	return 'Returns decrypted data: ', String.fromCharCode.apply(null, new Uint8Array(data));
@@ -29,8 +29,8 @@ module.exports = {
     },
 
     free: () => {
-      window.safeCryptoKeyPair.free(keyPairHandle);
-      keyPairHandle = null;
+      window.safeCryptoEncKeyPair.free(encKeyPairHandle);
+      encKeyPairHandle = null;
       return;
     },
 

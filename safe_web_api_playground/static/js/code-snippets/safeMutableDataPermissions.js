@@ -23,30 +23,24 @@ module.exports = {
 
     insertPermissionsSet: () => {
       // Example:
+      // const permissionSet = ['Insert', 'ManagePermissions'];
       // window.safeCrypto.getAppPubSignKey(appHandle)
       //    .then((pk) => signKeyHandle = pk)
       //    .then(_ => window.safeMutableData.getPermissions(mdHandle))
       //    .then((h) => permsHandle = h)
-      //    .then(_ => window.safeMutableData.newPermissionSet(appHandle))
-      //    .then((h) => permSetHandle = h)
-      //    .then(_ => window.safeMutableDataPermissionsSet.setAllow(permSetHandle, 'Insert'))
-      //    .then(_ => window.safeMutableDataPermissionsSet.setAllow(permSetHandle, 'ManagePermissions'))
-      //    .then(_ => window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, signKeyHandle, permSetHandle))
+      //    .then(_ => window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, signKeyHandle, permissionSet))
       //    .then(_ => console.log('Finished inserting new permissions'));
-
-      return window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, signKeyHandle, permSetHandle)
+      
+      const pmSet = ['Insert', 'ManagePermissions'];
+      return window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, signKeyHandle, pmSet)
       .then(_ => {
       	return 'Finished inserting new permissions' + _;
       });
     },
 
-    forEach: () => {
-      return window.safeMutableDataPermissions.forEach(permsHandle, (p) => {
-
-        console.log(p);
-      	console.log('Permissions-set entry handle: ', String.fromCharCode.apply(null, new Uint8Array(p)));
-
-      }).then(_ => 'Iteration finished');
+    listPermissionSets: async () => {
+      const permsArray = window.safeMutableDataPermissions.listPermissionSets(permsHandle);
+      return `Returns array of permission-sets: ${permsArray}`;
     },
 
     free: () => {

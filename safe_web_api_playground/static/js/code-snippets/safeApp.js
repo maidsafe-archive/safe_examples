@@ -114,6 +114,28 @@ module.exports = {
       });
     },
 
+    networkState: () => {
+      return window.safeApp.networkState(appHandle)
+      .then((s) => {
+        return 'Current network state: ' + s;
+      });
+    },
+
+    isNetStateInit: async () => {
+      const bool = await window.safeApp.isNetStateInit(appHandle);
+      return `Is app in initialised network state? ${bool}`;
+    },
+
+    isNetStateConnected: async () => {
+      const bool = await window.safeApp.isNetStateConnected(appHandle);
+      return `Is app in connected network state? ${bool}`;
+    },
+
+    isNetStateDisconnected: async () => {
+      const bool = await window.safeApp.isNetStateDisconnected(appHandle);
+      return `Is app in disconnected network state? ${bool}`;
+    },
+
     isRegistered: () => {
       return window.safeApp.isRegistered(appHandle)
       .then((r) => {
@@ -121,11 +143,14 @@ module.exports = {
       });
     },
 
-    networkState: () => {
-      return window.safeApp.networkState(appHandle)
-      .then((s) => {
-        return 'Current network state: ' + s;
-      });
+    clearObjectCache: async () => {
+      const complete = await window.safeApp.clearObjectCache(appHandle);
+      return 'All handles, except for appHandle, have been freed from memory';
+    },
+
+    isMockBuild: async () => {
+      const bool = await window.safeApp.isMockBuild(appHandle);
+      return `Are the underlying native libraries compiled for mock routing? ${bool}`;
     },
 
     canAccessContainer: () => {
@@ -166,6 +191,17 @@ module.exports = {
         mdHandle = res;
         return 'Returns handle to Mutable Data behind ' + container + ' container: ' + res;
       });
+    },
+
+    reconnect: async () => {
+      const connected = await window.safeApp.reconnect(appHandle);
+      return 'App reconnected to network';
+    },
+
+    logPath: async () => {
+      const filename = null; // if null, find path of safe_core log file
+      const path = await window.safeApp.logPath(appHandle, filename);
+      return `Path of log file: ${path}`;
     },
 
     free: () => {
