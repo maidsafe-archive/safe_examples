@@ -1,22 +1,24 @@
 module.exports = {
   safeMutableData: {
-    newRandomPrivate: () => {
-      return window.safeMutableData.newRandomPrivate(appHandle, 15001)
-      .then((res) => {
-      	mdHandle = res;
-      	return 'Returns handle to newly created, private, randomly named MutableData structure: ' + res;
-      });
+    newRandomPrivate: async () => {
+      try {
+        mdHandle = await window.safeMutableData.newRandomPrivate(appHandle, 15001)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to newly created, private, randomly named MutableData structure: ${mdHandle}`;
     },
 
-    newRandomPublic: () => {
-      return window.safeMutableData.newRandomPublic(appHandle, 15001)
-      .then((res) => {
-      	mdHandle = res;
-      	return 'Returns handle to newly created, public, randomly named MutableData structure: ' + res;
-      });
+    newRandomPublic: async () => {
+      try {
+        mdHandle = await window.safeMutableData.newRandomPublic(appHandle, 15001)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to newly created, public, randomly named MutableData structure: ${mdHandle}`;
     },
 
-    newPrivate: () => {
+    newPrivate: async () => {
       // Generate nonce with generated with safeCrypto.generateNonce
 
       // name and secKey must be 32 bytes.
@@ -25,51 +27,54 @@ module.exports = {
       let name = 'name-private-0101010101010101010';
       let secKey = 'secret-key-010101010101010101010';
 
-      return window.safeMutableData.newPrivate(appHandle, name, 15001, secKey, nonce)
-      .then((res) => {
-      	mdHandle = res;
-      	return 'Returns handle to newly created or already existing, private, explicitly named Mutable Data structure: ' + res;
-      })
+      try {
+        mdHandle = await window.safeMutableData.newPrivate(appHandle, name, 15001, secKey, nonce)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to newly created or already existing, private, explicitly named Mutable Data structure: ${mdHandle}`;
     },
 
-    newPublic: () => {
+    newPublic: async () => {
       // name must be 32 bytes.
       // You can use safeCrypto.sha3Hash to generate a 32 byte hash based on the string you input
 
       let name = 'name-public-01010101010101010101';
-      return window.safeMutableData.newPublic(appHandle, name, 15001)
-      .then((res) => {
-      	mdHandle = res;
-      	return 'Returns handle to newly created or already existing, public, explicitly named Mutable Data structure: ' + res;
-      });
+      try {
+       mdHandle = await window.safeMutableData.newPublic(appHandle, name, 15001)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to newly created or already existing, public, explicitly named Mutable Data structure: ${mdHandle}`;
     },
 
-    newPermissions: () => {
+    newPermissions: async () => {
       // This function and it's return value correspond to safeMutableDataPermissions functions
-
-      return window.safeMutableData.newPermissions(appHandle)
-      .then((res) => {
-      	permsHandle = res;
-      	return 'Newly created permissions handle returned: ' + res;
-      });
+      try {
+        permsHandle = await window.safeMutableData.newPermissions(appHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Newly created permissions handle returned: ${permsHandle}`;
     },
 
-    newMutation: () => {
+    newMutation: async () => {
       // This function and it's return value correspond to safeMutableDataMutation functions
-
-      return window.safeMutableData.newMutation(appHandle)
-      .then((res) => {
-      	mutationHandle = res;
-      	return 'Returns handle to be able to call safeMutableDataMutation functions: ' + res;
-      });
+      try {
+        mutationHandle = await window.safeMutableData.newMutation(appHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to be able to call safeMutableDataMutation functions: ${mutationHandle}`;
     },
 
-    newEntries: () => {
-      return window.safeMutableData.newEntries(appHandle)
-      .then((res) => {
-      	entriesHandle = res;
-      	return 'Returns an entries handle to be used with safeMutableDataEntries functions: ' + res;
-      });
+    newEntries: async () => {
+      try {
+        entriesHandle = await window.safeMutableData.newEntries(appHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Returns an entries handle to be used with safeMutableDataEntries functions: ${entriesHandle}`;
     },
 
     quickSetup: async () => {
@@ -81,147 +86,170 @@ module.exports = {
       return `Returns mdHandle: ${mdHandle}`;
     },
 
-    encryptKey: () => {
-      return window.safeMutableData.encryptKey(mdHandle, 'key1')
-      .then((res) => {
-      	encryptedKey = res;
-      	return 'Encrypted key: ' + res;
-      });
+    encryptKey: async () => {
+    try {
+      encryptedKey = await window.safeMutableData.encryptKey(mdHandle, 'key1')
+    } catch(err) {
+      return err;
+    }
+     return `Encrypted key: ${encryptedKey}`;
     },
 
-    encryptValue: () => {
-      return window.safeMutableData.encryptValue(mdHandle, 'value1')
-      .then((res) => {
-      	encryptedValue = res;
-      	return 'Encrypted value: ' + res;
-      });
+    encryptValue: async () => {
+      try {
+        encryptedValue = await window.safeMutableData.encryptValue(mdHandle, 'value1')
+      } catch(err) {
+        return err;
+      }
+       return `Encrypted value: ${encryptedValue}`;
     },
 
-    decrypt: () => {
+    decrypt: async () => {
       // `value` argument can be either encryptedValue or encryptedKey
-
-      return window.safeMutableData.decrypt(mdHandle, value)
-      .then((decryptedValue) => {
-      	return 'Decrypted key: ' + String.fromCharCode.apply(null, new Uint8Array(decryptedValue));
-      })
+      try {
+        decryptedValue = await window.safeMutableData.decrypt(mdHandle, value)
+      } catch(err) {
+        return err;
+      }
+      return `Decrypted key: ${String.fromCharCode.apply(null, new Uint8Array(decryptedValue))}`;
     },
 
-    getNameAndTag: () => {
-      return window.safeMutableData.getNameAndTag(mdHandle)
-      .then((res) => {
-        mdName = res.name.buffer;
-      	return 'Name: ' + String.fromCharCode.apply(null, new Uint8Array(res.name.buffer)) + ', Tag: ' + res.tag;
-      });
+    getNameAndTag: async () => {
+      try {
+        var nameAndTag = await window.safeMutableData.getNameAndTag(mdHandle)
+	mdName = nameAndTag.name.buffer;
+      } catch(err) {
+        return err;      
+      }
+      return `Name: ${String.fromCharCode.apply(null, new Uint8Array(nameAndTag.name.buffer))}, Tag: ${nameAndTag.type_tag}`;
     },
 
-    getVersion: () => {
-      return window.safeMutableData.getVersion(mdHandle)
-      .then((res) => {
-        version = res;
-      	return 'MutableData current version: ' + res;
-      });
+    getVersion: async () => {
+    try {
+      version = await window.safeMutableData.getVersion(mdHandle)
+    } catch(err) {
+      return err; 
+    }
+    return `MutableData current version: ${version}`;
     },
 
-    get: () => {
-      return window.safeMutableData.get(mdHandle, 'key1')
-      .then((value) => {
-      	return 'Value: ' + String.fromCharCode.apply(null, new Uint8Array(value.buf)) + ', Version: ' + value.version;
-      })
+    get: async () => {
+     // get entry valuefrom mutable data by key
+      try {
+        var value = await window.safeMutableData.get(mdHandle, 'key1')
+      } catch(err) {
+        return err;
+      }
+      return `Value: ${String.fromCharCode.apply(null, new Uint8Array(value.buf))}, Version: ${value.version}`;
     },
 
-    put: () => {
-      return window.safeMutableData.put(mdHandle, permsHandle, entriesHandle)
-      .then(_ => {
-      	return 'Finished creating and committing MutableData to the network' + _;
-      });
+    put: async () => {
+      await window.safeMutableData.put(mdHandle, permsHandle, entriesHandle)
+      return 'Finished creating and committing MutableData to the network';
     },
 
-    getEntries: () => {
+    getEntries: async () => {
       // This function returns a handle that will allow you to use the safeMutableDataEntries module below.
-
-      return window.safeMutableData.getEntries(mdHandle)
-      .then((res) => {
-      	entriesHandle = res;
-      	return 'Returns handle for safeMutableDataEntries operations: ' + res;
-      });
+      try {
+        entriesHandle = await window.safeMutableData.getEntries(mdHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle for safeMutableDataEntries operations: ${entriesHandle}`;
     },
 
     getKeys: async () => {
-      const keysArray = await window.safeMutableData.getKeys(mdHandle);
+      try {
+        var keysArray = await window.safeMutableData.getKeys(mdHandle);
+      } catch (err) {
+        return err;
+      }
       return `Returns array of entry keys: ${keysArray}`;
     },
 
     getValues: () => {
-      const valuesArray = window.safeMutableData.getValues(mdHandle);
+      try {
+        var valuesArray = window.safeMutableData.getValues(mdHandle);
+      } catch(err) {
+        return err; 
+      }
       return `Returns array of entry values: ${valuesArray}`;
     },
 
-    getPermissions: () => {
-      return window.safeMutableData.getPermissions(mdHandle)
-      .then((res) => {
-      	permsHandle = res;
-      	return 'Returns handle to operate on safeMutableDataPermissions: ' + res;
-      });
+    getPermissions: async () => {
+      try {
+        permsHandle = await window.safeMutableData.getPermissions(mdHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to operate on safeMutableDataPermissions: ${permsHandle}`;
     },
 
-    getUserPermissions: () => {
+    getUserPermissions: async () => {
       // First use safeCrypto.getAppPubSignKey to obtain signKeyHandle
-
-      return window.safeMutableData.getUserPermissions(mdHandle, signKeyHandle)
-      .then((res) => {
-      	permSetHandle = res;
-      	return 'Returns handle to operate on safeMutableDataPermissionsSet: ' + res;
-      });
+      try {
+        permsHandle = await window.safeMutableData.getUserPermissions(mdHandle, signKeyHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to operate on safeMutableDataPermissions: ${permsHandle}`;
     },
 
-    delUserPermissions: () => {
-      return window.safeMutableData.delUserPermissions(mdHandle, signKey, version + 1)
-      .then(_ => {
-      	return 'PermissionsSet removed for the sign key provided';
-      });
+    delUserPermissions: async () => {
+      try {
+        await window.safeMutableData.delUserPermissions(mdHandle, signKey, version + 1)
+      } catch(err) {
+        return err; 
+      }
+      return `Permissions-Set removed for the sign key provided`;
     },
 
-    setUserPermissions: () => {
-      return window.safeMutableData.setUserPermissions(mdHandle, signKeyHandle, permSetHandle, version + 1)
-      .then(_ => {
-      	return 'Finished setting user permission';
-      });
+    setUserPermissions: async () => {
+      try {
+        await window.safeMutableData.setUserPermissions(mdHandle, signKeyHandle, permSetHandle, version + 1)
+      } catch(err) {
+        return err;
+      }
+      return 'Finished setting user permission';
     },
 
-    applyEntriesMutation: () => {
+    applyEntriesMutation: async () => {
       // Use safeMutableData.newMutation to obtain mutationHandle
-
-      return window.safeMutableData.applyEntriesMutation(mdHandle, mutationHandle)
-      .then(_ => {
-      	return 'New entry was inserted in the MutableData and committed to the network' + _;
-      });
+      try {
+       await window.safeMutableData.applyEntriesMutation(mdHandle, mutationHandle)
+      } catch(err) {
+        return err;
+      }
+      return 'New entry was inserted in the MutableData and committed to the network';
     },
 
-    serialise: () => {
-      return window.safeMutableData.serialise(mdHandle)
-      .then((res) => {
-      	serializedMD = res;
-      	return 'MutableData serialised version retrieved: ' + res;
-      });
+    serialise: async () => {
+    try {
+      serialisedMD = await window.safeMutableData.serialise(mdHandle)
+    } catch(err) {
+      return err;
+    }
+    return `MutableData serialised version output: ${serialisedMD}`;
     },
 
-    fromSerial: () => {
-      return window.safeMutableData.fromSerial(appHandle, serializedMD)
-      .then((res) => {
-      	mdHandle = res;
-      	return 'Returns handle to MutableData: ' + res;
-      });
+    fromSerial: async () => {
+      try {
+        mdHandle = await window.safeMutableData.fromSerial(appHandle, serializedMD)
+      } catch(err) {
+        return err;
+      }
+       return `Returns handle to MutableData: ${mdHandle}`;
     },
 
-    emulateAs: () => {
+    emulateAs: async () => {
       // Wrap this MutableData into a known abstraction. Currently known: NFS
       // The returned nfsHandle will allow you to use safeNfs functions
-
-      return window.safeMutableData.emulateAs(mdHandle, 'NFS')
-      .then((res) => {
-      	nfsHandle = res;
-      	return 'Returns nfsHandle: ' + res;
-      });
+      try {
+        nfsHandle = await window.safeMutableData.emulateAs(mdHandle, 'NFS')
+      } catch(err) {
+        return err;
+      }
+      return `Returns nfsHandle: ${nfsHandle}`;
     }
   }
 }

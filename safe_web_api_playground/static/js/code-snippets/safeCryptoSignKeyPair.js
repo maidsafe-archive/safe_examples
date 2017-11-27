@@ -10,7 +10,11 @@ module.exports = {
     },
 
     getSecSignKey: async () => {
-      secSignKeyHandle = await window.safeCryptoSignKeyPair.getSecSignKey(signKeyPairHandle);
+      try {
+        secSignKeyHandle = await window.safeCryptoSignKeyPair.getSecSignKey(signKeyPairHandle);
+      } catch(err) {
+        return err;
+      }
       return `Returns secret signing key handle: ${secSignKeyHandle}`;
     }
   }

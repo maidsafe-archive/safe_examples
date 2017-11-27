@@ -1,31 +1,31 @@
 module.exports = {
   safeCryptoEncKeyPair: {
-    getPubEncKey: () => {
-      return window.safeCryptoEncKeyPair.getPubEncKey(encKeyPairHandle)
-      .then((res) => {
-      	pubEncKeyHandle = res;
-
-      	return 'Returns handle to the public key assocatiated with respective encrypted key pair: ' + res;
-      })
+    getPubEncKey: async () => {
+      try {
+        pubEncKeyHandle = await window.safeCryptoEncKeyPair.getPubEncKey(encKeyPairHandle)
+      } catch (err) {
+        return err;
+      }
+      return `Returns handle to the public key assocatiated with respective encrypted key pair: ${pubEncKeyHandle}`;
     },
 
-    getSecEncKey: () => {
-      return window.safeCryptoEncKeyPair.getSecEncKey(encKeyPairHandle)
-      .then((res) => {
-      	secEncKeyHandle = res;
-
-      	return 'Returns handle to secret key associated with respective encrypted key pair: ' + res;
-      });
+    getSecEncKey: async () => {
+      try {
+        secEncKeyHandle = await window.safeCryptoEncKeyPair.getSecEncKey(encKeyPairHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to secret key associated with respective encrypted key pair: ${secEncKeyHandle}`;
     },
 
-    decryptSealed: () => {
+    decryptSealed: async () => {
       // let cipher = <encrypted data>;
-
-      return window.safeCryptoEncKeyPair.decryptSealed(encKeyPairHandle, cipher)
-      .then(data => {
-
-      	return 'Returns decrypted data: ', String.fromCharCode.apply(null, new Uint8Array(data));
-      })
+      try {
+        var deciphered = await window.safeCryptoEncKeyPair.decryptSealed(encKeyPairHandle, cipher)
+      } catch(err) {
+        return err;
+      }
+      return `Returns decrypted data: ${String.fromCharCode.apply(null, new Uint8Array(deciphered))}`;
     },
 
     free: () => {

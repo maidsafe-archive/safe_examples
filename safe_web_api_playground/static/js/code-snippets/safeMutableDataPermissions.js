@@ -1,45 +1,53 @@
 module.exports = {
   safeMutableDataPermissions: {
-    len: () => {
+    len: async () => {
       // Need a permsHandle?
       // Use safeMutableData.getPermissions to obtain it.
-
-      return window.safeMutableDataPermissions.len(permsHandle)
-      .then((len) => {
-      	return 'Number of permissions entries in the MutableData: ' + len;
-      });
+      let length = null;
+      try {
+        length = await window.safeMutableDataPermissions.len(permsHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Number of permissions entries in the MutableData: ${length}`;
     },
 
-    getPermissionsSet: () => {
+    getPermissionsSet: async () => {
       // Use safeMutableData.getPermissions to obtain
-      // Use safeCrypto.getAppPubSignKey to get signKeyHandle
-
-      return window.safeMutableDataPermissions.getPermissionsSet(permsHandle, signKeyHandle)
-      .then(res => {
-      	permSetHandle = res;
-      	return 'Returns permissions-set handle for specific signing key: ' + res;
-      });
+      // Use safeCrypto.getAppPubSignKey to get pubSignKeyHandle
+      try {
+        permSet = await window.safeMutableDataPermissions.getPermissionsSet(permsHandle, pubSignKeyHandle)
+      } catch(err) {
+        return err;
+      }
+      	return `Returns permissions-set for specific signing key: ${permSet}`;
     },
 
-    insertPermissionsSet: () => {
+    insertPermissionsSet: async () => {
       // Example:
       // const permissionSet = ['Insert', 'ManagePermissions'];
       // window.safeCrypto.getAppPubSignKey(appHandle)
-      //    .then((pk) => signKeyHandle = pk)
+      //    .then((pk) => pubSignKeyHandle = pk)
       //    .then(_ => window.safeMutableData.getPermissions(mdHandle))
       //    .then((h) => permsHandle = h)
-      //    .then(_ => window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, signKeyHandle, permissionSet))
+      //    .then(_ => window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, pubSignKeyHandle, permissionSet))
       //    .then(_ => console.log('Finished inserting new permissions'));
       
       const pmSet = ['Insert', 'ManagePermissions'];
-      return window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, signKeyHandle, pmSet)
-      .then(_ => {
-      	return 'Finished inserting new permissions' + _;
-      });
+      try {
+        await window.safeMutableDataPermissions.insertPermissionsSet(permsHandle, pubSignKeyHandle, pmSet)
+      } catch(err) {
+        return err;
+      }
+      	return 'Finished inserting new permissions';
     },
 
     listPermissionSets: async () => {
-      const permsArray = window.safeMutableDataPermissions.listPermissionSets(permsHandle);
+      try {
+        var permsArray = window.safeMutableDataPermissions.listPermissionSets(permsHandle);
+      } catch(err) {
+        return err;
+      }
       return `Returns array of permission-sets: ${permsArray}`;
     },
 

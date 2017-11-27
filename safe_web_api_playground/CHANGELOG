@@ -1,31 +1,38 @@
+# SAFE web API playground Change Log
+
 ## 2.0.0
-- safeApp
+
+- improved error handling
+
+- refactor code to use async/await
+
+- window.safeApp additions
   - isNetStateInit
   - isNetStateConnected
   - isNetStateDisconnected
   - clearObjectCache
   - isMockBuild
 
-- safeCrypto
+- window.safeCrypto additions
   - generateSignKeyPair
   - pubSignKeyFromRaw
   - secSignKeyFromRaw
   - generateSignKeyPairFromRaw
 
-- safeCryptoPubSignKey
+- window.safeCryptoPubSignKey addition
   - verify
 
-- safeCryptoSecSignKey
+- window.safeCryptoSecSignKey additions
   - getRaw
   - sign
   - free
 
-- safeCryptoSignKeyPair
+- window.safeCryptoSignKeyPair additions
   - getPubSignKey
   - getSecSignKey
 
-- safeMutableDataPermissions
-  - forEach -> listPermissionSets
+- window.safeMutableDataPermissions
+  - `forEach` changed to `listPermissionSets`
   - insertPermissionsSet no longer takes permissionSetHandle, instead takes an array of permissions
 
 - safeMutableData

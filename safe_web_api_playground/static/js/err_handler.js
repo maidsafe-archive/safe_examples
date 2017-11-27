@@ -109,8 +109,8 @@ const errCase = (type) => {
           return 'idAddress not yet defined. Use safeImmutableData.closeWriter to first obtain idAddress';
           break;
 
-        case 'serializedMD':
-          return 'serializedMD not yet defined. Use safeMutableData.serialise to first obtain serializedMD';
+        case 'serialisedMD':
+          return 'serialisedMD not yet defined. Use safeMutableData.serialise to first obtain serialisedMD';
           break;
 
         case 'hashedString':

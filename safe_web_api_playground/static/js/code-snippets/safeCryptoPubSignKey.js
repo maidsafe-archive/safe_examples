@@ -1,12 +1,20 @@
 module.exports = {
   safeCryptoPubSignKey: {
     getRaw: async () => {
-      rawPubSignKey = await window.safeCryptoPubSignKey.getRaw(pubSignKeyHandle);
+      try {
+        rawPubSignKey = await window.safeCryptoPubSignKey.getRaw(pubSignKeyHandle);
+      } catch(err) {
+        return err;
+      }
       return `Returns raw public signing key: ${rawPubSignKey}`;
     },
 
     verify: async () => {
-      const verifiedData = await window.safeCryptoPubSignKey.verify(pubSignKeyHandle, signedData);
+      try {
+        var verifiedData = await window.safeCryptoPubSignKey.verify(pubSignKeyHandle, signedData);
+      } catch(err) {
+        return err;
+      }
       return `Returns verfied data: ${String.fromCharCode.apply(null, new Uint8Array(verifiedData))}`;
     }, 
 

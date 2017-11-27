@@ -1,48 +1,58 @@
 module.exports = {
   safeNfsFile: {
-    size: () => {
-      return window.safeNfsFile.size(fileContextHandle)
-      .then(fileSize => {
-        return 'file size in bytes: ' + filesize;
-      })
+    size: async () => {
+      let fileSize = null;
+      try {
+        fileSize = await window.safeNfsFile.size(fileContextHandle)
+      } catch(err) {
+        return err;
+      }
+      return `file size in bytes: ${filesize}`;
     },
 
-    read: () => {
+    read: async () => {
       //  Read the file from the beginning.
-      let FILE_READ_FROM_BEGIN = 0;
+      const FILE_READ_FROM_BEGIN = 0;
 
       //  Read entire contents of a file.
       const FILE_READ_TO_END = 0;
 
-      let position = FILE_READ_FROM_BEGIN;
-      let len = FILE_READ_TO_END;
-
-      return window.safeNfsFile.read(fileContextHandle, position, len)
-      .then(data => {
-        return String.fromCharCode.apply(null, new Uint8Array(data));
-      })
+      const position = FILE_READ_FROM_BEGIN;
+      const len = FILE_READ_TO_END;
+      try {
+       var data = await window.safeNfsFile.read(fileContextHandle, position, len)
+      } catch(err) {
+        return err;
+      }
+      return `${String.fromCharCode.apply(null, new Uint8Array(data))}`;
     },
 
-    write: () => {
+    write: async () => {
       let content = 'file content may be a string';
-      return window.safeNfsFile.write(fileContextHandle, content)
-      .then(_ => {
+      try {
+        await window.safeNfsFile.write(fileContextHandle, content)
+      } catch(err) {
+        return err;
+      }
         return 'File content written but still needs to be saved to the network.';
-      })
     },
 
-    close: () => {
-      return window.safeNfsFile.close(fileContextHandle)
-      .then(_ => {
+    close: async () => {
+      try {
+        await window.safeNfsFile.close(fileContextHandle)
+      } catch(err) {
+        return err;
+      }
         return 'File committed to the network!';
-      })
     },
 
-    metadata: () => {
-      return window.safeNfsFile.metadata(fileContextHandle)
-      .then(metaData => {
-        return 'Returns file meta data: ' + metaData;
-      })
+    metadata: async () => {
+      try {
+        var metaDat = await window.safeNfsFile.metadata(fileContextHandle)
+      } catch(err) {
+        return err;
+      }
+        return `Returns file meta data: ${metaData}`;
     },
 
     free: () => {

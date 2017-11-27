@@ -26,7 +26,7 @@ module.exports = [
   'rawSecEncKey',
   'encryptedBuffer',
   'idAddress',
-  'serializedMD',
+  'serialisedMD',
   'hashedString',
   'mdName',
   'signedData'
