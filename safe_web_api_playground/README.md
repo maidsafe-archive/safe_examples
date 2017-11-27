@@ -8,8 +8,8 @@ Instead of having to upload your site to the network every time you want to test
 ###### SETUP
 
 - clone this repository and `cd` into the respective directory
-- Run `npm install`
-- Run `npm run gulp` to start server
+- Run `yarn`
+- Run `yarn gulp` to start server
 - Visit `localhost:3003` in your SAFE browser to see page
 
 To upload this site to the network:
