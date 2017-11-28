@@ -1,5 +1,9 @@
 # MaidSafe Email Tutorial App Change Log
 
+## [0.4.2]
+
+- Upgrade `@maidsafe/safe-node-app` to v0.5.1
+
 ## [0.4.1]
 
 - Compatible with Safe Browser `v0.8.0`

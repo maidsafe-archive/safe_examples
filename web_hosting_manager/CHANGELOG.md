@@ -1,5 +1,9 @@
 # SAFE Hosting Manager App Change Log
 
+## [0.4.3]
+
+- Upgrade `@maidsafe/safe-node-app` to v0.5.1
+
 ## [0.4.2]
 
 - Compatible with Safe Browser `v0.8.0`
