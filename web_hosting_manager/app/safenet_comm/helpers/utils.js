@@ -20,7 +20,11 @@ export const parseNetworkPath = (nwPath) => {
     file: undefined,
   };
   if (nwPath) {
-    const sep = path.sep;
+    const sep = '/';
+    if (path.sep === '\\') {
+      const regx = new RegExp(/\\/,'g');
+      nwPath = nwPath.replace(regx, sep);
+    }
     const splitPath = nwPath.split(sep);
     result.dir = splitPath.slice(0, 3).join(sep);
     result.file = splitPath.slice(3).join(sep) || path.basename(nwPath);
