@@ -1,7 +1,7 @@
 {
   "name": "web-hosting-manager",
   "productName": "Web Hosting Manager",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Application to host web files in the SAFE Network",
   "identifier": "net.maidsafe.examples.webhostingmanager",
   "main": "./main.prod.js",
@@ -15,7 +15,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@maidsafe/safe-node-app": "0.5.0",
+    "@maidsafe/safe-node-app": "0.5.1",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "npm-font-open-sans": "^1.1.0",
