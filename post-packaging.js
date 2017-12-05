@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs-extra');
 const archiver = require('archiver');
 const commandLineArgs = require('command-line-args')
+const crypto = require('crypto');
+const nodeFs = require('fs');
 
 const optionDefinitions = [
   { name: 'example', alias: 'e', type: String,defaultOption: true, defaultValue: 'web_hosting_manager' },
@@ -137,3 +139,15 @@ archive.on('warning', function(err) {
 archive.pipe(output);
 archive.directory(`${targetDir}/${RELEASE_FOLDER_NAME}`, RELEASE_FOLDER_NAME);
 archive.finalize();
+
+
+const algorithm = 'sha256';
+const shasum = crypto.createHash(algorithm);
+const filePath = `${targetDir}/${RELEASE_FOLDER_NAME}.zip`;
+const s = nodeFs.createReadStream(filePath);
+s.on('data', (d) => { shasum.update(d); });
+s.on('end', () => {
+const d = shasum.digest('hex');
+  console.log(d);
+  fs.writeFileSync(`${targetDir}/${RELEASE_FOLDER_NAME}.txt`, d);
+});

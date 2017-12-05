@@ -1,0 +1,53 @@
+sudo: required
+dist: trusty
+
+os:
+- osx
+- linux
+
+
+env:
+- NODE_ENV=prod
+
+
+node_js:
+- '7'
+cache:
+  yarn: true
+  directories:
+  - node_modules
+  - app/node_modules
+  - $HOME/.electron
+  - $HOME/.cache
+language: node_js
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+script:
+- yarn install-all
+- yarn package-all
+before_deploy:
+- export EMAIL_APP="$(ls email_app/out/*.zip)";
+- export WEB_HOSTING_MANAGER="$(ls web_hosting_manager/release/*.zip)";
+- export SHA_256_SUM_EMAIL_APP="$(ls email_app/out/*.txt)";
+- export SHA_256_SUM_WHM="$(ls web_hosting_manager/release/*.txt)";
+- ls email_app/out
+- ls web_hosting_manager/release
+- echo "${EMAIL_APP}, ${WEB_HOSTING_MANAGER}, ${SHA_256_SUM_EMAIL_APP}, ${SHA_256_SUM_WHM} being deployed."
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key: $GITHUB_AUTH_TOKEN
+  file: 
+    - "${EMAIL_APP}"
+    - "${WEB_HOSTING_MANAGER}"
+    - "${SHA_256_SUM_EMAIL_APP}"
+    - "${SHA_256_SUM_WHM}"
+  draft: true
+  prerelease: true
+  tag_name: $TRAVIS_TAG
+  on:
+    tags: true
