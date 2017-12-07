@@ -25,5 +25,5 @@ export default {
   },
   MD_META_KEY: '_metadata',
   DEFAULT_LOADING_MSG: 'Please wait...',
-  MAX_COMMENT_VERSION_CHAR: 5
+  MAX_COMMENT_VERSION_CHAR: 5,
 };

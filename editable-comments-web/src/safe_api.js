@@ -39,7 +39,6 @@ const APP = {
  * Also exposes other utility functions for getting Public ID list and also to validate the user is admin
  */
 export default class SafeApi {
-
   /**
    * @constructor
    * @param {any} topic
@@ -78,28 +77,16 @@ export default class SafeApi {
         // Get public names container handle
         const publicNamesContainerHandle = await window.safeApp.getContainer(this.app, PUBLIC_NAMES_CONTAINER);
         // Get handle for the keys for the public names container
-        const keysHandle = await window.safeMutableData.getKeys(publicNamesContainerHandle);
-        const keysLen = await window.safeMutableDataKeys.len(keysHandle);
-        // If there is no Public ID return empty list
-        if (keysLen === 0) {
-          return resolve([]);
-        }
-        const publicNames = [];
-        // get all keys from the conatiner.
-        await window.safeMutableDataKeys.forEach(keysHandle, (key) => {
-          publicNames.push(key);
-        });
-        window.safeMutableDataKeys.free(keysHandle);
+        const publicNames = await window.safeMutableData.getKeys(publicNamesContainerHandle);
         // Decrypt the keys to get the actual Public ID
         for (const publicName of publicNames) {
           try {
-            const decryptedValue = await window.safeMutableData.decrypt(publicNamesContainerHandle, publicName);
-            decryptedPublicNames.push(String.fromCharCode.apply(null, new Uint8Array(decryptedValue)));
+            const decryptedKey = await window.safeMutableData.decrypt(publicNamesContainerHandle, publicName);
+            decryptedPublicNames.push(String.fromCharCode.apply(null, new Uint8Array(decryptedKey)));
           } catch (e) {
             console.warn(e);
           }
         }
-        window.safeMutableData.free(publicNamesContainerHandle);
       } catch (err) {
         return reject(err);
       }
@@ -132,12 +119,7 @@ export default class SafeApi {
           `Comments for the hosting ${this.MD_NAME} is saved in this MutableData`,
         );
         // create a new permission set
-        const permSet = await window.safeMutableData.newPermissionSet(this.app);
-        // allowing the user to perform the Insert operation
-        await window.safeMutableDataPermissionsSet.setAllow(permSet, PERMISSIONS.INSERT);
-        // allowing the user to perform the Insert operation
-        await window.safeMutableDataPermissionsSet.setAllow(permSet, PERMISSIONS.INSERT);
-        // setting the handle as null, anyone can perform the Insert operation
+        const permSet = [PERMISSIONS.INSERT];
         await window.safeMutableData.setUserPermissions(this.mData, null, permSet, 1);
         resolve();
       } catch (err) {
@@ -179,12 +161,11 @@ export default class SafeApi {
         // Connect as unregistered client
         await window.safeApp.connect(appHandle);
         const hashedName = await window.safeCrypto.sha3Hash(appHandle, this.MD_NAME);
+        // newPublic function only creates a handle in the local memory.
         const mdHandle = await window.safeMutableData.newPublic(appHandle, hashedName, TYPE_TAG);
-        // newPublic function only creates a handle in the local memmory.
         // The network operation is performed only when we call getEntries for validating that the MutableData exists
         const entriesHandle = await window.safeMutableData.getEntries(mdHandle);
         window.safeMutableDataEntries.free(entriesHandle);
-        window.safeMutableData.free(mdHandle);
         await window.safeApp.free(appHandle);
         resolve(true);
       } catch (err) {
@@ -211,8 +192,8 @@ export default class SafeApi {
           await this.createMutableDataHandle();
         }
         // set an application signkey
-        const signKeyHandle = await window.safeCrypto.getAppPubSignKey(this.app);
-        const rawPubKey = await window.safeCryptoSignKey.getRaw(signKeyHandle);
+        const pubSignKeyHandle = await window.safeCrypto.getAppPubSignKey(this.app);
+        const rawPubKey = await window.safeCryptoPubSignKey.getRaw(pubSignKeyHandle);
         this.signKey = rawPubKey.buffer.toString('hex');
         resolve();
       } catch (err) {
@@ -263,7 +244,6 @@ export default class SafeApi {
   listComments() {
     return new Promise(async (resolve) => {
       try {
-        const cmtList = [];
         const cmts = [];
         const entriesHandle = await window.safeMutableData.getEntries(this.mData);
         await window.safeMutableDataEntries.forEach(entriesHandle, (key, value) => {
@@ -279,7 +259,6 @@ export default class SafeApi {
           const isEditable = (this.signKey === cmt.signKey);
           if (!groupedCmts[id]) {
             groupedCmts[id] = new CommentModel(cmt.name, [], 0, isEditable, id);
-
           }
           groupedCmts[id].addMessage(cmt.message);
         }
@@ -294,7 +273,6 @@ export default class SafeApi {
   }
 
   deleteComment(comment) {
-
     const deleteEntry = async (id) => {
       const entriesHandle = await window.safeMutableData.getEntries(this.mData);
       const mutationHandle = await window.safeMutableDataEntries.mutate(entriesHandle);
@@ -304,19 +282,16 @@ export default class SafeApi {
       window.safeMutableDataMutation.free(mutationHandle);
       window.safeMutableDataEntries.free(entriesHandle);
     };
-
     return new Promise(async (resolve, reject) => {
       try {
         const deleteIDs = [];
-        for (let i = 1; i <= comment.version; i = i + 1) {
+        for (let i = 1; i <= comment.version; i += 1) {
           deleteIDs.push(this.getCommentId(comment.id, i));
         }
-
         const deleteQ = [];
-        for(const id of deleteIDs) {
+        for (const id of deleteIDs) {
           deleteQ.push(deleteEntry(id));
         }
-
         await Promise.all(deleteQ);
         this.comments = await this.listComments();
         resolve(this.comments);

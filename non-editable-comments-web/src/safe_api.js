@@ -37,7 +37,6 @@ const APP = {
  * Also exposes other utility functions for getting Public ID list and also to validate the user is admin
  */
 export default class SafeApi {
-
   /**
    * @constructor
    * @param {any} topic
@@ -67,28 +66,16 @@ export default class SafeApi {
         // Get public names container handle
         const publicNamesContainerHandle = await window.safeApp.getContainer(this.app, PUBLIC_NAMES_CONTAINER);
         // Get handle for the keys for the public names container
-        const keysHandle = await window.safeMutableData.getKeys(publicNamesContainerHandle);
-        const keysLen = await window.safeMutableDataKeys.len(keysHandle);
-        // If there is no Public ID return empty list
-        if (keysLen === 0) {
-          return resolve([]);
-        }
-        const publicNames = [];
-        // get all keys from the conatiner.
-        await window.safeMutableDataKeys.forEach(keysHandle, (key) => {
-          publicNames.push(key);
-        });
-        window.safeMutableDataKeys.free(keysHandle);
+        const publicNames = await window.safeMutableData.getKeys(publicNamesContainerHandle);
         // Decrypt the keys to get the actual Public ID
         for (const publicName of publicNames) {
           try {
-            const decryptedValue = await window.safeMutableData.decrypt(publicNamesContainerHandle, publicName);
-            decryptedPublicNames.push(String.fromCharCode.apply(null, new Uint8Array(decryptedValue)));
+            const decryptedKey = await window.safeMutableData.decrypt(publicNamesContainerHandle, publicName);
+            decryptedPublicNames.push(String.fromCharCode.apply(null, new Uint8Array(decryptedKey)));
           } catch (e) {
             console.warn(e);
           }
         }
-        window.safeMutableData.free(publicNamesContainerHandle);
       } catch (err) {
         return reject(err);
       }
@@ -121,10 +108,7 @@ export default class SafeApi {
           `Comments for the hosting ${this.MD_NAME} is saved in this MutableData`,
         );
         // create a new permission set
-        const permSet = await window.safeMutableData.newPermissionSet(this.app);
-        // allowing the user to perform the Insert operation
-        await window.safeMutableDataPermissionsSet.setAllow(permSet, PERMISSIONS.INSERT);
-        // setting the handle as null, anyone can perform the Insert operation
+        const permSet = [PERMISSIONS.INSERT];
         await window.safeMutableData.setUserPermissions(this.mData, null, permSet, 1);
         resolve();
       } catch (err) {
@@ -166,12 +150,11 @@ export default class SafeApi {
         // Connect as unregistered client
         await window.safeApp.connect(appHandle);
         const hashedName = await window.safeCrypto.sha3Hash(appHandle, this.MD_NAME);
+        // newPublic function only creates a handle in the local memory.
         const mdHandle = await window.safeMutableData.newPublic(appHandle, hashedName, TYPE_TAG);
-        // newPublic function only creates a handle in the local memmory.
         // The network operation is performed only when we call getEntries fo validating that the MutableData exists
         const entriesHandle = await window.safeMutableData.getEntries(mdHandle);
         window.safeMutableDataEntries.free(entriesHandle);
-        window.safeMutableData.free(mdHandle);
         await window.safeApp.free(appHandle);
         resolve(true);
       } catch (err) {
@@ -193,7 +176,7 @@ export default class SafeApi {
       try {
         const isInitialised = await this.isMDInitialised();
         if (!isInitialised) {
-          // Create the MutableData if the current user is the owner 
+          // Create the MutableData if the current user is the owner
           await this.setup();
         } else {
           await this.createMutableDataHandle();
