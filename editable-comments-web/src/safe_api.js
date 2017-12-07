@@ -77,9 +77,9 @@ export default class SafeApi {
         // Get public names container handle
         const publicNamesContainerHandle = await window.safeApp.getContainer(this.app, PUBLIC_NAMES_CONTAINER);
         // Get handle for the keys for the public names container
-        const keysHandle = await window.safeMutableData.getKeys(publicNamesContainerHandle);
+        const publicNames = await window.safeMutableData.getKeys(publicNamesContainerHandle);
         // Decrypt the keys to get the actual Public ID
-        for (const publicName of keysHandle) {
+        for (const publicName of publicNames) {
           try {
             const decryptedKey = await window.safeMutableData.decrypt(publicNamesContainerHandle, publicName);
             decryptedPublicNames.push(String.fromCharCode.apply(null, new Uint8Array(decryptedKey)));
@@ -161,8 +161,8 @@ export default class SafeApi {
         // Connect as unregistered client
         await window.safeApp.connect(appHandle);
         const hashedName = await window.safeCrypto.sha3Hash(appHandle, this.MD_NAME);
+        // newPublic function only creates a handle in the local memory.
         const mdHandle = await window.safeMutableData.newPublic(appHandle, hashedName, TYPE_TAG);
-        // newPublic function only creates a handle in the local memmory.
         // The network operation is performed only when we call getEntries for validating that the MutableData exists
         const entriesHandle = await window.safeMutableData.getEntries(mdHandle);
         window.safeMutableDataEntries.free(entriesHandle);
