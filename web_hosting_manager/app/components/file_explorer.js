@@ -227,7 +227,7 @@ export default class FileExplorer extends Component {
       showUploadMenu: !this.state.showUploadMenu,
     });
     remote.dialog.showOpenDialog({
-      title: onlyFile ? 'Select File' : 'Felect Folder',
+      title: onlyFile ? 'Select File' : 'Select Folder',
       properties: onlyFile ? ['openFile', 'multiSelections'] : ['openDirectory', 'multiSelections'],
     }, (selection) => {
       if (!selection || selection.length === 0) {
