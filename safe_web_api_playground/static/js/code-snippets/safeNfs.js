@@ -1,79 +1,79 @@
 module.exports = {
   safeNfs: {
-    create: () => {
+    create: async () => {
       // Where does nfsHandle come from?
       // Use safeMutableData.emulateAs to generate nfsHandle
 
       // fileContent can either be a string or a file buffer.
       // Choose a file and then use the line of code directly below to retreive file buffer.
-      let fileContent = window.fileContent;
-
-      return window.safeNfs.create(nfsHandle, fileContent)
-      .then((res) => {
-        fileContextHandle = res;
-
-        return 'Returns the file handle of a newly created file: ' + res;
-      });
-
+      const fileContent = window.fileContent;
+      try {
+        fileContextHandle = await window.safeNfs.create(nfsHandle, fileContent)
+      } catch(err) {
+        return err;
+      }
+        return `Returns the file handle of a newly created file: ${fileContextHandle}`;
     },
 
-    fetch: () => {
+    fetch: async () => {
       // fileName: (String) the path/file name
 
-      let fileName = 'index.html';
-      return window.safeNfs.fetch(nfsHandle, fileName)
-      .then(res => {
-      	fileContextHandle = res;
-
-      	return 'Returns file context handle: ' + res;
-      });
+      const fileName = 'index.html';
+      try {
+        fileContextHandle = await window.safeNfs.fetch(nfsHandle, fileName)
+      } catch(err) {
+        return err;
+      }
+        return `Returns the file handle: ${fileContextHandle}`;
     },
 
-    insert: () => {
-      let fileName = 'index.html';
-      return window.safeNfs.insert(nfsHandle, fileContextHandle, fileName)
-      .then(res => {
-      	fileContextHandle = res;
-
-      	return 'Returns same file context handle: ' + res;
-      });
+    insert: async () => {
+      const fileName = 'index.html';
+      try {
+        fileContextHandle = await window.safeNfs.insert(nfsHandle, fileContextHandle, fileName)
+      } catch(err) {
+        return err;
+      }
+        return `Returns same file handle: ${fileContextHandle}`;
     },
 
-    update: () => {
-      return window.safeNfs.update(nfsHandle, fileContextHandle, fileName, version)
-      .then(res => {
-      	fileContextHandle = res;
-
-      	return 'Returns the same file context handle: ' + res;
-      });
+    update: async () => {
+      try {
+        fileContextHandle = await window.safeNfs.update(nfsHandle, fileContextHandle, fileName, version)
+      } catch(err) {
+        return err;
+      }
+        return `Returns same file handle: ${fileContextHandle}`;
     },
 
 
-    delete: () => {
-      return window.safeNfs.delete(nfsHandle, fileName, version)
-      .then(_ => {
+    delete: async () => {
+      try {
+        await window.safeNfs.delete(nfsHandle, fileName, version)
+      } catch(err) {
+        return err;
+      }
         return 'File deleted from network';
-      });
     },
 
-    open: () => {
+    open: async () => {
       //  Replaces the entire content of the file when writing data.
       // Use this to open a new file for writing
-      let OPEN_MODE_OVERWRITE = 1;
+      const OPEN_MODE_OVERWRITE = 1;
 
       //  Appends to existing data in the file.
-      let OPEN_MODE_APPEND = 2;
+      const OPEN_MODE_APPEND = 2;
 
       //  Open file to read.
-      let OPEN_MODE_READ = 4;
+      const OPEN_MODE_READ = 4;
 
-      let openMode = OPEN_MODE_READ;
-      return window.safeNfs.open(nfsHandle, fileContextHandle, openMode)
-      .then(res => {
-        fileContextHandle = res;
-
-        return 'Returns handle to file context: ', res;
-      });
+      const openMode = OPEN_MODE_READ;
+      try {
+        fileContextHandle = await window.safeNfs.open(nfsHandle, fileContextHandle, openMode)
+      } catch(err) {
+        return err;
+      }
+      return `Returns same file context handle: ${fileContextHandle}`;
     },
 
     free: () => {

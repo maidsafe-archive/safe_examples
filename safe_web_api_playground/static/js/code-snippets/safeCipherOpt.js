@@ -1,30 +1,30 @@
 module.exports = {
   safeCipherOpt: {
-    newPlainText: () => {
-      return window.safeCipherOpt.newPlainText(appHandle)
-      .then(res => {
-      	cipherOptHandle = res;
-
-      	return 'Returns cipherOptHandle: ' + res;
-      });
+    newPlainText: async () => {
+      try {
+        cipherOptHandle = await window.safeCipherOpt.newPlainText(appHandle);
+      } catch (err) {
+        return err;
+      }
+      return `Returns plain text cipher option object handle ${cipherOptHandle}`;
     },
 
-    newSymmetric: () => {
-      return window.safeCipherOpt.newSymmetric(appHandle)
-      .then(res => {
-      	cipherOptHandle = res;
-
-      	return 'Returns symmetric cipherOptHandle: ' + res;
-      })
+    newSymmetric: async () => {
+      try {
+        cipherOptHandle = await window.safeCipherOpt.newSymmetric(appHandle);
+      } catch (err) {
+        return err;
+      }
+      return `Returns symmetric cipherOptHandle: ${cipherOptHandle}`; 
     },
 
-    newAsymmetric: () => {
-      return window.safeCipherOpt.newAsymmetric(appHandle)
-      .then(res => {
-      	cipherOptHandle = res;
-
-      	return 'Returns asymmetric cipherOptHandle: ' + res;
-      })
+    newAsymmetric: async () => {
+      try {
+        cipherOptHandle = await window.safeCipherOpt.newAsymmetric(appHandle);
+      } catch (err) {
+        return err;
+      }
+      return `Returns asymmetric cipherOptHandle: ${cipherOptHandle}`;
     },
 
     free: () => {

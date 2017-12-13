@@ -1,55 +1,63 @@
 module.exports = {
   safeImmutableData: {
-    create: () => {
-      return window.safeImmutableData.create(appHandle)
-      .then((res) => {
-      	idWriterHandle = res;
-      	return 'ImmutableData writer handle: ' + res;
-      });
+    create: async () => {
+      try {
+        idWriterHandle = await window.safeImmutableData.create(appHandle)
+      } catch(err) {
+        return err;
+      }
+      return `ImmutableData writer handle: ${idWriterHandle}`;
     },
 
-    write: () => {
+    write: async () => {
       // Where does idWriterHandle come from?
       // Run safeImmutableData.create first to obtain it.
 
       // After running this function, you have to use safeImmutableData.closeWriter to save data to the network
-      return window.safeImmutableData.write(idWriterHandle, 'my immutable data')
-      .then(_ => {
-      	return 'Data written, still needs to be saved using safeImmutableData.closeWriter';
-      })
+      try {
+        await window.safeImmutableData.write(idWriterHandle, 'my immutable data')
+      } catch (err) {
+        return err;
+      }
+      return 'Data written, still needs to be saved using safeImmutableData.closeWriter';
     },
 
-    closeWriter: () => {
-      return window.safeImmutableData.closeWriter(idWriterHandle, cipherOptHandle)
-      .then((res) => {
-      	idAddress = res;
-      	return 'ImmutableData was stored at address: ' + res;
-      });
+    closeWriter: async () => {
+      try {
+        idAddress = await window.safeImmutableData.closeWriter(idWriterHandle, cipherOptHandle)
+      } catch(err) {
+        return err;
+      }
+      return `ImmutableData was stored at address: ${idAddress}`;
     },
 
-    fetch: () => {
+    fetch: async () => {
       // idAddress argument is a buffer address to an ImmutableData structure
       // Use safeImmutableData.closeWriter to obtain idAddress
-
-      return window.safeImmutableData.fetch(appHandle, idAddress)
-      .then((res) => {
-      	idReaderHandle = res;
-      	return 'Return ImmutableData reader handle: ' + res;
-      });
+      try {
+        idReaderHandle = await window.safeImmutableData.fetch(appHandle, idAddress)
+      } catch(err) {
+        return err;
+      }
+      return `Return ImmutableData reader handle: ${idReaderHandle}`;
     },
 
-    read: () => {
-      return window.safeImmutableData.read(idReaderHandle)
-      .then((data) => {
-      	return 'Returns ImmutableData data: ' + String.fromCharCode.apply(null, new Uint8Array(data));
-      });
+    read: async () => {
+      try {
+        var data = await window.safeImmutableData.read(idReaderHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Returns ImmutableData data: ${String.fromCharCode.apply(null, new Uint8Array(data))}`;
     },
 
-    size: () => {
-      return window.safeImmutableData.size(idReaderHandle)
-      .then((size) => {
-      	return 'Size of the ImmutableData data: ' + size;
-      });
+    size: async () => {
+      try {
+        var size = await window.safeImmutableData.size(idReaderHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Size of the ImmutableData data: ${size}`;
     },
 
     free: () => {

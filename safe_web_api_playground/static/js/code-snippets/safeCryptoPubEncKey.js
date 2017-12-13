@@ -1,37 +1,35 @@
 module.exports = {
   safeCryptoPubEncKey: {
-    getRaw: () => {
-      return window.safeCryptoPubEncKey.getRaw(pubEncKeyHandle)
-      .then((res) => {
-      	rawPubEncKey = res.buffer;
-
-      	return 'Public encryption key: '+ String.fromCharCode.apply(null, new Uint8Array(res.buffer));
-      });
+    getRaw: async () => {
+      try {
+        rawPubEncKey = await window.safeCryptoPubEncKey.getRaw(pubEncKeyHandle)
+      } catch(err) {
+        return err;
+      }
+      return `Public encryption key: ${String.fromCharCode.apply(null, new Uint8Array(res.buffer))}`;
     },
 
-    encryptSealed: () => {
+    encryptSealed: async () => {
       // For practical application use, pubEncKeyHandle should be the recipients public key
       // let str = <utf-8 string> or <buffer>;
-
-      return window.safeCryptoPubEncKey.encryptSealed(pubEncKeyHandle, str)
-      .then(res => {
-      	encryptedBuffer = res;
-
-      	return 'Returns encrypted data: ' + String.fromCharCode.apply(null, new Uint8Array(res));
-      });
+      try {
+        encryptedBuffer = await window.safeCryptoPubEncKey.encryptSealed(pubEncKeyHandle, str)
+      } catch(err) {
+        return err;
+      }
+      return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(res))}`;
     },
 
-    encrypt: () => {
+    encrypt: async () => {
       // For practical application use, pubEncKeyHandle should be the recipients public key
       // str can be <utf-8 string> or <buffer>;
       // secretKey must be 64-bit value
-
-      return window.safeCryptoPubEncKey.encrypt(pubEncKeyHandle, str, secretKey)
-      .then(res => {
-      	encryptedBuffer = res;
-
-      	return 'Returns encrypted data: '+  String.fromCharCode.apply(null, new Uint8Array(res));
-      });
+      try {
+        encryptedBuffer = await window.safeCryptoPubEncKey.encrypt(pubEncKeyHandle, str, secretKey)
+      } catch(err) {
+        return err;
+      }
+       return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(res))}`;
     },
 
     free: () => {

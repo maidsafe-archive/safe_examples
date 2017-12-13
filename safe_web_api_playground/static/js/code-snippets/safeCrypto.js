@@ -1,84 +1,111 @@
 module.exports = {
   safeCrypto: {
-    sha3Hash: () => {
-      return window.safeCrypto.sha3Hash(appHandle, '1010101010101')
-      .then((res) => {
-        hashedString = res;
-      	return 'SHA3 Hash generated: ', String.fromCharCode.apply(null, new Uint8Array(res));
-      });
+    sha3Hash: async () => {
+    try {
+      hashedString = await window.safeCrypto.sha3Hash(appHandle, '1010101010101')
+    } catch (err) {
+      return err;
+    }
+    return `SHA3 Hash generated: ${String.fromCharCode.apply(null, new Uint8Array(res))}`;
     },
 
-    getAppPubSignKey: () => {
-      return window.safeCrypto.getAppPubSignKey(appHandle)
-      .then((res) => {
-      	signKeyHandle = res;
-
-      	return 'Returns applications public signing key: ' + res;
-      });
+    getAppPubSignKey: async () => {
+    try {
+      pubSignKeyHandle = await window.safeCrypto.getAppPubSignKey(appHandle)
+    }catch (err) {
+      return err;
+    }
+    return `Returns applications public signing key handle: ${pubSignKeyHandle}`;
     },
 
-    getAppPubEncKey: () => {
-      return window.safeCrypto.getAppPubEncKey(appHandle)
-      .then((res) => {
-      	pubEncKeyHandle = res;
-
-      	// This handle may be used to operate safeCryptoPubEncKey functions
-      	return 'Returns handle to application\'s public encryption key: ' + res;
-      });
+    getAppPubEncKey: async () => {
+    try {
+      pubEncKeyHandle = await window.safeCrypto.getAppPubEncKey(appHandle)
+    }catch (err) {
+      return err;
+    }
+    return `Returns handle to application's public encryption key handle: ${pubEncKeyHandle}`;
     },
 
-    generateEncKeyPair: () => {
-      return window.safeCrypto.generateEncKeyPair(appHandle)
-    	.then((res) => {
-      	keyPairHandle = res;
-
-      	return 'Returns handle to asymmetric encrypted key pair: ' + res;
-      });
+    generateEncKeyPair: async () => {
+      try {
+        encKeyPairHandle = await window.safeCrypto.generateEncKeyPair(appHandle);
+      }catch (err) {
+        return err;
+      }
+      return `Returns handle to asymmetric encrypted key pair: ${encKeyPairHandle}`;
     },
 
-    getSignKeyFromRaw: () => {
-      return window.safeCrypto.getSignKeyFromRaw(appHandle, rawSignKey)
-      .then((res) => {
-      	signKeyHandle = res;
-
-      	return 'Returns handle to signing key: ' + res;
-      });
+    generateSignKeyPair: async () => {
+      try {
+        signKeyPairHandle = await window.safeCrypto.generateSignKeyPair(appHandle);
+      } catch (err) {
+        return err;
+      }
+      return `Returns handle to signing key pair: ${signKeyPairHandle}`;
     },
 
-    pubEncKeyKeyFromRaw: () => {
-      return window.safeCrypto.pubEncKeyKeyFromRaw(appHandle, rawPubEncKey)
-      .then((res) => {
-      	pubEncKeyHandle = res;
-
-      	return 'Returns handle to application\'s public enryption key: ' + res;
-      });
+    pubSignKeyFromRaw: async () => {
+      try {
+        pubSignKeyHandle = await window.safeCrypto.pubSignKeyFromRaw(rawPubSignKey);
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to public signing key: ${pubSignKeyHandle}`;
     },
 
-    secEncKeyKeyFromRaw: () => {
-      return window.safeCrypto.secEncKeyKeyFromRaw(appHandle, rawSecEncKey)
-      .then((res) => {
-      	secEncKeyHandle = res;
-
-      	return 'Returns handle to secret encrypted key: ' + res;
-      });
+    secSignKeyFromRaw: async () => {
+      try {
+        secSignKeyHandle = await window.safeCrypto.secSignKeyFromRaw(rawSecSignKey);
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to secret signing key: ${secSignKeyHandle}`;
     },
 
-    generateEncKeyPairFromRaw: () => {
-      return window.safeCrypto.generateEncKeyPairFromRaw(appHandle, rawPubEncKey, rawSecEncKey)
-      .then((res) => {
-      	keyPairHandle = res;
-
-      	return 'Encryption key pair generated from raw strings: ' + res;
-      });
+    pubEncKeyFromRaw: async () => {
+      try {
+        pubEncKeyHandle = await window.safeCrypto.pubEncKeyFromRaw(appHandle, rawPubEncKey)
+      } catch(err) {
+        return err;
+      }
+      return `Returns handle to application's public enryption key handle from raw buffer: ${pubEncKeyHandle}`;
     },
 
-    generateNonce: () => {
-      return window.safeCrypto.generateNonce(appHandle)
-      .then((res) => {
-      	nonce = res.buffer;
+    secEncKeyFromRaw: async () => {
+    try {
+      secEncKeyHandle = await window.safeCrypto.secEncKeyFromRaw(appHandle, rawSecEncKey)
+    } catch (err) {
+      return err;
+    }
+    return `Returns handle to secret encrypted key: ${secEncKeyHandle}`;
+    },
 
-      	return 'Nonce generated: ' + String.fromCharCode.apply(null, new Uint8Array(res.buffer));;
-      });
+    generateEncKeyPairFromRaw: async () => {
+      try {
+        encKeyPairHandle = await window.safeCrypto.generateEncKeyPairFromRaw(appHandle, rawPubEncKey, rawSecEncKey)
+      } catch (err) {
+        return err;
+      }
+      return `Encryption key pair generated from raw strings: ${encKeyPairHandle}`;
+    },
+
+    generateSignKeyPairFromRaw: async () => {
+      try {
+        signKeyPairHandle = await window.safeCrypto.generateSignKeyPairFromRaw(rawSignKeyPair);
+      } catch (err) {
+        return err;
+      }
+      return `Returns handle to sign key pair: ${signKeyPairHandle}`;
+    },
+
+    generateNonce: async () => {
+      try {
+        nonce = await window.safeCrypto.generateNonce(appHandle)
+      } catch (err) {
+        return err;
+      }
+      return `Nonce generated: ${String.fromCharCode.apply(null, new Uint8Array(nonce.buffer))}`;
     },
 
   }
