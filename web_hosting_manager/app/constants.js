@@ -78,7 +78,7 @@ const CONSTANTS = {
     TILL_END: 0,
   },
   MOCK_RES_URI: 'safe-mock-response',
-  MD_EMAIL_PREFIX: '@email',
+  SERVICE_TYPE_POSTFIX_DELIM: '@',
   DOWNLOAD_CHUNK_SIZE: 1000000,
   UPLOAD_CHUNK_SIZE: 1000000,
   ASAR_LIB_PATH: path.resolve(__dirname, '..', 'app.asar.unpacked/node_modules/@maidsafe/safe-node-app/src/native'),
