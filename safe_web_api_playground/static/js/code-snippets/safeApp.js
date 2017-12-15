@@ -114,12 +114,12 @@ module.exports = {
       try {
         var data = await window.safeApp.webFetch(
           appHandle,
-          'safe://safeapi.playground/index.html' // the SAFE Network URL
+          'safe://codeplay.discover/index.html' // the SAFE Network URL
         );
       } catch(err) {
         return err;
       }
-      return String.fromCharCode.apply(null, new Uint8Array(data));
+      return String.fromCharCode.apply(null, data.body);
     },
 
     networkState: async () => {

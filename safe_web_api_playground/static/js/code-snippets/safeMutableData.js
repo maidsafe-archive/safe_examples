@@ -167,13 +167,14 @@ module.exports = {
       return `Returns array of entry keys: ${keysArray}`;
     },
 
-    getValues: () => {
+    getValues: async () => {
       try {
-        var valuesArray = window.safeMutableData.getValues(mdHandle);
+        const valuesArray = await window.safeMutableData.getValues(mdHandle);
+	var readableString = valuesArray.map(valueObject => String.fromCharCode.apply(null, valueObject.buf));
       } catch(err) {
         return err; 
       }
-      return `Returns array of entry values: ${valuesArray}`;
+      return `Returns array of entry values: ${readableString}`;
     },
 
     getPermissions: async () => {
