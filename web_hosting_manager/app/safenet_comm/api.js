@@ -78,7 +78,7 @@ class SafeApi extends Network {
         const metaDesc = `Container where all the services are mapped for the Public Name: ${name}`;
         const hashedName = await this.sha3Hash(name);
 
-        const servCntr = await this.getPublicNameMD(hashedName);
+        const servCntr = await this.getServicesContainer(hashedName);
         await servCntr.quickSetup({}, metaName, metaDesc);
         const pubNamesCntr = await this.getPublicNamesContainer();
         await this._insertToMData(pubNamesCntr, name, hashedName, true);
@@ -197,7 +197,7 @@ class SafeApi extends Network {
       try {
         const pubNamesCntr = await this.getPublicNamesContainer();
         const servCntrName = await this.getMDataValueForKey(pubNamesCntr, publicName);
-        servCntr = await this.getPublicNameMD(servCntrName);
+        servCntr = await this.getServicesContainer(servCntrName);
         await this._insertToMData(servCntr, serviceName, pathXORName);
         resolve(true);
       } catch (err) {
@@ -242,12 +242,14 @@ class SafeApi extends Network {
         try {
           const pubNamesCntr = await this.getPublicNamesContainer();
           const servCntrName = await this.getMDataValueForKey(pubNamesCntr, pubName);
-          const servCntr = await this.getPublicNameMD(servCntrName);
+          const servCntr = await this.getServicesContainer(servCntrName);
           const services = await servCntr.getEntries();
           await services.forEach((key, value) => {
             const service = key.toString();
-            // check service is not an email or deleted
-            if ((service.indexOf('@email') !== -1)
+            // Let's filter out the services which are not web services,
+            // i.e. those which don't have a `@<service type>` postfix.
+            // Also filter out the MD metadata entry and soft-deleted values.
+            if ((service.indexOf(CONSTANTS.SERVICE_TYPE_POSTFIX_DELIM) !== -1)
                 || (value.buf.length === 0)
                 || service === SAFE_CONSTANTS.MD_METADATA_KEY) {
               return;
@@ -307,7 +309,7 @@ class SafeApi extends Network {
           return reject(makeError(CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_NAME, 'Invalid serviceName'));
         }
         const hashedPubName = await this.sha3Hash(publicName);
-        const servCntr = await this.getPublicNameMD(hashedPubName);
+        const servCntr = await this.getServicesContainer(hashedPubName);
         await this._removeFromMData(servCntr, serviceName);
         resolve(true);
       } catch (err) {
@@ -339,7 +341,7 @@ class SafeApi extends Network {
         const servFolderPath = await this.getMDataValueForKey(pubCntr, servicePath);
         const pubNamesCntr = await this.getPublicNamesContainer();
         const servCntrName = await this.getMDataValueForKey(pubNamesCntr, publicName);
-        const servCntr = await this.getPublicNameMD(servCntrName);
+        const servCntr = await this.getServicesContainer(servCntrName);
         await this._updateMDataKey(servCntr, serviceName, servFolderPath);
         resolve(true);
       } catch (err) {
@@ -360,7 +362,7 @@ class SafeApi extends Network {
         }
         const pubNameCntr = await this.getPublicNamesContainer();
         const servCntrName = await this.getMDataValueForKey(pubNameCntr, publicName);
-        const servCntr = await this.getPublicNameMD(servCntrName);
+        const servCntr = await this.getServicesContainer(servCntrName);
         await this._checkMDAccessible(servCntr);
         resolve(true);
       } catch (err) {
@@ -655,7 +657,7 @@ class SafeApi extends Network {
     return this.app.crypto.sha3Hash(name);
   }
 
-  getPublicNameMD(pubXORName) {
+  getServicesContainer(pubXORName) {
     return this.app.mutableData.newPublic(pubXORName, CONSTANTS.TYPE_TAG.DNS);
   }
 

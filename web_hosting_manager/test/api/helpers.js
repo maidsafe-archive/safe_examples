@@ -46,8 +46,8 @@ export const fetchServiceName = (api, publicName, serviceName) => {
     try {
       const publicNamesMd = await api.getPublicNamesContainer();
       const hashPublicName = await sha3Hash(api, publicName);
-      const publicNameMd = await api.getPublicNameMD(hashPublicName);
-      const service = await api.getMDataValueForKey(publicNameMd, serviceName);
+      const servicesCtnrMd = await api.getServicesContainer(hashPublicName);
+      const service = await api.getMDataValueForKey(servicesCtnrMd, serviceName);
       resolve(service);
     } catch(err) {
       reject(err);

@@ -134,13 +134,14 @@ export default class Network {
         perms: ['Insert', 'Update', 'Delete'],
       });
 
-      const servCntr = await this.getPublicNameMD(servCntrName);
+      const servCntr = await this.getServicesContainer(servCntrName);
       const services = await servCntr.getEntries();
       await services.forEach((key, val) => {
         const service = key.toString();
-
-        // check service is not an email or deleted
-        if ((service.indexOf(CONSTANTS.MD_EMAIL_PREFIX) !== -1)
+        // Let's filter out the services which are not web services,
+        // i.e. those which don't have a `@<service type>` postfix.
+        // Also filter out the MD metadata entry and soft-deleted values.
+        if ((service.indexOf(CONSTANTS.SERVICE_TYPE_POSTFIX_DELIM) !== -1)
           || (val.buf.length === 0) || service === SAFE_CONSTANTS.MD_METADATA_KEY) {
           return;
         }
