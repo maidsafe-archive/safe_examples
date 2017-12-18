@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/2fnekwfbm5h2ayk7/branch/master?svg=true)]
+
 # safe_examples
 Examples showcasing various features of the SAFE Network
 
