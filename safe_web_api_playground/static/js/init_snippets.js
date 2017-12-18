@@ -13,7 +13,7 @@ let safeCryptoPubEncKey = require('./code-snippets/safeCryptoPubEncKey');
 let safeCryptoSecEncKey = require('./code-snippets/safeCryptoSecEncKey');
 let safeCryptoPubSignKey = require('./code-snippets/safeCryptoPubSignKey');
 let safeCryptoSecSignKey = require('./code-snippets/safeCryptoSecSignKey');
-let safeCryptoSignKeypair = require('./code-snippets/safeCryptoSignKeypair');
+let safeCryptoSignKeyPair = require('./code-snippets/safeCryptoSignKeyPair');
 // let helpers = require('./code-snippets/helpers');
 
 let codeSnippets = [
@@ -32,7 +32,7 @@ let codeSnippets = [
   safeCryptoSecEncKey,
   safeCryptoPubSignKey,
   safeCryptoSecSignKey,
-  safeCryptoSignKeypair
+  safeCryptoSignKeyPair
 //  helpers
 ];
 
