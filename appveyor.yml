@@ -1,0 +1,47 @@
+platform:
+  - x64
+
+image: Visual Studio 2015
+
+environment:
+  nodejs_version: "7"
+  matrix:
+    - NODE_ENV: "prod"
+      win_runtime: win-x64
+      arch: x64
+      plat: win32
+
+install:
+  - ps: Install-Product node $env:nodejs_version x64
+  - node --version
+  - npm --version
+  - yarn --version
+  - yarn add windows-build-tools --global
+  - yarn --ignore-optional
+
+
+build_script:
+  - node --version
+  - yarn --version
+  - yarn install-all
+  - yarn package-all
+
+
+after_build:
+  - echo %APPVEYOR_REPO_TAG%
+  - echo %APPVEYOR_REPO_TAG_NAME%
+  - ps: Get-ChildItem .\email_app\out\*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+  - ps: Get-ChildItem .\web_hosting_manager\release\*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+  - ps: Get-ChildItem .\email_app\out\*.txt | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+  - ps: Get-ChildItem .\web_hosting_manager\release\*.txt | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+
+
+deploy:
+  release: $(appveyor_repo_tag_name)
+  tag: $(appveyor_repo_tag_name)
+  provider: GitHub
+  auth_token: $(github_auth_token)
+  draft: true
+  prerelease: true
+  on:
+    appveyor_repo_tag:  true        # deploy on tag push only
