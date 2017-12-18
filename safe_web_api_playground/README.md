@@ -10,7 +10,8 @@ Instead of having to upload your site to the network every time you want to test
 - clone this repository and `cd` into the respective directory
 - Run `yarn`
 - Run `yarn gulp` to start server
-- Visit `localhost:3003` in your SAFE browser to see page
+- Visit `localhost://p:3003` in your SAFE browser to see page
+- Note: this will soon be changing to `http://localhost:3003` with the new browser.
 
 To upload this site to the network:
  - Run `npm run gulp` and observe the `build` directory that's created
