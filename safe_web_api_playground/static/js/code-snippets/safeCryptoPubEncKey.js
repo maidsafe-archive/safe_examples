@@ -11,25 +11,27 @@ module.exports = {
 
     encryptSealed: async () => {
       // For practical application use, pubEncKeyHandle should be the recipients public key
-      // let str = <utf-8 string> or <buffer>;
+      // let stringOrBuffer = <utf-8 string> or <buffer>;
+      const stringOrBuffer = 'plain string to be encrypted';
       try {
-        encryptedBuffer = await window.safeCryptoPubEncKey.encryptSealed(pubEncKeyHandle, str)
+        encryptedBuffer = await window.safeCryptoPubEncKey.encryptSealed(pubEncKeyHandle, stringOrBuffer)
       } catch(err) {
         return err;
       }
-      return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(res))}`;
+      return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(encryptedBuffer))}`;
     },
 
     encrypt: async () => {
       // For practical application use, pubEncKeyHandle should be the recipients public key
-      // str can be <utf-8 string> or <buffer>;
+      // stringOrBuffer can be <utf-8 string> or <buffer>;
       // secretKey must be 64-bit value
+      const stringOrBuffer = 'plain string to be encrypted';
       try {
-        encryptedBuffer = await window.safeCryptoPubEncKey.encrypt(pubEncKeyHandle, str, secretKey)
+        encryptedBuffer = await window.safeCryptoPubEncKey.encrypt(pubEncKeyHandle, stringOrBuffer, secEncKeyHandle)
       } catch(err) {
         return err;
       }
-       return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(res))}`;
+       return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(encryptedBuffer))}`;
     },
 
     free: () => {

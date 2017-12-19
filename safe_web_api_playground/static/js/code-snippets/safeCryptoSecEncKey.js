@@ -11,11 +11,11 @@ module.exports = {
 
     decrypt: async () => {
       try {
-        encryptedBuffer = await window.safeCryptoSecEncKey.decrypt(secEncKeyHandle, cipher, pubEncKeyHandle)
+        decipheredBuffer = await window.safeCryptoSecEncKey.decrypt(secEncKeyHandle, encryptedBuffer, pubEncKeyHandle)
       } catch(err) {
         return err;
       }
-      return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(res.buffer))}`;
+      return `Returns deciphered data: ${String.fromCharCode.apply(null, new Uint8Array(decipheredBuffer))}`;
     },
 
     free: () => {
