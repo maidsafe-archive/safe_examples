@@ -47,7 +47,8 @@
       {
         "from": "./app/dist/fonts",
         "to": "dist/fonts"
-      }, {
+      },
+      {
         "from": "./app/dist/imgs",
         "to": "dist/imgs"
       }
@@ -169,7 +170,7 @@
     "react-test-renderer": "^15.6.1",
     "redux-logger": "^3.0.6",
     "redux-promise-middleware": "^4.4.1",
-    "rimraf": "^2.6.1",
+    "rimraf": "^2.6.2",
     "sass-loader": "^6.0.6",
     "sinon": "^2.3.5",
     "spectron": "^3.7.0",

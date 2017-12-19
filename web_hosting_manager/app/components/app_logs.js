@@ -1,7 +1,7 @@
 import fs from 'fs';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import CONSTANTS from '../constants';
+// import CONSTANTS from '../constants';
 
 export default class AppLogs extends Component {
   constructor() {
@@ -14,27 +14,27 @@ export default class AppLogs extends Component {
     };
   }
   componentDidMount() {
-    this.setState({loading: true});
-    this.props.getLogFilePath()
-      .then(path => {
+    this.setState({ loading: true }); // eslint-disable-line react/no-did-mount-set-state
+    this.props.getLogFilePath() // eslint-disable-line react/prop-types
+      .then(path => { // eslint-disable-line promise/always-return
         this.logPath = path.value;
         this.readLogFile();
-        this.setState({loading: false});
+        this.setState({ loading: false });
       })
-      .catch(err => this.setState({loading: false, error: err.message}));
+      .catch(err => this.setState({ loading: false, error: err.message }));
   }
 
   readLogFile() {
     if (!this.logPath) {
-      this.setState({error: 'Log path not set'});
+      this.setState({ error: 'Log path not set' });
       return;
     }
-    this.setState({loading: false});
+    this.setState({ loading: false });
     try {
       const logData = fs.readFileSync(this.logPath);
-      this.setState({loading: false, logData: logData.toString()});
-    } catch(err) {
-      this.setState({loading: false, error: err.message});
+      this.setState({ loading: false, logData: logData.toString() });
+    } catch (err) {
+      this.setState({ loading: false, error: err.message });
     }
   }
 
@@ -46,7 +46,7 @@ export default class AppLogs extends Component {
     return (
       <div className="_error">
         <h4>{this.state.error}</h4>
-        <button className="btn" onClick={() => this.setState({error: ''})}>Close</button>
+        <button className="btn" onClick={() => this.setState({ error: '' })}>Close</button>
       </div>
     );
   }
@@ -71,10 +71,10 @@ export default class AppLogs extends Component {
         <h3 className="_title">App logs</h3>
         <div className="_opts">
           <div className="_opt left">
-            <button className="btn" onClick={e => {e.preventDefault(); this.props.history.go(-1);}}>Back</button>
+            <button className="btn" onClick={e => { e.preventDefault(); this.props.history.go(-1); }}>Back</button>
           </div>
           <div className="_opt right">
-            <button className="btn" disabled={this.state.loading} onClick={e => {e.preventDefault(); this.readLogFile();}}>Refresh</button>
+            <button className="btn" disabled={this.state.loading} onClick={e => { e.preventDefault(); this.readLogFile(); }}>Refresh</button>
           </div>
         </div>
         {this.getErrorContainer()}

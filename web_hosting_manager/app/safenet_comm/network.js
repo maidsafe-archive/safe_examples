@@ -1,8 +1,7 @@
-import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
+import { initializeApp, fromAuthURI, CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 
 import makeError from './error';
 import CONSTANTS from '../constants';
-import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 import { openExternal, nodeEnv } from './helpers';
 
 const _app = Symbol('app');

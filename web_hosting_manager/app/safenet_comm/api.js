@@ -5,7 +5,8 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-import { shell } from 'electron';
+// import { shell } from 'electron';
+import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 
 import Network from './network';
 import Uploader from './uploader';
@@ -13,7 +14,6 @@ import Downloader from './downloader';
 import makeError from './error';
 import { nodeEnv } from './helpers';
 import CONSTANTS from '../constants';
-import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 
 // Private variables
 const _publicNames = Symbol('publicNames');
