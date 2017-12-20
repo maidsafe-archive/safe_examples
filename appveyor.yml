@@ -16,18 +16,19 @@ install:
   - node --version
   - npm --version
   - yarn --version
+  - yarn config set child-concurrency 1
+  - yarn 
   - yarn add windows-build-tools --global
-  - yarn --ignore-optional
 
 
 build_script:
   - node --version
   - yarn --version
+
+
+before_deploy:
   - yarn install-all
   - yarn package-all
-
-
-after_build:
   - echo %APPVEYOR_REPO_TAG%
   - echo %APPVEYOR_REPO_TAG_NAME%
   - ps: Get-ChildItem .\email_app\out\*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }

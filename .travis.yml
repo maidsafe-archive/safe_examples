@@ -26,10 +26,9 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-script:
+before_deploy:
 - yarn install-all
 - yarn package-all
-before_deploy:
 - export EMAIL_APP="$(ls email_app/out/*.zip)";
 - export WEB_HOSTING_MANAGER="$(ls web_hosting_manager/release/*.zip)";
 - export SHA_256_SUM_EMAIL_APP="$(ls email_app/out/*.txt)";

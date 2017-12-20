@@ -19,13 +19,13 @@ module.exports = {
     },
 
     decryptSealed: async () => {
-      // let cipher = <encrypted data>;
+      // let encryptedBuffer = <encrypted data>;
       try {
-        var deciphered = await window.safeCryptoEncKeyPair.decryptSealed(encKeyPairHandle, cipher)
+        decipheredBuffer = await window.safeCryptoEncKeyPair.decryptSealed(encKeyPairHandle, encryptedBuffer)
       } catch(err) {
         return err;
       }
-      return `Returns decrypted data: ${String.fromCharCode.apply(null, new Uint8Array(deciphered))}`;
+      return `Returns decrypted data: ${String.fromCharCode.apply(null, new Uint8Array(decipheredBuffer))}`;
     },
 
     free: () => {

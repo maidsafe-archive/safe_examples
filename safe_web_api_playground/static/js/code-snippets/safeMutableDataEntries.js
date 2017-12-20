@@ -30,7 +30,7 @@ module.exports = {
         await window.safeMutableDataEntries.forEach(entriesHandle, (k, v) => {
 
           let key = String.fromCharCode.apply(null, k);
-          let value = String.fromCharCode.apply(null, new Uint8Array(v.buf));
+          let value = String.fromCharCode.apply(null, v.buf);
 
           console.log(key + ': ' + value);
 
