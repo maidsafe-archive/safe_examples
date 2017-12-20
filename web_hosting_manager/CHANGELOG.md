@@ -1,5 +1,15 @@
 # SAFE Hosting Manager App Change Log
 
+## [0.4.4] - 20-12-2017
+### Changed
+- Upgrade `@maidsafe/safe-node-app` to v0.6.0
+
+### Fixed
+- fix/Make sure that all non-web services are filtered out from the list of services
+
+### SAFE libraries dependencies
+- @maidsafe/safe-node-app: v0.6.0
+
 ## [0.4.3]
 
 - Upgrade `@maidsafe/safe-node-app` to v0.5.1

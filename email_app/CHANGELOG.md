@@ -1,5 +1,15 @@
 # MaidSafe Email Tutorial App Change Log
 
+## [0.4.3] - 20-12-2017
+### Changed
+- Upgrade `@maidsafe/safe-node-app` to v0.6.0
+
+### Fixed
+- The update to @maidsafe/safe-node-app fixes issue with malformed auth URI's on Fedora, using default GNOME3 window manager
+
+### SAFE libraries dependencies
+- @maidsafe/safe-node-app: v0.6.0
+
 ## [0.4.2]
 
 - Upgrade `@maidsafe/safe-node-app` to v0.5.1
