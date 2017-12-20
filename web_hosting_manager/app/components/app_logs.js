@@ -1,7 +1,6 @@
 import fs from 'fs';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-// import CONSTANTS from '../constants';
 
 export default class AppLogs extends Component {
   constructor() {
@@ -13,13 +12,15 @@ export default class AppLogs extends Component {
       error: ''
     };
   }
-  componentDidMount() {
-    this.setState({ loading: true }); // eslint-disable-line react/no-did-mount-set-state
-    this.props.getLogFilePath() // eslint-disable-line react/prop-types
-      .then(path => { // eslint-disable-line promise/always-return
+
+  componentWillMount() {
+    this.setState({ loading: true });
+    this.props.getLogFilePath()
+      .then(path => {
         this.logPath = path.value;
         this.readLogFile();
         this.setState({ loading: false });
+        return Promise.resolve(true);
       })
       .catch(err => this.setState({ loading: false, error: err.message }));
   }
@@ -86,4 +87,5 @@ export default class AppLogs extends Component {
 
 AppLogs.propTypes = {
   history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  getLogFilePath: PropTypes.func.isRequired,
 };

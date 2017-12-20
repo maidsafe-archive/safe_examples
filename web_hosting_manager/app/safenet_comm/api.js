@@ -5,7 +5,6 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-// import { shell } from 'electron';
 import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 
 import Network from './network';
