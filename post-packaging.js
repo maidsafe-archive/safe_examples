@@ -138,16 +138,14 @@ archive.on('warning', function(err) {
 // pipe archive data to the file
 archive.pipe(output);
 archive.directory(`${targetDir}/${RELEASE_FOLDER_NAME}`, RELEASE_FOLDER_NAME);
-archive.finalize();
-
-
-const algorithm = 'sha256';
-const shasum = crypto.createHash(algorithm);
-const filePath = `${targetDir}/${RELEASE_FOLDER_NAME}.zip`;
-const s = nodeFs.createReadStream(filePath);
-s.on('data', (d) => { shasum.update(d); });
-s.on('end', () => {
-const d = shasum.digest('hex');
-  console.log(d);
-  fs.writeFileSync(`${targetDir}/${RELEASE_FOLDER_NAME}.txt`, d);
+archive.finalize().then(() => {
+  const algorithm = 'sha256';
+  const shasum = crypto.createHash(algorithm);
+  const filePath = `${targetDir}/${RELEASE_FOLDER_NAME}.zip`;
+  const input = nodeFs.createReadStream(filePath);
+  input.on('data', (d) => { shasum.update(d); });
+  input.on('end', () => {
+    const d = shasum.digest('hex');
+    fs.writeFileSync(`${targetDir}/${RELEASE_FOLDER_NAME}.txt`, d);
+  });
 });
