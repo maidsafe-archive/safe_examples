@@ -10,7 +10,8 @@ const mapStateToProps = state => {
     savedSize: state.emailApp.savedSize,
     spaceUsed: state.emailApp.spaceUsed,
     app: state.emailApp.app,
-    account: state.emailApp.account
+    account: state.emailApp.account,
+    processing: state.emailApp.processing
   };
 };
 
