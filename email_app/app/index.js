@@ -1,13 +1,14 @@
 import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
-var path = require('path');
+
+const path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 const sendResponse = (res) => {
-  mainWindow.webContents.send('auth-response', res ? res : '');
+  mainWindow.webContents.send('auth-response', res || '');
 };
 
 const createWindow = () => {
@@ -44,7 +45,7 @@ const createWindow = () => {
     mainWindow.focus();
   });
 
-  const shouldQuit = app.makeSingleInstance(function(commandLine) {
+  const shouldQuit = app.makeSingleInstance((commandLine) => {
     if (commandLine.length >= 2 && commandLine[1]) {
       sendResponse(commandLine[1]);
     }
@@ -59,7 +60,6 @@ const createWindow = () => {
   if (shouldQuit) {
     app.quit();
   }
-
 };
 
 // This method will be called when Electron has finished
@@ -84,6 +84,6 @@ app.on('activate', () => {
   }
 });
 
-app.on('open-url', function (e, url) {
+app.on('open-url', (e, url) => {
   sendResponse(url);
 });

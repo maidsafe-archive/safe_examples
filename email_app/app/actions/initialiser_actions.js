@@ -20,20 +20,20 @@ const newNetStatusCallback = (dispatch) => {
       type: ACTION_TYPES.NET_STATUS_CHANGED,
       payload: state
     });
-  }
+  };
 };
 
 export const receiveResponse = (uri) => {
   return function (dispatch, getState) {
-    let appStatus = getState().initialiser.appStatus;
+    const appStatus = getState().initialiser.appStatus;
     if (appStatus === APP_STATUS.AUTHORISED) {
       return dispatch({
         type: ACTION_TYPES.CONNECT_APP,
         payload: connect(uri, newNetStatusCallback(dispatch))
       });
     } else {
-      let app = getState().initialiser.app;
-      let serviceToRegister = getState().emailApp.serviceToRegister;
+      const app = getState().initialiser.app;
+      const serviceToRegister = getState().emailApp.serviceToRegister;
       return dispatch({
         type: ACTION_TYPES.AUTHORISE_SHARE_MD,
         payload: connectWithSharedMd(app, uri, serviceToRegister)
@@ -67,13 +67,13 @@ export const authoriseApplication = () => {
           });
       })
     })
-    .catch((err) => {console.log("Error1: ", err)});
+    .catch((err) => { console.error('Error1: ', err); });
   };
 };
 
 export const reconnectApplication = () => {
   return function (dispatch, getState) {
-    let app = getState().initialiser.app;
+    const app = getState().initialiser.app;
     return dispatch({
       type: ACTION_TYPES.RECONNECT_APP,
       payload: reconnect(app)

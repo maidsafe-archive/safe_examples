@@ -9,20 +9,18 @@ import CreateAccountPage from './containers/create_account_container';
 import ComposeMailPage from './containers/compose_mail_container';
 import AppLogs from './containers/app_logs';
 
-let router = () => {
-  return (
-    <Route path="/" component={App}>
-      <IndexRoute component={InitializerPage} />
-      <Route path="/home" component={HomePage}>
-        <IndexRoute component={InboxPage} />
-        <Route path="/inbox" component={InboxPage} />
-        <Route path="/saved" component={SavedPage} />
-        <Route path="/compose_mail" component={ComposeMailPage} />
-      </Route>
-      <Route path="/create_account" component={CreateAccountPage} />
-      <Route path="/app_logs" component={AppLogs} />
+const router = () => (
+  <Route path="/" component={App}>
+    <IndexRoute component={InitializerPage} />
+    <Route path="/home" component={HomePage}>
+      <IndexRoute component={InboxPage} />
+      <Route path="/inbox" component={InboxPage} />
+      <Route path="/saved" component={SavedPage} />
+      <Route path="/compose_mail" component={ComposeMailPage} />
     </Route>
-  );
-};
+    <Route path="/create_account" component={CreateAccountPage} />
+    <Route path="/app_logs" component={AppLogs} />
+  </Route>
+);
 
 export default router;

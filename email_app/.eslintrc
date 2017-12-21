@@ -7,15 +7,18 @@
     "node": true
   },
   "rules": {
-    "consistent-return": 0,
+    "arrow-body-style": ["error", "as-needed"],
     "comma-dangle": 0,
+    "consistent-return": 0,
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "linebreak-style": ["error", "windows"],
+    "max-len": ["error", { "code": 150 }],
     "no-use-before-define": 0,
     "import/no-unresolved": [2, { "ignore": ["electron"] }],
     "import/no-extraneous-dependencies": 0,
     "react/jsx-no-bind": 0,
     "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx"] }],
     "react/prefer-stateless-function": 0,
-    # https://github.com/eslint/eslint/issues/6274
     "generator-star-spacing": 0
   },
   "plugins": [

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactMaterialSelect from 'react-material-select'
-import { MESSAGES, CONSTANTS, ACC_STATUS, SAFE_APP_ERROR_CODES } from '../constants';
 import { ModalPortal } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
+import ReactMaterialSelect from 'react-material-select';
+
+import { MESSAGES, CONSTANTS, ACC_STATUS, SAFE_APP_ERROR_CODES } from '../constants';
 
 const spinnerBackgroundStyle = {
   zIndex: '5',
@@ -12,14 +13,14 @@ const spinnerBackgroundStyle = {
   width: '100%',
   opacity: '0.75',
   backgroundColor: 'white'
-}
+};
 
 const spinnerMessageStyle = {
   position: 'fixed',
   top: '55%',
   width: '100%',
   textAlign: 'center'
-}
+};
 
 export default class CreateAccount extends Component {
   constructor() {
@@ -28,6 +29,28 @@ export default class CreateAccount extends Component {
     this.storeCreatedAccount = this.storeCreatedAccount.bind(this);
     this.handleChooseAccount = this.handleChooseAccount.bind(this);
     this.readEmailIds = this.readEmailIds.bind(this);
+  }
+
+  componentWillMount() {
+    return this.readEmailIds();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { accStatus, createAccountError } = this.props;
+
+    if (prevProps.accStatus !== ACC_STATUS.CREATED
+      && accStatus === ACC_STATUS.CREATED) {
+      return this.storeCreatedAccount();
+    } else if (prevProps.accStatus === ACC_STATUS.AUTHORISING) {
+      switch (accStatus) {
+        case ACC_STATUS.AUTHORISATION_DENIED:
+          return createAccountError(new Error(MESSAGES.AUTHORISATION_DENIED));
+        case ACC_STATUS.AUTHORISATION_FAILED:
+          return createAccountError(new Error(MESSAGES.AUTHORISATION_ERROR));
+        default:
+          break;
+      }
+    }
   }
 
   readEmailIds() {
@@ -40,11 +63,11 @@ export default class CreateAccount extends Component {
     const { newAccount, storeNewAccount, createAccountError } = this.props;
     return storeNewAccount(newAccount)
       .then((_) => {
-        this.context.router.push('/home')
+        this.context.router.push('/home');
       })
       .catch((e) => {
-        console.log("did not route home: ", e);
-        createAccountError(new Error(e))
+        console.error('did not route home: ', e);
+        createAccountError(new Error(e));
       });
   }
 
@@ -68,8 +91,9 @@ export default class CreateAccount extends Component {
           return createAccountError(new Error(MESSAGES.EMAIL_ALREADY_TAKEN));
         }
         return createAccountError(err);
-      });
-  };
+      }
+    );
+  }
 
   handleChooseAccount(e) {
     e.preventDefault();
@@ -79,30 +103,10 @@ export default class CreateAccount extends Component {
     return refreshConfig(emailId)
       .then((_) => this.context.router.push('/home'))
       .catch((e) => createAccountError(new Error(e)));
-  };
-
-  componentWillMount() {
-    return this.readEmailIds();
-  };
-
-  componentDidUpdate(prevProps, prevState) {
-    const { accStatus, createAccountError } = this.props;
-    if (prevProps.accStatus !== ACC_STATUS.CREATED
-        && accStatus === ACC_STATUS.CREATED) {
-      return this.storeCreatedAccount();
-    } else if (prevProps.accStatus === ACC_STATUS.AUTHORISING) {
-      switch (accStatus) {
-        case ACC_STATUS.AUTHORISATION_DENIED:
-          return createAccountError(new Error(MESSAGES.AUTHORISATION_DENIED));
-        case ACC_STATUS.AUTHORISATION_FAILED:
-          return createAccountError(new Error(MESSAGES.AUTHORISATION_ERROR));
-      };
-    }
-  };
-
+  }
 
   render() {
-    const { emailIds, networkStatus, processing, accStatus, error } = this.props;
+    const { emailIds, processing, accStatus, error } = this.props;
 
     return (
       <div className="create-account">
@@ -111,7 +115,7 @@ export default class CreateAccount extends Component {
           <ModalPortal>
             <div style={spinnerBackgroundStyle}>
               <ReactSpinner />
-              { accStatus === ACC_STATUS.AUTHORISING &&
+              {accStatus === ACC_STATUS.AUTHORISING &&
                 <div style={spinnerMessageStyle}>
                   Authorising access to the services container...
                 </div>
@@ -128,12 +132,16 @@ export default class CreateAccount extends Component {
                   <h3 className="title">Create Email Id</h3>
                   <form className="form" onSubmit={this.handleCreateAccount}>
                     <div className="inp-grp">
-                      <input type="text" name="emailId" id="emailId" ref={c => {this.emailId = c;}} autoFocus="autoFocus" required="required" />
+                      <input type="text" name="emailId" id="emailId" ref={c => { this.emailId = c; }} autoFocus="autoFocus" required="required" />
                       <label htmlFor="emailId">Email ID</label>
-                      <div className="alert">Email Id must be less than {CONSTANTS.EMAIL_ID_MAX_LENGTH} characters. (This is just a restriction in this tutorial)</div>
+                      <div className="alert">
+                        Email Id must be less than {CONSTANTS.EMAIL_ID_MAX_LENGTH} characters. (This is just a restriction in this tutorial)
+                      </div>
                     </div>
                     <div className="inp-btn-cnt">
-                      <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary" disabled={processing.state}>Create</button>
+                      <button
+                        type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary" disabled={processing.state}
+                      > Create</button>
                     </div>
                   </form>
                 </div>
@@ -144,9 +152,7 @@ export default class CreateAccount extends Component {
                   <form className="form">
                     <ReactMaterialSelect ref="emailSelected" defaultValue={emailIds[0]} label="Select Email Id">
                       {
-                        emailIds.map((email, i) => {
-                          return (<option key={`email-${i}`} dataValue={email}>{email}</option>)
-                        })
+                        emailIds.map((email, i) => (<option key={`email-${i}`} dataValue={email}>{email}</option>))
                       }
                     </ReactMaterialSelect>
                     <div className="inp-btn-cnt">

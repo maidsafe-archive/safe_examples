@@ -1,21 +1,23 @@
-import { shell } from 'electron';
-import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from '../constants';
+// import { shell } from 'electron';
 import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
+
+import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from '../constants';
 import { genRandomEntryKey, deserialiseArray, splitPublicIdAndService } from '../utils/app_utils';
 import * as netFns from './network.js';
 
 const fetchPublicIds = async (app) => {
-  let rawEntries = [];
-  let publicIds = [];
+  const rawEntries = [];
+  const publicIds = [];
   try {
     const pubNamesMd = await app.auth.getContainer(netFns.APP_INFO.containers.publicNames);
     const entries = await pubNamesMd.getEntries();
     await entries.forEach((key, value) => {
-      rawEntries.push({key, value});
+      rawEntries.push({ key, value });
     });
 
-    await Promise.all(rawEntries.map( async (entry) => {
-      if (entry.value.buf.length === 0) { //FIXME: this condition is a work around for a limitation in safe_core
+    await Promise.all(rawEntries.map(async (entry) => {
+      // FIXME: this condition is a work around for a limitation in safe_core
+      if (entry.value.buf.length === 0) {
         return Promise.resolve();
       }
 
@@ -33,40 +35,40 @@ const fetchPublicIds = async (app) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 export const fetchEmailIds = async (app) => {
-  let emailIds = [];
+  const emailIds = [];
 
   try {
     const publicIds = await fetchPublicIds(app);
-    await Promise.all(publicIds.map( async (publicId) => {
-        let rawEmailIds = [];
-        const servicesMd = await app.mutableData.newPublic(publicId.service, CONSTANTS.TAG_TYPE_DNS);
-        const keys = await servicesMd.getKeys();
-        await keys.forEach((key) => {
-          rawEmailIds.push(key.toString());
-        });
-        await Promise.all(rawEmailIds.map((emailId) => {
-          // Let's filter out the services which are not email services,
-          // i.e. those which don't have the `@email` postfix.
-          // This will filter out the MD metadata entry also.
-          const regex = new RegExp('.*(?=' + CONSTANTS.SERVICE_NAME_POSTFIX +'$)', 'g');
-          let res = regex.exec(emailId);
-          if (res) {
-            emailIds.push(res[0] + ((res[0].length > 0) ? '.' : '') + publicId.id);
-          }
-        }))
+    await Promise.all(publicIds.map(async (publicId) => {
+      const rawEmailIds = [];
+      const servicesMd = await app.mutableData.newPublic(publicId.service, CONSTANTS.TAG_TYPE_DNS);
+      const keys = await servicesMd.getKeys();
+      await keys.forEach((key) => {
+        rawEmailIds.push(key.toString());
+      });
+      await Promise.all(rawEmailIds.map((emailId) => {
+        // Let's filter out the services which are not email services,
+        // i.e. those which don't have the `@email` postfix.
+        // This will filter out the MD metadata entry also.
+        const regex = new RegExp(`.*(?=${CONSTANTS.SERVICE_NAME_POSTFIX}$)`, 'g');
+        const res = regex.exec(emailId);
+        if (res) {
+          emailIds.push(res[0] + ((res[0].length > 0) ? '.' : '') + publicId.id);
+        }
+      }));
     }));
     return emailIds;
   } catch (err) {
     console.error(err);
     throw err;
   }
-}
+};
 
 export const readConfig = async (app, emailId) => {
-  let account = {id: emailId};
+  const account = { id: emailId };
 
   try {
     const md = await app.auth.getOwnContainer();
@@ -78,13 +80,13 @@ export const readConfig = async (app, emailId) => {
     const archiveMd = await app.mutableData.fromSerial(storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ARCHIVE]);
     account.archiveMd = archiveMd;
     account.encSk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY];
-    account.encPk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]
+    account.encPk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY];
     return account;
   } catch (err) {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * Helper function to encrypt a key and a value, and insert them into/
@@ -99,13 +101,13 @@ const insertEncrypted = async (md, mut, key, value) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * Stores new account information in app's private container
 */
 export const writeConfig = async (app, account) => {
-  let emailAccount = {
+  const emailAccount = {
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ID]: account.id,
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY]: account.encSk,
     [CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]: account.encPk
@@ -125,10 +127,10 @@ export const writeConfig = async (app, account) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 const decryptEmail = async (app, account, key, value, cb) => {
-  if (value.length > 0) { //FIXME: this condition is a work around for a limitation in safe_core
+  if (value.length > 0) { // FIXME: this condition is a work around for a limitation in safe_core
     try {
       const entryValue = await netFns.decrypt(app, value, account.encSk, account.encPk);
       const immData = await app.immutableData.fetch(deserialiseArray(entryValue));
@@ -140,7 +142,7 @@ const decryptEmail = async (app, account, key, value, cb) => {
       throw err;
     }
   }
-}
+};
 
 export const readInboxEmails = async (app, account, cb) => {
   try {
@@ -155,19 +157,17 @@ export const readInboxEmails = async (app, account, cb) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 export const readArchivedEmails = async (app, account, cb) => {
   try {
     const entries = await account.archiveMd.getEntries();
-    await entries.forEach((key, value) => {
-      return decryptEmail(app, account, key, value.buf, cb);
-    })
+    await entries.forEach((key, value) => decryptEmail(app, account, key, value.buf, cb));
   } catch (err) {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * creates an inbox composed of a Mutable Data structure and permissions/
@@ -177,12 +177,12 @@ export const readArchivedEmails = async (app, account, cb) => {
 * public encryption key
 */
 const createInbox = async (app, encPk) => {
-  let baseInbox = {
+  const baseInbox = {
     [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: encPk
   };
 
   try {
-    const inboxMd = await app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_INBOX)
+    const inboxMd = await app.mutableData.newRandomPublic(CONSTANTS.TAG_TYPE_INBOX);
     await inboxMd.quickSetup(baseInbox);
     const permSet = ['Insert'];
     await inboxMd.setUserPermissions(SAFE_CONSTANTS.USER_ANYONE, permSet, 1);
@@ -191,7 +191,7 @@ const createInbox = async (app, encPk) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * Archive is created as a place to store saved emails, composed of a private/
@@ -205,7 +205,7 @@ const createArchive = async (app) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * This function will be called when an email service is created, for which/
@@ -221,7 +221,7 @@ const createPublicIdAndEmailService = async (
   };
 
   try {
-    const md = await app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS)
+    const md = await app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS);
     await md.quickSetup(
       { [serviceInfo.serviceName]: inboxSerialised }, metadata.name, metadata.description
     );
@@ -232,21 +232,25 @@ const createPublicIdAndEmailService = async (
     console.error(err);
     throw err;
   }
-}
+};
 
 const genNewAccount = async (app, id) => {
   try {
     const encKeyPair = await netFns.genEncKeyPair(app);
     const inboxMd = await createInbox(app, encKeyPair.publicKey);
     const archiveMd = await createArchive(app);
-    return {id, inboxMd, archiveMd,
-                          encSk: encKeyPair.privateKey,
-                          encPk: encKeyPair.publicKey};
+    return {
+      id,
+      inboxMd,
+      archiveMd,
+      encSk: encKeyPair.privateKey,
+      encPk: encKeyPair.publicKey
+    };
   } catch (err) {
     console.error(err);
     throw err;
   }
-}
+};
 
 const registerEmailService = async (app, serviceToRegister) => {
   try {
@@ -261,7 +265,7 @@ const registerEmailService = async (app, serviceToRegister) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * When a new email ID is created, in the case where a public ID already
@@ -283,7 +287,7 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
     const newAccount = await registerEmailService(app, emailService);
     return { newAccount };
   } catch (err) {
-    if(err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
+    if (err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
       console.error(err);
       throw err;
     }
@@ -293,7 +297,7 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
     );
     return emailService;
   }
-}
+};
 
 /*
 * Overarching starting point to create a new account. With two cases:/
@@ -301,7 +305,6 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
 * or it needs to be created
 */
 export const setupAccount = async (app, emailId) => {
-
   const serviceInfo = await genServiceInfo(app, emailId);
   const pubNamesMd = await app.auth.getContainer(netFns.APP_INFO.containers.publicNames);
   try { // If service container already exists, try to add email service
@@ -320,14 +323,14 @@ export const setupAccount = async (app, emailId) => {
       // The public ID doesn't exist in _publicNames
       const newAccount = await genNewAccount(app, serviceInfo.emailId);
       const inboxSerialised = await newAccount.inboxMd.serialise();
-      await createPublicIdAndEmailService(app,pubNamesMd, serviceInfo, inboxSerialised);
+      await createPublicIdAndEmailService(app, pubNamesMd, serviceInfo, inboxSerialised);
       return { newAccount };
     } catch (err) {
       console.error(err);
       throw err;
     }
   }
-}
+};
 
 /*
 * Once authorisation to share an MD with this app has been approved/
@@ -342,7 +345,7 @@ export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 const writeEmailContent = async (app, email, pk) => {
   try {
@@ -355,7 +358,7 @@ const writeEmailContent = async (app, email, pk) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * Sends an email to a recipient
@@ -375,9 +378,9 @@ export const storeEmail = async (app, email, to) => {
     return inboxMd.applyEntriesMutation(mut);
   } catch (err) {
     console.error(err);
-    throw MESSAGES.EMAIL_ID_NOT_FOUND
+    throw MESSAGES.EMAIL_ID_NOT_FOUND;
   }
-}
+};
 
 export const removeEmail = async (app, container, key) => {
   try {
@@ -388,14 +391,14 @@ export const removeEmail = async (app, container, key) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 /*
 * Inserts email in archive MD
 */
 export const archiveEmail = async (app, account, key) => {
   try {
-    let newEntryKey = genRandomEntryKey();
+    const newEntryKey = genRandomEntryKey();
     const xorName = await account.inboxMd.get(key);
     let mut = await app.mutableData.newMutation();
     await mut.insert(newEntryKey, xorName.buf);
@@ -407,11 +410,11 @@ export const archiveEmail = async (app, account, key) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 export const genServiceInfo = async (app, emailId) => {
   try {
-    let serviceInfo = splitPublicIdAndService(emailId);
+    const serviceInfo = splitPublicIdAndService(emailId);
     const hashed = await app.crypto.sha3Hash(serviceInfo.publicId);
     serviceInfo.serviceAddr = hashed;
     return serviceInfo;
@@ -419,7 +422,7 @@ export const genServiceInfo = async (app, emailId) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 export const getLogFilePath = (app) => {
   if (!app) {

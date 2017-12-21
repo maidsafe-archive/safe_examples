@@ -1,4 +1,4 @@
- const initialiser = {
+const initialiser = {
   AUTHORISE_APP: 'AUTHORISE_APP',
   SET_INITIALISER_TASK: 'SET_INITIALISER_TASK',
   NET_STATUS_CHANGED: 'NET_STATUS_CHANGED',

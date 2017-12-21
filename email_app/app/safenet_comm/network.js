@@ -1,12 +1,11 @@
 import { shell } from 'electron';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
+import 'babel-polyfill';
+
 import { getAuthData, saveAuthData, clearAuthData,
   parseUrl, showError } from '../utils/app_utils';
 import pkg from '../../package.json';
 import { CONSTANTS } from '../constants';
-import 'babel-polyfill';
-
-
 
 export const APP_INFO = {
   info: {
@@ -27,7 +26,7 @@ export const APP_INFO = {
 };
 
 const DEVELOPMENT = 'dev';
-const nodeEnv = process.env.NODE_ENV || DEVELOPMENT
+const nodeEnv = process.env.NODE_ENV || DEVELOPMENT;
 
 let libPath;
 
@@ -54,7 +53,7 @@ export const requestShareMdAuth = async (app, mdPermissions) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 const requestAuth = async () => {
   try {
@@ -68,7 +67,7 @@ const requestAuth = async () => {
     console.error(err);
     showError();
   }
-}
+};
 
 /*
 * Handles whether or not to request authorisation, to use already generated/
@@ -87,13 +86,13 @@ export const authApp = async (netStatusCallback) => {
       await registeredApp.auth.refreshContainersPermissions();
       return registeredApp;
     } catch (err) {
-      console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
+      console.warn('Auth URI stored is not valid anymore, app needs to be re-authorised.');
       clearAuthData();
       return requestAuth();
     }
   }
   return requestAuth();
-}
+};
 
 /*
 * Once this app's authorisation has been approved, it will then use the connect/
@@ -110,15 +109,13 @@ export const connect = async (uri, netStatusCallback) => {
     console.error(err);
     throw err;
   }
-}
+};
 
-export const reconnect = (app) => {
-  return app.reconnect();
-}
+export const reconnect = (app) => app.reconnect();
 
 export const genEncKeyPair = async (app) => {
   try {
-    let rawKeyPair = {};
+    const rawKeyPair = {};
     const keyPair = await app.crypto.generateEncKeyPair();
     const rawPubEncKey = await keyPair.pubEncKey.getRaw();
     rawKeyPair.publicKey = rawPubEncKey.buffer.toString('hex');
@@ -129,10 +126,10 @@ export const genEncKeyPair = async (app) => {
     console.error(err);
     throw err;
   }
-}
+};
 
 export const encrypt = async (app, input, pk) => {
-  if(Array.isArray(input)) {
+  if (Array.isArray(input)) {
     input = input.toString();
   }
   try {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { showError, showSuccess } from '../utils/app_utils';
+import { showError } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
 
 export default class ComposeMail extends Component {
@@ -15,7 +15,7 @@ export default class ComposeMail extends Component {
   }
 
   sendMail(e) {
-    const { app, fromMail, sendEmail } = this.props;
+    const { fromMail, sendEmail } = this.props;
 
     e.preventDefault();
     const mailTo = this.mailTo.value.trim().toLowerCase();
@@ -28,15 +28,15 @@ export default class ComposeMail extends Component {
       return showError('Mail Content is too Long', 'Mail Content is too long!');
     }
 
-    let newEmail = {
+    const newEmail = {
       subject: mailSub,
       from: fromMail,
       time: (new Date()).toUTCString(),
       body: mailContent
     };
     return sendEmail(newEmail, mailTo)
-        .then(() => this.context.router.push('/home'))
-        .catch((err) => showError('Error sending email', err));
+      .then(() => this.context.router.push('/home'))
+      .catch((err) => showError('Error sending email', err));
   }
 
   handleCancel() {
@@ -44,19 +44,19 @@ export default class ComposeMail extends Component {
     this.context.router.push('/home');
   }
 
-  handleMailToLimit(e) {
+  handleMailToLimit() {
     if (this.mailTo.value.length > CONSTANTS.EMAIL_ID_MAX_LENGTH) {
       this.mailTo.value = this.mailTo.value.substring(0, CONSTANTS.EMAIL_ID_MAX_LENGTH);
     }
   }
 
-  handleSubLimit(e) {
+  handleSubLimit() {
     if (this.mailSub.value.length > CONSTANTS.MAIL_SUBJECT_LIMIT) {
       this.mailSub.value = this.mailSub.value.substring(0, CONSTANTS.MAIL_SUBJECT_LIMIT);
     }
   }
 
-  handleTextLimit(e) {
+  handleTextLimit() {
     if (this.mailContent.value.length > CONSTANTS.MAIL_CONTENT_LIMIT) {
       return this.mailContent.classList.add('hasError');
     }
@@ -68,37 +68,49 @@ export default class ComposeMail extends Component {
     // email id to reply to and subject are set in the location: '/compose_mail?<email id>&<subject>'
     const params = location.search.slice(1).split('&');
     const replyTo = params[0];
-    let subject = params[1] ? `Re: ${params[1].replace(/^Re: /g, '')}` : '';
-    let isProcessing = processing.state;
+    const subject = params[1] ? `Re: ${params[1].replace(/^Re: /g, '')}` : '';
+    const isProcessing = processing.state;
     return (
       <div className="compose-mail">
         <div className="compose-mail-b">
           <h3 className="title heading-lg text-center">Compose Mail</h3>
           <form className="form" onSubmit={this.sendMail}>
             <div className="inp-grp">
-              <input type="text" name="mailTo" id="mailTo" onKeyUp={this.handleMailToLimit} ref={c => {
-                this.mailTo = c;
-              }} required="required" autoFocus={replyTo ? '' : 'autoFocus'} defaultValue={replyTo}/>
+              <input
+                type="text" name="mailTo" id="mailTo" onKeyUp={this.handleMailToLimit} ref={c => {
+                  this.mailTo = c;
+                }} required="required" autoFocus={replyTo ? '' : 'autoFocus'} defaultValue={replyTo}
+              />
               <label htmlFor="mailTo">To</label>
             </div>
             <div className="inp-grp">
-              <input type="text" name="mailSub" id="mailSub" onKeyUp={this.handleSubLimit} ref={c => {
-                this.mailSub = c;
-              }} required="required" defaultValue={subject}/>
+              <input
+                type="text" name="mailSub" id="mailSub" onKeyUp={this.handleSubLimit} ref={c => {
+                  this.mailSub = c;
+                }} required="required" defaultValue={subject}
+              />
               <label htmlFor="mailSub">Subject</label>
             </div>
             <div className="inp-grp">
-              <textarea name="mailContent" onKeyUp={this.handleTextLimit} ref={c => {
-                this.mailContent = c;
-              }} required="required" defaultValue="" autoFocus={replyTo ? 'autoFocus' : ''}/>
+              <textarea
+                name="mailContent" onKeyUp={this.handleTextLimit} ref={c => {
+                  this.mailContent = c;
+                }} required="required" defaultValue="" autoFocus={replyTo ? 'autoFocus' : ''}
+              />
               <div className="limit">
-                Only { CONSTANTS.MAIL_CONTENT_LIMIT } characters allowed (this restriction is to reduce the number of chunks managed by the tutorial).
+                Only {CONSTANTS.MAIL_CONTENT_LIMIT} characters allowed (this restriction is to reduce the number of chunks managed by the tutorial).
               </div>
             </div>
             <div className="inp-btn-cnt">
-              <button type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary btn-eq" disabled={isProcessing}>{isProcessing ? 'Sending' : 'Send'}</button>
-              <button type="button" className="mdl-button mdl-js-button mdl-button--raised btn-eq" disabled={isProcessing ? 'disabled' : ''} onClick={this.handleCancel}>
-                Cancel
+              <button
+                type="submit" className="mdl-button mdl-js-button mdl-button--raised bg-primary btn-eq" disabled={isProcessing}
+              >{isProcessing ? 'Sending' : 'Send'}</button>
+              <button
+                type="button"
+                className="mdl-button mdl-js-button mdl-button--raised btn-eq"
+                disabled={isProcessing ? 'disabled' : ''}
+                onClick={this.handleCancel}
+              > Cancel
               </button>
             </div>
           </form>
@@ -110,5 +122,7 @@ export default class ComposeMail extends Component {
 }
 
 ComposeMail.contextTypes = {
-  router: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired,
+  sendEmail: PropTypes.func.isRequired,
+  cancelCompose: PropTypes.func.isRequired
 };

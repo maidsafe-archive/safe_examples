@@ -22,12 +22,8 @@ const initialState = {
   }
 };
 
-
-
 const pushEmailSorted = (list, item) => {
-  let index = list.findIndex((elem) => {
-    return elem.time <= item.email.time;
-  });
+  const index = list.findIndex((elem) => elem.time <= item.email.time);
   item.email.id = item.id;
   if (index < 0) {
     list.push(item.email);
@@ -35,7 +31,7 @@ const pushEmailSorted = (list, item) => {
     list.splice(index, 0, item.email);
   }
   return list;
-}
+};
 
 const mail = (state = initialState, action) => {
   switch (action.type) {
@@ -44,7 +40,6 @@ const mail = (state = initialState, action) => {
         accStatus: APP_STATUS.READING_CONFIG,
         processing: { state: true, msg: 'Reading emails...' }
       };
-      break;
     case `${ACTION_TYPES.GET_CONFIG}_SUCCESS`:
       return { ...state,
         account: action.payload,
@@ -52,7 +47,6 @@ const mail = (state = initialState, action) => {
         accStatus: APP_STATUS.READY,
         processing: { state: false, msg: null }
       };
-      break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_LOADING`:
       return { ...state,
         coreData: { ...state.coreData, inbox: [], saved: [] },
@@ -60,50 +54,40 @@ const mail = (state = initialState, action) => {
         savedSize: 0,
         processing: { state: true, msg: 'Reading emails...' }
       };
-      break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_SUCCESS`:
       return { ...state,
         spaceUsed: action.payload,
         processing: { state: false, msg: null }
       };
-      break;
     case `${ACTION_TYPES.REFRESH_EMAIL}_ERROR`:
       return { ...state, processing: { state: false, msg: null } };
-      break;
     case `${ACTION_TYPES.MAIL_PROCESSING}_LOADING`:
       return { ...state, processing: { state: true, msg: action.msg } };
-      break;
     case `${ACTION_TYPES.MAIL_PROCESSING}_SUCCESS`:
     case `${ACTION_TYPES.MAIL_PROCESSING}_ERROR`:
       return { ...state, processing: { state: false, msg: null } };
-      break;
     case ACTION_TYPES.PUSH_TO_INBOX: {
-      let inbox = state.coreData.inbox.slice();
+      const inbox = state.coreData.inbox.slice();
       pushEmailSorted(inbox, action.payload);
       return { ...state,
         coreData: { ...state.coreData, inbox },
         inboxSize: inbox.length
       };
-      break;
     }
     case ACTION_TYPES.PUSH_TO_ARCHIVE: {
-      let saved = state.coreData.saved.slice();
+      const saved = state.coreData.saved.slice();
       pushEmailSorted(saved, action.payload);
       return { ...state,
         coreData: { ...state.coreData, saved },
         savedSize: saved.length
       };
-      break;
     }
     case ACTION_TYPES.CANCEL_COMPOSE:
       return { ...state, error: {} };
-      break;
     case `${ACTION_TYPES.FETCH_EMAIL_IDS}_LOADING`:
       return { ...state, accStatus: APP_STATUS.FETCHING_EMAIL_IDS };
-      break;
     case `${ACTION_TYPES.FETCH_EMAIL_IDS}_SUCCESS`:
       return { ...state, emailIds: action.payload };
-      break;
     case `${ACTION_TYPES.CREATE_ACCOUNT_RESET}_LOADING`:
       return { ...state,
         accStatus: null,
@@ -111,13 +95,10 @@ const mail = (state = initialState, action) => {
         newAccount: null,
         serviceToRegister: null
       };
-      break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_LOADING`:
       return { ...state, processing: { state: true, msg: 'Creating email ID...' } };
-      break;
     case `${ACTION_TYPES.CREATE_ACCOUNT}_ERROR`:
-      return { ...state, error: action.payload, processing: {state: false, msg: null}};
-      break;
+      return { ...state, error: action.payload, processing: { state: false, msg: null } };
     case `${ACTION_TYPES.CREATE_ACCOUNT}_SUCCESS`:
       if (action.payload.newAccount) {
         return { ...state,
@@ -130,22 +111,18 @@ const mail = (state = initialState, action) => {
         accStatus: ACC_STATUS.AUTHORISING,
         serviceToRegister: action.payload
       };
-      break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_LOADING`:
       return { ...state, processing: { state: true, msg: 'Storing email info...' } };
-      break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_SUCCESS`:
       return { ...state,
         account: action.payload,
         coreData: { ...state.coreData, id: action.payload.id },
         processing: { state: false, msg: null }
       };
-      break;
     case `${ACTION_TYPES.STORE_NEW_ACCOUNT}_ERROR`:
       return { ...state, error: action.payload };
-      break;
-    case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_ERROR`:
-      status = ACC_STATUS.AUTHORISATION_FAILED;
+    case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_ERROR`: {
+      let status = ACC_STATUS.AUTHORISATION_FAILED;
       if (action.payload.code === SAFE_APP_ERROR_CODES.ERR_SHARE_MDATA_DENIED) {
         status = ACC_STATUS.AUTHORISATION_DENIED;
       }
@@ -154,17 +131,15 @@ const mail = (state = initialState, action) => {
         serviceToRegister: null,
         error: action.payload
       };
-      break;
+    }
     case `${ACTION_TYPES.AUTHORISE_SHARE_MD}_SUCCESS`:
       return { ...state,
         accStatus: ACC_STATUS.CREATED,
         newAccount: action.payload,
         serviceToRegister: null
       };
-      break;
     default:
       return state;
-      break;
   }
 };
 
