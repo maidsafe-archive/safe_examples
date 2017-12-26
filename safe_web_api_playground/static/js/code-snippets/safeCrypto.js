@@ -6,7 +6,7 @@ module.exports = {
     } catch (err) {
       return err;
     }
-    return `SHA3 Hash generated: ${String.fromCharCode.apply(null, new Uint8Array(res))}`;
+    return `SHA3 Hash generated: ${String.fromCharCode.apply(null, new Uint8Array(hashedString))}`;
     },
 
     getAppPubSignKey: async () => {
