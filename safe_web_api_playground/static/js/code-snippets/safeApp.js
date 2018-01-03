@@ -4,9 +4,12 @@ module.exports = {
     initialise: async () => {
 
       // Welcome! Get started by running this snippet.
-      // Then open the `safeApp` module on the left-hand side of the screen.
+      // Then open the `safeApp` module to the left and start exploring
       // Reference documentation: http://docs.maidsafe.net/beaker-plugin-safe-app/
-      // When not focused in this text box, simply use your `Enter` key at any time to run code snippets.
+
+      /* Helpful tips */
+      // When not focused in this editor, simply hit `Enter` at any time to run code.
+      // Want to quickly focus this editor without using your mouse? Press `Tab`
 
       const appInfo = {
         id: 'net.maidsafe.api_playground.webclient.10',

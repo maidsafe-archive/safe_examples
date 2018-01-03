@@ -2,6 +2,11 @@ let initSnippets = require('./init_snippets.js');
 require('./code_test.js');
 const apiVariables = require('./api_variables');
 const errHandler = require('./err_handler');
+const CodeMirror = require('../../codemirror/lib/codemirror.js');
+require("../../codemirror/mode/javascript/javascript.js");
+require("../../codemirror/addon/edit/matchbrackets.js");
+require("../../codemirror/keymap/vim.js");
+require("../../codemirror/addon/selection/active-line.js");
 
 function updateVariableValues() {
   return apiVariables.map(variable => {
@@ -78,10 +83,9 @@ function handleSubmit() {
   loader.setAttribute('id', 'loader');
   document.getElementById('rightside').appendChild(loader);
 
-  let el = document.getElementById('code');
   try {
-    let res = eval(el.value);
-    let isFreeSyncFunction = new RegExp('free').test(el.value);
+    const res = eval(editor.getValue());
+    const isFreeSyncFunction = new RegExp('free').test(editor.getValue());
     if(isFreeSyncFunction) {
       loader.parentNode.removeChild(loader);
       res();
@@ -89,7 +93,6 @@ function handleSubmit() {
       return;
     }
     return res().then(res => {
-      console.log(res);
       loader.parentNode.removeChild(loader);
 
       updateVariableValues();
@@ -120,11 +123,30 @@ function handleSubmit() {
   }
 }
 
+const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+        lineNumbers:true,
+        lineWrapping:true,
+        mode: 'javascript',
+	viewportMargin: 50 ,
+	matchBrackets: true,
+	tabSize: 2,
+	styleActiveLine: true
+});
 
+const toggleVim = () => {
+  if(editor.options.keyMap === 'default') {
+    editor.setOption('keyMap', 'vim');
+  } else {
+    editor.setOption('keyMap', 'default');
+  }
+  editor.focus();
+};
+window.toggleVim = toggleVim;
+window.editor = editor;
 window.handleSubmit = handleSubmit;
 
 document.addEventListener('keyup', function(e) {
-  let textAreaFocused = document.activeElement == document.getElementById('code');
+  const textAreaFocused = editor.hasFocus();
   if(e.keyCode == 13 && !textAreaFocused) {
     handleSubmit();
   }
@@ -136,10 +158,5 @@ document.addEventListener('animationend', function(e) {
   	elem.removeAttribute('class');
   })
 })
-
-document.addEventListener('input', function(e) {
-  e.target.style.height = '0px';
-  e.target.style.height = e.target.scrollHeight + 'px';
-});
 
 module.exports = {};

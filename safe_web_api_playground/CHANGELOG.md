@@ -1,5 +1,13 @@
 # SAFE web API playground Change Log
 
+## 2.1.0
+
+- embeds text editor to improve user experience(codemirror)
+  - toggle vim key bindings
+  - smart indent
+  - active line highlight
+  - syntax highlighting
+
 ## 2.0.0
 
 - improved error handling

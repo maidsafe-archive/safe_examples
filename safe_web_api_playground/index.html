@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>SAFE web API playground</title>
     <link rel="icon" href="./favicon.ico" sizes="16x16" />
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="css/deps.css">
     <link rel="stylesheet" href="css/styles.css">
 
@@ -71,6 +72,11 @@
                 <form class="form" id="codeForm">
                   <textarea class="form-control" id="code" ></textarea>
                   <button type="button" class="btn btn-default" id="runButton" onclick="handleSubmit()">RUN</button>
+		  <label class="switch pull-right">
+		    <input type="checkbox" onclick="toggleVim()">
+                    <span class="slider round"></span>
+	          </label>
+		  <p class="pull-right">vim&nbsp</p>
                 </form>
               </div>
             </div>
@@ -90,6 +96,5 @@
     <script type="text/javascript" src="js/deps.js"></script>
     <script type="text/javascript" src="js/client-scripts.js"></script>
 
-    </script>
   </body>
 </html>
