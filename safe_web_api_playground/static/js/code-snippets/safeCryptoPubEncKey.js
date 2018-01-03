@@ -6,7 +6,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Public encryption key: ${String.fromCharCode.apply(null, new Uint8Array(res.buffer))}`;
+      return `Public encryption key: ${String.fromCharCode.apply(null, rawPubEncKey.buffer)}`;
     },
 
     encryptSealed: async () => {
