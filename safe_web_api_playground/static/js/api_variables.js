@@ -24,6 +24,7 @@ module.exports = [
   'rawSecSignKey',
   'rawPubEncKey',
   'rawSecEncKey',
+  'rawSignKeyPair',
   'encryptedBuffer',
   'decipheredBuffer',
   'idAddress',

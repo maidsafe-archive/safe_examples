@@ -27,7 +27,7 @@ module.exports = {
     },
 
     authorise: async () => {
-      // After clicking `RUN`, check SAFE browser authenticator for authorization request
+      // After clicking `RUN`, check SAFE Browser authenticator for authorization request
 
       try {
         authUri = await window.safeApp.authorise(
@@ -77,7 +77,11 @@ module.exports = {
       try {
         authUri = await window.safeApp.authoriseContainer(
           appHandle,
-          { _publicNames: ['Update'] } // request to update into `_publicNames` container
+          { _videos: [
+              'Read',
+              'Insert',
+              'Update',
+	    ] } // request permissions for `_videos` container
         )
       } catch (err) {
         return err;
