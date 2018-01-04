@@ -128,7 +128,8 @@ const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
         mode: 'javascript',
 	matchBrackets: true,
 	tabSize: 2,
-	styleActiveLine: true
+	styleActiveLine: true,
+	viewportMargin: Infinity 
 });
 
 const toggleVim = () => {

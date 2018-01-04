@@ -40,7 +40,7 @@ body {
   font-size: 22px;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5{
   font-family: 'Roboto-Slab'
 }
 
@@ -63,6 +63,10 @@ textarea {
   height: auto;
   font-size: 16px;
   font-family: 'SourceCodePro';
+}
+
+.CodeMirror-scroll {
+  max-height: 70vh;
 }
 
 .roboto-medium {
@@ -107,15 +111,19 @@ textarea {
 
 .box {
   background-color: #ffffff;
-  margin: 3%;
+  margin: 1%;
   padding: 1%;
   overflow: auto;
+}
+
+.clear-padding {
+  padding: 0;
 }
 
 .red-box {
   background-color: #ffffff;
   color: #F44336;
-  margin: 3%;
+  margin: 1%;
   padding: 1%;
   overflow: auto;
 }
@@ -128,7 +136,7 @@ textarea {
 
 .snippet {
   display: block;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
 }
 
 .module-title {
@@ -152,8 +160,12 @@ textarea {
   color: #000000;
 }
 
+#codebox {
+  padding: 0;
+}
+
 #rightside {
-  height: 100vh;
+  height: 95vh;
   position: fixed;
   right: 0;
   overflow: auto;
@@ -171,15 +183,20 @@ textarea {
 }
 
 #snippetParent {
-  height: 85vh;
+  height: 95vh;
   position: fixed;
   overflow: auto;
-  width: 25%;
+  width: 16.67%;
+  padding-left: 1%;
 }
 
 #runButton {
   font-family: 'Roboto-Regular';
   margin: 1%;
+}
+
+#title {
+  margin: 0 auto;
 }
 
 @keyframes flash {

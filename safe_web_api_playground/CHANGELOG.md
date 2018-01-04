@@ -8,6 +8,12 @@
   - active line highlight
   - syntax highlighting
 
+- improved layout
+  - reduces size of font for module and function names
+  - increased editor area
+  - improved responsiveness
+  - cleaner and more intuitive scroll bars
+
 ## 2.0.0
 
 - improved error handling
