@@ -125,9 +125,7 @@ function handleSubmit() {
 
 const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
         lineNumbers:true,
-        lineWrapping:true,
         mode: 'javascript',
-	viewportMargin: 50 ,
 	matchBrackets: true,
 	tabSize: 2,
 	styleActiveLine: true

@@ -170,6 +170,13 @@ textarea {
   padding-right: 1%;
 }
 
+#snippetParent {
+  height: 85vh;
+  position: fixed;
+  overflow: auto;
+  width: 25%;
+}
+
 #runButton {
   font-family: 'Roboto-Regular';
   margin: 1%;
