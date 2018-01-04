@@ -58,9 +58,9 @@ gulp.task('fonts', function () {
 
 gulp.task('codemirror', function () {
   gulp.src([
-      './codemirror/**/*'
+      './node_modules/codemirror/lib/codemirror.css'
     ])
-    .pipe(gulp.dest('./build/codemirror'));
+    .pipe(gulp.dest('./build/css'));
 });
 
 gulp.task('js', function () {

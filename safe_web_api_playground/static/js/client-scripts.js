@@ -2,11 +2,11 @@ let initSnippets = require('./init_snippets.js');
 require('./code_test.js');
 const apiVariables = require('./api_variables');
 const errHandler = require('./err_handler');
-const CodeMirror = require('../../codemirror/lib/codemirror.js');
-require("../../codemirror/mode/javascript/javascript.js");
-require("../../codemirror/addon/edit/matchbrackets.js");
-require("../../codemirror/keymap/vim.js");
-require("../../codemirror/addon/selection/active-line.js");
+const CodeMirror = require('codemirror/lib/codemirror.js');
+require("codemirror/mode/javascript/javascript.js");
+require("codemirror/addon/edit/matchbrackets.js");
+require("codemirror/keymap/vim.js");
+require("codemirror/addon/selection/active-line.js");
 
 function updateVariableValues() {
   return apiVariables.map(variable => {

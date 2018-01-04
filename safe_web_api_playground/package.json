@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "gulp": "./node_modules/.bin/gulp"
+    "gulp": "./node_modules/.bin/gulp",
+    "postinstall": "cd ./node_modules/codemirror && yarn"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
     "body-parser": "^1.17.2",
     "bootstrap": "^3.3.7",
     "browserify": "^14.4.0",
+    "codemirror": "^5.33.0",
     "envfile": "^2.1.1",
     "express": "^4.15.3",
     "gulp": "^3.9.1",
