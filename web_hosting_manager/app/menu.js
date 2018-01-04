@@ -67,7 +67,7 @@ export default class MenuBuilder {
     const OpenAppLogs = () => {
       this.mainWindow.webContents.send('show-log-file');
     };
-    let menu = [];
+    const menu = [];
 
     menu.unshift(new MenuItem({
       label: '&Open log file',

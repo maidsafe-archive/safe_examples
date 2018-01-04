@@ -82,11 +82,10 @@ describe('Fetch PublicNames API', () => {
   const publicName2 = h.randomStr();
   beforeAll(async () => {
     api = await h.authoriseApp();
+  });
+  it(`fetch PublicNames list with \'${publicName1}\' and \'${publicName2}\'`, async () => {
     await api.createPublicName(publicName1);
     await api.createPublicName(publicName2);
-  });
-
-  it(`fetch PublicNames list with \'${publicName1}\' and \'${publicName2}\'`, async () => {
     const expected = [
       { name: publicName1 },
       { name: publicName2 }
@@ -120,7 +119,7 @@ describe('Create Service Mutable Data API', () => {
     await expect(api.createServiceFolder(servicePath, metaFor)).resolves.isXORName()
   ));
 
-  it('fail to create duplicate service MD', async () => (
+  it('fails to create duplicate service MD', async () => (
     await expect(api.createServiceFolder(servicePath, metaFor))
       .rejects
       .toHaveProperty(h.errorCodeKey, CONSTANTS.ERROR_CODE.ENTRY_EXISTS)
@@ -135,8 +134,6 @@ describe('Create Service API', () => {
   let serviceXORName = undefined;
   beforeAll(async () => {
     api = await h.authoriseApp();
-    await api.createPublicName(publicName);
-    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
   });
 
   it('throws error if publicName is empty', async () => (
@@ -158,11 +155,14 @@ describe('Create Service API', () => {
   ));
 
   it('create new service', async () => {
+    await api.createPublicName(publicName);
+    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
+    await api.fetchPublicNames();
     await expect(api.createService(publicName, serviceName, serviceXORName)).resolves.toBeTruthy();
     await expect(h.fetchServiceName(api, publicName, serviceName)).resolves.toMatchObject(serviceXORName.buffer);
-  });
+  }, 50000);
 
-  it('fail to create duplicate service', async () => (
+  it('fails to create duplicate service', async () => (
     await expect(api.createService(publicName, serviceName, serviceXORName))
       .rejects
       .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.ENTRY_VALUE_NOT_EMPTY)
@@ -172,8 +172,6 @@ describe('Create Service API', () => {
     const serviceName2 = h.randomStr();
     await expect(api.createService(publicName, serviceName2, serviceXORName)).resolves.toBeTruthy();
   });
-
-  // it('create new service with service folder mapped to service of another publicName')
 });
 
 describe('Fetch Services API', () => {
@@ -184,27 +182,27 @@ describe('Fetch Services API', () => {
   let serviceXORName = undefined;
   beforeAll(async () => {
     api = await h.authoriseApp();
-    await api.createPublicName(publicName);
-    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
-    await api.createService(publicName, serviceName, serviceXORName);
-    await api.fetchPublicNames();
   });
 
   it('fetch services for all publicName', async() => {
+    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
+    await api.createPublicName(publicName);
+    await api.createService(publicName, serviceName, serviceXORName);
+    await api.fetchPublicNames();
     const expected = [
       {
         name: publicName,
         services: [
           {
             name: serviceName,
-            path: servicePath
+            path: servicePath,
           }
         ]
       }
     ];
     await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expected));
     await expect(api.fetchServices()).resolves.arrayCounts(1);
-  });
+  }, 50000);
 });
 
 describe('Delete Service API', () => {
@@ -215,11 +213,6 @@ describe('Delete Service API', () => {
   let serviceXORName = undefined;
   beforeAll(async () => {
     api = await h.authoriseApp();
-    await api.createPublicName(publicName);
-    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
-    await api.createService(publicName, serviceName, serviceXORName);
-    await api.fetchPublicNames();
-    await api.fetchServices();
   });
 
   it('throws error if publicName is empty', async () => (
@@ -234,7 +227,12 @@ describe('Delete Service API', () => {
       .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_NAME)
   ));
 
-  it('delets the service', async () => {
+  it('deletes the service', async () => {
+    await api.createPublicName(publicName);
+    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
+    await api.createService(publicName, serviceName, serviceXORName);
+    await api.fetchPublicNames();
+    await api.fetchServices();
     const expected = [
       {
         name: publicName,
@@ -243,7 +241,7 @@ describe('Delete Service API', () => {
     ];
     await expect(api.deleteService(publicName, serviceName)).resolves.toBeTruthy();
     await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expected));
-  });
+  }, 50000);
 });
 
 describe('Remap Service', () => {
@@ -256,12 +254,6 @@ describe('Remap Service', () => {
   let serviceXORName2 = undefined;
   beforeAll(async () => {
     api = await h.authoriseApp();
-    await api.createPublicName(publicName);
-    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
-    serviceXORName2 = await api.createServiceFolder(servicePath2, `${serviceName}2`);
-    await api.createService(publicName, serviceName, serviceXORName);
-    await api.fetchPublicNames();
-    await api.fetchServices();
   });
 
   it('throws error if publicName is empty', async () => (
@@ -283,6 +275,12 @@ describe('Remap Service', () => {
   ));
 
   it('remap to another service folder', async () => {
+    await api.createPublicName(publicName);
+    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
+    serviceXORName2 = await api.createServiceFolder(servicePath2, `${serviceName}2`);
+    await api.createService(publicName, serviceName, serviceXORName);
+    await api.fetchPublicNames();
+    await api.fetchServices();
     const expectedBefore = [
       {
         name: publicName,
@@ -308,7 +306,7 @@ describe('Remap Service', () => {
     await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expectedBefore));
     await expect(api.remapService(publicName, serviceName, servicePath2)).resolves.toBeTruthy();
     await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expectedAfter));
-  });
+  }, 50000);
 });
 
 describe('Can Access Service Container API', () => {
@@ -316,7 +314,6 @@ describe('Can Access Service Container API', () => {
   const publicName = h.randomStr();
   beforeAll(async () => {
     api = await h.authoriseApp();
-    await api.createPublicName(publicName);
   });
 
   it('throws error if publicName is empty', async () => (
@@ -326,6 +323,7 @@ describe('Can Access Service Container API', () => {
   ));
 
   it('can access publicName created by own', async () => {
+    await api.createPublicName(publicName);    
     await expect(api.canAccessServiceContainer(publicName)).resolves.toBeTruthy();
   });
 
@@ -333,11 +331,10 @@ describe('Can Access Service Container API', () => {
     const api2 = await h.authoriseApp();
     const publicName2 = h.randomStr();
     await api2.createPublicName(publicName2);
-
     await expect(api.canAccessServiceContainer(publicName2))
       .rejects
       .toHaveProperty(h.errorCodeKey, CONSTANTS.ERROR_CODE.NO_SUCH_ENTRY);
-  });
+  }, 50000);
 });
 
 describe('Get Service Folder Names API', () => {
@@ -351,21 +348,21 @@ describe('Get Service Folder Names API', () => {
   let serviceXORName2 = undefined;
   beforeAll(async () => {
     api = await h.authoriseApp();
+  });
+
+  it('fetch path names', async () => {
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
     serviceXORName2 = await api.createServiceFolder(servicePath2, serviceName2);
     await api.createService(publicName, serviceName, serviceXORName);
     await api.createService(publicName, serviceName2, serviceXORName2);
     await api.fetchPublicNames();
-  });
-
-  it('fetch path names', async () => {
     const expected = [];
     expected.push(servicePath);
     expected.push(servicePath2);
     await expect(api.getServiceFolderNames()).resolves.toEqual(expect.arrayContaining(expected))
     await expect(api.getServiceFolderNames()).resolves.arrayCounts(2);
-  });
+  }, 50000);
 });
 
 describe('Get Service Folder Info', () => {
@@ -376,10 +373,6 @@ describe('Get Service Folder Info', () => {
   let serviceXORName = undefined;
   beforeAll(async () => {
     api = await h.authoriseApp();
-    await api.createPublicName(publicName);
-    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
-    await api.createService(publicName, serviceName, serviceXORName);
-    await api.fetchPublicNames();
   });
 
   it('throws error if service path is empty', async () => (
@@ -389,11 +382,15 @@ describe('Get Service Folder Info', () => {
   ));
 
   it('fetch info', async () => {
+    await api.createPublicName(publicName);
+    serviceXORName = await api.createServiceFolder(servicePath, serviceName);
+    await api.createService(publicName, serviceName, serviceXORName);
+    await api.fetchPublicNames();
     const info = await api.getServiceFolderInfo(servicePath);
     expect(info.name).isXORName();
     expect(info.name).toEqual(serviceXORName);
-    expect(info.tag).toEqual(CONSTANTS.TYPE_TAG.WWW);
-  });
+    expect(info.type_tag).toEqual(CONSTANTS.TYPE_TAG.WWW);
+  }, 50000);
 });
 
 describe('Upload File API', () => {
@@ -404,14 +401,14 @@ describe('Upload File API', () => {
   let serviceXORName = undefined;
   beforeAll(async () => {
     api = await h.authoriseApp();
+  });
+
+  it('upload dir', async () => {
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
     await api.createService(publicName, serviceName, serviceXORName);
     await api.fetchPublicNames();
     await api.fetchServices();
-  });
-
-  it('upload dir', async () => {
     await expect(new Promise((resolve, reject) => {
       const localPath = __dirname;
       const networkPath = servicePath;
@@ -436,7 +433,7 @@ describe('Upload File API', () => {
       };
       api.fileUpload(localPath, networkPath, progressCb, errorCb);
     })).resolves.toBeTruthy();
-  });
+  }, 50000);
 });
 
 describe('Download File API', () => {
@@ -447,6 +444,7 @@ describe('Download File API', () => {
   let serviceXORName = undefined;
   const localPath = path.resolve(__dirname, 'sample.txt');
   const networkPath = servicePath;
+  
   beforeAll(async () => {
     initTempFolder();
     api = await h.authoriseApp();
@@ -461,14 +459,13 @@ describe('Download File API', () => {
           resolve(true);
         }
       };
-
       const errorCb = (error) => {
         reject(error);
       };
       api.fileUpload(localPath, networkPath, progressCb, errorCb);
     }));
-  });
-
+  }, 50000);
+  
   it('download file', async () => {
     await expect(new Promise((resolve, reject) => {
       const cb = (err, status) => {
