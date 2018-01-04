@@ -27,6 +27,9 @@ addons:
     packages:
     - g++-4.8
 before_deploy:
+- export TOKEN="$GITHUB_AUTH_TOKEN" OWNER="MaidSafe" REPO="release_config"
+- export FILE="https://api.github.com/repos/$OWNER/$REPO/contents/safe_authenticator/log.toml"
+- curl -O "$FILE" -H "Authorization:token $TOKEN" -H "Accept:application/vnd.github.v3.raw"
 - yarn install-all
 - yarn package-all
 - export EMAIL_APP="$(ls email_app/out/*.zip)";
