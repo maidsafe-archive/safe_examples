@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>SAFE web API playground</title>
     <link rel="icon" href="./favicon.ico" sizes="16x16" />
+    <link rel="stylesheet" href="css/codemirror.css">
     <link rel="stylesheet" href="css/deps.css">
     <link rel="stylesheet" href="css/styles.css">
 
@@ -42,10 +43,11 @@
     <div class="container-fluid">
       <header>
         <div class="row">
-          <div class="col-xs-3 header mint-bg">
+          <div class="col-xs-2 header mint-bg">
 
           </div>
-          <div class="col-xs-9 header primary-blue-bg" id="rightheader">
+          <div class="col-xs-10 header primary-blue-bg" id="rightheader">
+            <h3 id="title" class="white pull-left">SAFE web API playground</h3>
             <img id="safe-logo" class="pull-right" src="images/safenetwork_logo_mono.svg" alt="Safe Network Logo">
           </div>
         </div>
@@ -53,29 +55,33 @@
 
       <div class="row">
 
-        <div class="col-xs-3">
-          <h2>SAFE web API playground</h2>
+        <div class="col-xs-2">
           <div class="row">
-            <div class="col-xs-12" id="snippetParent">
+            <div id="snippetParent">
 
             </div>
           </div>
         </div>
 
-        <div class="col-xs-9 primary-grey-bg" id="rightside">
+        <div class="col-xs-10 primary-grey-bg" id="rightside">
 
           <div class="row">
 
-            <div class="col-xs-9" id="codebox">
+            <div class="col-xs-10" id="codebox">
               <div class="box">
                 <form class="form" id="codeForm">
                   <textarea class="form-control" id="code" ></textarea>
                   <button type="button" class="btn btn-default" id="runButton" onclick="handleSubmit()">RUN</button>
+		  <label class="switch pull-right">
+		    <input type="checkbox" onclick="toggleVim()">
+                    <span class="slider round"></span>
+	          </label>
+		  <p class="pull-right">vim&nbsp;</p>
                 </form>
               </div>
             </div>
 
-            <div class="col-xs-3">
+            <div class="col-xs-2 clear-padding">
               <div class="box" id="variables">
                 <h4>Saved variables</h4>
                 <p id="tempText"><i>No variables saved yet.</i></p>
@@ -90,6 +96,5 @@
     <script type="text/javascript" src="js/deps.js"></script>
     <script type="text/javascript" src="js/client-scripts.js"></script>
 
-    </script>
   </body>
 </html>
