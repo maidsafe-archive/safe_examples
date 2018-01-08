@@ -1,5 +1,19 @@
 # SAFE web API playground Change Log
 
+## 2.1.0
+
+- embeds text editor to improve user experience(codemirror)
+  - toggle vim key bindings
+  - smart indent
+  - active line highlight
+  - syntax highlighting
+
+- improved layout
+  - reduces size of font for module and function names
+  - increased editor area
+  - improved responsiveness
+  - cleaner and more intuitive scroll bars
+
 ## 2.0.0
 
 - improved error handling

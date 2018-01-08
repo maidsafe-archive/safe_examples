@@ -20,7 +20,7 @@ module.exports = {
 
     newAsymmetric: async () => {
       try {
-        cipherOptHandle = await window.safeCipherOpt.newAsymmetric(appHandle);
+        cipherOptHandle = await window.safeCipherOpt.newAsymmetric(pubEncKeyHandle);
       } catch (err) {
         return err;
       }
