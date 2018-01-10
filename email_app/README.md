@@ -20,7 +20,9 @@ First, clone the repository:
 $ cd your-project-name
 ```
 
-And then install the dependencies:
+And then install the dependencies:  
+
+*Note:* You must use `npm` commands at the moment and not `yarn`: https://github.com/electron-userland/electron-forge/issues/249
 
 ```bash
 $ npm install
