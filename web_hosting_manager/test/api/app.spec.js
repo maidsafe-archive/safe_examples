@@ -1,78 +1,46 @@
 import path from 'path';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+chai.use(chaiAsPromised);
+const should = chai.should();
+const {expect, assert} = chai;
 
 import * as h from './helpers';
 import { initTempFolder } from '../../app/safenet_comm/temp';
 import CONSTANTS from '../../app/constants';
 
-expect.extend({
-  isXORName(received) {
-    if (received.length === 32) {
-      return {
-        message: () => (
-          `expected ${received} not to be an ArrayType`
-        ),
-        pass: true,
-      };
-    }
-    return {
-      message: () => (
-        `expected ${received} not to be an ArrayType`
-      ),
-      pass: false,
-    };
-  },
-  arrayCounts(received, argument) {
-    if (received.length === argument) {
-      return {
-        message: () => (
-          `expected ${received} length not to be equal to ${argument}`
-        ),
-        pass: true,
-      };
-    }
-    return {
-      message: () => (
-        `expected ${received} length not to be equal to ${argument}`
-      ),
-      pass: false,
-    };
-  },
-});
-
 describe('Smoke test', () => {
   let api = undefined;
-  beforeAll(() => {
+  before(() => {
     api = h.newSafeApi();
   });
 
-  it('Mock authorisation with Authenticator', async () => (
-    await expect(api.authoriseMock()).resolves
-  ));
+  it('Mock authorisation with Authenticator', async () => {
+    await expect(api.authoriseMock()).to.be.ok
+  });
 });
 
 describe('Create PublicName API', () => {
   let api = undefined;
   const publicName = h.randomStr();
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
   });
 
-  it('throws error if publicName is empty', async () => (
-    await expect(api.createPublicName())
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_PUBLIC_NAME)
-  ));
-
-  it(`create with name \'${publicName}\'`, async () => {
-    await expect(api.createPublicName(publicName)).resolves.toBeTruthy();
-    const hashPublicName = await h.sha3Hash(api, publicName);
-    await expect(h.fetchPublicName(api, publicName)).resolves.toMatchObject(hashPublicName);
+  it('throws error if publicName is empty', () => {
+    return expect(api.createPublicName())
+      .to.eventually.be.rejectedWith('Invalid publicName');
   });
 
-  it(`fail to crate create dubpicate public name (name - \'${publicName}\')`, async () => {
-    await expect(api.createPublicName(publicName))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.ERROR_CODE.DATA_EXISTS);
+  it(`create with name \'${publicName}\'`, async () => {
+    await api.createPublicName(publicName);
+    const hashPublicName = await api.sha3Hash(publicName);
+    return expect(Promise.resolve(h.fetchPublicName(api, publicName))).to.eventually.eql(hashPublicName);
+  });
+
+  it(`fail to create duplicate public name (name - \'${publicName}\')`, async () => {
+    return expect(api.createPublicName(publicName))
+      .to.eventually.be.rejectedWith('Data given already exists');
   });
 });
 
@@ -80,7 +48,7 @@ describe('Fetch PublicNames API', () => {
   let api = undefined;
   const publicName1 = h.randomStr();
   const publicName2 = h.randomStr();
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName1);
     await api.createPublicName(publicName2);
@@ -91,8 +59,11 @@ describe('Fetch PublicNames API', () => {
       { name: publicName1 },
       { name: publicName2 }
     ];
-    await expect(api.fetchPublicNames()).resolves.toEqual(expect.arrayContaining(expected));
-    await expect(api.fetchPublicNames()).resolves.arrayCounts(2);
+    const actual = await api.fetchPublicNames();
+    const expectedSorted = expected.map(i => i.name).sort;
+    const actualSorted = actual.map(i => i.name).sort;
+    await expect(Promise.resolve(actual)).to.eventually.be.ok.and.have.lengthOf(2);
+    await expect(actualSorted).to.eql(expectedSorted);
   });
 });
 
@@ -100,31 +71,29 @@ describe('Create Service Mutable Data API', () => {
   let api = undefined;
   const metaFor = h.randomStr();
   const servicePath = `_public/${metaFor}`
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
   });
 
-  it('throws error if servicePath is empty', async () => (
-    await expect(api.createServiceFolder())
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_PATH)
-  ));
+  it('throws error if servicePath is empty', async () => {
+    return expect(api.createServiceFolder())
+      .to.eventually.be.rejectedWith('Invalid service path');
+  });
 
-  it('throws error if serice metadata is empty', async () => (
-    await expect(api.createServiceFolder(servicePath))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_META)
-  ));
+  it('throws error if serice metadata is empty', async () => {
+    return expect(api.createServiceFolder(servicePath))
+      .to.eventually.be.rejectedWith('Invalid service metadata');
+  });
 
-  it('create new service MD', async () => (
-    await expect(api.createServiceFolder(servicePath, metaFor)).resolves.isXORName()
-  ));
+  it('create new service MD', async () => {
+    return expect(Promise.resolve(api.createServiceFolder(servicePath, metaFor))).to.eventually.be.ok
+      .and.have.lengthOf(32);
+  });
 
-  it('fail to create duplicate service MD', async () => (
-    await expect(api.createServiceFolder(servicePath, metaFor))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.ERROR_CODE.ENTRY_EXISTS)
-  ));
+  it('fail to create duplicate service MD', async () => {
+    return expect(api.createServiceFolder(servicePath, metaFor))
+      .to.eventually.be.rejectedWith('EntryExists');
+  });
 });
 
 describe('Create Service API', () => {
@@ -133,47 +102,40 @@ describe('Create Service API', () => {
   const serviceName = h.randomStr();
   const servicePath = `_public/${serviceName}`;
   let serviceXORName = undefined;
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
   });
 
-  it('throws error if publicName is empty', async () => (
-    await expect(api.createService())
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_PUBLIC_NAME)
-  ));
-
-  it('throws error if serviceName is empty', async () => (
-    await expect(api.createService(publicName))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_NAME)
-  ));
-
-  it('throws error if service path is empty', async () => (
-    await expect(api.createService(publicName, serviceName))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_PATH)
-  ));
-
-  it('create new service', async () => {
-    await expect(api.createService(publicName, serviceName, serviceXORName)).resolves.toBeTruthy();
-    await expect(h.fetchServiceName(api, publicName, serviceName)).resolves.toMatchObject(serviceXORName.buffer);
+  it('throws error if publicName is empty', async () => {
+    return expect(api.createService())
+      .to.eventually.be.rejectedWith('Invalid publicName');
   });
 
-  it('fail to create duplicate service', async () => (
-    await expect(api.createService(publicName, serviceName, serviceXORName))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.ENTRY_VALUE_NOT_EMPTY)
-  ));
+  it('throws error if serviceName is empty', async () => {
+    return expect(api.createService(publicName))
+      .to.eventually.be.rejectedWith('Invalid serviceName');
+  });
+
+  it('throws error if service path is empty', async () => {
+    return expect(api.createService(publicName, serviceName))
+      .to.eventually.be.rejectedWith('Invalid service path');
+  });
+
+  it('create new service', async () => {
+    await expect(api.createService(publicName, serviceName, serviceXORName)).to.be.ok;
+  });
+
+  it('fails to create duplicate service', async () => {
+    return expect(api.createService(publicName, serviceName, serviceXORName))
+      .to.eventually.rejectedWith('Entry value is not empty');
+  });
 
   it('create new service with already mapped service folder', async () => {
     const serviceName2 = h.randomStr();
-    await expect(api.createService(publicName, serviceName2, serviceXORName)).resolves.toBeTruthy();
+    await expect(api.createService(publicName, serviceName2, serviceXORName)).to.be.ok;
   });
-
-  // it('create new service with service folder mapped to service of another publicName')
 });
 
 describe('Fetch Services API', () => {
@@ -182,7 +144,7 @@ describe('Fetch Services API', () => {
   const serviceName = h.randomStr();
   const servicePath = `_public/${serviceName}`;
   let serviceXORName = undefined;
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
@@ -202,8 +164,8 @@ describe('Fetch Services API', () => {
         ]
       }
     ];
-    await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expected));
-    await expect(api.fetchServices()).resolves.arrayCounts(1);
+    await expect(Promise.resolve(api.fetchServices())).to.eventually.have.lengthOf(1)
+      .and.eql(expected);
   });
 });
 
@@ -213,7 +175,7 @@ describe('Delete Service API', () => {
   const serviceName = h.randomStr();
   const servicePath = `_public/${serviceName}`;
   let serviceXORName = undefined;
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
@@ -222,27 +184,27 @@ describe('Delete Service API', () => {
     await api.fetchServices();
   });
 
-  it('throws error if publicName is empty', async () => (
-    await expect(api.deleteService())
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_PUBLIC_NAME)
-  ));
+  it('throws error if publicName is empty', async () => {
+    return expect(api.deleteService())
+      .to.eventually.be.rejectedWith('Invalid publicName');
+  });
 
-  it('throws error if serviceName is empty', async () => (
-    await expect(api.deleteService(publicName))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_NAME)
-  ));
+  it('throws error if serviceName is empty', async () => {
+    return expect(api.deleteService(publicName))
+      .to.eventually.be.rejectedWith('Invalid serviceName');
+  });
 
-  it('delets the service', async () => {
+  it('deletes the service', async () => {
     const expected = [
       {
         name: publicName,
         services: []
       }
     ];
-    await expect(api.deleteService(publicName, serviceName)).resolves.toBeTruthy();
-    await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expected));
+    await expect(api.deleteService(publicName, serviceName)).to.be.ok;
+    // await safeApi.fetchServices();
+    await expect(Promise.resolve(api.fetchServices())).to.eventually.eql(expected)
+      .and.have.lengthOf(1);
   });
 });
 
@@ -254,7 +216,7 @@ describe('Remap Service', () => {
   const servicePath2 = `_public/${serviceName}2`;
   let serviceXORName = undefined;
   let serviceXORName2 = undefined;
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
@@ -264,23 +226,20 @@ describe('Remap Service', () => {
     await api.fetchServices();
   });
 
-  it('throws error if publicName is empty', async () => (
-    await expect(api.remapService())
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_PUBLIC_NAME)
-  ));
+  it('throws error if publicName is empty', async () => {
+    return expect(api.remapService())
+      .to.eventually.be.rejectedWith('Invalid publicName');
+  });
 
-  it('throws error if serviceName is empty', async () => (
-    await expect(api.remapService(publicName))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_NAME)
-  ));
+  it('throws error if serviceName is empty', async () => {
+    return expect(api.remapService(publicName))
+      .to.eventually.be.rejectedWith('Invalid serviceName');
+  });
 
-  it('throws error if service path is empty', async () => (
-    await expect(api.remapService(publicName, serviceName))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_PATH)
-  ));
+  it('throws error if service path is empty', async () => {
+    return expect(api.remapService(publicName, serviceName))
+      .to.eventually.be.rejectedWith('Invalid service path');
+  });
 
   it('remap to another service folder', async () => {
     const expectedBefore = [
@@ -305,38 +264,36 @@ describe('Remap Service', () => {
         ]
       }
     ];
-    await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expectedBefore));
-    await expect(api.remapService(publicName, serviceName, servicePath2)).resolves.toBeTruthy();
-    await expect(api.fetchServices()).resolves.toEqual(expect.arrayContaining(expectedAfter));
+    await expect(Promise.resolve(api.fetchServices())).to.eventually.eql(expectedBefore);
+    await expect(api.remapService(publicName, serviceName, servicePath2)).to.be.ok;
+    await api.fetchServices();
+    await expect(Promise.resolve(api.fetchServices())).to.eventually.eql(expectedAfter);
   });
 });
 
 describe('Can Access Service Container API', () => {
   let api = undefined;
   const publicName = h.randomStr();
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
   });
 
-  it('throws error if publicName is empty', async () => (
-    await expect(api.canAccessServiceContainer())
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_PUBLIC_NAME)
-  ));
+  it('throws error if publicName is empty', async () => {
+    return expect(Promise.resolve(api.canAccessServiceContainer()))
+      .to.eventually.be.rejectedWith('Invalid publicName');
+  });
 
   it('can access publicName created by own', async () => {
-    await expect(api.canAccessServiceContainer(publicName)).resolves.toBeTruthy();
+    expect(api.canAccessServiceContainer(publicName)).to.be.ok;
   });
 
   it('can\'t access publicName created by other user', async () => {
     const api2 = await h.authoriseApp();
     const publicName2 = h.randomStr();
     await api2.createPublicName(publicName2);
-
-    await expect(api.canAccessServiceContainer(publicName2))
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.ERROR_CODE.NO_SUCH_ENTRY);
+    await expect(Promise.resolve(api.canAccessServiceContainer(publicName2)))
+      .to.eventually.be.rejectedWith('Requested entry not found');
   });
 });
 
@@ -349,7 +306,7 @@ describe('Get Service Folder Names API', () => {
   const servicePath2 = `_public/${serviceName2}`;
   let serviceXORName = undefined;
   let serviceXORName2 = undefined;
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
@@ -360,11 +317,15 @@ describe('Get Service Folder Names API', () => {
   });
 
   it('fetch path names', async () => {
-    const expected = [];
-    expected.push(servicePath);
-    expected.push(servicePath2);
-    await expect(api.getServiceFolderNames()).resolves.toEqual(expect.arrayContaining(expected))
-    await expect(api.getServiceFolderNames()).resolves.arrayCounts(2);
+    const expected = [
+      servicePath,
+      servicePath2
+    ];
+    const actual = await api.getServiceFolderNames();
+    const expectedSorted = expected.map(i => i).sort;
+    const actualSorted = actual.map(i => i).sort;
+    await expect(Promise.resolve(actual)).to.eventually.have.lengthOf(2);
+    await expect(actualSorted).to.eql(expectedSorted);
   });
 });
 
@@ -374,7 +335,7 @@ describe('Get Service Folder Info', () => {
   const serviceName = h.randomStr();
   const servicePath = `_public/${serviceName}`;
   let serviceXORName = undefined;
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
@@ -382,17 +343,16 @@ describe('Get Service Folder Info', () => {
     await api.fetchPublicNames();
   });
 
-  it('throws error if service path is empty', async () => (
-    await expect(api.getServiceFolderInfo())
-      .rejects
-      .toHaveProperty(h.errorCodeKey, CONSTANTS.APP_ERR_CODE.INVALID_SERVICE_PATH)
-  ));
+  it('throws error if service path is empty', async () => {
+    return expect(api.getServiceFolderInfo())
+      .to.eventually.be.rejectedWith('Invalid service path');
+  });
 
   it('fetch info', async () => {
     const info = await api.getServiceFolderInfo(servicePath);
-    expect(info.name).isXORName();
-    expect(info.name).toEqual(serviceXORName);
-    expect(info.tag).toEqual(CONSTANTS.TYPE_TAG.WWW);
+    await expect(Promise.resolve(info.name)).to.eventually.have.lengthOf(32);
+    await expect(Promise.resolve(info.name)).to.eventually.eql(serviceXORName);
+    await expect(Promise.resolve(info.type_tag)).to.eventually.eql(CONSTANTS.TYPE_TAG.WWW);
   });
 });
 
@@ -402,7 +362,7 @@ describe('Upload File API', () => {
   const serviceName = h.randomStr();
   const servicePath = `_public/root-${publicName}/${serviceName}`;
   let serviceXORName = undefined;
-  beforeAll(async () => {
+  before(async () => {
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
     serviceXORName = await api.createServiceFolder(servicePath, serviceName);
@@ -411,31 +371,31 @@ describe('Upload File API', () => {
     await api.fetchServices();
   });
 
-  it('upload dir', async () => {
+  it('upload directory', async () => {
     await expect(new Promise((resolve, reject) => {
       const localPath = __dirname;
       const networkPath = servicePath;
       const progressCb = (status, isCompleted) => {
-        expect(status).toHaveProperty('total');
-        expect(status.total).toHaveProperty('size');
-        expect(status.total).toHaveProperty('files');
-        expect(status.total).toHaveProperty('directories');
-        expect(status).toHaveProperty('completed');
-        expect(status.completed).toHaveProperty('size');
-        expect(status.completed).toHaveProperty('files');
-        expect(status.completed).toHaveProperty('directories');
-        expect(status).toHaveProperty('progress');
+        expect(status).to.have.property('total');
+        expect(status.total).to.have.property('size');
+        expect(status.total).to.have.property('files');
+        expect(status.total).to.have.property('directories');
+        expect(status).to.have.property('completed');
+        expect(status.completed).to.have.property('size');
+        expect(status.completed).to.have.property('files');
+        expect(status.completed).to.have.property('directories');
+        expect(status).to.have.property('progress');
         if (isCompleted) {
-          expect(status.progress).toEqual(100);
+          expect(status.progress).to.be.equal(100);
           resolve(true);
-        }
+        }     
       };
 
       const errorCb = (error) => {
         reject(error);
       };
       api.fileUpload(localPath, networkPath, progressCb, errorCb);
-    })).resolves.toBeTruthy();
+    })).to.be.ok;
   });
 });
 
@@ -447,7 +407,7 @@ describe('Download File API', () => {
   let serviceXORName = undefined;
   const localPath = path.resolve(__dirname, 'sample.txt');
   const networkPath = servicePath;
-  beforeAll(async () => {
+  before(async () => {
     initTempFolder();
     api = await h.authoriseApp();
     await api.createPublicName(publicName);
@@ -475,15 +435,15 @@ describe('Download File API', () => {
         if (err) {
           return reject(err);
         }
-        expect(status).toHaveProperty('completed');
-        expect(status).toHaveProperty('progress');
+        expect(status).to.have.property('completed');
+        expect(status).to.have.property('progress');
         if (status.completed) {
-          expect(status.progress).toEqual(100);
+          expect(status.progress).to.equal(100);
           resolve(true);
         }
       };
       const nwPath = `${networkPath}/sample.txt`;
       api.fileDownload(nwPath, cb);
-    })).resolves.toBeTruthy();
+    })).to.be.ok;
   });
 });

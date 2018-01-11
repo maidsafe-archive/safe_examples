@@ -25,7 +25,8 @@
     "start": "cross-env NODE_ENV=production electron ./app/",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./app/main.dev",
     "start-renderer-dev": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack-dev-server/bin/webpack-dev-server --config webpack.config.renderer.dev.js",
-    "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings ./test/runTests.js",
+    "test": "cross-env NODE_ENV=test electron-mocha --require babel-polyfill --require babel-core/register --timeout 10000 ./test/**/*.spec.js",
+    "__test__": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings ./test/runTests.js",
     "test-all": "npm run lint && npm run flow && npm run build && npm run test && npm run test-e2e",
     "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings ./test/runTests.js e2e",
     "test-watch": "npm test -- --watch",
@@ -48,7 +49,8 @@
       {
         "from": "./app/dist/fonts",
         "to": "dist/fonts"
-      }, {
+      },
+      {
         "from": "./app/dist/imgs",
         "to": "dist/imgs"
       }
@@ -112,6 +114,7 @@
     ]
   },
   "devDependencies": {
+    "babel": "^6.23.0",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.3",
     "babel-jest": "^20.0.3",
@@ -122,13 +125,18 @@
     "babel-plugin-flow-runtime": "^0.11.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-classes": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.5.1",
+    "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-react-optimize": "^1.0.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.24.1",
     "babili-webpack-plugin": "^0.1.2",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "chalk": "^2.0.1",
     "concurrently": "^3.5.0",
     "copy-webpack-plugin": "^4.2.0",
@@ -138,6 +146,8 @@
     "electron": "1.7.9",
     "electron-builder": "^19.8.0",
     "electron-devtools-installer": "^2.2.0",
+    "electron-mocha": "^5.0.0",
+    "electron-rebuild": "^1.6.0",
     "enzyme": "^2.9.1",
     "enzyme-to-json": "^1.5.1",
     "eslint": "^3.19.0",
@@ -164,13 +174,14 @@
     "jest": "^20.0.4",
     "jsdom": "^11.0.0",
     "minimist": "^1.2.0",
+    "mocha": "^4.1.0",
     "node-sass": "^4.5.3",
     "react-addons-test-utils": "^15.6.0",
     "react-redux-i18n": "^1.9.0",
     "react-test-renderer": "^15.6.1",
     "redux-logger": "^3.0.6",
     "redux-promise-middleware": "^4.4.1",
-    "rimraf": "^2.6.1",
+    "rimraf": "^2.6.2",
     "sass-loader": "^6.0.6",
     "sinon": "^2.3.5",
     "spectron": "^3.7.0",

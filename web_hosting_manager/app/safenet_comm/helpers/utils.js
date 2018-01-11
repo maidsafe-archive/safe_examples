@@ -22,7 +22,7 @@ export const parseNetworkPath = (nwPath) => {
   if (nwPath) {
     const sep = '/';
     if (path.sep === '\\') {
-      const regx = new RegExp(/\\/,'g');
+      const regx = new RegExp(/\\/, 'g');
       nwPath = nwPath.replace(regx, sep);
     }
     const splitPath = nwPath.split(sep);
