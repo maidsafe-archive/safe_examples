@@ -3,7 +3,11 @@
 ## [Unreleased]
 ### Changed
 - Update to Node JS to ^8.0.0
-- Update @maidsafe/safe-node-app to v0.6.1 
+- Update @maidsafe/safe-node-app to v0.6.1
+- Make use of `safeApp.auth.openUri` function for sending auth requests instead of `electron.shell.openExternal`
+
+### SAFE libraries dependencies
+- @maidsafe/safe-node-app: v0.6.1
 
 ## [0.4.4] - 20-12-2017
 ### Changed

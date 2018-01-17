@@ -3,7 +3,7 @@ import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import makeError from './error';
 import CONSTANTS from '../constants';
 import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
-import { openExternal, nodeEnv } from './helpers';
+import { parseUrl, nodeEnv } from './helpers';
 
 const _app = Symbol('app');
 const _appInfo = Symbol('appInfo');
@@ -33,10 +33,7 @@ export default class Network {
     try {
       const app = await initializeApp(this[_appInfo].info, null, { libPath: this[_libPath] });
       const resp = await app.auth.genAuthUri(this[_appInfo].permissions, this[_appInfo].opts);
-      // commented out until system_uri open issue is solved for osx
-      // await app.auth.openUri(resp.uri);
-      openExternal(resp.uri);
-      return;
+      await app.auth.openUri(parseUrl(resp.uri));
     } catch (err) {
       throw err;
     }
@@ -49,10 +46,7 @@ export default class Network {
   async requestShareMdAuth(mdPermissions) {
     try {
       const resp = await this.app.auth.genShareMDataUri(mdPermissions);
-      // commented out until system_uri open issue is solved for osx
-      // await this[_app].auth.openUri(resp.uri);
-      openExternal(resp.uri);
-      return;
+      await this[_app].auth.openUri(parseUrl(resp.uri));
     } catch (err) {
       throw err;
     }

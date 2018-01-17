@@ -1,12 +1,9 @@
-import { shell } from 'electron';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData,
   parseUrl, showError } from '../utils/app_utils';
 import pkg from '../../package.json';
 import { CONSTANTS } from '../constants';
 import 'babel-polyfill';
-
-
 
 export const APP_INFO = {
   info: {
@@ -46,10 +43,7 @@ if (nodeEnv === DEVELOPMENT) {
 export const requestShareMdAuth = async (app, mdPermissions) => {
   try {
     const resp = await app.auth.genShareMDataUri(mdPermissions);
-    // commented out until system_uri open issue is solved for osx
-    // await app.auth.openUri(resp.uri);
-    shell.openExternal(parseUrl(resp.uri));
-    return;
+    await app.auth.openUri(parseUrl(resp.uri));
   } catch (err) {
     console.error(err);
     throw err;
@@ -60,10 +54,7 @@ const requestAuth = async () => {
   try {
     const app = await initializeApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
-    // commented out until system_uri open issue is solved for osx
-    // await app.auth.openUri(resp.uri);
-    shell.openExternal(parseUrl(resp.uri));
-    return;
+    await app.auth.openUri(parseUrl(resp.uri));
   } catch (err) {
     console.error(err);
     showError();

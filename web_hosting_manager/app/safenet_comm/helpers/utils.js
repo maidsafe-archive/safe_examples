@@ -4,12 +4,8 @@ import { shell } from 'electron';
 
 import CONSTANTS from '../../constants';
 
-const parseUrl = url => (
+export const parseUrl = url => (
   (url.indexOf('safe-auth://') === -1) ? url.replace('safe-auth:', 'safe-auth://') : url
-);
-
-export const openExternal = url => (
-  shell.openExternal(parseUrl(url))
 );
 
 export const nodeEnv = process.env.NODE_ENV || CONSTANTS.DEV_ENV;
