@@ -69,6 +69,16 @@ const requestAuth = async () => {
   }
 };
 
+export const authoriseMock = () => new Promise(async (resolve) => {
+  try {
+    const app = await initializeApp(APP_INFO.info, null, { libPath });
+    await app.auth.loginForTest(APP_INFO.permissions);
+    resolve(app);
+  } catch (err) {
+    throw err;
+  }
+});
+
 /*
 * Handles whether or not to request authorisation, to use already generated/
 * auth data, or to use fake auth for development purposes.

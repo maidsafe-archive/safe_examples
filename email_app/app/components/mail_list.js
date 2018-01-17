@@ -18,55 +18,55 @@ export default class MailList extends Component {
 
   refreshEmail(account) {
     this.props.refreshEmail(account)
-        .catch((error) => {
-          console.error('Fetching emails failed: ', error);
-          showError('Fetching emails failed: ', error);
-        });
+      .catch((error) => {
+        console.error('Fetching emails failed: ', error);
+        showError('Fetching emails failed: ', error);
+      });
   }
 
   handleDeleteFromInbox(e) {
     e.preventDefault();
-    const { account, deleteEmail, refreshEmail } = this.props;
+    const { account, deleteEmail } = this.props;
     deleteEmail(account.inboxMd, e.target.dataset.index)
-        .catch((error) => {
-          console.error('Failed trying to delete email from inbox: ', error);
-          showError('Failed trying to delete email from inbox: ', error);
-        })
-        .then(() => this.refreshEmail(account))
+      .catch((error) => {
+        console.error('Failed trying to delete email from inbox: ', error);
+        showError('Failed trying to delete email from inbox: ', error);
+      })
+      .then(() => this.refreshEmail(account));
   }
 
   handleDeleteSaved(e) {
     e.preventDefault();
-    const { account, deleteEmail, refreshEmail } = this.props;
+    const { account, deleteEmail } = this.props;
     deleteEmail(account.archiveMd, e.target.dataset.index)
-        .catch((error) => {
-          console.error('Failed trying to delete saved email: ', error);
-          showError('Failed trying to delete saved email: ', error);
-        })
-        .then(() => this.refreshEmail(account))
+      .catch((error) => {
+        console.error('Failed trying to delete saved email: ', error);
+        showError('Failed trying to delete saved email: ', error);
+      })
+      .then(() => this.refreshEmail(account));
   }
 
   handleSave(e) {
     e.preventDefault();
-    const { account, saveEmail, refreshEmail } = this.props;
+    const { account, saveEmail } = this.props;
     saveEmail(account, e.target.dataset.index)
-        .catch((error) => {
-          console.error('Failed trying to save the email: ', error);
-          showError('Failed trying to save the email: ', error);
-        })
-        .then(() => this.refreshEmail(account))
+      .catch((error) => {
+        console.error('Failed trying to save the email: ', error);
+        showError('Failed trying to save the email: ', error);
+      })
+      .then(() => this.refreshEmail(account));
   }
 
   handleReply(e) {
     e.preventDefault();
-    let replyTo = e.target.dataset.from;
-    let subject = e.target.dataset.subject;
+    const replyTo = e.target.dataset.from;
+    const subject = e.target.dataset.subject;
     this.context.router.push(`/compose_mail?${replyTo}&${subject}`);
   }
 
   render() {
     const self = this;
-    const { coreData, error, inboxSize, inbox, savedSize, saved } = this.props;
+    const { coreData, inboxSize, inbox, savedSize, saved } = this.props;
     let container = null;
 
     if (inbox) {
@@ -76,7 +76,7 @@ export default class MailList extends Component {
           {
             inboxSize === 0 ? <li className="mdl-card" title="No data in inbox mutableData">Inbox empty</li> : coreData.inbox.map((email) => {
               if (!self.listColors.hasOwnProperty(email.from)) {
-                self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
+                self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`;
               }
               return (
                 <li className="mdl-card" key={email.id}>
@@ -91,17 +91,32 @@ export default class MailList extends Component {
                   </div>
                   <div className="opt">
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={email.from} data-subject={email.subject}>reply</i></button>
+                      <button
+                        className="mdl-button mdl-js-button mdl-button--icon"
+                        name="reply"
+                        onClick={this.handleReply}
+                      > <i className="material-icons" data-from={email.from} data-subject={email.subject}> reply </i>
+                      </button>
                     </div>
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="save" onClick={this.handleSave}><i className="material-icons" data-index={email.id}>save</i></button>
+                      <button
+                        className="mdl-button mdl-js-button mdl-button--icon"
+                        name="save"
+                        onClick={this.handleSave}
+                      > <i className="material-icons" data-index={email.id}> save </i>
+                      </button>
                     </div>
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteFromInbox}><i className="material-icons" data-index={email.id}>delete</i></button>
+                      <button
+                        className="mdl-button mdl-js-button mdl-button--icon"
+                        name="delete"
+                        onClick={this.handleDeleteFromInbox}
+                      > <i className="material-icons" data-index={email.id}> delete </i>
+                      </button>
                     </div>
                   </div>
                 </li>
-              )
+              );
             })
           }
         </div>
@@ -114,9 +129,9 @@ export default class MailList extends Component {
           {
             savedSize === 0 ? <li className="mdl-card">Saved empty</li> : coreData.saved.map((email) => {
               if (!self.listColors.hasOwnProperty(email.from)) {
-                self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`
+                self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`;
               }
-               return (
+              return (
                 <li className="mdl-card" key={email.id}>
                   <div className="icon">
                     <span className={this.listColors[email.from]}>{email.from[0]}</span>
@@ -129,14 +144,24 @@ export default class MailList extends Component {
                   </div>
                   <div className="opt">
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="reply" onClick={this.handleReply}><i className="material-icons" data-from={email.from} data-subject={email.subject}>reply</i></button>
+                      <button
+                        className="mdl-button mdl-js-button mdl-button--icon"
+                        name="reply"
+                        onClick={this.handleReply}
+                      > <i className="material-icons" data-from={email.from} data-subject={email.subject}> reply </i>
+                      </button>
                     </div>
                     <div className="opt-i">
-                      <button className="mdl-button mdl-js-button mdl-button--icon" name="delete" onClick={this.handleDeleteSaved}><i className="material-icons" data-index={email.id}>delete</i></button>
+                      <button
+                        className="mdl-button mdl-js-button mdl-button--icon"
+                        name="delete"
+                        onClick={this.handleDeleteSaved}
+                      > <i className="material-icons" data-index={email.id}> delete </i>
+                      </button>
                     </div>
                   </div>
                 </li>
-              )
+              );
             })
           }
         </div>
@@ -153,4 +178,16 @@ export default class MailList extends Component {
 
 MailList.contextTypes = {
   router: PropTypes.object.isRequired
+};
+
+MailList.propTypes = {
+  refreshEmail: PropTypes.func.isRequired,
+  deleteEmail: PropTypes.func.isRequired,
+  saveEmail: PropTypes.func.isRequired,
+  account: PropTypes.object.isRequired,
+  coreData: PropTypes.object.isRequired,
+  inboxSize: PropTypes.number.isRequired,
+  savedSize: PropTypes.number.isRequired,
+  inbox: PropTypes.bool.isRequired,
+  saved: PropTypes.bool.isRequired,
 };

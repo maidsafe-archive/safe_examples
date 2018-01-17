@@ -6,7 +6,7 @@ export const CONSTANTS = {
   TAG_TYPE_INBOX: 15003,
   TAG_TYPE_EMAIL_ARCHIVE: 15004,
   SERVICE_NAME_POSTFIX: '@email',
-  SERVICE_METADATA: {name: 'Services container for', description: 'Container where all the services are mapped for the Public ID'},
+  SERVICE_METADATA: { name: 'Services container for', description: 'Container where all the services are mapped for the Public ID' },
   ACCOUNT_KEY_EMAIL_INBOX: 'inbox',
   ACCOUNT_KEY_EMAIL_ARCHIVE: 'archive',
   ACCOUNT_KEY_EMAIL_ID: 'email_id',
@@ -24,8 +24,8 @@ export const CONSTANTS = {
   MAIL_CONTENT_LIMIT: 150,
   DATE_FORMAT: 'h:MM-mmm dd',
   NET_STATUS_CONNECTED: 'Connected',
-  ASAR_LIB_PATH: path.resolve( __dirname, '../..', 'app.asar.unpacked/node_modules/@maidsafe/safe-node-app/src/native'),
-  DEV_LIB_PATH: path.resolve( __dirname, '..', 'node_modules/@maidsafe/safe-node-app/src/native')
+  ASAR_LIB_PATH: path.resolve(__dirname, '../..', 'app.asar.unpacked/node_modules/@maidsafe/safe-node-app/src/native'),
+  DEV_LIB_PATH: path.resolve(__dirname, '..', 'node_modules/@maidsafe/safe-node-app/src/native')
 
 };
 
@@ -40,7 +40,7 @@ export const APP_STATUS = {
   CONNECTED: 'CONNECTED',
   CONNECT_FAILED: 'CONNECT_FAILED',
   CONNECTING: 'CONNECTING'
-}
+};
 
 export const ACC_STATUS = {
   CREATING: 'CREATING',
@@ -49,7 +49,7 @@ export const ACC_STATUS = {
   AUTHORISING: 'AUTHORISING',
   AUTHORISATION_FAILED: 'AUTHORISATION_FAILED',
   AUTHORISATION_DENIED: 'AUTHORISATION_DENIED'
-}
+};
 
 export const SAFE_APP_ERROR_CODES = {
   ERR_SHARE_MDATA_DENIED: -206,
@@ -59,7 +59,7 @@ export const SAFE_APP_ERROR_CODES = {
   ERR_DATA_EXISTS: -104,
   ERR_DATA_NOT_FOUND: -103,
   ERR_OPERATION_ABORTED: -14
-}
+};
 
 export const MESSAGES = {
   INITIALISE: {

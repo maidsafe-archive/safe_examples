@@ -13,9 +13,6 @@ const showAuthError = (appStatus) => {
 };
 
 export default class Initializer extends Component {
-  constructor() {
-    super();
-  }
 
   componentDidMount() {
     const { setInitialiserTask, authoriseApplication } = this.props;
@@ -24,11 +21,11 @@ export default class Initializer extends Component {
     return authoriseApplication();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { appStatus } = this.props;
     if (prevProps.appStatus === APP_STATUS.AUTHORISING
         && (appStatus === APP_STATUS.AUTHORISATION_DENIED
-            || appStatus === APP_STATUS.AUTHORISATION_FAILED) ) {
+            || appStatus === APP_STATUS.AUTHORISATION_FAILED)) {
       showAuthError(appStatus);
     } else if (appStatus === APP_STATUS.CONNECTED) {
       this.context.router.push('/create_account');
@@ -44,9 +41,7 @@ export default class Initializer extends Component {
           <h3 className="heading-lg text-center">Initialising application</h3>
           <ul>
             {
-              tasks.map((task, i) => {
-                return <li key={i}>{task}</li>;
-              })
+              tasks.map((task, i) => <li key={i}>{task}</li>)
             }
           </ul>
         </div>
@@ -57,4 +52,11 @@ export default class Initializer extends Component {
 
 Initializer.contextTypes = {
   router: PropTypes.object.isRequired
+};
+
+Initializer.propTypes = {
+  setInitialiserTask: PropTypes.func.isRequired,
+  authoriseApplication: PropTypes.func.isRequired,
+  appStatus: PropTypes.string.isRequired,
+  tasks: PropTypes.array.isRequired,
 };

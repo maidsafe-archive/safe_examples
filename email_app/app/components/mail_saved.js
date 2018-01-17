@@ -5,7 +5,7 @@ export default class MailSaved extends Component {
   render() {
     return (
       <div className="mail-list">
-        <MailList {...this.props} saved/>
+        <MailList {...this.props} saved />
       </div>
     );
   }

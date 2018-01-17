@@ -85,6 +85,9 @@ export default class AppLogs extends Component {
 }
 
 AppLogs.contextTypes = {
-  getLogPath: PropTypes.func.isRequired,
   router: PropTypes.object.isRequired,
+};
+
+AppLogs.propTypes = {
+  getLogPath: PropTypes.func.isRequired,
 };

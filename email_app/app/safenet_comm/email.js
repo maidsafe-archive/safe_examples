@@ -5,7 +5,7 @@ import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from '../constants';
 import { genRandomEntryKey, deserialiseArray, splitPublicIdAndService } from '../utils/app_utils';
 import * as netFns from './network.js';
 
-const fetchPublicIds = async (app) => {
+export const fetchPublicIds = async (app) => {
   const rawEntries = [];
   const publicIds = [];
   try {
@@ -176,7 +176,7 @@ export const readArchivedEmails = async (app, account, cb) => {
 * Initially saved with a single entry, representing the receiving account's/
 * public encryption key
 */
-const createInbox = async (app, encPk) => {
+export const createInbox = async (app, encPk) => {
   const baseInbox = {
     [CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY]: encPk
   };
@@ -197,7 +197,7 @@ const createInbox = async (app, encPk) => {
 * Archive is created as a place to store saved emails, composed of a private/
 * Mutable Data structure
 */
-const createArchive = async (app) => {
+export const createArchive = async (app) => {
   try {
     const md = await app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE);
     return md.quickSetup();
@@ -211,7 +211,7 @@ const createArchive = async (app) => {
 * This function will be called when an email service is created, for which/
 * a public ID does not already exist.
 */
-const createPublicIdAndEmailService = async (
+export const createPublicIdAndEmailService = async (
   app, pubNamesMd, serviceInfo, inboxSerialised
 ) => {
   const metadata = {
@@ -234,7 +234,7 @@ const createPublicIdAndEmailService = async (
   }
 };
 
-const genNewAccount = async (app, id) => {
+export const genNewAccount = async (app, id) => {
   try {
     const encKeyPair = await netFns.genEncKeyPair(app);
     const inboxMd = await createInbox(app, encKeyPair.publicKey);
@@ -252,7 +252,7 @@ const genNewAccount = async (app, id) => {
   }
 };
 
-const registerEmailService = async (app, serviceToRegister) => {
+export const registerEmailService = async (app, serviceToRegister) => {
   try {
     const newAccount = await genNewAccount(app, serviceToRegister.emailId);
     const inboxSerialised = await newAccount.inboxMd.serialise();
@@ -325,9 +325,9 @@ export const setupAccount = async (app, emailId) => {
       const inboxSerialised = await newAccount.inboxMd.serialise();
       await createPublicIdAndEmailService(app, pubNamesMd, serviceInfo, inboxSerialised);
       return { newAccount };
-    } catch (err) {
-      console.error(err);
-      throw err;
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
   }
 };
@@ -347,7 +347,7 @@ export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
   }
 };
 
-const writeEmailContent = async (app, email, pk) => {
+export const writeEmailContent = async (app, email, pk) => {
   try {
     const encryptedEmail = await netFns.encrypt(app, JSON.stringify(email), pk);
     const emailWriter = await app.immutableData.create();
@@ -424,7 +424,7 @@ export const genServiceInfo = async (app, emailId) => {
   }
 };
 
-export const getLogFilePath = (app) => {
+export const getLogFilePath = async (app) => {
   if (!app) {
     return Promise.reject(new Error('Application not initialised'));
   }

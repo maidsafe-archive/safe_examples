@@ -4,7 +4,7 @@ import { Link, IndexLink } from 'react-router';
 import { ModalDialog, ModalPortal, ModalBackground } from 'react-modal-dialog';
 import ReactSpinner from 'react-spinjs';
 import className from 'classnames';
-import pkg from '../../package.json';
+
 import { CONSTANTS } from '../constants';
 
 export default class Home extends Component {
@@ -19,7 +19,7 @@ export default class Home extends Component {
     const { reconnectApplication, account, refreshEmail } = this.props;
     return reconnectApplication()
       .then(() => refreshEmail(account),
-            (err) => 'failed reconnecting');
+      () => 'failed reconnecting');
   }
 
   handleBack(e) {
@@ -27,7 +27,7 @@ export default class Home extends Component {
     const { resetCurrentAccount, getEmailIds } = this.props;
     return resetCurrentAccount()
       .then(() => getEmailIds())
-      .then(() => this.context.router.push(`/create_account`));
+      .then(() => this.context.router.push('/create_account'));
   }
 
   render() {
@@ -42,7 +42,7 @@ export default class Home extends Component {
       width: '100%',
       opacity: '0.75',
       backgroundColor: 'white'
-    }
+    };
 
     return (
       <div className="home">
@@ -58,9 +58,9 @@ export default class Home extends Component {
                 <ModalBackground>
                   <ModalDialog>
                     <div className="text-center">
-                        <div>The application hast lost network connection.</div><br />
-                        <div>Make sure the network link is up before trying to reconnect.</div><br />
-                        <button className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
+                      <div>The application hast lost network connection.</div><br />
+                      <div>Make sure the network link is up before trying to reconnect.</div><br />
+                      <button className="mdl-button mdl-js-button bg-primary" onClick={this.reconnect}>Reconnect</button>
                     </div>
                   </ModalDialog>
                 </ModalBackground>
@@ -69,7 +69,7 @@ export default class Home extends Component {
         }
 
         <div className="home-b">
-          <div className={className('float-btn', { hide: router.isActive('/compose_mail')  })}>
+          <div className={className('float-btn', { hide: router.isActive('/compose_mail') })}>
             <button className="mdl-button mdl-js-button mdl-button--fab mdl-button--primary">
               <Link id="new_mail" to="/compose_mail"><i className="material-icons">add</i></Link>
             </button>
@@ -104,7 +104,7 @@ export default class Home extends Component {
                   <span className="mdl-list__item-secondary-action">{savedSize === 0 ? '' : `${savedSize}`}</span>
                 </div>
               </Link>
-             </div>
+            </div>
             <div className="home-list-cnt  mdl-layout__content">
               <div className="page-content">{this.props.children}</div>
             </div>
@@ -116,5 +116,19 @@ export default class Home extends Component {
 }
 
 Home.contextTypes = {
-  router: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired,
+};
+
+Home.propTypes = {
+  reconnectApplication: PropTypes.func.isRequired,
+  refreshEmail: PropTypes.func.isRequired,
+  resetCurrentAccount: PropTypes.func.isRequired,
+  getEmailIds: PropTypes.func.isRequired,
+  account: PropTypes.object.isRequired,
+  coreData: PropTypes.object.isRequired,
+  inboxSize: PropTypes.number.isRequired,
+  savedSize: PropTypes.number.isRequired,
+  processing: PropTypes.object.isRequired,
+  children: PropTypes.element.isRequired,
+  networkStatus: PropTypes.string.isRequired,
 };

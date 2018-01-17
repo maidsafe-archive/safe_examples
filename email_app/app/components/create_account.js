@@ -102,7 +102,7 @@ export default class CreateAccount extends Component {
 
     return refreshConfig(emailId)
       .then((_) => this.context.router.push('/home'))
-      .catch((e) => createAccountError(new Error(e)));
+      .catch((err) => createAccountError(new Error(err)));
   }
 
   render() {
@@ -176,5 +176,19 @@ export default class CreateAccount extends Component {
 }
 
 CreateAccount.contextTypes = {
-  router: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired,
+};
+
+CreateAccount.propTypes = {
+  createAccountError: PropTypes.func.isRequired,
+  createAccount: PropTypes.func.isRequired,
+  storeNewAccount: PropTypes.func.isRequired,
+  setInitialiserTask: PropTypes.func.isRequired,
+  getEmailIds: PropTypes.func.isRequired,
+  refreshConfig: PropTypes.func.isRequired,
+  accStatus: PropTypes.string.isRequired,
+  newAccount: PropTypes.string.isRequired,
+  emailIds: PropTypes.array.isRequired,
+  processing: PropTypes.object.isRequired,
+  error: PropTypes.object.isRequired,
 };

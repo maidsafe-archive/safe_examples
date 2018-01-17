@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import MailList from './mail_list';
 import { showError } from '../utils/app_utils';
 import { CONSTANTS } from '../constants';
@@ -31,7 +33,9 @@ export default class MailInbox extends Component {
       <div className="mail-list">
         <div className="mail-list-head">
           <div className="stats">
-            Space used: <span className="highlight">{this.props.spaceUsed} of {CONSTANTS.TOTAL_AVAILABLE_SPACE}</span> (Note that deleted and saved emails still use space in the inbox)
+            Space used: <span className="highlight">
+              {this.props.spaceUsed} of {CONSTANTS.TOTAL_AVAILABLE_SPACE}
+            </span> (Note that deleted and saved emails still use space in the inbox)
           </div>
           <div className="options text-right">
             <button className="mdl-button mdl-js-button mdl-button--icon" title="Fetch emails" onClick={this.fetchMails}>
@@ -44,3 +48,9 @@ export default class MailInbox extends Component {
     );
   }
 }
+
+MailInbox.propTypes = {
+  refreshEmail: PropTypes.func.isRequired,
+  account: PropTypes.object.isRequired,
+  spaceUsed: PropTypes.number.isRequired,
+};

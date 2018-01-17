@@ -123,6 +123,13 @@ export default class ComposeMail extends Component {
 
 ComposeMail.contextTypes = {
   router: PropTypes.object.isRequired,
+};
+
+ComposeMail.propTypes = {
   sendEmail: PropTypes.func.isRequired,
-  cancelCompose: PropTypes.func.isRequired
+  cancelCompose: PropTypes.func.isRequired,
+  error: PropTypes.object.isRequired,
+  processing: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  fromMail: PropTypes.string.isRequired,
 };
