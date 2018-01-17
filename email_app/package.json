@@ -1,7 +1,7 @@
 {
   "name": "safe-mail-tutorial",
   "productName": "SAFE Mail Tutorial",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Mailing application tutorial using SAFE Network",
   "identifier": "net.maidsafe.examples.mailtutorial",
   "vendor": "MaidSafe.net Ltd",

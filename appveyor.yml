@@ -27,6 +27,17 @@ build_script:
 
 
 before_deploy:
+  - ps: >-
+        $TOKEN="$env:GITHUB_AUTH_TOKEN";
+        $OWNER="MaidSafe";
+        $REPO="release_config";
+        $REPO_PATH="safe_authenticator/log.toml";
+        $FILE="https://api.github.com/repos/$OWNER/$REPO/contents/$REPO_PATH";
+        $APP_DIR="$env:APP_PKG_DIR";
+        $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]";
+        $headers.Add("Authorization", "token $TOKEN");
+        $headers.Add("Accept", 'application/vnd.github.v3.raw');
+        Invoke-WebRequest -URI $FILE -Headers $headers -OutFile ".\log.toml";
   - yarn install-all
   - yarn package-all
   - echo %APPVEYOR_REPO_TAG%

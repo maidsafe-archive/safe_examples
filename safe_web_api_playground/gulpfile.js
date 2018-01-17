@@ -56,12 +56,18 @@ gulp.task('fonts', function () {
     .pipe(gulp.dest('./build/fonts'));
 });
 
+gulp.task('codemirror', function () {
+  gulp.src([
+      './node_modules/codemirror/lib/codemirror.css'
+    ])
+    .pipe(gulp.dest('./build/css'));
+});
+
 gulp.task('js', function () {
   var sourceDirectory = __dirname + '/static/js',
     destinationDirectory = __dirname + '/build/js',
     outputFile = 'client-scripts.js',
     env = envfile.parseFileSync('.env');
-
     var bundler = browserify(sourceDirectory + '/client-scripts.js').transform(babelify);
 
     return bundler.bundle()
@@ -100,4 +106,4 @@ gulp.task('watch', function () {
   });
 });
 
-gulp.task('default', ['js-deps', 'html', 'css', 'css-deps', 'js', 'watch', 'serve', 'fonts', 'image']);
+gulp.task('default', ['codemirror', 'js-deps', 'html', 'css', 'css-deps', 'js', 'watch', 'serve', 'fonts', 'image']);

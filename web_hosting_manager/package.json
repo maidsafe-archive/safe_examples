@@ -1,7 +1,7 @@
 {
   "name": "web-hosting-manager",
   "productName": "Web Hosting Manager",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Application to host web files in the SAFE Network",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -20,7 +20,7 @@
     "package-all": "npm run build && build -mwl",
     "package-linux": "npm run build && build --linux",
     "package-win": "npm run build && build --win --x64",
-    "postinstall": "concurrently \"npm run flow-typed\" \"npm run build-dll\" \"electron-builder install-app-deps\" \"node node_modules/fbjs-scripts/node/check-dev-engines.js package.json\"",
+    "postinstall": "concurrently \"npm run flow-typed\" \"npm run build-dll\" \"electron-builder install-app-deps\" \"node node_modules/fbjs-scripts/node/check-dev-engines.js package.json\" && yarn rebuild",
     "prestart": "npm run build",
     "start": "cross-env NODE_ENV=production electron ./app/",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./app/main.dev",

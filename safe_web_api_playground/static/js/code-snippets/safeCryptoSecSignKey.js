@@ -6,7 +6,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns raw secret signing key: ${rawSecSignKey}`;
+      return `Returns raw secret signing key: ${rawSecSignKey.buffer}`;
     },
 
     sign: async () => {

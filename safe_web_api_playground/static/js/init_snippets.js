@@ -108,8 +108,7 @@ function updateCode(string) {
     }
   }
 
-  let el = document.getElementById('code');
-  el.value = string;
+  editor.getDoc().setValue(string.toString());
   el.style.height = '0px';
   el.style.height = el.scrollHeight + 'px';
 }
@@ -129,7 +128,7 @@ codeSnippets.map(function(module) {
 
   window.snippets[moduleName] = Object.assign({}, module[moduleName]);
 
-  let titleEl = window.document.createElement('h4');
+  let titleEl = window.document.createElement('h5');
   titleEl.setAttribute('data-toggle', 'collapse');
   titleEl.setAttribute('class', 'module-title');
   titleEl.setAttribute('data-target', '#'+moduleName);
@@ -153,6 +152,5 @@ codeSnippets.map(function(module) {
 
 let el = document.getElementById('code');
 el.value = safeApp.safeApp.initialise;
-el.style.height = el.scrollHeight + 'px';
 
 module.exports = {};

@@ -6,7 +6,7 @@ module.exports = {
     } catch (err) {
       return err;
     }
-    return `SHA3 Hash generated: ${String.fromCharCode.apply(null, new Uint8Array(res))}`;
+    return `SHA3 Hash generated: ${String.fromCharCode.apply(null, new Uint8Array(hashedString))}`;
     },
 
     getAppPubSignKey: async () => {
@@ -47,7 +47,7 @@ module.exports = {
 
     pubSignKeyFromRaw: async () => {
       try {
-        pubSignKeyHandle = await window.safeCrypto.pubSignKeyFromRaw(rawPubSignKey);
+        pubSignKeyHandle = await window.safeCrypto.pubSignKeyFromRaw(appHandle, rawPubSignKey.buffer);
       } catch(err) {
         return err;
       }
@@ -56,7 +56,7 @@ module.exports = {
 
     secSignKeyFromRaw: async () => {
       try {
-        secSignKeyHandle = await window.safeCrypto.secSignKeyFromRaw(rawSecSignKey);
+        secSignKeyHandle = await window.safeCrypto.secSignKeyFromRaw(appHandle, rawSecSignKey.buffer);
       } catch(err) {
         return err;
       }
@@ -65,7 +65,7 @@ module.exports = {
 
     pubEncKeyFromRaw: async () => {
       try {
-        pubEncKeyHandle = await window.safeCrypto.pubEncKeyFromRaw(appHandle, rawPubEncKey)
+        pubEncKeyHandle = await window.safeCrypto.pubEncKeyFromRaw(appHandle, rawPubEncKey.buffer)
       } catch(err) {
         return err;
       }
@@ -74,7 +74,7 @@ module.exports = {
 
     secEncKeyFromRaw: async () => {
     try {
-      secEncKeyHandle = await window.safeCrypto.secEncKeyFromRaw(appHandle, rawSecEncKey)
+      secEncKeyHandle = await window.safeCrypto.secEncKeyFromRaw(appHandle, rawSecEncKey.buffer)
     } catch (err) {
       return err;
     }
@@ -83,7 +83,7 @@ module.exports = {
 
     generateEncKeyPairFromRaw: async () => {
       try {
-        encKeyPairHandle = await window.safeCrypto.generateEncKeyPairFromRaw(appHandle, rawPubEncKey, rawSecEncKey)
+        encKeyPairHandle = await window.safeCrypto.generateEncKeyPairFromRaw(appHandle, rawPubEncKey.buffer, rawSecEncKey.buffer)
       } catch (err) {
         return err;
       }
@@ -92,7 +92,7 @@ module.exports = {
 
     generateSignKeyPairFromRaw: async () => {
       try {
-        signKeyPairHandle = await window.safeCrypto.generateSignKeyPairFromRaw(rawSignKeyPair);
+        signKeyPairHandle = await window.safeCrypto.generateSignKeyPairFromRaw(appHandle, rawPubSignKey.buffer, rawSecSignKey.buffer);
       } catch (err) {
         return err;
       }

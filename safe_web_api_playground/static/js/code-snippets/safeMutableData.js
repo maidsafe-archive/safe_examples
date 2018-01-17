@@ -21,14 +21,15 @@ module.exports = {
     newPrivate: async () => {
       // Generate nonce with generated with safeCrypto.generateNonce
 
-      // name and secKey must be 32 bytes.
+      // hashedString and secKey must be 32 bytes.
       // You can use safeCrypto.sha3Hash to generate a 32 byte hash based on the string you input
 
-      let name = 'name-private-0101010101010101010';
+      // Why a secret key? It's used to encrypt data.
+
       let secKey = 'secret-key-010101010101010101010';
 
       try {
-        mdHandle = await window.safeMutableData.newPrivate(appHandle, name, 15001, secKey, nonce)
+        mdHandle = await window.safeMutableData.newPrivate(appHandle, hashedString, 15001, secKey, nonce)
       } catch(err) {
         return err;
       }
@@ -36,12 +37,11 @@ module.exports = {
     },
 
     newPublic: async () => {
-      // name must be 32 bytes.
+      // hashedString must be 32 bytes.
       // You can use safeCrypto.sha3Hash to generate a 32 byte hash based on the string you input
 
-      let name = 'name-public-01010101010101010101';
       try {
-       mdHandle = await window.safeMutableData.newPublic(appHandle, name, 15001)
+       mdHandle = await window.safeMutableData.newPublic(appHandle, hashedString, 15001)
       } catch(err) {
         return err;
       }
