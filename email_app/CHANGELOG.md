@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 ### Changed
-- Upgrade to Node JS to ^8.0.0
+- Update to Node JS to ^8.0.0
+- Update @maidsafe/safe-node-app to v0.6.1 
 
 ## [0.4.3] - 20-12-2017
 ### Changed
