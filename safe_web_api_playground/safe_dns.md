@@ -5,23 +5,23 @@ Example URL: safe://safeapi.playground
 `playground` is our example public ID.  
 `safeapi` is our example service.
 
-This is the mutable data structure that composes a web service, holding file entries:
+This is the mutable data structure, with type tag 15002, that composes a web service, holding file entries:
 ```
-newRandomPublic.name<15002>: {
+newRandomPublicMD<type_tag: 15002>: {
   index.html: <fileData>,
   favicon.ico: <fileData>
 }
 ```
-This is the mutable data structure that is represented by our public id, holding a name reference to the service above.
+This is the mutable data structure, with type tag 15001, that is represented by the sha3 hash of our public id, holding an XOR name reference to the service above.
 ```
-hashed("playground")<15001>: {
-  safeapi: 'newRandomPublic.name'
+newPublicMD<name: sha3hash("playground")><type_tag: 15001>: {
+  safeapi: newRandomPublicMD<type_tag: 15002>.name
 }
 ```
 
 ```
 let key = "playground";
-let value = hashed("playground");
+let value = sha3hash("playground");
 
 _publicNames {
   encrypted(key): encrypted(value)
@@ -31,6 +31,5 @@ _publicNames {
 
 ```
 _public: {
-  _public/playground/safeapi-root: 'newRandomPublic.name'
-}
+  _public/playground/root-safeapi: newRandomPublicMD<type_tag: 15002>.name
 ```

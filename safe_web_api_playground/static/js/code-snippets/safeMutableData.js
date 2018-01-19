@@ -121,7 +121,7 @@ module.exports = {
       } catch(err) {
         return err;      
       }
-      return `Name: ${String.fromCharCode.apply(null, new Uint8Array(nameAndTag.name.buffer))}, Tag: ${nameAndTag.type_tag}`;
+      return `Name: ${String.fromCharCode.apply(null, nameAndTag.name.buffer)}, Tag: ${nameAndTag.type_tag}`;
     },
 
     getVersion: async () => {

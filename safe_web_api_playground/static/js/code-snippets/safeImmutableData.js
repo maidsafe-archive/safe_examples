@@ -48,7 +48,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns ImmutableData data: ${String.fromCharCode.apply(null, new Uint8Array(data))}`;
+      return `Returns ImmutableData data: ${String.fromCharCode.apply(null, data)}`;
     },
 
     size: async () => {
@@ -57,7 +57,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Size of the ImmutableData data: ${size}`;
+      return `Size of the ImmutableData data: ${size} bytes`;
     },
 
     free: () => {

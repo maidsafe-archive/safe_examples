@@ -19,7 +19,7 @@ module.exports = {
       } catch (err) {
         return err;
       }
-      return `Value: ${String.fromCharCode.apply(null, new Uint8Array(value.buf))}`;
+      return `Value: ${String.fromCharCode.apply(null, value.buf)}`;
     },
 
     forEach: async () => {

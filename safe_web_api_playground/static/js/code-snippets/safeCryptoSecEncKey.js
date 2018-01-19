@@ -15,7 +15,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns deciphered data: ${String.fromCharCode.apply(null, new Uint8Array(decipheredBuffer))}`;
+      return `Returns deciphered data: ${String.fromCharCode.apply(null, decipheredBuffer)}`;
     },
 
     free: () => {

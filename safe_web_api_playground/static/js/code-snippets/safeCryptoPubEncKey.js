@@ -18,7 +18,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(encryptedBuffer))}`;
+      return `Returns encrypted data: ${String.fromCharCode.apply(null, encryptedBuffer)}`;
     },
 
     encrypt: async () => {
@@ -31,7 +31,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-       return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(encryptedBuffer))}`;
+       return `Returns encrypted data: ${String.fromCharCode.apply(null, encryptedBuffer)}`;
     },
 
     free: () => {
