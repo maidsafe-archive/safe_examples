@@ -38,7 +38,11 @@ export default class MailInbox extends Component {
             </span> (Note that deleted and saved emails still use space in the inbox)
           </div>
           <div className="options text-right">
-            <button className="mdl-button mdl-js-button mdl-button--icon" {...this.props.processing.state && {'disabled' : 'disabled'} } title="Fetch emails" onClick={this.fetchMails}>
+            <button
+              className="mdl-button mdl-js-button mdl-button--icon"
+              {...this.props.processing.state && { disabled: 'disabled' }}
+              title="Fetch emails" onClick={this.fetchMails}
+            >
               <i className="material-icons">refresh</i>
             </button>
           </div>
@@ -53,4 +57,5 @@ MailInbox.propTypes = {
   refreshEmail: PropTypes.func.isRequired,
   account: PropTypes.object.isRequired,
   spaceUsed: PropTypes.number.isRequired,
+  processing: PropTypes.object.isRequired,
 };

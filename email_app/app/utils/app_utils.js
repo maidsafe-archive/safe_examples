@@ -7,11 +7,9 @@ export const getAuthData = () => {
   //   window.localStorage.getItem(CONSTANTS.LOCAL_AUTH_DATA_KEY)
   // );
   // return authData;
-  return;
 };
 
 export const saveAuthData = () => {
-  return;
   //  window.localStorage.setItem(CONSTANTS.LOCAL_AUTH_DATA_KEY,
   //   window.JSON.stringify(authData)
   // );

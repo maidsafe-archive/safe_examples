@@ -98,7 +98,7 @@ export default class CreateAccount extends Component {
   handleChooseAccount(e) {
     e.preventDefault();
     const { refreshConfig, createAccountError } = this.props;
-    const emailId = this.refs.emailSelected.getValue();
+    const emailId = this.emailSelected.getValue();
 
     return refreshConfig(emailId)
       .then((_) => this.context.router.push('/home'))
@@ -150,7 +150,7 @@ export default class CreateAccount extends Component {
                 <div className="email-ls">
                   <h3 className="title">Select Email Id</h3>
                   <form className="form">
-                    <ReactMaterialSelect ref="emailSelected" defaultValue={emailIds[0]} label="Select Email Id">
+                    <ReactMaterialSelect ref={(el) => { this.emailSelected = el; }} defaultValue={emailIds[0]} label="Select Email Id">
                       {
                         emailIds.map((email, i) => (<option key={`email-${i}`} dataValue={email}>{email}</option>))
                       }

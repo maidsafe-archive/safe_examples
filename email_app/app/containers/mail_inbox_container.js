@@ -2,18 +2,16 @@ import { connect } from 'react-redux';
 import MailInbox from '../components/mail_inbox';
 import { deleteEmail, saveEmail, refreshEmail } from '../actions';
 
-const mapStateToProps = state => {
-  return {
-    error: state.emailApp.error,
-    coreData: state.emailApp.coreData,
-    inboxSize: state.emailApp.inboxSize,
-    savedSize: state.emailApp.savedSize,
-    spaceUsed: state.emailApp.spaceUsed,
-    app: state.emailApp.app,
-    account: state.emailApp.account,
-    processing: state.emailApp.processing
-  };
-};
+const mapStateToProps = state => ({
+  error: state.emailApp.error,
+  coreData: state.emailApp.coreData,
+  inboxSize: state.emailApp.inboxSize,
+  savedSize: state.emailApp.savedSize,
+  spaceUsed: state.emailApp.spaceUsed,
+  app: state.emailApp.app,
+  account: state.emailApp.account,
+  processing: state.emailApp.processing
+});
 
 const mapDispatchToProps = dispatch => ({
   refreshEmail: (account) => (dispatch(refreshEmail(account))),

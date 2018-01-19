@@ -75,7 +75,7 @@ export default class MailList extends Component {
         <div>
           {
             inboxSize === 0 ? <li className="mdl-card" title="No data in inbox mutableData">Inbox empty</li> : coreData.inbox.map((email) => {
-              if (!self.listColors.hasOwnProperty(email.from)) {
+              if (!Object.prototype.hasOwnProperty.call(self.listColors, email.from)) {
                 self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`;
               }
               return (
@@ -128,7 +128,7 @@ export default class MailList extends Component {
         <div>
           {
             savedSize === 0 ? <li className="mdl-card">Saved empty</li> : coreData.saved.map((email) => {
-              if (!self.listColors.hasOwnProperty(email.from)) {
+              if (!Object.prototype.hasOwnProperty.call(self.listColors, email.from)) {
                 self.listColors[email.from] = `bg-color-${Object.keys(self.listColors).length % 10}`;
               }
               return (
