@@ -98,7 +98,7 @@
     "webpack-merge": "^0.14.1"
   },
   "dependencies": {
-    "@maidsafe/safe-node-app": "0.6.0",
+    "@maidsafe/safe-node-app": "0.6.1",
     "axios": "^0.14.0",
     "babel-plugin-transform-class-properties": "^6.23.0",
     "babel-polyfill": "^6.26.0",
@@ -129,8 +129,8 @@
     "urlsafe-base64": "^1.0.0"
   },
   "devEngines": {
-    "node": "4.x || 5.x || 6.x || 7.x",
-    "npm": "2.x || 3.x || 4.x"
+    "node": "6.x || 7.x || 8.x",
+    "npm": "3.x || 4.x || 5.x"
   },
   "config": {
     "forge": {
@@ -152,9 +152,9 @@
         "appCategoryType": "public.app-category.tools",
         "dir": "./",
         "icon": "app/app.icns",
-		"asar" : {
-			"unpackDir" : "**/@maidsafe/**/*"
-		}
+        "asar": {
+          "unpackDir": "**/@maidsafe/**/*"
+        }
       },
       "electronWinstallerConfig": {
         "name": ""

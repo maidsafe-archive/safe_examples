@@ -1,5 +1,10 @@
 # SAFE Hosting Manager App Change Log
 
+## [Unreleased]
+### Changed
+- Update to Node JS to ^8.0.0
+- Update @maidsafe/safe-node-app to v0.6.1 
+
 ## [0.4.4] - 20-12-2017
 ### Changed
 - Upgrade `@maidsafe/safe-node-app` to v0.6.0
