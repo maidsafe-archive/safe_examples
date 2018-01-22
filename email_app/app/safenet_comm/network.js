@@ -26,11 +26,12 @@ export const APP_INFO = {
 };
 
 const DEVELOPMENT = 'dev';
+const TEST = 'test';
 const nodeEnv = process.env.NODE_ENV || DEVELOPMENT;
 
 let libPath;
 
-if (nodeEnv === DEVELOPMENT) {
+if (nodeEnv === DEVELOPMENT || TEST) {
   libPath = CONSTANTS.DEV_LIB_PATH;
 } else {
   libPath = CONSTANTS.ASAR_LIB_PATH;
@@ -139,13 +140,14 @@ export const genEncKeyPair = async (app) => {
 };
 
 export const encrypt = async (app, input, pk) => {
+  let newInput = input;
   if (Array.isArray(input)) {
-    input = input.toString();
+    newInput = input.toString();
   }
   try {
     const stringToBuffer = Buffer.from(pk, 'hex');
     const pubEncKey = await app.crypto.pubEncKeyFromRaw(stringToBuffer);
-    return pubEncKey.encryptSealed(input);
+    return pubEncKey.encryptSealed(newInput);
   } catch (err) {
     console.error(err);
     throw err;

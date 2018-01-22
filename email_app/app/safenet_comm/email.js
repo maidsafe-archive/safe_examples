@@ -57,6 +57,7 @@ export const fetchEmailIds = async (app) => {
         if (res) {
           emailIds.push(res[0] + ((res[0].length > 0) ? '.' : '') + publicId.id);
         }
+        return Promise.resolve();
       }));
     }));
     return emailIds;

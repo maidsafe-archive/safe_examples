@@ -13,15 +13,16 @@ export default class AppLogs extends Component {
     };
   }
 
-  componentWillMount() {
-    this.setState({ loading: true });
-    this.props.getLogPath()
-      .then(path => {
-        this.logPath = path.value;
-        this.readLogFile();
-        this.setState({ loading: false });
-      })
-      .catch(err => this.setState({ loading: false, error: err.message }));
+  async componentWillMount() {
+    try {
+      await this.setState({ loading: true });
+      const path = await this.props.getLogPath();
+      this.logPath = path.value;
+      await this.readLogFile();
+      await this.setState({ loading: false });
+    } catch (err) {
+      return this.setState({ loading: false, error: err.message });
+    }
   }
 
   getErrorContainer() {

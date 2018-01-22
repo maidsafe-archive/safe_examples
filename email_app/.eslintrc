@@ -12,6 +12,8 @@
     "consistent-return": 0,
     "func-names": ["error", "never"],
     "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-param-reassign": ["error", { "props": false }],
+    "no-unneeded-ternary": 0,
     "linebreak-style": ["error", "windows"],
     "max-len": ["error", { "code": 150 }],
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],

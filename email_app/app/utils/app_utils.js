@@ -25,9 +25,9 @@ export const splitPublicIdAndService = (emailId) => {
   const toParts = str.split('.');
   const publicId = toParts.pop();
   const serviceId = str.slice(0, -1 * (publicId.length + 1));
-  emailId = (serviceId.length > 0 ? (`${serviceId}.`) : '') + publicId;
+  const emailID = (serviceId.length > 0 ? (`${serviceId}.`) : '') + publicId;
   const serviceName = serviceId + CONSTANTS.SERVICE_NAME_POSTFIX;
-  return { emailId, publicId, serviceName };
+  return { emailID, publicId, serviceName };
 };
 
 export const genRandomEntryKey = () => crypto.randomBytes(32).toString('hex');
