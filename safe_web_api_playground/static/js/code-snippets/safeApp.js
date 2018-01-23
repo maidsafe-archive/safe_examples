@@ -126,7 +126,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return String.fromCharCode.apply(null, data.body);
+      return data.body;
     },
 
     networkState: async () => {

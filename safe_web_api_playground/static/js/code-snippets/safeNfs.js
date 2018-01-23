@@ -84,10 +84,3 @@ module.exports = {
 
   }
 }
-
-// let regexObj = new RegExp('^' + 'js');
-// if(regexObj.test(k)) {
-//    let key = String.fromCharCode.apply(null, k);
-//    let value = String.fromCharCode.apply(null, new Uint8Array(v.buf));
-//    console.log('Key: ' + key + ', ' + 'Value: ' + value);
-//  }

@@ -24,7 +24,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `${String.fromCharCode.apply(null, data)}`;
+      return `${data}`;
     },
 
     write: async () => {

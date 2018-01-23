@@ -15,7 +15,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns verfied data: ${String.fromCharCode.apply(null, verifiedData)}`;
+      return `Returns verfied data: ${verifiedData}`;
     }, 
 
     free: () => {

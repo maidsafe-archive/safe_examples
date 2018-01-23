@@ -25,7 +25,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns decrypted data: ${String.fromCharCode.apply(null, decipheredBuffer)}`;
+      return `Returns decrypted data: ${decipheredBuffer}`;
     },
 
     free: () => {
