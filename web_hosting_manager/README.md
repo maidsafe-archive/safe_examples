@@ -3,7 +3,7 @@ The tutorial app show cases how to create and manage web services for Public ID 
 
 ## Install
 
-* **Note: requires a node version 8.0.0 and an npm version 5.0.0**
+* **Note: requires a node version ^8.0.0 and an npm version ^5.0.0**
 
 First, clone the repo via git:
 
