@@ -46,7 +46,7 @@ export default class Network {
   async requestShareMdAuth(mdPermissions) {
     try {
       const resp = await this.app.auth.genShareMDataUri(mdPermissions);
-      await this[_app].auth.openUri(parseUrl(resp.uri));
+      await this.app.auth.openUri(parseUrl(resp.uri));
     } catch (err) {
       throw err;
     }
