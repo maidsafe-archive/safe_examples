@@ -12,6 +12,7 @@ const sendResponse = (res) => {
 
 const createWindow = () => {
   // Create the browser window.
+  console.info('App window created, app launching...');
   mainWindow = new BrowserWindow({
     show: false,
     resizable: false,
@@ -85,5 +86,6 @@ app.on('activate', () => {
 });
 
 app.on('open-url', function (e, url) {
+  console.info('App executed by system with URL: ', url);
   sendResponse(url);
 });

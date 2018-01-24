@@ -36,6 +36,7 @@ const fetchPublicIds = async (app) => {
 }
 
 export const fetchEmailIds = async (app) => {
+  console.info('Fetching email ID\'s...');
   let emailIds = [];
 
   try {
@@ -58,6 +59,7 @@ export const fetchEmailIds = async (app) => {
           }
         }))
     }));
+    console.info('Email ID\'s populated');
     return emailIds;
   } catch (err) {
     console.error(err);
@@ -66,6 +68,7 @@ export const fetchEmailIds = async (app) => {
 }
 
 export const readConfig = async (app, emailId) => {
+  console.info('Retrieving email account information...');
   let account = {id: emailId};
 
   try {
@@ -79,6 +82,7 @@ export const readConfig = async (app, emailId) => {
     account.archiveMd = archiveMd;
     account.encSk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY];
     account.encPk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]
+    console.info('Email account retrieved.');
     return account;
   } catch (err) {
     console.error(err);
@@ -214,6 +218,7 @@ const createArchive = async (app) => {
 const createPublicIdAndEmailService = async (
   app, pubNamesMd, serviceInfo, inboxSerialised
 ) => {
+  console.info('Creating both public ID and associated email account...');
   const metadata = {
     ...CONSTANTS.SERVICE_METADATA,
     name: `${CONSTANTS.SERVICE_METADATA.name}: '${serviceInfo.publicId}'`,
@@ -301,7 +306,7 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
 * or it needs to be created
 */
 export const setupAccount = async (app, emailId) => {
-
+  console.info('Setting up new email account...');
   const serviceInfo = await genServiceInfo(app, emailId);
   const pubNamesMd = await app.auth.getContainer(netFns.APP_INFO.containers.publicNames);
   try { // If service container already exists, try to add email service
@@ -321,6 +326,7 @@ export const setupAccount = async (app, emailId) => {
       const newAccount = await genNewAccount(app, serviceInfo.emailId);
       const inboxSerialised = await newAccount.inboxMd.serialise();
       await createPublicIdAndEmailService(app,pubNamesMd, serviceInfo, inboxSerialised);
+      console.info('New account setup complete.');
       return { newAccount };
     } catch (err) {
       console.error(err);
@@ -361,6 +367,7 @@ const writeEmailContent = async (app, email, pk) => {
 * Sends an email to a recipient
 */
 export const storeEmail = async (app, email, to) => {
+  console.info('Sending email...');
   try {
     const serviceInfo = await genServiceInfo(app, to);
     const md = await app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS);
@@ -372,6 +379,7 @@ export const storeEmail = async (app, email, to) => {
     const entryKey = genRandomEntryKey();
     const entryValue = await netFns.encrypt(app, emailAddr, pk.buf.toString());
     await mut.insert(entryKey, entryValue);
+    console.info('Email sent.');
     return inboxMd.applyEntriesMutation(mut);
   } catch (err) {
     console.error(err);

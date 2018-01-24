@@ -85,6 +85,7 @@ export default class FileUploadTask extends Task {
           isCompleted: true,
           size: 0,
         });
+	console.info('File uploaded.');
         resolve();
       } catch (err) {
         callback(err);

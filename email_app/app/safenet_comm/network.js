@@ -6,8 +6,6 @@ import pkg from '../../package.json';
 import { CONSTANTS } from '../constants';
 import 'babel-polyfill';
 
-
-
 export const APP_INFO = {
   info: {
     id: pkg.identifier,
@@ -48,6 +46,7 @@ export const requestShareMdAuth = async (app, mdPermissions) => {
     const resp = await app.auth.genShareMDataUri(mdPermissions);
     // commented out until system_uri open issue is solved for osx
     // await app.auth.openUri(resp.uri);
+    console.info('Request to share MutableData being sent to authenticator...');
     shell.openExternal(parseUrl(resp.uri));
     return;
   } catch (err) {
@@ -57,14 +56,17 @@ export const requestShareMdAuth = async (app, mdPermissions) => {
 }
 
 const requestAuth = async () => {
+  console.info('Generating auth URI...');
   try {
     const app = await initializeApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
     // commented out until system_uri open issue is solved for osx
     // await app.auth.openUri(resp.uri);
+    console.info('Authorisation request sent to authenticator');
     shell.openExternal(parseUrl(resp.uri));
     return;
   } catch (err) {
+    console.info('app initialisation failed');
     console.error(err);
     showError();
   }
@@ -101,10 +103,14 @@ export const authApp = async (netStatusCallback) => {
 */
 export const connect = async (uri, netStatusCallback) => {
   try {
+    console.info('Connecting to network...');
+    console.time('Connect');
     const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
+    console.timeEnd('Connect');
     // synchronous
     saveAuthData(uri);
     await registeredApp.auth.refreshContainersPermissions();
+    console.info('Connected to network.');
     return registeredApp;
   } catch (err) {
     console.error(err);
@@ -113,6 +119,7 @@ export const connect = async (uri, netStatusCallback) => {
 }
 
 export const reconnect = (app) => {
+  console.info('Reconnecting to network...');
   return app.reconnect();
 }
 

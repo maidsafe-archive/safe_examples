@@ -61,6 +61,7 @@ app.on('window-all-closed', () => {
 
 
 app.on('ready', async () => {
+  console.info('App window created, app launching...');
   if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
     await installExtensions();
   }
@@ -111,5 +112,6 @@ app.on('ready', async () => {
 
 // receive IPC message for MAC OS
 app.on('open-url', (e, url) => {
+  console.info('App executed by system with URL: ', url);
   handleIPCResponse(url);
 });
