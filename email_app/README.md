@@ -79,6 +79,14 @@ To package apps with options:
 $ npm run package -- --[option]
 ```
 
+## Test
+
+```bash
+npm run test
+```
+
+Run `npm run rebuild` if there is Node Module Mismatch Error while running test, this will build the native modules for Nodejs.
+
 ## Application Data Model
 
 The following diagram depicts how the emails are stored in the SAFE network, as well as how the email app stores email accounts information.
