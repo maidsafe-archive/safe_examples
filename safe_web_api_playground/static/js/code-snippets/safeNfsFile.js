@@ -24,7 +24,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `${String.fromCharCode.apply(null, new Uint8Array(data))}`;
+      return `${data}`;
     },
 
     write: async () => {
@@ -43,16 +43,16 @@ module.exports = {
       } catch(err) {
         return err;
       }
-        return 'File committed to the network!';
+        return 'File closed and committed to the network, if not previsouly!';
     },
 
     metadata: async () => {
       try {
-        var metaDat = await window.safeNfsFile.metadata(fileContextHandle)
+        var metaData = await window.safeNfsFile.metadata(fileContextHandle)
       } catch(err) {
         return err;
       }
-        return `Returns file meta data: ${metaData}`;
+        return `Returns file meta data: ${JSON.stringify(metaData)}`;
     },
 
     free: () => {

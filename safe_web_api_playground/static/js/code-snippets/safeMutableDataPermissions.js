@@ -44,11 +44,11 @@ module.exports = {
 
     listPermissionSets: async () => {
       try {
-        var permsArray = window.safeMutableDataPermissions.listPermissionSets(permsHandle);
+        var permsArray = await window.safeMutableDataPermissions.listPermissionSets(permsHandle);
       } catch(err) {
         return err;
       }
-      return `Returns array of permission-sets: ${permsArray}`;
+      return `Returns array of permission-sets: ${JSON.stringify(permsArray)}`;
     },
 
     free: () => {

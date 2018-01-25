@@ -6,7 +6,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Public encryption key: ${String.fromCharCode.apply(null, rawPubEncKey.buffer)}`;
+      return `Public encryption key: ${rawPubEncKey.buffer}`;
     },
 
     encryptSealed: async () => {
@@ -18,7 +18,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(encryptedBuffer))}`;
+      return `Returns encrypted data: ${encryptedBuffer}`;
     },
 
     encrypt: async () => {
@@ -31,7 +31,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-       return `Returns encrypted data: ${String.fromCharCode.apply(null, new Uint8Array(encryptedBuffer))}`;
+       return `Returns encrypted data: ${encryptedBuffer}`;
     },
 
     free: () => {

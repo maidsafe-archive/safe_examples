@@ -6,7 +6,7 @@ module.exports = {
      } catch(err) {
        return err;
      }
-     return `Secret encryption key raw string: ${String.fromCharCode.apply(null, rawSecEncKey.buffer)}`;
+     return `Secret encryption key raw string: ${rawSecEncKey.buffer}`;
     },
 
     decrypt: async () => {
@@ -15,7 +15,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns deciphered data: ${String.fromCharCode.apply(null, new Uint8Array(decipheredBuffer))}`;
+      return `Returns deciphered data: ${decipheredBuffer}`;
     },
 
     free: () => {

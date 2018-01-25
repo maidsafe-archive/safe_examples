@@ -28,6 +28,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
+      idWriterHandle = null;
       return `ImmutableData was stored at address: ${idAddress}`;
     },
 
@@ -48,7 +49,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns ImmutableData data: ${String.fromCharCode.apply(null, new Uint8Array(data))}`;
+      return `Returns ImmutableData data: ${data}`;
     },
 
     size: async () => {
@@ -57,7 +58,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Size of the ImmutableData data: ${size}`;
+      return `Size of the ImmutableData data: ${size} bytes`;
     },
 
     free: () => {

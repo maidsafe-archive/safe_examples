@@ -24,12 +24,12 @@ module.exports = {
       // hashedString and secKey must be 32 bytes.
       // You can use safeCrypto.sha3Hash to generate a 32 byte hash based on the string you input
 
-      // Why a secret key? It's used to encrypt data.
+      // Why a secret key? It's used to encrypt entries.
 
-      let secKey = 'secret-key-010101010101010101010';
+      const secKey = rawSecEncKey.buffer;
 
       try {
-        mdHandle = await window.safeMutableData.newPrivate(appHandle, hashedString, 15001, secKey, nonce)
+        mdHandle = await window.safeMutableData.newPrivate(appHandle, hashedString, 15001, secKey, nonce.buffer)
       } catch(err) {
         return err;
       }
@@ -111,7 +111,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Decrypted key: ${String.fromCharCode.apply(null, new Uint8Array(decryptedValue))}`;
+      return `Decrypted key: ${decryptedValue}`;
     },
 
     getNameAndTag: async () => {
@@ -121,7 +121,7 @@ module.exports = {
       } catch(err) {
         return err;      
       }
-      return `Name: ${String.fromCharCode.apply(null, new Uint8Array(nameAndTag.name.buffer))}, Tag: ${nameAndTag.type_tag}`;
+      return `Name: ${nameAndTag.name.buffer}, Tag: ${nameAndTag.type_tag}`;
     },
 
     getVersion: async () => {
@@ -140,7 +140,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Value: ${String.fromCharCode.apply(null, new Uint8Array(value.buf))}, Version: ${value.version}`;
+      return `Value: ${value.buf}, Version: ${value.version}`;
     },
 
     put: async () => {
@@ -170,7 +170,7 @@ module.exports = {
     getValues: async () => {
       try {
         const valuesArray = await window.safeMutableData.getValues(mdHandle);
-	var readableString = valuesArray.map(valueObject => String.fromCharCode.apply(null, valueObject.buf));
+	var readableString = valuesArray.map(valueObject => valueObject.buf);
       } catch(err) {
         return err; 
       }

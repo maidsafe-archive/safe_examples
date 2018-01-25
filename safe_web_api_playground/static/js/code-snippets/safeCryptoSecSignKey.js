@@ -16,7 +16,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns signed data: ${String.fromCharCode.apply(null, new Uint8Array(signedData))}`;
+      return `Returns signed data: ${signedData}`;
     }, 
 
     free: () => {

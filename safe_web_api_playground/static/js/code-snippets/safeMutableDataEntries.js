@@ -19,7 +19,7 @@ module.exports = {
       } catch (err) {
         return err;
       }
-      return `Value: ${String.fromCharCode.apply(null, new Uint8Array(value.buf))}`;
+      return `Value: ${value.buf}`;
     },
 
     forEach: async () => {
@@ -27,12 +27,9 @@ module.exports = {
 
       // Look for console log output in your safe browser console, not this console
       try {
-        await window.safeMutableDataEntries.forEach(entriesHandle, (k, v) => {
+        await window.safeMutableDataEntries.forEach(entriesHandle, (key, value) => {
 
-          let key = String.fromCharCode.apply(null, k);
-          let value = String.fromCharCode.apply(null, v.buf);
-
-          console.log(key + ': ' + value);
+          console.log(key + ': ' + value.buf);
 
         })
       } catch(err) {
