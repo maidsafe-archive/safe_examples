@@ -40,14 +40,13 @@ export default merge.smart(baseConfig, {
   target: 'electron-renderer',
 
   entry: [
-    'react-hot-loader/patch',
-    `webpack-dev-server/client?http://localhost:${port}/`,
-    'webpack/hot/only-dev-server',
     path.join(__dirname, 'app/index.js'),
   ],
 
   output: {
-    publicPath: `http://localhost:${port}/dist/`
+    path: path.join(__dirname, 'app/dist'),
+    publicPath: `./dist/`,
+    filename: 'renderer.prod.js'
   },
 
   module: {
@@ -65,7 +64,6 @@ export default merge.smart(baseConfig, {
               // before react-hot-loader/babel
               'transform-class-properties',
               'transform-es2015-classes',
-              'react-hot-loader/babel'
             ],
           }
         }
@@ -94,6 +92,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'fonts/[hash].[ext]',
             limit: 10000,
             mimetype: 'application/font-woff',
           }
@@ -105,6 +104,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'fonts/[hash].[ext]',
             limit: 10000,
             mimetype: 'application/font-woff',
           }
@@ -116,6 +116,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'fonts/[hash].[ext]',
             limit: 10000,
             mimetype: 'application/octet-stream'
           }
@@ -124,7 +125,7 @@ export default merge.smart(baseConfig, {
       // EOT Font
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        use: 'file-loader',
+        use: 'file-loader?name=fonts/[hash].[ext]',
       },
       // SVG Font
       {
@@ -132,6 +133,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'url-loader',
           options: {
+            name: 'imgs/[hash].[ext]',
             limit: 10000,
             mimetype: 'image/svg+xml',
           }
@@ -140,7 +142,7 @@ export default merge.smart(baseConfig, {
       // Common Image Formats
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-        use: 'url-loader',
+        use: 'url-loader?name=imgs/[hash].[ext]',
       }
     ]
   },
@@ -214,7 +216,7 @@ export default merge.smart(baseConfig, {
     },
     before() {
       if (process.env.START_HOT) {
-        console.warn('Staring Main Process...');
+        console.warn('Starting Main Process...');
         spawn(
           'npm',
           ['run', 'start-main-dev'],

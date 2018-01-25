@@ -11,7 +11,6 @@ const app = remote.app;
 
 const cwd = process.cwd();
 const electronExt = process.platform === 'win32' ? '.cmd' : '';
-const execPathString = `${cwd}/node_modules/.bin/electron${electronExt} ${cwd}/app`;
 
 export const APP_INFO = {
   info: {
@@ -19,7 +18,7 @@ export const APP_INFO = {
     scope: null,
     name: pkg.productName,
     vendor: pkg.vendor,
-    customExecPath: isDevMode ?  execPathString.split(' ') : app.getPath('exe')
+    customExecPath: isDevMode ? [`${cwd}/node_modules/.bin/electron${electronExt}`, `${cwd}/app`] : [app.getPath('exe')]
   },
   opts: {
     own_container: true
