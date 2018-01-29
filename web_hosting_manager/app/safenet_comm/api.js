@@ -14,6 +14,7 @@ import makeError from './error';
 import { nodeEnv } from './helpers';
 import CONSTANTS from '../constants';
 import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
+import log from 'electron-log';
 
 // Private variables
 const _publicNames = Symbol('publicNames');
@@ -68,7 +69,7 @@ class SafeApi extends Network {
    * @param {string} publicName the public name
    */
   createPublicName(publicName) {
-    console.info('Creating publid ID...');
+    log.info('Creating publid ID...');
     return new Promise(async (resolve, reject) => {
       try {
         if (!publicName) {
@@ -83,7 +84,7 @@ class SafeApi extends Network {
         await servCntr.quickSetup({}, metaName, metaDesc);
         const pubNamesCntr = await this.getPublicNamesContainer();
         await this._insertToMData(pubNamesCntr, name, hashedName, true);
-	console.info('Public ID created.');
+	log.info('Public ID created.');
         resolve(true);
       } catch (err) {
         reject(err);
@@ -96,7 +97,7 @@ class SafeApi extends Network {
    * @return {Promise<[PublicNames]>} array of Public Names
    */
   fetchPublicNames() {
-    console.info('Fetching list of Public ID\'s...');
+    log.info('Fetching list of Public ID\'s...');
     const publicNames = [];
 
     const decryptPublicName = (pubNamesCntr, encPubName) => (
@@ -134,7 +135,7 @@ class SafeApi extends Network {
 
         await Promise.all(decryptPubNamesQ);
         this[_publicNames] = publicNames.slice(0);
-	console.info('Public ID\'s populated');
+	log.info('Public ID\'s populated');
         resolve(this[_publicNames]);
       } catch (err) {
         reject(err);
@@ -152,7 +153,7 @@ class SafeApi extends Network {
    * @param {string} metaFor - will be of `serviceName.publicName` format
    */
   createServiceFolder(servicePath, metaFor) {
-    console.info('Creating a web service...');
+    log.info('Creating a web service...');
     return new Promise(async (resolve, reject) => {
       try {
         if (!servicePath) {
@@ -169,7 +170,7 @@ class SafeApi extends Network {
         const servFolderInfo = await servFolder.getNameAndTag();
         const pubCntr = await this.getPublicContainer();
         await this._insertToMData(pubCntr, servicePath, servFolderInfo.name);
-	console.info('Web service created.');
+	log.info('Web service created.');
         resolve(servFolderInfo.name);
       } catch (err) {
         reject(err);
@@ -225,7 +226,7 @@ class SafeApi extends Network {
    * @return {Promise<[PublicNames]>} array of Public Names with services
    */
   fetchServices() {
-    console.info('Fetching all services...');
+    log.info('Fetching all services...');
     const publicNames = this[_publicNames].slice(0);
     const updatedPubNames = [];
 
@@ -292,7 +293,7 @@ class SafeApi extends Network {
         }
         await Promise.all(publicNameQ);
         this[_publicNames] = updatedPubNames.slice(0);
-	console.info('All services populated.');
+	log.info('All services populated.');
         resolve(this[_publicNames]);
       } catch (err) {
         reject(err);
@@ -308,7 +309,7 @@ class SafeApi extends Network {
    * @param {string} serviceName the service name to delete
    */
   deleteService(publicName, serviceName) {
-    console.info('Deleting service...');
+    log.info('Deleting service...');
     return new Promise(async (resolve, reject) => {
       try {
         if (!publicName) {
@@ -320,7 +321,7 @@ class SafeApi extends Network {
         const hashedPubName = await this.sha3Hash(publicName);
         const servCntr = await this.getServicesContainer(hashedPubName);
         await this._removeFromMData(servCntr, serviceName);
-	console.info('Service deleted');
+	log.info('Service deleted');
         resolve(true);
       } catch (err) {
         reject(err);
@@ -336,7 +337,7 @@ class SafeApi extends Network {
    * @param {string} servicePath service path to which the service to be remapped
    */
   remapService(publicName, serviceName, servicePath) {
-    console.info('Remapping service to different Public ID...');
+    log.info('Remapping service to different Public ID...');
     return new Promise(async (resolve, reject) => {
       try {
         if (!publicName) {
@@ -354,7 +355,7 @@ class SafeApi extends Network {
         const servCntrName = await this.getMDataValueForKey(pubNamesCntr, publicName);
         const servCntr = await this.getServicesContainer(servCntrName);
         await this._updateMDataKey(servCntr, serviceName, servFolderPath);
-	console.info('Service remapped');
+	log.info('Service remapped');
         resolve(true);
       } catch (err) {
         reject(err);
@@ -492,7 +493,7 @@ class SafeApi extends Network {
    * @param {string} servicePath path to service mutable data
    */
   fetchFiles(servicePath) {
-    console.info('Fetching files for web service...');
+    log.info('Fetching files for web service...');
     const fetchFile = (nfs, file) => (
       new Promise(async (resolve, reject) => {
         try {
@@ -555,7 +556,7 @@ class SafeApi extends Network {
 
         const resultFiles = await Promise.all(fetchFileQ);
         result = result.concat(resultFiles);
-	console.info('Web service files populated.');
+	log.info('Web service files populated.');
         resolve(result);
       } catch (err) {
         reject(err);

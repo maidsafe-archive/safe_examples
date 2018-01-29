@@ -3,6 +3,7 @@ import path from 'path';
 import { I18n } from 'react-redux-i18n';
 import * as Helper from './helpers';
 import CONSTANTS from '../constants';
+import log from 'electron-log';
 
 const _safeApi = Symbol('safeApi');
 const _localPath = Symbol('localPath');
@@ -87,7 +88,7 @@ export default class Uploader {
   }
 
   _handleDir() {
-    console.info('Uploading directory...');
+    log.info('Uploading directory...');
     this[_status].total = Helper.getDirectoryStats(this[_localPath]);
     const items = Helper.readDir(this[_localPath])
       .sort()
@@ -109,7 +110,7 @@ export default class Uploader {
   }
 
   _handleFile() {
-    console.info('Uploading file...');
+    log.info('Uploading file...');
     const fileName = path.basename(this[_localPath]);
     this[_status].total.size = fs.statSync(this[_localPath]).size;
     if (this[_status].total.size > CONSTANTS.MAX_FILE_SIZE) {

@@ -108,6 +108,7 @@
     "dateformat": "^1.0.12",
     "electron-compile": "^6.2.0",
     "electron-debug": "^1.0.1",
+    "electron-log": "^2.2.14",
     "less": "^2.7.2",
     "material-design-lite": "^1.2.1",
     "open-sans-fontface": "^1.4.0",
