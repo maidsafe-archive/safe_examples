@@ -11,11 +11,11 @@
     "url": "https://maidsafe.net"
   },
   "scripts": {
-    "postinstall": "npm rebuild --runtime=electron --target=1.7.9 --disturl=https://atom.io/download/atom-shell --build-from-source"
+    "postinstall": "npm rebuild --runtime=electron --target=1.7.11 --disturl=https://atom.io/download/atom-shell --build-from-source"
   },
   "license": "MIT",
   "dependencies": {
-    "@maidsafe/safe-node-app": "0.6.1",
+    "@maidsafe/safe-node-app": "0.7.0",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "npm-font-open-sans": "^1.1.0",
