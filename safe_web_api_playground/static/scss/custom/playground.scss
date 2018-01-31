@@ -1,0 +1,123 @@
+@font-face {
+  font-family: 'SourceCodePro';
+  src: url('../fonts/SourceCodePro/SourceCodePro-Regular.ttf') format('truetype');
+}
+
+
+a {
+  color: map-get($colors, 'primary-blue');
+}
+
+a:hover {
+  color: map-get($colors, 'primary-blue');
+  cursor: pointer;
+}
+
+textarea {
+  resize: none;
+}
+
+.CodeMirror {
+  height: auto;
+  font-size: 16px;
+  font-family: 'SourceCodePro';
+}
+
+.CodeMirror-scroll {
+  max-height: 70vh;
+}
+
+.header {
+  height: 40px;
+}
+
+.box {
+  background-color: map-get($colors, 'primary-white');
+  margin: 1%;
+  padding: 1%;
+  overflow: auto;
+}
+
+.clear-padding {
+  padding: 0;
+}
+
+.red-box {
+  background-color: map-get($colors, 'primary-white');
+  color: map-get($colors, 'secondary-red');
+  margin: 1%;
+  padding: 1%;
+  overflow: auto;
+}
+
+.box, .red-box {
+  font-size: 16px;
+  font-family: 'SourceCodePro';
+  box-shadow: 5px 5px 5px #000000;
+}
+
+.snippet {
+  display: block;
+  font-size: 1.5rem;
+}
+
+.module-title {
+  font-size: 1.5rem;
+}
+
+.module-title:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.moduleContainer {
+  padding-left: 3%;
+}
+
+.varName {
+  color: map-get($colors, 'teal-100');
+}
+
+.varValue {
+  color: map-get($colors, 'smoke-dark');
+}
+
+#codebox {
+  padding: 0;
+}
+
+#rightside {
+  height: 95vh;
+  position: fixed;
+  right: 0;
+  overflow: auto;
+}
+
+#rightheader {
+  position: fixed;
+  right: 0;
+}
+
+#safe-logo {
+  height: 75%;
+  width: auto;
+  padding-right: 1%;
+}
+
+#snippetParent {
+  height: 95vh;
+  position: fixed;
+  overflow: auto;
+  width: 16.67%;
+  padding-left: 1%;
+}
+
+#runButton {
+  margin: 1%;
+  border: none;
+}
+
+#runButton:hover {
+  color: map-get($colors, 'primary-white');
+  background-color: map-get($colors, 'teal-100');
+}
