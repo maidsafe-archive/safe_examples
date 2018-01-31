@@ -1,4 +1,4 @@
-import { shell } from 'electron';
+import { shell, remote } from 'electron';
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData,
   parseUrl, showError } from '../utils/app_utils';
@@ -6,14 +6,18 @@ import pkg from '../../package.json';
 import { CONSTANTS } from '../constants';
 import 'babel-polyfill';
 
-
+const isDevMode = process.execPath.match(/[\\/]electron/);
+const app = remote.app;
+const cwd = process.cwd();
+const electronExt = process.platform === 'win32' ? '.cmd' : '';
 
 export const APP_INFO = {
   info: {
     id: pkg.identifier,
     scope: null,
     name: pkg.productName,
-    vendor: pkg.vendor
+    vendor: pkg.vendor,
+    customExecPath: isDevMode ? [`${cwd}/node_modules/.bin/electron${electronExt}`, `${cwd}/app`] : [app.getPath('exe')]
   },
   opts: {
     own_container: true
@@ -25,6 +29,13 @@ export const APP_INFO = {
     _publicNames: ['Read', 'Insert']
   }
 };
+
+// OSX: Add bundle for electron in dev mode
+if (isDevMode && process.platform === 'darwin') {
+  APP_INFO.bundle = 'com.github.electron';
+} else if (process.platform === 'darwin') {
+  APP_INFO.bundle = 'com.electron.peruse';
+}
 
 const DEVELOPMENT = 'dev';
 const nodeEnv = process.env.NODE_ENV || DEVELOPMENT
