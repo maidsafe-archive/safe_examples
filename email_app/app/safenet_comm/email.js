@@ -3,8 +3,10 @@ import { CONSTANTS, MESSAGES, SAFE_APP_ERROR_CODES } from '../constants';
 import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 import { genRandomEntryKey, deserialiseArray, splitPublicIdAndService } from '../utils/app_utils';
 import * as netFns from './network.js';
+import log from '../logging';
 
 const fetchPublicIds = async (app) => {
+  log.info('Fetching public ID\'s...');
   let rawEntries = [];
   let publicIds = [];
   try {
@@ -27,15 +29,16 @@ const fetchPublicIds = async (app) => {
       const service = await pubNamesMd.decrypt(entry.value.buf);
       publicIds.push({ id, service });
     }));
-
+    log.info('Public ID\'s populated.');
     return publicIds;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
 
 export const fetchEmailIds = async (app) => {
+  log.info('Fetching email ID\'s...');
   let emailIds = [];
 
   try {
@@ -58,14 +61,16 @@ export const fetchEmailIds = async (app) => {
           }
         }))
     }));
+    log.info('Email ID\'s populated.');
     return emailIds;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
 
 export const readConfig = async (app, emailId) => {
+  log.info('Retrieving email account information...');
   let account = {id: emailId};
 
   try {
@@ -79,9 +84,10 @@ export const readConfig = async (app, emailId) => {
     account.archiveMd = archiveMd;
     account.encSk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_SECRET_KEY];
     account.encPk = storedAccount[CONSTANTS.ACCOUNT_KEY_EMAIL_ENC_PUBLIC_KEY]
+    log.info('Email account retrieved.');
     return account;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -96,7 +102,7 @@ const insertEncrypted = async (md, mut, key, value) => {
     const encryptedValue = await md.encryptValue(value);
     return mut.insert(encryptedKey, encryptedValue);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -122,7 +128,7 @@ export const writeConfig = async (app, account) => {
     await md.applyEntriesMutation(mut);
     return account;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -136,7 +142,7 @@ const decryptEmail = async (app, account, key, value, cb) => {
       const decryptedEmail = await netFns.decrypt(app, content, account.encSk, account.encPk);
       return cb({ id: key, email: JSON.parse(decryptedEmail) });
     } catch (err) {
-      console.error(err);
+      log.error(err);
       throw err;
     }
   }
@@ -152,7 +158,7 @@ export const readInboxEmails = async (app, account, cb) => {
     });
     return entries.len();
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -164,7 +170,7 @@ export const readArchivedEmails = async (app, account, cb) => {
       return decryptEmail(app, account, key, value.buf, cb);
     })
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -188,7 +194,7 @@ const createInbox = async (app, encPk) => {
     await inboxMd.setUserPermissions(SAFE_CONSTANTS.USER_ANYONE, permSet, 1);
     return inboxMd;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -202,7 +208,7 @@ const createArchive = async (app) => {
     const md = await app.mutableData.newRandomPrivate(CONSTANTS.TAG_TYPE_EMAIL_ARCHIVE);
     return md.quickSetup();
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -214,6 +220,7 @@ const createArchive = async (app) => {
 const createPublicIdAndEmailService = async (
   app, pubNamesMd, serviceInfo, inboxSerialised
 ) => {
+  log.info('Creating both public ID and associated email account...');
   const metadata = {
     ...CONSTANTS.SERVICE_METADATA,
     name: `${CONSTANTS.SERVICE_METADATA.name}: '${serviceInfo.publicId}'`,
@@ -229,7 +236,7 @@ const createPublicIdAndEmailService = async (
     await insertEncrypted(pubNamesMd, mut, serviceInfo.publicId, serviceInfo.serviceAddr);
     return pubNamesMd.applyEntriesMutation(mut);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -243,7 +250,7 @@ const genNewAccount = async (app, id) => {
                           encSk: encKeyPair.privateKey,
                           encPk: encKeyPair.publicKey};
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -258,7 +265,7 @@ const registerEmailService = async (app, serviceToRegister) => {
     await md.applyEntriesMutation(mut);
     return newAccount;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -284,7 +291,7 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
     return { newAccount };
   } catch (err) {
     if(err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
-      console.error(err);
+      log.error(err);
       throw err;
     }
     await netFns.requestShareMdAuth(
@@ -301,7 +308,7 @@ export const createEmailService = async (app, servicesXorName, serviceInfo) => {
 * or it needs to be created
 */
 export const setupAccount = async (app, emailId) => {
-
+  log.info('Setting up new email account...');
   const serviceInfo = await genServiceInfo(app, emailId);
   const pubNamesMd = await app.auth.getContainer(netFns.APP_INFO.containers.publicNames);
   try { // If service container already exists, try to add email service
@@ -310,10 +317,10 @@ export const setupAccount = async (app, emailId) => {
     return createEmailService(app, servicesXorName, serviceInfo);
   } catch (err) { // ...if not then create it
     if (err.code !== SAFE_APP_ERROR_CODES.ERR_NO_SUCH_ENTRY) {
-      console.error(err);
+      log.error(err);
       throw err;
     } else if (err.code === SAFE_APP_ERROR_CODES.ENTRY_ALREADY_EXISTS) {
-      console.error(err);
+      log.error(err);
       throw err;
     }
     try {
@@ -321,9 +328,10 @@ export const setupAccount = async (app, emailId) => {
       const newAccount = await genNewAccount(app, serviceInfo.emailId);
       const inboxSerialised = await newAccount.inboxMd.serialise();
       await createPublicIdAndEmailService(app,pubNamesMd, serviceInfo, inboxSerialised);
+      log.info('New account setup complete.');
       return { newAccount };
     } catch (err) {
-      console.error(err);
+      log.error(err);
       throw err;
     }
   }
@@ -339,7 +347,7 @@ export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
     await app.auth.refreshContainersPermissions();
     return registerEmailService(app, serviceToRegister);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -352,7 +360,7 @@ const writeEmailContent = async (app, email, pk) => {
     const cipherOpt = await app.cipherOpt.newPlainText();
     return emailWriter.close(cipherOpt);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -361,6 +369,7 @@ const writeEmailContent = async (app, email, pk) => {
 * Sends an email to a recipient
 */
 export const storeEmail = async (app, email, to) => {
+  log.info('Sending email...');
   try {
     const serviceInfo = await genServiceInfo(app, to);
     const md = await app.mutableData.newPublic(serviceInfo.serviceAddr, CONSTANTS.TAG_TYPE_DNS);
@@ -372,9 +381,10 @@ export const storeEmail = async (app, email, to) => {
     const entryKey = genRandomEntryKey();
     const entryValue = await netFns.encrypt(app, emailAddr, pk.buf.toString());
     await mut.insert(entryKey, entryValue);
+    log.info('Email sent.');
     return inboxMd.applyEntriesMutation(mut);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw MESSAGES.EMAIL_ID_NOT_FOUND
   }
 }
@@ -385,7 +395,7 @@ export const removeEmail = async (app, container, key) => {
     await mut.remove(key, 1);
     return container.applyEntriesMutation(mut);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -404,7 +414,7 @@ export const archiveEmail = async (app, account, key) => {
     await mut.remove(key, 1);
     return account.inboxMd.applyEntriesMutation(mut);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -416,7 +426,7 @@ export const genServiceInfo = async (app, emailId) => {
     serviceInfo.serviceAddr = hashed;
     return serviceInfo;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }

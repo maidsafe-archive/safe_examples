@@ -4,6 +4,7 @@ import makeError from './error';
 import CONSTANTS from '../constants';
 import { CONSTANTS as SAFE_CONSTANTS } from '@maidsafe/safe-node-app';
 import { openExternal, nodeEnv } from './helpers';
+import log from 'electron-log';
 
 const _app = Symbol('app');
 const _appInfo = Symbol('appInfo');
@@ -35,6 +36,7 @@ export default class Network {
       const resp = await app.auth.genAuthUri(this[_appInfo].permissions, this[_appInfo].opts);
       // commented out until system_uri open issue is solved for osx
       // await app.auth.openUri(resp.uri);
+      log.info('Authorisation request sent to authenticator...');
       openExternal(resp.uri);
       return;
     } catch (err) {
@@ -51,6 +53,7 @@ export default class Network {
       const resp = await this.app.auth.genShareMDataUri(mdPermissions);
       // commented out until system_uri open issue is solved for osx
       // await this[_app].auth.openUri(resp.uri);
+      log.info('Permissions request for MutableData sent to authenticator...');
       openExternal(resp.uri);
       return;
     } catch (err) {
@@ -79,6 +82,7 @@ export default class Network {
       this[_app] = await fromAuthURI(this[_appInfo].info, uri, netStatusCallback,
         { libPath: this[_libPath] });
       await this.app.auth.refreshContainersPermissions();
+      log.info('Connected to network.');
       netStatusCallback(CONSTANTS.NETWORK_STATE.CONNECTED);
     } catch (err) {
       throw err;
@@ -110,6 +114,7 @@ export default class Network {
       return Promise.reject(makeError(CONSTANTS.APP_ERR_CODE.APP_NOT_INITIALISED,
         'Application not initialised'));
     }
+    log.info('Reconnecting to network...');
     return this.app.reconnect();
   }
 
@@ -118,6 +123,7 @@ export default class Network {
    * @param {string} publicName the public name
    */
   async authoriseSharedMD(publicName) {
+    log.info('Public ID created with different app, requesting permissions for this app...');
     const mdPermissions = [];
     if (!publicName) {
       return Promise.reject(makeError(CONSTANTS.APP_ERR_CODE.INVALID_PUBLIC_NAME,

@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
+import log from './logging';
 var path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -7,11 +8,13 @@ var path = require('path');
 let mainWindow;
 
 const sendResponse = (res) => {
+  log.info('Auth request approved. URI response: ', url);
   mainWindow.webContents.send('auth-response', res ? res : '');
 };
 
 const createWindow = () => {
   // Create the browser window.
+  log.info('App window created, app launching...');
   mainWindow = new BrowserWindow({
     show: false,
     resizable: false,

@@ -48,7 +48,8 @@
       {
         "from": "./app/dist/fonts",
         "to": "dist/fonts"
-      }, {
+      },
+      {
         "from": "./app/dist/imgs",
         "to": "dist/imgs"
       }
@@ -187,6 +188,7 @@
   "dependencies": {
     "devtron": "^1.4.0",
     "electron-debug": "^1.2.0",
+    "electron-log": "^2.2.14",
     "font-awesome": "^4.7.0",
     "history": "^4.6.3",
     "prop-types": "^15.6.0",
