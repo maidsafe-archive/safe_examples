@@ -128,9 +128,9 @@ codeSnippets.map(function(module) {
 
   window.snippets[moduleName] = Object.assign({}, module[moduleName]);
 
-  let titleEl = window.document.createElement('h5');
+  let titleEl = window.document.createElement('p');
   titleEl.setAttribute('data-toggle', 'collapse');
-  titleEl.setAttribute('class', 'module-title');
+  titleEl.setAttribute('class', 'module-title text-bold-2');
   titleEl.setAttribute('data-target', '#'+moduleName);
   titleEl.innerText = moduleName;
 
@@ -141,10 +141,24 @@ codeSnippets.map(function(module) {
   window.document.getElementById('snippetParent').appendChild(titleEl);
   window.document.getElementById('snippetParent').appendChild(moduleContainer);
 
-  Object.keys(module[moduleName]).map(function(key) {
+  Object.keys(module[moduleName]).map(function(key, i) {
     let anchorEl = window.document.createElement('a');
     anchorEl.setAttribute("onclick", "updateCode(window.snippets." + moduleName + "." + key  + ")");
-    anchorEl.setAttribute("class", "snippet");
+    if (key  === 'initialise') {
+      anchorEl.setAttribute("class", "snippet bgcolor-blue-500");
+    } else {
+      anchorEl.setAttribute("class", "snippet");
+    }
+    anchorEl.setAttribute("id", i);
+    anchorEl.addEventListener("click", (event) => {
+      event.target.setAttribute("class", "snippet bgcolor-blue-500");
+      const snippetArray = document.getElementsByClassName('snippet');
+      Array.prototype.forEach.call(snippetArray, (snippet) => {
+       if(event.target.id !== snippet.id) {
+         snippet.setAttribute("class", "snippet"); 
+       }
+      });
+    });
     anchorEl.innerText = key;
     moduleContainer.appendChild(anchorEl);
   });
