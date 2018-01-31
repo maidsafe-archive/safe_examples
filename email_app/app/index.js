@@ -45,8 +45,9 @@ const createWindow = () => {
   });
 
   const shouldQuit = app.makeSingleInstance(function(commandLine) {
-    if (commandLine.length >= 2 && commandLine[1]) {
-      sendResponse(commandLine[1]);
+    const uri = commandLine[commandLine.length - 1];
+    if (commandLine.length >= 2 && uri) {
+      sendResponse(uri);
     }
 
     // Someone tried to run a second instance, we should focus our window

@@ -8,6 +8,7 @@ import { openExternal, nodeEnv } from './helpers';
 const _app = Symbol('app');
 const _appInfo = Symbol('appInfo');
 const _libPath = Symbol('libPath');
+const isDevMode = process.execPath.match(/[\\/]electron/);
 
 export default class Network {
   constructor() {
@@ -30,6 +31,12 @@ export default class Network {
    * - Send URI to Authenticator
    */
   async requestAuth() {
+    // OSX: Add bundle for electron in dev mode
+    if (isDevMode && process.platform === 'darwin') {
+      this[_appInfo].info.bundle = 'com.github.electron';
+    } else if (process.platform === 'darwin') {
+      this[_appInfo].info.bundle = 'com.electron.peruse';
+    }
     try {
       const app = await initializeApp(this[_appInfo].info, null, { libPath: this[_libPath] });
       const resp = await app.auth.genAuthUri(this[_appInfo].permissions, this[_appInfo].opts);
