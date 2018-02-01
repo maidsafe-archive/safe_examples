@@ -11,6 +11,7 @@ const isDevMode = process.execPath.match(/[\\/]electron/);
 const app = remote.app;
 const cwd = process.cwd();
 const electronExt = process.platform === 'win32' ? '.cmd' : '';
+import log from '../logging';
 
 export const APP_INFO = {
   info: {
@@ -60,24 +61,28 @@ export const requestShareMdAuth = async (app, mdPermissions) => {
     const resp = await app.auth.genShareMDataUri(mdPermissions);
     // commented out until system_uri open issue is solved for osx
     // await app.auth.openUri(resp.uri);
+    log.info('Request to share MutableData being sent to authenticator...');
     shell.openExternal(parseUrl(resp.uri));
     return;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
 
 const requestAuth = async () => {
+  log.info('Generating auth URI...');
   try {
     const app = await initializeApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
     // commented out until system_uri open issue is solved for osx
     // await app.auth.openUri(resp.uri);
+    log.info('Authorisation request sent to authenticator');
     shell.openExternal(parseUrl(resp.uri));
     return;
   } catch (err) {
-    console.error(err);
+    log.info('app initialisation failed');
+    log.error(err);
     showError();
   }
 }
@@ -99,7 +104,7 @@ export const authApp = async (netStatusCallback) => {
       await registeredApp.auth.refreshContainersPermissions();
       return registeredApp;
     } catch (err) {
-      console.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
+      log.warn("Auth URI stored is not valid anymore, app needs to be re-authorised.");
       clearAuthData();
       return requestAuth();
     }
@@ -112,23 +117,29 @@ export const authApp = async (netStatusCallback) => {
 * function to create a registered session with the network.
 */
 export const connect = async (uri, netStatusCallback) => {
+  log.info('Connecting to network...');
+  console.time('Connect');
   try {
     const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
+    console.timeEnd('Connect');
     // synchronous
     saveAuthData(uri);
     await registeredApp.auth.refreshContainersPermissions();
+    log.info('Connected to network.');
     return registeredApp;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
 
 export const reconnect = (app) => {
+  log.info('Reconnecting to network...');
   return app.reconnect();
 }
 
 export const genEncKeyPair = async (app) => {
+  log.info('Generating encrypted key pair...');
   try {
     let rawKeyPair = {};
     const keyPair = await app.crypto.generateEncKeyPair();
@@ -136,9 +147,10 @@ export const genEncKeyPair = async (app) => {
     rawKeyPair.publicKey = rawPubEncKey.buffer.toString('hex');
     const rawSecEncKey = await keyPair.secEncKey.getRaw();
     rawKeyPair.privateKey = rawSecEncKey.buffer.toString('hex');
+    log.info('Encrypted key pair returned');
     return rawKeyPair;
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 }
@@ -152,7 +164,7 @@ export const encrypt = async (app, input, pk) => {
     const pubEncKey = await app.crypto.pubEncKeyFromRaw(stringToBuffer);
     return pubEncKey.encryptSealed(input);
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 };
@@ -163,7 +175,7 @@ export const decrypt = async (app, cipherMsg, sk, pk) => {
     const decrypted = await keyPair.decryptSealed(cipherMsg);
     return decrypted.toString();
   } catch (err) {
-    console.error(err);
+    log.error(err);
     throw err;
   }
 };

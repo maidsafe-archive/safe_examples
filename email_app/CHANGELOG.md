@@ -5,6 +5,7 @@
 - Update to Node JS to ^8.0.0
 - Update @maidsafe/safe-node-app to v0.7.0
 - Email app may now be run from terminal and authorised without having to package
+- Adds logging to email app
 
 ### SAFE libraries dependencies
 - @maidsafe/safe-node-app: v0.7.0
