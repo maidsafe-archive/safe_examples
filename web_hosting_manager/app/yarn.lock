@@ -236,6 +236,10 @@ ecc-jsbn@~0.1.1:
     semver "^5.3.0"
     sumchecker "^2.0.1"
 
+electron-log@^2.2.14:
+  version "2.2.14"
+  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-2.2.14.tgz#2123319ccb8d70b0db07f0eda57d5823cb42b4b0"
+
 enum@^2.3.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/enum/-/enum-2.4.0.tgz#1aea67cdf74a34e6d8198283b2b3cb348e221b5e"
