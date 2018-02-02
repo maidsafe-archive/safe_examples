@@ -1,7 +1,9 @@
 import fs from 'fs';
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import CONSTANTS from '../constants';
+import pkg from '../package.json';
 
 export default class AppLogs extends Component {
   constructor() {
@@ -9,7 +11,8 @@ export default class AppLogs extends Component {
     this.logPath = null;
     this.state = {
       loading: true,
-      logData: '',
+      logMap: {},
+      logData: [],
       error: ''
     };
   }
@@ -18,21 +21,25 @@ export default class AppLogs extends Component {
     this.props.getLogFilePath()
       .then(path => {
         this.logPath = path.value;
-        this.readLogFile();
         this.setState({loading: false});
       })
-      .catch(err => this.setState({loading: false, error: err.message}));
+      .catch(err => {
+        this.setState({loading: false, error: err.message})
+      }).then(() => {
+        this.readLogFile();
+      });
   }
 
   readLogFile() {
-    if (!this.logPath) {
-      this.setState({error: 'Log path not set'});
-      return;
-    }
-    this.setState({loading: false});
+    const logMap = {};
     try {
-      const logData = fs.readFileSync(this.logPath);
-      this.setState({loading: false, logData: logData.toString()});
+      if (this.logPath) {
+        const clientLibraryLogs = fs.readFileSync(this.logPath);
+        Object.assign(logMap, { clientLibraryLogs: clientLibraryLogs.toString() });
+      }
+      const clientLogs = fs.readFileSync(`${process.cwd()}/${pkg.name}-client.log`);
+      Object.assign(logMap, { clientLogs: clientLogs.toString().split('\r\n') });
+      this.setState({loading: false, logMap: logMap});
     } catch(err) {
       this.setState({loading: false, error: err.message});
     }
@@ -44,24 +51,42 @@ export default class AppLogs extends Component {
     }
 
     return (
-      <div className="_error">
+      <div key={this.state.error} className="_error">
         <h4>{this.state.error}</h4>
         <button className="btn" onClick={() => this.setState({error: ''})}>Close</button>
       </div>
     );
   }
 
+  renderLogs(logs) {
+     return logs.map((log) => <div key={log}>{log}</div> )
+  }
+
+  getLogs() {
+    return Object.keys(this.state.logMap).map((key) => {
+        return (
+          <div>
+            <a key={key} onClick={() => this.setState({ logData: this.state.logMap[key] })} >
+              {key}
+            </a>
+          </div>
+        );
+    });
+  }
+
   getLogsContainer() {
+    if (this.state.logData.length > 0) {
+      return (
+        <div className="_logs">
+          {this.renderLogs(this.state.logData)}
+        </div>
+      );
+    }
     if (this.state.loading) {
       return (<div className="_loading">Please wait. Fetching logs...</div>);
     }
-    if (!this.state.logData || this.state.logData === 'null') {
-      return (
-        <div className="_logs default">No logs found</div>
-      );
-    }
     return (
-      <div className="_logs">{this.state.logData}</div>
+      <div className="_logs">{this.getLogs()}</div>
     );
   }
 
@@ -71,7 +96,14 @@ export default class AppLogs extends Component {
         <h3 className="_title">App logs</h3>
         <div className="_opts">
           <div className="_opt left">
-            <button className="btn" onClick={e => {e.preventDefault(); this.props.history.go(-1);}}>Back</button>
+            <button className="btn" onClick={e => {
+              e.preventDefault();
+              if (this.state.logData.length > 0) {
+                this.setState({ logData: [] }); 
+              } else {
+                this.props.history.go(-1);
+              }
+            }}>Back</button>
           </div>
           <div className="_opt right">
             <button className="btn" disabled={this.state.loading} onClick={e => {e.preventDefault(); this.readLogFile();}}>Refresh</button>

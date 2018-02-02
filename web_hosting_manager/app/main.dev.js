@@ -11,6 +11,7 @@
 /* eslint-disable global-require */
 import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
+import log from './logging';
 
 let mainWindow = null;
 
@@ -30,6 +31,7 @@ const handleIPCResponse = (res) => {
   if (!res) {
     return;
   }
+  log.info('Auth request approved. URI response: ', res);
   mainWindow.webContents.send('auth-response', res);
 };
 
@@ -43,7 +45,7 @@ const installExtensions = async () => {
 
   return Promise
     .all(extensions.map(name => installer.default(installer[name], forceDownload)))
-    .catch(console.warn);
+    .catch(log.warn);
 };
 
 
@@ -61,6 +63,7 @@ app.on('window-all-closed', () => {
 
 
 app.on('ready', async () => {
+  log.info('App window created, app launching...');
   if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
     await installExtensions();
   }
@@ -112,5 +115,6 @@ app.on('ready', async () => {
 
 // receive IPC message for MAC OS
 app.on('open-url', (e, url) => {
+  log.info('App executed by system with URL: ', url);
   handleIPCResponse(url);
 });

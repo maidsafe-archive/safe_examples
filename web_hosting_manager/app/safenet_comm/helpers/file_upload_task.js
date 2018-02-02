@@ -3,6 +3,7 @@ import fs from 'fs';
 import Task from './task';
 import { parseNetworkPath } from './utils';
 import CONSTANTS from '../../constants';
+import log from '../../logging';
 
 export default class FileUploadTask extends Task {
   constructor(api, localPath, networkPath) {
@@ -85,6 +86,7 @@ export default class FileUploadTask extends Task {
           isCompleted: true,
           size: 0,
         });
+	log.info('File uploaded.');
         resolve();
       } catch (err) {
         callback(err);

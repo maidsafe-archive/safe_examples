@@ -6,7 +6,9 @@ import Base from './_base';
 export default class Authorisation extends Component {
   componentDidMount() {
     // send auth request on load
-    this.props.sendAuthReq();
+    if (!this.props.authorising) {
+      this.props.sendAuthReq();
+    } 
   }
 
   componentDidUpdate() {

@@ -9,6 +9,7 @@ function mapStateToProps(state) {
   return {
     nwState: state.initialiser.nwState,
     authorised: state.authorisation.authorised,
+    authorising: state.authorisation.authorising,
     error: state.authorisation.error,
     processing: state.authorisation.processing,
     processDesc: state.authorisation.processDesc,
