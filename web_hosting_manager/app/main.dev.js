@@ -15,6 +15,7 @@ import MenuBuilder from './menu';
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
+  console.log('yes, running in production');
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
