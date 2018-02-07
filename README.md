@@ -25,4 +25,4 @@ To run a complete package of the email/webhosting apps, (assuming each project h
 * Use either of the commands below to separately package each app:
 * Run `yarn pack:webhosting` to package and zip the app with all required files (to: web_hosting_manager/release).
 * Run `yarn pack:email` to package and zip the app with all required files (to: email_app/out).
-* Alternatively, run `yarn package-all` to both `email_app` and ``web_hosting_manager`
+* Alternatively, run `yarn package-all` to package both `email_app` and `web_hosting_manager`
