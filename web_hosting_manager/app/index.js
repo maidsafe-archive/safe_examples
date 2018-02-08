@@ -1,3 +1,4 @@
+require('babel-polyfill');
 import { remote, ipcRenderer as ipc } from 'electron';
 import React from 'react';
 import { render } from 'react-dom';
@@ -10,7 +11,7 @@ import loadLocale from './locales/loader';
 import { initTempFolder } from './safenet_comm/temp';
 
 import { receiveResponse, simulateMockRes } from './actions/authorisation';
-import './sass/index.sass';
+// import './sass/index.sass';
 
 const store = configureStore();
 
@@ -44,17 +45,9 @@ render(
   <AppContainer>
     <Root store={store} history={history} />
   </AppContainer>,
-  document.getElementById('App')
+  document.getElementById('root')
 );
 
 if (module.hot) {
-  module.hot.accept('./containers/root', () => {
-    const NextRoot = require('./containers/root'); // eslint-disable-line global-require
-    render(
-      <AppContainer>
-        <NextRoot store={store} history={history} />
-      </AppContainer>,
-      document.getElementById('App')
-    );
-  });
+  module.hot.accept(render);
 }
