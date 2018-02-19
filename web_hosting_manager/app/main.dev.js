@@ -15,7 +15,6 @@ import MenuBuilder from './menu';
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('yes, running in production');
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
@@ -94,10 +93,11 @@ app.on('ready', async () => {
   menuBuilder.buildMenu();
 
   const shouldQuit = app.makeSingleInstance((commandLine) => {
-    if (commandLine.length >= 2 && commandLine[1]) {
-      handleIPCResponse(commandLine[1]);
+    const uri = commandLine[commandLine.length - 1];
+    console.log('uri: ', uri);
+    if (commandLine.length >= 2 && uri) {
+       sendResponse(uri);
     }
-
     // Someone tried to run a second instance, we should focus our window
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();

@@ -4,7 +4,7 @@
   "version": "0.4.4",
   "description": "Application to host web files in the SAFE Network",
   "identifier": "net.maidsafe.examples.webhostingmanager",
-  "main": "./main.prod.js",
+  "main": "./main.js",
   "author": {
     "name": "MaidSafe",
     "email": "dev@maidsafe.net",
