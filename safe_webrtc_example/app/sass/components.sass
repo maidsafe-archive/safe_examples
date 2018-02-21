@@ -1,0 +1,224 @@
+.selected-pub-id
+  padding: 50px 0
+  text-align: center
+  position: relative
+  .selected-pub-id-b
+    position: relative
+    display: inline-block
+    min-width: 600px
+  h3
+    font-size: 18px
+    font-weight: normal
+    color: $color-common-text
+  h4
+    font-size: 20px
+    font-weight: normal
+    color: $color-common-text
+    margin-top: 16px
+  .switch-btn
+    position: absolute
+    top: 0
+    right: 0
+  .back-btn
+    position: absolute
+    top: 0
+    left: 0
+
+.switch-id
+  width: 600px
+  position: relative
+  padding: 50px 0
+  margin: 0 auto
+  .title
+    font-size: 18px
+    font-weight: normal
+    color: $color-common-text
+    text-align: center
+  .id-ls
+    width: 400px
+    margin: 0 auto
+    padding: 40px 0 0
+    .id-ls-i
+      padding: 0 36px
+      font-size: 14px
+      font-weight: normal
+      line-height: 36px
+      cursor: pointer
+      position: relative
+      &:after
+        content: ""
+        display: none
+        width: 30px
+        height: 30px
+        position: absolute
+        top: 3px
+        left: 0
+        background-image: url('../images/checked.svg')
+        background-position: center
+        background-repeat: no-repeat
+        background-size: 16px
+      &.checked:after
+        display: inline-block
+      &:hover
+        background-color: $pr-pale-blue-2
+  .refresh-btn
+    position: absolute
+    top: 50px
+    right: 0
+  .ack
+    text-align: center
+    margin: 80px 0 0
+    p
+      font-size: 18px
+      font-weight: normal
+      color: $color-common-text
+      line-height: 24px
+    .opts
+      margin: 40px 0 0
+      .opt
+        display: inline-block
+        margin: 0 8px
+.choose-chat
+  text-align: center
+  margin-top: 50px
+  .choose-chat-b
+    display: inline-block
+    position: relative
+    &:after
+      content: ""
+      display: inline-block
+      height: 50px
+      border: 1px solid #dddddd
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
+    .choose-chat-i
+      display: inline-block
+      width: 200px
+      height: 200px
+      background-color: $pr-pale-blue-2
+      margin: 0 25px
+      button
+        width: 100%
+        height: 100%
+        background-color: transparent
+        .icn
+          display: block
+          width: 30px
+          height: 30px
+          margin: 0 auto
+          background-position: center
+          background-size: 30px
+          background-repeat: no-repeat
+      &.invites
+        .icn
+          background-image: url('../images/invites.svg')
+      &.new-chat
+        .icn
+          background-image: url('../images/start-chat.svg')
+      &:hover
+        background-color: $pr-pale-blue
+        button
+          color: #ffffff
+  &.no-invites
+    .choose-chat-b
+      &:after
+        display: none
+      .choose-chat-i
+        &.invites
+          display: none
+
+.invites
+  width: 600px
+  position: relative
+  padding: 50px 0
+  margin: 0 auto
+  position: relative
+  .title
+    font-size: 18px
+    font-weight: normal
+    color: $color-common-text
+    text-align: center
+  .invites-ls
+    width: 400px
+    margin: 0 auto
+    padding: 40px 0 0
+    .invites-ls-i
+      text-align: center
+      font-size: 14px
+      font-weight: normal
+      line-height: 36px
+      cursor: pointer
+      position: relative
+      &:hover
+        background-color: $pr-pale-blue-2
+  .refresh-btn
+    position: absolute
+    top: 50px
+    right: 0
+
+.new-chat
+  .title
+    font-size: 18px
+    font-weight: normal
+    color: $color-common-text
+    text-align: center
+  .new-chat-form
+    width: 80%
+    padding: 25px 0 0
+    margin: 0 auto
+    .inpt
+      input
+        width: 100%
+        line-height: 30px
+        font-size: 14px
+        padding: 0 8px
+    .inpt-btn
+      margin-top: 50px
+      text-align: center
+
+.card
+  width: 600px
+  position: relative
+  margin: 0 auto
+  &.margin-top
+    margin-top: 100px
+  .card-b
+    background-color: $pr-pale-blue-2
+    padding: 50px 0
+    border-radius: 10px
+    &.danger
+      background-color: $pr-red
+
+.loading
+  .icn
+    width: 50px
+    height: 50px
+    margin: 0 auto
+  .desc
+    font-size: 14px
+    font-weight: normal
+    color: $color-common-text
+    text-align: center
+    margin-top: 25px
+
+
+.error
+  .icn
+    width: 30px
+    height: 30px
+    margin: 0 auto
+    background-image: url("../images/error.svg")
+    background-position: center
+    background-size: 30px
+    background-repeat: no-repeat
+  .desc
+    font-size: 16px
+    font-weight: normal
+    color: $color-common-text
+    text-align: center
+    margin-top: 25px
+  .opt
+    text-align: center
+    margin-top: 50px

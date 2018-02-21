@@ -1,0 +1,72 @@
+.chat-room
+  position: fixed
+  width: 100%
+  height: 100%
+  padding-top: 50px
+  top: 0
+  left: 0
+  .chat-room-b
+    .chat-room-remote
+      position: fixed
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      background-color: #f4f4f4
+      z-index: 99
+      video
+        width: 100%
+        height: 100%
+    .chat-room-origin
+      position: fixed
+      top: 50px
+      right: 50px
+      width: 300px
+      z-index: 99
+      video
+        width: 100%
+        // height: 100%
+  .chat-room-opts
+    position: fixed
+    bottom: 50px
+    left: 50%
+    width: auto
+    transform: translate(-50%, 0)
+    z-index: 99
+    button
+      width: 50px
+      border-radius: 50%
+      height: 50px
+      line-height: 50px
+      background-color: $pr-red-dark
+      color: white
+      font-size: 14px
+      font-weight: 600
+      border: 0
+      cursor: pointer
+      outline: none
+  .chat-room-conn-status
+    position: fixed
+    bottom: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background-color: rgba(255, 255, 255, 0.5)
+    z-index: 999
+    .chat-room-conn-status-b
+      width: 400px
+      padding: 24px
+      background-color: #ffffff
+      position: relative
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
+      border-radius: 3px
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25)
+      .status
+        font-size: 14px
+        font-weight: normal
+        text-align: center
+        padding: 40px 16px
+      .cancel-btn
+        text-align: center
