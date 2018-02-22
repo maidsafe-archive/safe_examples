@@ -16,11 +16,11 @@ export default {
   CONFIG: {
     SERVER: {
       iceServers: [
-        { url: 'stun:stun1.l.google.com:19302' },
+        { url: 'stun:stun1.l.google.com:19302' }, // URL to STUN Server
         {
           url: 'turn:numb.viagenie.ca',
-          credential: 'string21',
-          username: 'shankar21mail@gmail.com'
+          credential: 'PASSWORD', // fill turn server password
+          username: 'USERNAME' // fill turn server username
         },
       ]
     },
