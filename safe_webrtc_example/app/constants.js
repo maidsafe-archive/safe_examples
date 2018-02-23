@@ -3,7 +3,7 @@ export default {
     DEFAULT_LOADING_DESC: 'Please wait...',
     CONN_MSGS: {
       INIT: 'Initialising connection',
-      SEND_INVITE: 'Invite sent. Wait to remote to accept it',
+      SEND_INVITE: 'Invite sent. Waiting for the remote peer to accept the connection',
       INVITE_ACCEPTED: 'Invite accepted. Establishing connection with remote',
       CALLING: 'Remote accepted the invite. Establishing connection with remote',
     },

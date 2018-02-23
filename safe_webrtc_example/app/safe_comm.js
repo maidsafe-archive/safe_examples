@@ -26,6 +26,7 @@ const APP = {
 
 const ERROR_MSG = {
   ENTRY_NOT_FOUND: 'Core error: Routing client error -> Requested entry not found',
+  SYMMETRIC_DECIPHER_FAILURE: 'Core error: Symmetric decryption failed',
 };
 
 const keySeparator = '-';
@@ -303,6 +304,9 @@ export default class SafeApi {
           const deckey = await window.safeMutableData.decrypt(this.pubNameCntr, key);
           resolve(utils.uint8ToStr(deckey));
         } catch (err) {
+          if (err.message === ERROR_MSG.SYMMETRIC_DECIPHER_FAILURE) {
+            return resolve('');
+          }
           utils.putLog('Get public names - decrypt keys error', err);
           reject(err);
         }
@@ -324,7 +328,7 @@ export default class SafeApi {
           encPubNamesQ.push(decryptKey(publicNames[i]));
         }
         const decPubNames = await Promise.all(encPubNamesQ);
-        resolve(decPubNames);
+        resolve(decPubNames.filter(k => !!k));
       } catch (err) {
         utils.putLog('Get public names error', err);
         reject(err);
