@@ -4,6 +4,7 @@
 ### Changed
 - Update to Node JS to ^8.0.0
 - Update @maidsafe/safe-node-app to v0.7.0
+- App may now be run from terminal and authorised without having to package
 
 ### SAFE libraries dependencies
 - @maidsafe/safe-node-app: v0.7.0
