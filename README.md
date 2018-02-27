@@ -13,7 +13,7 @@ Examples showcasing various features of the SAFE Network
 [web_hosting_manager](web_hosting_manager), written in `NodeJS`, is an application which allows hosting and managing web files.
 
 
-For more details and build-instructions, please check the corresponding folder's [README](https://github.com/maidsafe/safe_examples/tree/master/web_hosting_manager).
+**Note:** For more details and build-instructions, please check the corresponding folder's README.
 
 ## Packaging
 
