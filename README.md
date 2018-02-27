@@ -1,13 +1,13 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/2fnekwfbm5h2ayk7/branch/master?svg=true)]
 
 # safe_examples
-Examples showcasing various features of the SAFE Network
+Examples showcasing various features of the SAFE Network.
 
 ## email_app (NodeJS - Electron)
 [email_app](email_app), written in `NodeJS`, is an application to exchange messages.
 
 ## safe_web_api_playground (NodeJS - Electron)
-[safe_web_api_playground](safe_web_api_playground), written in `NodeJS`, is an application allowing you to explore the web api.
+[safe_web_api_playground](safe_web_api_playground), written in `NodeJS`, is an application allowing you to explore the web API.
 
 ## web_hosting_manager (NodeJS - Electron)
 [web_hosting_manager](web_hosting_manager), written in `NodeJS`, is an application which allows hosting and managing web files.
