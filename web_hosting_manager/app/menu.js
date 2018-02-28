@@ -8,7 +8,7 @@ export default class MenuBuilder {
 
   buildMenu() {
     // this.mainWindow.openDevTools();
-    if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    if (process.env.NODE_ENV === 'dev' || process.env.DEBUG_PROD === 'true') {
       this.setupDevelopmentEnvironment();
     }
 
@@ -50,7 +50,7 @@ export default class MenuBuilder {
     let menu = null;
 
     // add mock response simulation to menu
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'dev') {
       menu = [];
       menu.unshift(new MenuItem({
         label: '&Simulate Mock Response',
@@ -182,7 +182,7 @@ export default class MenuBuilder {
       ],
     };
 
-    const subMenuView = process.env.NODE_ENV === 'development'
+    const subMenuView = process.env.NODE_ENV === 'dev'
       ? subMenuViewDev
       : subMenuViewProd;
 
@@ -218,7 +218,7 @@ export default class MenuBuilder {
       }],
     }, {
       label: '&View',
-      submenu: (process.env.NODE_ENV === 'development') ? [{
+      submenu: (process.env.NODE_ENV === 'dev') ? [{
         label: '&Reload',
         accelerator: 'Ctrl+R',
         click: () => {

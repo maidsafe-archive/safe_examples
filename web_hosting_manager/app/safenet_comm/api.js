@@ -5,6 +5,7 @@
  */
 
 /* eslint-disable no-underscore-dangle */
+require('babel-polyfill');
 import { shell } from 'electron';
 
 import Network from './network';

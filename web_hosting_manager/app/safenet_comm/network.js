@@ -1,3 +1,4 @@
+require('babel-polyfill');
 import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
 
 import makeError from './error';

@@ -10,16 +10,19 @@
  */
 /* eslint-disable global-require */
 import { app, BrowserWindow } from 'electron';
+
 import MenuBuilder from './menu';
+
+require('babel-polyfill');
 
 let mainWindow = null;
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'prod') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
 
-if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+if (process.env.NODE_ENV === 'dev' || process.env.DEBUG_PROD === 'true') {
   require('electron-debug')();
   const path = require('path');
   const p = path.join(__dirname, '..', 'app', 'node_modules');
@@ -61,7 +64,7 @@ app.on('window-all-closed', () => {
 
 
 app.on('ready', async () => {
-  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+  if (process.env.NODE_ENV === 'dev' || process.env.DEBUG_PROD === 'true') {
     await installExtensions();
   }
 
