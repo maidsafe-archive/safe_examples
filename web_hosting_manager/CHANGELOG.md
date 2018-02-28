@@ -5,6 +5,7 @@
 - Update to Node JS to ^8.0.0
 - Update electron to 1.7.11 for security reasons
 - Update @maidsafe/safe-node-app to v0.7.0
+- Adds logs for Web Hosting Manager
 
 ### SAFE libraries dependencies
 - @maidsafe/safe-node-app: v0.7.0
