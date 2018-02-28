@@ -1,5 +1,11 @@
+import { remote } from 'electron';
+import electron from 'electron';
 import path from 'path';
 import pkg from './package.json';
+const isDevMode = process.execPath.match(/[\\/]electron/);
+const app = remote.app;
+const cwd = process.cwd();
+const electronExt = process.platform === 'win32' ? '.cmd' : '';
 
 const CONSTANTS = {
   ENV: {
@@ -17,6 +23,7 @@ const CONSTANTS = {
       scope: null,
       name: pkg.productName,
       vendor: pkg.author.name,
+      customExecPath: isDevMode ? [`${cwd}/node_modules/.bin/electron${electronExt}`, `${cwd}/app`] : [app.getPath('exe')]
     },
     opt: {
       own_container: false,
