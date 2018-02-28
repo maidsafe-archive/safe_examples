@@ -5,6 +5,7 @@
 - Upgrade Node JS to ^8.0.0
 - Upgrade electron to 1.8.4 which solves reported security vulnerabilities
 - Upgrade @maidsafe/safe-node-app to v0.8.1
+- Web hosting manager may now be run from terminal and authorised without having to package
 
 ### SAFE libraries dependencies
 - @maidsafe/safe-node-app: v0.8.1

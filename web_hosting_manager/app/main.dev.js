@@ -93,8 +93,9 @@ app.on('ready', async () => {
   menuBuilder.buildMenu();
 
   const shouldQuit = app.makeSingleInstance((commandLine) => {
+    const uri = commandLine[commandLine.length - 1];
     if (commandLine.length >= 2 && commandLine[1]) {
-      handleIPCResponse(commandLine[1]);
+      handleIPCResponse(uri);
     }
 
     // Someone tried to run a second instance, we should focus our window
