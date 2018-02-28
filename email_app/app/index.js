@@ -1,17 +1,20 @@
 import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
-var path = require('path');
+import log from './logging';
+const path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 const sendResponse = (res) => {
+  log.info('Auth request approved. URI response: ', res);
   mainWindow.webContents.send('auth-response', res ? res : '');
 };
 
 const createWindow = () => {
   // Create the browser window.
+  log.info('App window created, app launching...');
   mainWindow = new BrowserWindow({
     show: false,
     resizable: false,

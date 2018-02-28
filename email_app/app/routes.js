@@ -8,6 +8,7 @@ import SavedPage from './containers/mail_saved_container';
 import CreateAccountPage from './containers/create_account_container';
 import ComposeMailPage from './containers/compose_mail_container';
 import AppLogs from './containers/app_logs';
+import Log from './components/log';
 
 let router = () => {
   return (
@@ -21,6 +22,7 @@ let router = () => {
       </Route>
       <Route path="/create_account" component={CreateAccountPage} />
       <Route path="/app_logs" component={AppLogs} />
+      <Route path="/app_logs/:log" component={Log}  />
     </Route>
   );
 };
