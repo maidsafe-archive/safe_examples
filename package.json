@@ -13,7 +13,8 @@
     "pack:webhosting": "cd web_hosting_manager && yarn package && yarn post-package",
     "post-pack:webhosting": "cd web_hosting_manager && yarn post-package",
     "pack:email": "cd email_app && yarn package && yarn post-package",
-    "post-pack:email": "cd email_app && yarn post-package"
+    "post-pack:email": "cd email_app && yarn post-package",
+    "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
     "archiver": "^2.0.3",
