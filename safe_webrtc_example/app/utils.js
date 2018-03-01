@@ -11,7 +11,7 @@ export const putLog = (msg, data) => {
   if (!msg) {
     return;
   }
-  // console.log(`${(new Date()).toISOString()} :: ${msg} :: `, data);
+  console.log(`${(new Date()).toISOString()} :: ${msg} :: `, data);
 };
 
 export const bufToArr = (buf) => {

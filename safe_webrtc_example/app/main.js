@@ -5,7 +5,7 @@ import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { Router } from 'react-router';
 import AppRouter from './router';
-import AppStore from './appStore';
+import AppStore from './app_store';
 
 const browserHistory = createHashHistory();
 const routingStore = new RouterStore();

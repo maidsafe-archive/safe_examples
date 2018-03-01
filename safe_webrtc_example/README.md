@@ -23,9 +23,9 @@ Configure the STUN and TURN server in `app/constants.js` before building the app
 CONFIG: {
   SERVER: {
     iceServers: [
-      { url: 'stun:stun1.l.google.com:19302' }, // URL to STUN Server
+      { url: 'STUN_SERVER_URL' }, // fill STUN Server url
       {
-        url: 'turn:numb.viagenie.ca',
+        url: 'TURN_SERVER_URL', // fill turn server url
         credential: 'TURN_PASSWORD', // fill turn server password
         username: 'TURN_USERNAME' // fill turn server username
       },

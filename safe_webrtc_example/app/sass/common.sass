@@ -5,32 +5,22 @@
 
 body
   font-family: 'Open Sans', sans-serif
+  background-color: $body-bg
 
-.root
-  .root-b
-    .root-h
-      background-color: $bg-header
+.card-1
+  width: $card-width
+  min-height: $card-height
+  background-color: #ffffff
+  border-radius: 5px
+  transform: translate(-50%, -50%)
+  position: absolute
+  top: 50%
+  left: 50%
+  padding: $card-padd
 
-.base
-  width: 960px
-  margin: 0 auto
-  padding: 50px 0
-
-.brand
-  padding: 16px 0
-  .brand-img
-    width: 100px
-    margin: 0 auto
-    img
-      width: 100%
-  .brand-name
-    font-size: 16px
-    font-weight: 600
-    text-align: center
-    color: $pr-blue
-
-.no-pub-name
-  text-align: center
+.default
   font-size: 16px
-  font-weight: 600
-  color: #808080
+  color: $color-smoke-medium
+  text-align: center
+  line-height: 36px
+  padding: 8px 0

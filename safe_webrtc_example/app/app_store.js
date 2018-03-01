@@ -6,17 +6,23 @@ import SafeApi from './safe_comm';
 
 export default class AppStore {
   @observable error = '';
-  @observable loading = false;
-  @observable loaded = false;
-  @observable loaderDesc = CONST.UI.DEFAULT_LOADING_DESC;
+  @observable progress = '';
+  @observable isAuthorised = false;
   @observable publicNames = [];
+  @observable activePublicName = '';
   @observable invites = [];
-  @observable newInvites = 0;
-  @observable selectedPubName = '';
-  @observable connectionState = CONST.CONN_STATE.INIT;
+  @observable invitesCount = 0;
+  @observable switchIDProgress = '';
+  @observable switchIDError = '';
+  @observable newChatProgress = '';
+  @observable newChatError = '';
+  @observable chatRoomProgress = '';
+  @observable chatRoomError = '';
   @observable isNwConnected = true;
   @observable isNwConnecting = false;
+  @observable connectionState = CONST.CONN_STATE.INIT;
 
+  @observable friendID = null;
   @observable uid = null;
   @observable initiater = null;
   @observable persona = null;
@@ -31,8 +37,45 @@ export default class AppStore {
   @observable remoteAnswerCandidates = [];
 
   constructor() {
-    this.api = null;
-    this.isAuthorised = false;
+    this.app = null;
+  }
+
+  timout(state) {
+    return new Promise(async (resolve, reject) => {
+      setTimeout(() => {
+        if (state) {
+          return resolve();
+        }
+        return reject();
+      }, 2000);
+    });
+  }
+
+  @action
+  reset() {
+    this.error = '';
+    this.progress = '';
+  }
+
+  @action
+  resetSwitchIDState() {
+    this.switchIDError = '';
+    this.switchIDProgress = '';
+  }
+
+  @action
+  resetNewChatState() {
+    this.newChatError = '';
+    this.newChatProgress = '';
+  }
+
+  @action
+  nwStateCb(newState) {
+    if (newState === CONST.NET_STATE.CONNECTED) {
+      this.isNwConnected = true;
+      return;
+    }
+    this.isNwConnected = false;
   }
 
   createUid() {
@@ -154,6 +197,7 @@ export default class AppStore {
         const connStr = await this.api.fetchConnInfo(connInfo);
         const parsedConnInfo = this.parseConnStr(connStr);
         if (parsedConnInfo.state === CONST.CONN_STATE.INVITE_ACCEPTED) {
+          this.setConnState(CONST.CONN_STATE.INVITE_ACCEPTED);
           this.setRemoteOffer(parsedConnInfo.callee.offer);
           this.setRemoteOfferCandidates(parsedConnInfo.callee.offerCandidates);
           this.setRemoteAnswer(parsedConnInfo.callee.answer);
@@ -163,6 +207,8 @@ export default class AppStore {
         }
         resolve(false);
       } catch (err) {
+        console.error(`Failed to accept invite :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.inviteAcceptFail
         reject(err);
       }
     });
@@ -176,11 +222,13 @@ export default class AppStore {
         const connStr = await this.api.fetchConnInfo(connInfo);
         const parsedConnInfo = this.parseConnStr(connStr);
         if (parsedConnInfo.state === CONST.CONN_STATE.CONNECTED) {
-          this.connectionState = CONST.CONN_STATE.CONNECTED;
+          this.setConnState(CONST.CONN_STATE.CONNECTED);
           return resolve(true);
         }
         resolve(false);
       } catch (err) {
+        console.error(`Failed to accept call :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.callAcceptFail
         reject(err);
       }
     });
@@ -200,6 +248,8 @@ export default class AppStore {
         }
         resolve(false);
       } catch (err) {
+        console.error(`Failed to check whether remote trying to connect :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.checkCallingFail
         reject(err);
       }
     });
@@ -208,15 +258,6 @@ export default class AppStore {
   @action
   setUid(uid) {
     this.uid = uid;
-  }
-
-  @action
-  nwStateCb(newState) {
-    if (newState === CONST.NET_STATE.CONNECTED) {
-      this.isNwConnected = true;
-      return;
-    }
-    this.isNwConnected = false;
   }
 
   @action
@@ -243,14 +284,15 @@ export default class AppStore {
   authorisation() {
     return new Promise(async (resolve, reject) => {
       try {
-        this.setLoader(true, 'Authorising application');
+        this.progress = CONST.UI.MESSAGES.authorise;
         this.api = new SafeApi(this.nwStateCb);
         await this.api.authorise();
         this.isAuthorised = true;
-        this.setLoader(false);
-        resolve(true);
-      } catch (err) {
-        console.error(`Authorisation error :: ${err}`);
+        resolve();
+      } catch(err) {
+        this.error = CONST.UI.MESSAGES.authoriseFail;
+        console.error(`Authorisation error :: ${err.message}`);
+        reject(err);
       }
     });
   }
@@ -259,16 +301,37 @@ export default class AppStore {
   fetchPublicNames() {
     return new Promise(async (resolve, reject) => {
       try {
-        this.setLoader(true, 'Fetching public names');
+        this.progress = CONST.UI.MESSAGES.fetchPublicName;
         this.publicNames = await this.api.getPublicNames();
-        if (this.publicNames.length !== 0 && !this.selectedPubName) {
-          this.setLoader(true, 'Initializing');
-          this.selectedPubName = this.publicNames[0];
-          await this.api.setupPublicName(this.selectedPubName);
+        this.progress = '';
+        resolve();
+      } catch(err) {
+        console.error(`Fetch public names error :: ${err.message}`);
+        this.error = CONST.UI.MESSAGES.fetchPublicNameFail;
+        reject(err);
+      }
+    });
+  }
+
+  @action
+  setupPublicName() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (this.publicNames.length === 0) {
+          this.error = CONST.UI.MESSAGES.noPubNameFound;
+          return reject();
         }
-        this.setLoader(false);
-      } catch (err) {
-        console.error(`Fetch publicNames error :: ${err}`);
+        if (!this.activePublicName) {
+          this.activePublicName = this.publicNames[0];
+        }
+        this.progress = CONST.UI.MESSAGES.initialise;
+        await this.api.setupPublicName(this.activePublicName);
+        this.progress = '';
+        resolve();
+      } catch(err) {
+        console.error(`Initilise error :: ${err.message}`);
+        this.error = CONST.UI.MESSAGES.initialiseFail;
+        reject(err);
       }
     });
   }
@@ -277,49 +340,69 @@ export default class AppStore {
   fetchInvites(isPolling) {
     return new Promise(async (resolve, reject) => {
       try {
-
         if (isPolling && !this.isAuthorised) {
           return resolve(true);
         }
 
         if (!isPolling) {
-          this.setLoader(true, 'Fetching invites');
+          this.progress = CONST.UI.MESSAGES.fetchInvites;
         }
-        const oldCount = this.invites.length;
         this.invites = await this.api.fetchInvites();
-        const diff = this.invites.length - oldCount;
-        if (diff >= 1) {
-          this.newInvites += diff;
+        this.invitesCount = this.invites.length;
+        this.progress = '';
+        resolve();
+      } catch(err) {
+        console.error(`Fetch invites error :: ${err.message}`);
+        if (!isPolling) {
+          this.error = CONST.UI.MESSAGES.fetchInvitesFail;
         }
-        this.setLoader(false);
-        resolve(true);
-      } catch (err) {
-        console.error('Fetch invites :: ', err);
         reject(err);
       }
     });
   }
 
   @action
-  activatePubName(pubName) {
-    if (!pubName || !this.publicNames.includes(pubName)) {
-      return;
-    }
+  activatePublicName(pubName) {
     return new Promise(async (resolve, reject) => {
-      this.setLoader(true, `Activating selected ${pubName}`);
-      this.selectedPubName = pubName;
-      await this.api.setupPublicName(this.selectedPubName);
-      // reset invite count
-      this.newInvites = 0;
-      this.setLoader(false, null, true);
+      if (!pubName || !this.publicNames.includes(pubName)) {
+        this.switchIDError = CONST.UI.MESSAGES.invalidPublicName;
+        return reject();
+      }
+      try {
+        this.switchIDProgress = CONST.UI.MESSAGES.activatePublicName;
+        await this.api.setupPublicName(pubName);
+        this.activePublicName = pubName;
+        this.switchIDProgress = '';
+        resolve();
+      } catch(err) {
+        console.error(`Activate public name error :: ${err.message}`);
+        this.switchIDProgress = '';
+        this.switchIDError = CONST.UI.MESSAGES.activatePublicNameFail;
+        reject(err);
+      }
     });
   }
 
   @action
-  reset() {
-    this.loaded = false;
-    this.error = '';
-    this.setLoader(false);
+  connect(friendID) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (this.publicNames.includes(friendID)) {
+          this.newChatError = CONST.UI.MESSAGES.cantInviteYourself;
+          return reject();
+        }
+        this.newChatProgress = CONST.UI.MESSAGES.connecting;
+        await this.api.connect(friendID);
+        this.friendID = friendID;
+        this.newChatProgress = '';
+        resolve();
+      } catch(err) {
+        console.error(`Connect error :: ${err.message}`);
+        this.newChatProgress = '';
+        this.newChatError = CONST.UI.MESSAGES.connectingFail;
+        reject(err);
+      }
+    });
   }
 
   @action
@@ -332,7 +415,7 @@ export default class AppStore {
         const isCallee = !!friendID;
         const userPosition = isCallee ? CONST.USER_POSITION.CALLEE : CONST.USER_POSITION.CALLER;
         const uid = friendUID || this.createUid();
-        this.createConn(this.selectedPubName, userPosition, uid);
+        this.createConn(this.activePublicName, userPosition, uid);
         if (isCallee) {
           this.setInitiater(friendID);
           const connInfo = this.transformConnInfo();
@@ -344,7 +427,9 @@ export default class AppStore {
         }
         resolve(true);
       } catch (err) {
-        console.error('Initialise connInfo error :: ', err);
+        console.error(`Initialise connInfo error :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.initialisationFail;
+        reject(err);
       }
     });
   }
@@ -359,7 +444,9 @@ export default class AppStore {
         await this.api.sendInvite(connInfo);
         resolve(true);
       } catch (err) {
-        console.error('Send invite error :: ', err);
+        console.error(`Send invite error :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.sendInviteFail;
+        reject(err);
       }
     });
   }
@@ -375,7 +462,9 @@ export default class AppStore {
         await this.api.acceptInvite(connInfo);
         resolve(true);
       } catch (err) {
-        console.error('Accept invite error :: ', err);
+        console.error(`Accept invite error :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.acceptInviteFail;
+        reject(err);
       }
     });
   }
@@ -390,22 +479,9 @@ export default class AppStore {
         await this.api.calling(connInfo);
         resolve(true);
       } catch (err) {
-        console.error('Calling error :: ', err);
-      }
-    });
-  }
-
-  @action
-  connect(friendID) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.setLoader(true, `Connecting to ${friendID}`);
-        await this.api.connect(friendID);
-        this.setLoader(false, null, true);
-        resolve(true);
-      } catch (err) {
-        this.error = new Error('Make sure the Callee has initialised with WebRTC app');
-        console.log('Connect error :: ', err);
+        console.error(`Calling error :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.callingFail;
+        reject(err);
       }
     });
   }
@@ -419,14 +495,11 @@ export default class AppStore {
         await this.api.connected(connInfo);
         resolve(true);
       } catch (err) {
-        console.log('Connected error :: ', err);
+        console.error(`Connected error :: ${err.message}`);
+        this.chatRoomError = CONST.UI.MESSAGES.connectingFail;
+        reject(err);
       }
     });
-  }
-
-  @action
-  resetFetchCount() {
-    this.newInvites = 0;
   }
 
   @action
@@ -437,7 +510,7 @@ export default class AppStore {
         await this.api.deleteInvite(connInfo);
         return resolve(true);
       } catch (err) {
-        console.log('Connected error :: ', err);
+        console.error(`Delete invite error :: ${err.message}`);
         reject(err);
       }
     });

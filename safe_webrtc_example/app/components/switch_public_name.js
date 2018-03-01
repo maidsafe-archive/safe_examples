@@ -2,52 +2,51 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { inject, observer } from "mobx-react";
 import classNames from 'classnames';
+
 import CONST from '../constants';
 import ActivePublicName from './active_public_name';
 
 @inject("store")
 @observer
-export default class Invites extends Component {
+export default class SwitchPublicName extends Component {
   constructor() {
     super();
     this.state = {
-      selectedInvite: {
-        publicId: null,
-        uid: null
-      }
+      selectedPubName: null
     };
   }
-
   componentWillMount() {
     if (!this.props.store.isAuthorised) {
       return this.props.history.push('/');
     }
-    this.props.store.fetchInvites();
+    this.props.store.fetchPublicNames();
   }
 
   componentWillUnmount() {
     this.props.store.reset();
+    this.props.store.resetSwitchIDState();
   }
 
-  onClickInvite(invite) {
-    if (!invite.publicId || !invite.uid) { return };
-
-    this.setState({ selectedInvite: invite });
+  onClickPubName(name) {
+    if (!name) { return };
+    this.props.store.resetSwitchIDState();
+    this.setState({ selectedPubName: name });
   }
 
   getOptions(onlyCancel) {
     const { store, history } = this.props;
+
     return (
       <div className="opts">
         {
           !onlyCancel ? (
             <div className="opt">
-              <button
-                className="btn primary"
-                disabled={!this.state.selectedInvite.publicId || !this.state.selectedInvite.uid || (store.invites.length === 0)}
-                onClick={() => {
-                  history.push(`chat-room/${this.state.selectedInvite.publicId}/${this.state.selectedInvite.uid}`);
-                }}>{CONST.UI.LABELS.connect}</button>
+              <button className="btn primary" disabled={!this.state.selectedPubName} onClick={() => {
+                store.activatePublicName(this.state.selectedPubName)
+                  .then(() => {
+                    history.push('/home');
+                  });
+              }}>{CONST.UI.LABELS.activate}</button>
             </div>
           ) : null
         }
@@ -58,6 +57,17 @@ export default class Invites extends Component {
         </div>
       </div>
     );
+  }
+
+  getProgressLoader(msg) {
+    return (
+      <div className="progress">
+        <div className="progress-b">
+          <div className="icn spinner"></div>
+          <div className="desc">{msg}</div>
+        </div>
+      </div>
+    )
   }
 
   getError(msg) {
@@ -74,61 +84,57 @@ export default class Invites extends Component {
     );
   }
 
-  getProgressLoader(msg) {
-    return (
-      <div className="progress">
-        <div className="progress-b">
-          <div className="icn spinner"></div>
-          <div className="desc">{msg}</div>
+  getProgress() {
+    const { store } = this.props;
+
+    if (store.switchIDError) {
+      return (
+        <div className="progress error">
+          <div className="progress-b">
+            <div className="icn"></div>
+            <div className="desc">{store.switchIDError}</div>
+          </div>
         </div>
-      </div>
-    )
+      );
+    }
+    if (store.switchIDProgress) {
+      return this.getProgressLoader(store.switchIDProgress);
+    }
+
+    return <span></span>
   }
 
-  // getProgress() {
-  //   const { store } = this.props;
-
-  //   if (store.error) {
-  //     return (
-  //       <div className="progress error">
-  //         <div className="progress-b">
-  //           <div className="icn"></div>
-  //           <div className="desc">{store.error}</div>
-  //         </div>
-  //       </div>
-  //     );
-  //   }
-  //   return this.getProgressLoader(store.progress);
-  // }
-
-  getInvitesList() {
+  getPubNamesList() {
     const { store, history } = this.props;
     let container = undefined;
-    if (store.invites.length === 0) {
-      container = <div className="default">{CONST.UI.LABELS.noInvites}</div>
+    if (store.publicNames.length === 1) {
+      container = <div className="default">{CONST.UI.LABELS.noPublicName}</div>
     } else {
       container = (
         <ul>
           {
-            store.invites.map((invite, i) => {
+            store.publicNames.map((pub, i) => {
+              if (pub === store.activePublicName) {
+                return null;
+              }
               const listClassName = classNames({
-                active: (invite.uid === this.state.selectedInvite.uid) && (invite.publicId === this.state.selectedInvite.publicId)
+                active: pub === this.state.selectedPubName
               });
               return (
                 <li key={i} className={listClassName} onClick={() => {
-                  this.onClickInvite(invite);
-                }}>{invite.publicId} {invite.uid}</li>
+                  this.onClickPubName(pub);
+                }}>{pub}</li>
               );
             })
           }
         </ul>
-      );
+      )
     }
     return (
       <div>
-        <h3>{CONST.UI.LABELS.chooseInvite}</h3>
+        <h3>{CONST.UI.LABELS.choosePublicName}</h3>
         {container}
-        {this.getOptions()}
+        {!store.switchIDProgress ? this.getOptions() : null}
       </div>
     );
   }
@@ -151,7 +157,7 @@ export default class Invites extends Component {
     } else if (store.progress) {
       container = this.getProgressLoader(store.progress);
     } else {
-      container = this.getInvitesList();
+      container = this.getPubNamesList();
     }
 
     return (
@@ -162,11 +168,12 @@ export default class Invites extends Component {
         <div className="list">
           {container}
         </div>
+        {this.getProgress()}
         {this.getActivePublicContainer()}
       </div>
     );
   }
 }
 
-Invites.propTypes = {
+SwitchPublicName.propTypes = {
 };

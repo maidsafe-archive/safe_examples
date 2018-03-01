@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { observable } from 'mobx';
-import { observer, inject } from 'mobx-react';
+import { inject, observer } from "mobx-react";
+import classNames from 'classnames';
 import CONST from '../constants';
-
 @inject("store")
 @observer
 export default class ChatRoom extends Component {
@@ -21,20 +22,26 @@ export default class ChatRoom extends Component {
     this.onCreateOfferSuccess = this.onCreateOfferSuccess.bind(this);
     this.onClickCancel = this.onClickCancel.bind(this);
     this.setTimer = this.setTimer.bind(this);
+    this.getConnectionStatus = this.getConnectionStatus.bind(this);
     this.timer = null;
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    if (!this.props.store.isAuthorised) {
+      return this.props.history.push('/');
+    }
     this.friendID = this.props.match.params.friendId;
     this.friendUID = this.props.match.params.uid;
-    this.props.store.initialiseConnInfo(this.friendID, this.friendUID);
-    this.startStream()
-      .then(() => this.setupOrigin())
-      .then(() => this.setupRemote())
+    this.props.store.initialiseConnInfo(this.friendID, this.friendUID)
       .then(() => {
-        this.originConn.createOffer(this.offerOptions)
-          .then(this.onCreateOfferSuccess, (err) => {
-            console.error('create offer error :: ', err);
+        this.startStream()
+          .then(() => this.setupOrigin())
+          .then(() => this.setupRemote())
+          .then(() => {
+            this.originConn.createOffer(this.offerOptions)
+              .then(this.onCreateOfferSuccess, (err) => {
+                console.error('create offer error :: ', err);
+              });
           });
       });
   }
@@ -52,11 +59,11 @@ export default class ChatRoom extends Component {
           this.setTimer(fn);
           return;
         }
-        if (store.persona === CONST.USER_POSITION.CALLER && store.remoteOffer) {
+        if (store.persona === CONST.USER_POSITION.CALLER && store.remoteOffer && store.state === CONST.CONN_STATE.INVITE_ACCEPTED) {
           this.call();
         }
 
-        if(store.persona === CONST.USER_POSITION.CALLEE && store.remoteAnswer) {
+        if (store.persona === CONST.USER_POSITION.CALLEE && store.remoteAnswer) {
           this.finishConnection();
         }
       });
@@ -69,6 +76,15 @@ export default class ChatRoom extends Component {
         this.originStream = stream;
         this.origin.srcObject = stream;
       });
+  }
+
+  stopAllStreams() {
+    if (!this.originStream) {
+      return;
+    }
+    this.originStream.getTracks().forEach((track) => {
+      track.stop();
+    });
   }
 
   setupOrigin() {
@@ -143,12 +159,17 @@ export default class ChatRoom extends Component {
         }));
       }, (err) => {
         console.error('set destination remote session failed ::', err);
-      }).then(() => {
-        this.destConn.createAnswer().then((ansDesc) => {
-          this.onCreateAnswerSuccess(ansDesc);
-        }, (err) => {
-          console.error('create answer error :: ', err);
-        });
+      })
+      .then(() => this.destConn.createAnswer())
+      .then((ansDesc) => {
+        this.onCreateAnswerSuccess(ansDesc);
+      }, (err) => {
+        console.error('create answer error :: ', err);
+      })
+      .then(() => {
+        if (store.persona === CONST.USER_POSITION.CALLER && store.remoteAnswer) {
+          this.finishConnection();
+        }
       });
   }
 
@@ -163,9 +184,10 @@ export default class ChatRoom extends Component {
   }
 
   onCreateAnswerSuccess(answer) {
+    const { store } = this.props;
     this.destConn.setLocalDescription(answer)
       .then(() => {
-        return this.props.store.setAnswer(answer);
+        return store.setAnswer(answer);
         console.log('set destination local session success');
       }, (err) => {
         console.error('set destination local session failed ::', err);
@@ -175,6 +197,7 @@ export default class ChatRoom extends Component {
   reset() {
     clearTimeout(this.timer);
     this.props.store.resetConnInfo();
+    this.stopAllStreams();
   }
 
   endCall(e) {
@@ -184,59 +207,96 @@ export default class ChatRoom extends Component {
     this.originConn = null;
     this.destConn = null;
     this.reset();
-    this.props.history.push('/');
+    this.props.history.push('/home');
   }
 
   onClickCancel(e) {
     e.preventDefault();
     const self = this;
     const moveHome = () => {
-      console.log('moveHome');
       self.reset();
-      self.props.history.push('/');
+      self.props.history.push('/home');
     };
     this.props.store.deleteInvite()
-    .then(moveHome, moveHome);
+      .then(moveHome, moveHome);
+  }
+
+  getProgress(progress, error) {
+    if (error) {
+      return (
+        <div className="progress error">
+          <div className="progress-b">
+            <div className="icn"></div>
+            <div className="desc">{error}</div>
+          </div>
+        </div>
+      );
+    } else if (progress) {
+      return (
+        <div className="progress">
+          <div className="progress-b">
+            <div className="icn spinner"></div>
+            <div className="desc">{progress}</div>
+          </div>
+        </div>
+      );
+    }
+    return <span></span>;
   }
 
   getConnectionStatus() {
     let connectionMsg = null;
-    const { connectionState } = this.props.store;
+    const { store } = this.props;
+    const { connectionState } = store;
     const { CONN_STATE, UI } = CONST;
     const { CONN_MSGS } = UI;
 
-    // FIXME check for not caller persona
-    if (connectionState === CONN_STATE.CONNECTED) {
-      this.finishConnection();
-      return;
+    const isConnected = (connectionState === CONN_STATE.CONNECTED);
+
+    if (!isConnected) {
+      switch (connectionState) {
+        case CONN_STATE.INIT:
+          connectionMsg = CONN_MSGS.INIT;
+          break;
+        case CONN_STATE.SEND_INVITE:
+          connectionMsg = CONN_MSGS.SEND_INVITE;
+          break;
+        case CONN_STATE.INVITE_ACCEPTED:
+          connectionMsg = CONN_MSGS.INVITE_ACCEPTED;
+          break;
+        case CONN_STATE.CALLING:
+          connectionMsg = CONN_MSGS.CALLING;
+          break;
+        default:
+          connectionMsg = UI.DEFAULT_LOADING_DESC
+      }
     }
 
-    switch (connectionState) {
-      case CONN_STATE.INIT:
-        connectionMsg = CONN_MSGS.INIT;
-        break;
-      case CONN_STATE.SEND_INVITE:
-        connectionMsg = CONN_MSGS.SEND_INVITE;
-        break;
-      case CONN_STATE.INVITE_ACCEPTED:
-        connectionMsg = CONN_MSGS.INVITE_ACCEPTED;
-        break;
-      case CONN_STATE.CALLING:
-        connectionMsg = CONN_MSGS.CALLING;
-        break;
-      default:
-        connectionMsg = UI.DEFAULT_LOADING_DESC
-    }
+    const statusClassName = classNames('status', {
+      'connected': connectionState === CONN_STATE.CONNECTED
+    });
+
     return (
-      <div className="chat-room-conn-status">
-        <div className="chat-room-conn-status-b">
-          <h3 className="status">{connectionMsg}</h3>
-          <div className="cancel-btn">
-            <button
-              type="button"
-              className="btn primary"
-              onClick={this.onClickCancel}
-            >Cancel</button>
+      <div className={statusClassName}>
+        <div className="status-b">
+          <div className="card-1">
+            <div className="logo logo-sm">
+              <div className="logo-img"></div>
+            </div>
+            <div className="call-for">
+              <div className="call-for-b">
+                <div className="caller">{store.activePublicName}</div>
+                <div className="split"></div>
+                <div className="callee">{this.friendID || store.friendID}</div>
+              </div>
+              <div className="id">#{this.friendUID || store.uid}</div>
+            </div>
+            {this.getProgress(connectionMsg, store.chatRoomError)}
+            <div className="opts">
+              <div className="opt">
+                <button className="btn" onClick={this.onClickCancel}>{CONST.UI.LABELS.cancel}</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -246,15 +306,18 @@ export default class ChatRoom extends Component {
   finishConnection() {
     const { store } = this.props;
     this.originConn.setRemoteDescription(store.remoteAnswer)
-    .then(() => {
+      .then(() => {
         Promise.all(store.remoteAnswerCandidates.map((can) => {
           return this.originConn.addIceCandidate(new RTCIceCandidate(can))
             .then(() => {
-              console.log('set ICE candidate success');
+              console.log('set ICE candidate origin success');
             }, (err) => {
-              console.error('set ICE candidate failed ::', err);
+              console.error('set ICE candidate origin failed ::', err);
             });
         })).then(() => {
+          if (store.persona === CONST.USER_POSITION.CALLER) {
+            return;
+          }
           store.connected();
         });
       }, (err) => {
@@ -263,23 +326,24 @@ export default class ChatRoom extends Component {
   }
 
   render() {
-    const { match } = this.props;
-
     return (
       <div className="chat-room">
-        <div className="chat-room-b">
-          <div className="chat-room-remote">
-            <video ref={(c) => { this.destinaton = c; }} autoPlay></video>
-          </div>
-          <div className="chat-room-origin">
+        <div className="remote">
+          <video ref={(c) => { this.destinaton = c; }} autoPlay></video>
+          <div className="origin">
             <video ref={(c) => { this.origin = c; }} autoPlay></video>
+          </div>
+          <div className="opts">
+            <div className="opt">
+              <button className="btn end-call" onClick={this.endCall.bind(this)}></button>
+            </div>
           </div>
         </div>
         {this.getConnectionStatus()}
-        <div className="chat-room-opts">
-          <button type="button" onClick={this.endCall.bind(this)}>END</button>
-        </div>
       </div>
     );
   }
 }
+
+ChatRoom.propTypes = {
+};

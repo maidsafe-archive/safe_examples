@@ -1,5 +1,44 @@
 export default {
   UI: {
+    LABELS: {
+      title: 'SAFE WebRTC Signalling',
+      activePubName: 'Active public name',
+      newVideoCall: 'New Video Call',
+      invites: 'Invites',
+      switch: 'Switch',
+      connect: 'Connect',
+      cancel: 'Cancel',
+      activate: 'Activate',
+      friendIdPlaceholder: 'Enter friend\'s public name',
+      chooseInvite: 'Choose an invite',
+      noInvites: 'No invites available',
+      noPublicName: 'No Public Name available to switch',
+      choosePublicName: 'Select Public Name',
+    },
+    MESSAGES: {
+      authorise: 'Authorising with Authenticator',
+      authoriseFail: 'Authorisation Failed',
+      initialise: 'Initialising application',
+      initialiseFail: 'Failed to initialise application',
+      noPubNameFound: 'No Public Name found.',
+      fetchPublicName: 'Fetching Public Names',
+      fetchPublicNameFail: 'Unable to fetch Public Names',
+      fetchInvites: 'Fetching Invites',
+      fetchInvitesFail: 'Unable to fetch Invites',
+      activatePublicName: 'Activating public name',
+      activatePublicNameFail: 'Failed to activate Public Name',
+      connecting: 'Connecting with friend',
+      connectingFail: 'Failed to connect with friend',
+      invalidPublicName: 'Invalid Public Name',
+      cantInviteYourself: 'Can\'t invite yourself',
+      inviteAcceptFail: 'Failed to accept invite',
+      callAcceptFail: 'Failed after remote accepted the call',
+      checkCallingFail: 'Failed to accept remote call',
+      initialisationFail: 'Failed to initialise the connection',
+      sendInviteFail: 'Failed to send invitation to remote',
+      callingFail: 'Failed to call remote',
+      connectingFail: 'Failed to connect with remote'
+    },
     DEFAULT_LOADING_DESC: 'Please wait...',
     CONN_MSGS: {
       INIT: 'Initialising connection',
@@ -16,11 +55,11 @@ export default {
   CONFIG: {
     SERVER: {
       iceServers: [
-        { url: 'stun:stun1.l.google.com:19302' }, // URL to STUN Server
+        { url: 'STUN_SERVER_URL' }, // fill STUN Server url
         {
-          url: 'turn:numb.viagenie.ca',
-          credential: 'PASSWORD', // fill turn server password
-          username: 'USERNAME' // fill turn server username
+          url: 'TURN_SERVER_URL', // fill turn server url
+          credential: 'TURN_PASSWORD', // fill turn server password
+          username: 'TURN_USERNAME' // fill turn server username
         },
       ]
     },
@@ -61,9 +100,6 @@ export default {
   TYPE_TAG: {
     CHANNEL: 15005,
     DNS: 15001,
-  },
-  ERR_CODE: {
-    NO_SUCH_ENTRY: -106,
   },
   CRYPTO_KEYS: {
     SEC_SIGN_KEY: '__SEC_SIGN_KEY__',

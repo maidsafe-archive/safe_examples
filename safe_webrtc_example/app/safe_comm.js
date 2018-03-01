@@ -184,6 +184,7 @@ export default class SafeApi {
         this.selectedPubName = await window.safeMutableData.get(ownCntr, CONST.SELECTED_PUB_NAME_KEY);
         resolve(true);
       } catch (err) {
+        // FIXME: change from error message to code
         // if (err.code !== CONST.ERR_CODE.NO_SUCH_ENTRY) {
         if (err.message !== ERROR_MSG.ENTRY_NOT_FOUND) {
           utils.putLog('Select public name error', err);
@@ -207,6 +208,7 @@ export default class SafeApi {
 
         resolve(true);
       } catch (err) {
+        // FIXME: change from error message to code
         // if (err.code !== -1011) {
         if (err.message !== 'Core error: Routing client error -> Key does not exists') {
           utils.putLog('Check service container access error', err);
@@ -304,6 +306,7 @@ export default class SafeApi {
           const deckey = await window.safeMutableData.decrypt(this.pubNameCntr, key);
           resolve(utils.uint8ToStr(deckey));
         } catch (err) {
+          // FIXME: change from error message to code
           if (err.message === ERROR_MSG.SYMMETRIC_DECIPHER_FAILURE) {
             return resolve('');
           }
@@ -468,13 +471,16 @@ export default class SafeApi {
         if (isCaller) {
           utils.putLog('Insert data', dataKey);
           await window.safeMutableDataMutation.insert(mutationHandle, dataKey, connInfoStr);
+          utils.putLog('Inserted data', dataKey);
         } else {
           utils.putLog('Update data', dataKey);
           const connStr = await window.safeMutableData.get(channelMD, dataKey);
           await window.safeMutableDataMutation.update(mutationHandle, dataKey, connInfoStr, connStr.version + 1);
+          utils.putLog('Updated data', dataKey);
         }
 
         await window.safeMutableData.applyEntriesMutation(channelMD, mutationHandle);
+        utils.putLog('put confirmed', dataKey);
         window.safeMutableDataMutation.free(mutationHandle);
         window.safeMutableDataEntries.free(entriesHandle);
         resolve(true);
@@ -515,6 +521,7 @@ export default class SafeApi {
           data: decryptedData
         }));
       } catch (err) {
+        // FIXME: change from error message to code
         if (err.message !== ERROR_MSG.ENTRY_NOT_FOUND) {
           return reject(err);
         }

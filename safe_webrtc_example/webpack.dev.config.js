@@ -18,6 +18,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    new ExtractTextPlugin({ filename: './styles/style.css', disable: false, allChunks: true }),
   ],
   resolve: {
     extensions: ['.js', '.jsx']
