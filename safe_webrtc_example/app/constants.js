@@ -2,14 +2,14 @@ export default {
   UI: {
     LABELS: {
       title: 'SAFE WebRTC Signalling',
-      activePubName: 'Active public name',
-      newVideoCall: 'New Video Call',
+      activePubName: 'Active Public Name',
+      newVideoCall: 'New video call',
       invites: 'Invites',
       switch: 'Switch',
       connect: 'Connect',
       cancel: 'Cancel',
       activate: 'Activate',
-      friendIdPlaceholder: 'Enter friend\'s public name',
+      friendIdPlaceholder: 'Enter remote peer\'s Public Name',
       chooseInvite: 'Choose an invite',
       noInvites: 'No invites available',
       noPublicName: 'No Public Name available to switch',
@@ -17,34 +17,34 @@ export default {
     },
     MESSAGES: {
       authorise: 'Authorising with Authenticator',
-      authoriseFail: 'Authorisation Failed',
+      authoriseFail: 'Authorisation failed',
       initialise: 'Initialising application',
       initialiseFail: 'Failed to initialise application',
       noPubNameFound: 'No Public Name found.',
       fetchPublicName: 'Fetching Public Names',
       fetchPublicNameFail: 'Unable to fetch Public Names',
-      fetchInvites: 'Fetching Invites',
-      fetchInvitesFail: 'Unable to fetch Invites',
-      activatePublicName: 'Activating public name',
+      fetchInvites: 'Fetching invites',
+      fetchInvitesFail: 'Unable to fetch invites',
+      activatePublicName: 'Activating Public Name',
       activatePublicNameFail: 'Failed to activate Public Name',
-      connecting: 'Connecting with friend',
-      connectingFail: 'Failed to connect with friend',
+      connecting: 'Connecting with remote peer',
+      connectingFail: 'Failed to connect with remote peer',
       invalidPublicName: 'Invalid Public Name',
       cantInviteYourself: 'Can\'t invite yourself',
       inviteAcceptFail: 'Failed to accept invite',
-      callAcceptFail: 'Failed after remote accepted the call',
-      checkCallingFail: 'Failed to accept remote call',
+      callAcceptFail: 'Failed after remote peer accepted the call',
+      checkCallingFail: 'Failed to accept remote peer call',
       initialisationFail: 'Failed to initialise the connection',
-      sendInviteFail: 'Failed to send invitation to remote',
-      callingFail: 'Failed to call remote',
-      connectingFail: 'Failed to connect with remote'
+      sendInviteFail: 'Failed to send invitation to remote peer',
+      callingFail: 'Failed to call remote peer',
+      connectingFail: 'Failed to connect with remote peer'
     },
     DEFAULT_LOADING_DESC: 'Please wait...',
     CONN_MSGS: {
       INIT: 'Initialising connection',
       SEND_INVITE: 'Invite sent. Waiting for the remote peer to accept the connection',
-      INVITE_ACCEPTED: 'Invite accepted. Establishing connection with remote',
-      CALLING: 'Remote accepted the invite. Establishing connection with remote',
+      INVITE_ACCEPTED: 'Invite accepted. Establishing connection with remote peer',
+      CALLING: 'Remote peer accepted invite. Establishing connection',
     },
     CONN_TIMER_INTERVAL: 2000,
     TIMER_INTERVAL: {
@@ -55,11 +55,11 @@ export default {
   CONFIG: {
     SERVER: {
       iceServers: [
-        { url: 'STUN_SERVER_URL' }, // fill STUN Server url
+        { url: 'stun:stun1.l.google.com:19302' }, // fill STUN Server url
         {
-          url: 'TURN_SERVER_URL', // fill turn server url
-          credential: 'TURN_PASSWORD', // fill turn server password
-          username: 'TURN_USERNAME' // fill turn server username
+          url: 'turn:numb.viagenie.ca', // fill turn server url
+          credential: 'string21', // fill turn server password
+          username: 'shankar21mail@gmail.com' // fill turn server username
         },
       ]
     },
