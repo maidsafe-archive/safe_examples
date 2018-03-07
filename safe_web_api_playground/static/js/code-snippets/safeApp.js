@@ -121,7 +121,8 @@ module.exports = {
       try {
         var data = await window.safeApp.webFetch(
           appHandle,
-          'safe://codeplay.discover'
+          'safe://codeplay.discover',
+	  {range: {start:0, end: undefined}}
         );
       } catch(err) {
         return err;
@@ -243,11 +244,22 @@ module.exports = {
 
     getContainersPermissions: async () => {
       try {
-        var permissionsData = await  window.safeApp.getContainersPermissions(appHandle);
+        var permissionsData = await window.safeApp.getContainersPermissions(appHandle);
       } catch(err) {
         return err;
       }
       return `Returns object with container names and permissions: ${JSON.stringify(permissionsData)}`;
+    },
+
+    readGrantedPermissions: async () => {
+      // This function appears redundant to window.safeApp.getContainersPermissions, however the difference\
+      // is that readGrantedPermissions doesn't need an authorised app connection. 
+      try {
+        var grantedPermissions = await window.safeApp.readGrantedPermissions(appHandle, authUri);
+      } catch(err) {
+        return err;
+      }
+      return `Returns object with granted container permissions: ${JSON.stringify(grantedPermissions)}`;
     },
 
     getOwnContainer: async () => {
@@ -257,6 +269,15 @@ module.exports = {
         return err;
       }
       return `Returns handle for Mutable Data structure behind app's root container: ${mdHandle}`
+    },
+
+    getOwnContainerName: async () => {
+      try {
+        var containerName = await window.safeApp.getOwnContainerName(appHandle);
+      } catch(err) {
+        return err;
+      }
+      return `Returns name of app's root container: ${containerName}`;
     },
 
     getContainer: async () => {

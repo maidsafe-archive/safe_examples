@@ -12,9 +12,9 @@ var envfile = require('envfile'),
 
 gulp.task('safe-styles', function() {
   gulp.src([
-    './node_modules/safe-styles/scss/**/*.scss',
+    './node_modules/safe_ux_guidelines/scss/**/*.scss',
     './node_modules/npm-font-open-sans/open-sans.scss',
-    '!./node_modules/safe-styles/scss/main.scss'
+    '!./node_modules/safe_ux_guidelines/scss/main.scss'
   ])
     .pipe(gulp.dest('./static/scss'));
 

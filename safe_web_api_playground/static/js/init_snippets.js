@@ -14,7 +14,7 @@ let safeCryptoSecEncKey = require('./code-snippets/safeCryptoSecEncKey');
 let safeCryptoPubSignKey = require('./code-snippets/safeCryptoPubSignKey');
 let safeCryptoSecSignKey = require('./code-snippets/safeCryptoSecSignKey');
 let safeCryptoSignKeyPair = require('./code-snippets/safeCryptoSignKeyPair');
-// let helpers = require('./code-snippets/helpers');
+//let helpers = require('./code-snippets/helpers');
 
 let codeSnippets = [
   safeApp,
@@ -33,7 +33,6 @@ let codeSnippets = [
   safeCryptoPubSignKey,
   safeCryptoSecSignKey,
   safeCryptoSignKeyPair
-//  helpers
 ];
 
 function updateCode(string) {
@@ -84,11 +83,11 @@ function updateCode(string) {
 
     let fileInputEl = document.createElement('input');
     fileInputEl.setAttribute('type', 'file');
-    fileInputEl.setAttribute('class', 'form-control');
+    //fileInputEl.setAttribute('class', 'form-control');
     fileInputEl.setAttribute('id', 'dirExplorer');
-    fileInputEl.setAttribute('value', ' directory');
     fileInputEl.setAttribute('webkitdirectory', '');
-    fileInputEl.setAttribute('directory', '');
+    fileInputEl.setAttribute('multiple', '');
+    fileInputEl.setAttribute('allowDir', 'true');
 
     let parentEl = document.getElementById('codeForm');
     let buttonEl = document.getElementById('runButton');

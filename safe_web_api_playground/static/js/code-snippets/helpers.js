@@ -1,41 +1,31 @@
 module.exports = {
   helpers: {
-    uploadDirectory: () => {
+    uploadDirectory: async () => {
 
       // Open up your console to view names of uploaded files
+      console.log("Starting upload...");
+      console.time("upload-time");
+      const directory = document.getElementById('dirExplorer').files;
+      console.log(directory);
 
-      let directory = document.getElementById('dirExplorer').files;
-
-      function uploadQueue(i) {
-        if( i == directory.length) {
-          return new Promise((resolve, reject) => {
-            return resolve("Upload complete.")
-          });
-        } else {
-          return window.safeNfs.create(nfsHandle, directory[i])
-          .then((res) => {
-            fileHandle = res;
-
-            return window.safeNfs.insert(nfsHandle, fileHandle, directory[i].webkitRelativePath.split('/').slice(1).join('/'))
-            .then(res => {
-              fileHandle = res;
-
-              return window.safeNfs.freeFile(fileHandle)
-              .then(_ => {
-                fileHandle = null;
-                console.log(directory[i].webkitRelativePath.split('/').slice(1).join('/') + ' saved. ');
-                return uploadQueue( i + 1);
-              });
-            });
-          });
+      await Array.prototype.forEach.call(directory, async (file) => {
+        const fileReader = new FileReader();
+        fileReader.onload = async (event) => {
+          const fileBuffer = new Buffer(event.target.result);
+	  console.log('file buffer: ', fileBuffer);
+          const fileContextHandle = await window.safeNfs.create(nfsHandle, fileBuffer);
+	  console.log('file handle: ', fileContextHandle);
+          await window.safeNfs.insert(nfsHandle, fileContextHandle, file.webkitRelativePath.split('/').slice(1).join('/'))
+          await window.safeNfsFile.free(fileContextHandle)
+          console.log(directory[i].webkitRelativePath.split('/').slice(1).join('/') + ' saved. ');
         }
-      }
-
-      return uploadQueue(0).then(res => {
-        console.log(res);
-        return res;
+	console.log(file);
+        fileReader.readAsArrayBuffer(file);
       });
 
+      console.log("Upload complete.");
+      const duration = console.timeEnd("upload-time");
+      return `Upload Complete. Duration: ${duration}`
     },
 
     getDirectory: () => {
