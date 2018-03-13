@@ -11,7 +11,7 @@ require("codemirror/addon/selection/active-line.js");
 function updateVariableValues() {
   return apiVariables.map(variable => {
     try {
-      if(eval(variable)) {
+      if(window[variable]) {
         if(document.getElementById('tempText')) {
           let tempText = document.getElementById('tempText');
           tempText.parentNode.removeChild(tempText);
@@ -28,11 +28,11 @@ function updateVariableValues() {
           spanEl.textContent = variable + ': ';
           pEl.appendChild(spanEl);
 
-          let textNodeEl = document.createTextNode(eval(variable));
+          let textNodeEl = document.createTextNode(window[variable]);
 
           pEl.appendChild(textNodeEl);
 
-          let regexObject = new RegExp(eval(variable));
+          let regexObject = new RegExp(window[variable]);
 
           if(!(regexObject.test(currentTextContent))) {
               pEl.setAttribute('class', 'flash');
@@ -48,7 +48,7 @@ function updateVariableValues() {
           spanEl.textContent = variable + ': ';
           pEl.appendChild(spanEl);
 
-          let textNodeEl = document.createTextNode(eval(variable));
+          let textNodeEl = document.createTextNode(window[variable]);
 
           pEl.appendChild(textNodeEl);
           pEl.setAttribute('class', 'flash');
@@ -75,6 +75,11 @@ function updateVariableValues() {
   });
 }
 
+
+function evalSnippet(string) {
+  return Function(`return ${string};`)();
+}
+
 function handleSubmit() {
   if(document.getElementById('loader')) {
     document.getElementById('loader').parentNode.removeChild(document.getElementById('loader'));
@@ -84,7 +89,7 @@ function handleSubmit() {
   document.getElementById('rightside').appendChild(loader);
 
   try {
-    const res = eval(editor.getValue());
+    const res = evalSnippet(editor.getValue());
     const isFreeSyncFunction = new RegExp('free').test(editor.getValue());
     if(isFreeSyncFunction) {
       loader.parentNode.removeChild(loader);
