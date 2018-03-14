@@ -37,7 +37,7 @@ ipc.on('simulate-mock-res', () => {
 });
 
 ipc.on('show-log-file', () => {
-  history.push('/appLogs')
+  history.push('/appLogs');
 });
 
 render(
