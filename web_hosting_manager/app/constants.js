@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import { remote } from 'electron';
 import path from 'path';
 import pkg from './package.json';
 
@@ -20,7 +20,7 @@ const CONSTANTS = {
       scope: null,
       name: pkg.productName,
       vendor: pkg.author.name,
-      customExecPath: isRunningUnpacked ? [process.execPath, path.join(process.cwd(), 'app', 'main.prod.js')] : [app.getPath('exe')]
+      customExecPath: isRunningUnpacked ? [process.execPath, path.join(process.cwd(), 'app', 'main.prod.js')] : [remote.app.getPath('exe')]
     },
     opt: {
       own_container: false,

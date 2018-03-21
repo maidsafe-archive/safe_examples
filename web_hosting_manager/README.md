@@ -10,28 +10,31 @@ First, clone the repo via git:
 ```bash
 $ git clone https://github.com/maidsafe/safe_examples && cd safe_examples/web_hosting_manager
 ```
+Do you want to develop on a local mock network?
+Then run:
+```bash
+export NODE_ENV=dev
+If running Windows Powershell: $env:NODE_ENV = "dev"
+```
 
-And then install Node.js dependencies.
+Or do you want to connect with live network?
+```bash
+export NODE_ENV=prod
+If running Windows Powershell: $env:NODE_ENV = "prod"
+```
+Then install Node.js dependencies:
 
 ```bash
 $ yarn
 ```
-Set `NODE_ENV=dev` to use Mock Vault. By deafult it uses Actual Network Or set `NODE_ENV=prod` to use Actual Network.
-
-## Run
-
+Now to run, if `NODE_ENV=prod` use:
 ```bash
 $ yarn start
 ```
-
-To open application on development environment run `yarn dev`
-
-### Authorising against Mock
-
-To simplify the auth process, as web-hosting can't received a response when running in dev mode.
-
-Run the app, and in the main menu, select `Simulate Mock Response`, and you're good to go.
-
+If `NODE_ENV=dev` use:
+```bash
+$ yarn dev
+```
 ## Packaging
 
 To package apps for the local platform:
