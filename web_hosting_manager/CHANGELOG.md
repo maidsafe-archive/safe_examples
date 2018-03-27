@@ -2,12 +2,12 @@
 
 ## [Unreleased]
 ### Changed
-- Update to Node JS to ^8.0.0
-- Update electron to 1.7.11 for security reasons
-- Update @maidsafe/safe-node-app to v0.7.0
+- Upgrade Node JS to ^8.0.0
+- Upgrade electron to 1.8.4 which solves reported security vulnerabilities
+- Upgrade @maidsafe/safe-node-app to v0.8.1
 
 ### SAFE libraries dependencies
-- @maidsafe/safe-node-app: v0.7.0
+- @maidsafe/safe-node-app: v0.8.1
 
 ## [0.4.4] - 20-12-2017
 ### Changed
