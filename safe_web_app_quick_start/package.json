@@ -1,0 +1,18 @@
+{
+  "name": "safe_web_app_quick_start",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "neutrino build",
+    "start": "neutrino start"
+  },
+  "dependencies": {
+    "@babel/helper-module-imports": "^7.0.0-beta.44",
+    "vue": "^2.5.16"
+  },
+  "devDependencies": {
+    "@neutrinojs/vue": "^8.2.1",
+    "neutrino": "^8.2.1"
+  }
+}
