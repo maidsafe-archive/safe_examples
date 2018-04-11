@@ -7,17 +7,23 @@
     "start": "electron .",
     "postinstall": "npm rebuild --runtime=electron --target=1.8.4 --disturl=https://atom.io/download/atom-shell --build-from-source"
   },
-  "repository": "https://github.com/bochaco/safe_app_electron_quick_start",
+  "repository": "https://github.com/maidsafe/safe_examples/safe_app_electron_quick_start",
   "keywords": [
     "Electron",
     "quick",
     "start",
     "tutorial",
     "demo",
+    "boilerplate",
     "SAFE",
-    "SAFE Network"
+    "SAFE Network",
+    "MaidSafe"
   ],
-  "author": "GitHub",
+  "author": {
+    "name": "MaidSafe.net Ltd",
+    "email": "dev@maidsafe.net",
+    "url": "https://maidsafe.net"
+  },
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^1.8.4"
