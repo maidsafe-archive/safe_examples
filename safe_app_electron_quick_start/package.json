@@ -1,0 +1,28 @@
+{
+  "name": "safe_app_electron_quick_start",
+  "version": "1.0.0",
+  "description": "A minimal SAFE App application with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "npm rebuild --runtime=electron --target=1.8.4 --disturl=https://atom.io/download/atom-shell --build-from-source"
+  },
+  "repository": "https://github.com/bochaco/safe_app_electron_quick_start",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo",
+    "SAFE",
+    "SAFE Network"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^1.8.4"
+  },
+  "dependencies": {
+    "angular": "^1.6.9"
+  }
+}

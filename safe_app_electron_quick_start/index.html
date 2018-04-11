@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html ng-app="tripsPlanner">
+  <head>
+    <meta charset="UTF-8">
+    <title>SAFE App with Electron</title>
+    <script type="text/javascript" src="./node_modules/angular/angular.js"></script>
+    <script type="text/javascript" src="./controller.js"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h1>Hello SAFE Network!</h1>
+
+    <h2>Trips Planner</h2>
+    <div id="planner" ng-controller="tripsPlannerController as ctrl">
+      <span>{{ctrl.remaining()}} of {{ctrl.trips.length}} trips to be made</span>
+      [ <a href="" ng-click="ctrl.remove()">remove trips already made</a> ]
+      <ul class="unstyled">
+        <li ng-repeat="trip in ctrl.trips">
+          <label class="checkbox">
+            <input type="checkbox" ng-model="trip.value.made">
+            <span class="done-{{trip.value.made}}">{{trip.value.text}}</span>
+          </label>
+        </li>
+      </ul>
+      <form ng-submit="ctrl.addTrip()">
+        <input type="text" ng-model="ctrl.tripText" size="30"
+               placeholder="type new trip description here">
+        <input class="btn-primary" type="submit" value="Add a trip to the plan">
+      </form>
+    </div>
+
+  </body>
+</html>
