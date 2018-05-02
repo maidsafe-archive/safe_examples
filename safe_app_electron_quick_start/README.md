@@ -13,7 +13,8 @@ The boilerplate implements a simple single page application using [Angular.js](h
 
 First you need to make sure you have the following tools installed to be able to work with this tutorial:
 - [Git](https://git-scm.com/): to be able to clone the boilerplate code
-- [Node.js](https://nodejs.org/en/download) (which comes with [npm](http://npmjs.com/)) to be able to run the application since it's a Node.js application
+- [Node.js](https://nodejs.org/en/download) v8.11.1 (which comes with [npm](http://npmjs.com/) v5.6.0) to be able to run the application since it's a Node.js application
+- If you are using Debian 9 as OS, `build-essential` and/or `libgconf-2-4` dependencies might be missing. Please install them with [Synaptic Package Mgr.](https://help.ubuntu.com/community/SynapticHowto), or with apt from a shell console: `$ sudo apt-get install build-essential libgconf-2-4`.
 
 ## Install a SAFE Browser
 
@@ -35,6 +36,8 @@ If you are using Windows you can set it with the following command instead:
 $ set NODE_ENV=dev
 ```
 
+You can now launch the browser (make sure you launch it from the same console where you just set the NODE_ENV variable), please create an account from the Authenticator. You can enter any string when you are requested for the “Invitation token”.
+
 After you finished creating your account, please keep the browser open and logged in your account before proceeding with next steps.
 
 ## Create basic skeleton
@@ -53,6 +56,8 @@ If you are using Windows you can set it with the following command instead:
 ```bash
 $ set NODE_ENV=dev
 ```
+
+Please note that all the commands we will be executing in the next steps need to be made on the same console where you just set the NODE_ENV environment variable.
 
 If you otherwise decided to use the browser which connects to a live SAFE Network, please skip the above step.
 

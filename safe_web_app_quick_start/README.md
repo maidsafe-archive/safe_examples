@@ -10,8 +10,8 @@ The boilerplate implements a simple single page application using [Vue.js](https
 ## Pre-requisites
 
 First you need to make sure you have the following tools installed to be able to work with this tutorial:
-- [git](https://git-scm.com/) to be able to clone the boilerplate code
-- [Node.js](https://nodejs.org/en/download) (which comes with [npm](http://npmjs.com/)) to be able to run the application since it's a Node.js application.
+- [Git](https://git-scm.com/) to be able to clone the boilerplate code
+- [Node.js](https://nodejs.org/en/download) v8.11.1 (which comes with [npm](http://npmjs.com/) v5.6.0) to be able to run the application since it's a Node.js application.
 - If you are using Ubuntu as OS, `libpng-dev` might be needed. Please install it with [Synaptic Package Mgr.](https://help.ubuntu.com/community/SynapticHowto), or with `apt` from a shell console: `$ sudo apt-get install libpng-dev`.
 
 ## Install a SAFE Browser
@@ -33,6 +33,8 @@ If you are using Windows you can set it with the following command instead:
 ```bash
 $ set NODE_ENV=dev
 ```
+
+You can now launch the browser (make sure you launch it from the same console where you just set the NODE_ENV variable), please create an account from the Authenticator. You can enter any string when you are requested for the “Invitation token”.
 
 After you finished creating your account, please keep the browser open and logged in your account before proceeding with next steps.
 
