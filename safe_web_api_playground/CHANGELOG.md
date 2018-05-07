@@ -1,5 +1,8 @@
 # SAFE web API playground Change Log
 
+[Unreleased]
+- Change naming to be consistent with safe_app_nodejs and web API
+
 ## 2.1.0
 
 - embeds text editor to improve user experience(codemirror)
