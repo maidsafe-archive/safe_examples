@@ -1,5 +1,8 @@
 # SAFE web API playground Change Log
 
+[Unrelease]
+- Changes Mutable Data entries function from forEach to listEntries
+
 ## 2.1.0
 
 - embeds text editor to improve user experience(codemirror)
