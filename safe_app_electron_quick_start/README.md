@@ -13,8 +13,8 @@ The boilerplate implements a simple single page application using [Angular.js](h
 
 First you need to make sure you have the following tools installed to be able to work with this tutorial:
 - [Git](https://git-scm.com/): to be able to clone the boilerplate code
-- [Node.js](https://nodejs.org/en/download) v8.11.1 (which comes with [npm](http://npmjs.com/) v5.6.0) to be able to run the application since it's a Node.js application
-- If you are using Debian 9 as OS, `build-essential` and/or `libgconf-2-4` dependencies might be missing. Please install them with [Synaptic Package Mgr.](https://help.ubuntu.com/community/SynapticHowto), or with apt from a shell console: `$ sudo apt-get install build-essential libgconf-2-4`.
+- [Node.js](https://nodejs.org/en/download) v8.11.1 (which comes with [npm](http://npmjs.com/) v5.6.0) to be able to run the application since it's a Node.js application. All the steps in this tutorial are explained using npm, if you otherwise prefer to use [yarn](https://yarnpkg.com/en/), please make sure you install v1.6.0. Note that the use of yarn is not required and totally optional
+- If you are using Debian 9 as OS, `build-essential` and/or `libgconf-2-4` dependencies might be missing. Please install them with [Synaptic Package Mgr.](https://help.ubuntu.com/community/SynapticHowto), or with apt from a shell console: `$ sudo apt-get install build-essential libgconf-2-4`
 
 ## Install a SAFE Browser
 
