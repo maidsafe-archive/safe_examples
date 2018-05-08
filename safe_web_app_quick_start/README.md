@@ -12,7 +12,7 @@ The boilerplate implements a simple single page application using [Vue.js](https
 First you need to make sure you have the following tools installed to be able to work with this tutorial:
 - [Git](https://git-scm.com/) to be able to clone the boilerplate code
 - [Node.js](https://nodejs.org/en/download) v8.11.1 (which comes with [npm](http://npmjs.com/) v5.6.0) to be able to run the application since it's a Node.js application. All the steps in this tutorial are explained using npm, if you otherwise prefer to use [yarn](https://yarnpkg.com/en/), please make sure you install v1.6.0. Note that the use of yarn is not required and totally optional
-- If you are using Ubuntu as OS, `libpng-dev` might be needed. Please install it with [Synaptic Package Mgr.](https://help.ubuntu.com/community/SynapticHowto), or with `apt` from a shell console: `$ sudo apt-get install libpng-dev`
+- If you are using Ubuntu or Debian 9 as OS, `libpng-dev` might be needed. Please install it with [Synaptic Package Mgr.](https://help.ubuntu.com/community/SynapticHowto), or with `apt` from a shell console: `$ sudo apt-get install libpng-dev`
 
 ## Install a SAFE Browser
 
