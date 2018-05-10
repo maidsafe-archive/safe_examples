@@ -26,3 +26,12 @@ To run a complete package of the email/webhosting apps, (assuming each project h
 * Run `yarn pack:webhosting` to package and zip the app with all required files (to: web_hosting_manager/release).
 * Run `yarn pack:email` to package and zip the app with all required files (to: email_app/out).
 * Alternatively, run `yarn package-all` to package both `email_app` and `web_hosting_manager`
+
+# License
+
+The projects published in this repository are dual-licensed under
+
+* the Modified BSD ([LICENSE-BSD](https://opensource.org/licenses/BSD-3-Clause)) or
+* the MIT license ([LICENSE-MIT](http://opensource.org/licenses/MIT))
+
+at your option.
