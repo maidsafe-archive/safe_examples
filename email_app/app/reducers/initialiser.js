@@ -20,11 +20,11 @@ const initialiser = (state = initialState, action) => {
       return { ...state, tasks };
       break;
     case `${ACTION_TYPES.AUTHORISE_APP}_LOADING`:
-      return { ...state, app: null, appStatus: APP_STATUS.AUTHORISING };
+      return { ...state, appStatus: APP_STATUS.AUTHORISING };
       break;
     case `${ACTION_TYPES.AUTHORISE_APP}_SUCCESS`:
       return { ...state,
-        app: action.payload,
+        app: action.payload || state.app,
         appStatus: APP_STATUS.AUTHORISED,
         networkStatus: CONSTANTS.NET_STATUS_CONNECTED
       };
@@ -59,6 +59,9 @@ const initialiser = (state = initialState, action) => {
         networkStatus: CONSTANTS.NET_STATUS_CONNECTED,
         processing: { state: false, msg: null }
       };
+      break;
+    case `${ACTION_TYPES.INITIALISE_APP}_SUCCESS`:
+      return { ...state, app: action.payload, appStatus: APP_STATUS.INITIALISED };
       break;
     default:
       return state;

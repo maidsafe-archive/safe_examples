@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Initializer from '../components/initialiser';
-import { setInitialiserTask, authoriseApplication } from '../actions';
+import { setInitialiserTask, authoriseApplication, initialiseApplication } from '../actions';
 
 const mapStateToProps = state => {
   return {
@@ -13,7 +13,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     setInitialiserTask: (task) => (dispatch(setInitialiserTask(task))),
-    authoriseApplication: () => (dispatch(authoriseApplication()))
+    authoriseApplication: () => (dispatch(authoriseApplication())),
+    initialiseApplication: () => (dispatch(initialiseApplication()))
   };
 };
 

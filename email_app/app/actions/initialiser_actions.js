@@ -1,6 +1,6 @@
 import ACTION_TYPES from './action_types';
 import { APP_STATUS } from '../constants';
-import { authApp, connect, reconnect, connectWithSharedMd } from '../safenet_comm';
+import { authApp, connect, reconnect, connectWithSharedMd, initialise } from '../safenet_comm';
 
 export const setInitialiserTask = (task) => ({
   type: ACTION_TYPES.SET_INITIALISER_TASK,
@@ -40,6 +40,13 @@ export const receiveResponse = (uri) => {
       });
     }
   };
+};
+
+export const initialiseApplication = () => {
+  return (dispatch) => dispatch({
+    type: ACTION_TYPES.INITIALISE_APP,
+    payload: initialise()
+  });
 };
 
 export const authoriseApplication = () => {

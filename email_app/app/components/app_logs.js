@@ -2,7 +2,7 @@ import fs from 'fs';
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import PropTypes from 'prop-types';
-const pkg = require('../../package.json');
+import pkg from '../../package.json';
 
 export default class AppLogs extends Component {
   constructor() {
@@ -10,12 +10,13 @@ export default class AppLogs extends Component {
     this.logPath = null;
     this.state = {
       loading: true,
-      logData: '',
+      logMap: {},
+      logData: [],
       error: ''
     };
   }
   componentDidMount() {
-    this.setState({loading: true});
+    this.setState({ loading: true });
     this.props.getLogPath()
       .then(path => {
         this.logPath = path.value;
@@ -32,12 +33,12 @@ export default class AppLogs extends Component {
     }
     this.setState({loading: false});
     try {
-      const nativeLogData = fs.readFileSync(this.logPath);
+      const clientLibraryLogData = fs.readFileSync(this.logPath);
       const logMap = {};
-      Object.assign(logMap, { nativeLogData: nativeLogData.toString() });
-      const electronLogData = fs.readFileSync(`${process.cwd()}/${pkg.name}-nodejs.log`);
-      Object.assign(logMap, { electronLogData: electronLogData.toString() });
-      this.setState({ loading: false, logData: logMap });
+      Object.assign(logMap, { clientLibraryLogs: clientLibraryLogData.toString().split('\r\n') });
+      const clientLogData = fs.readFileSync(`${process.cwd()}/${pkg.name}-client.log`);
+      Object.assign(logMap, { clientLogs: clientLogData.toString().split('\r\n') });
+      this.setState({ loading: false, logMap });
     } catch (err) {
       this.setState({ loading: false, error: err.message });
     }
@@ -56,11 +57,15 @@ export default class AppLogs extends Component {
     );
   }
 
+  renderLogs(logs) {
+    return logs.map((log) => <div key={log}>{log}</div>);
+  }
+
   getLogs() {
-    return Object.keys(this.state.logData).map((key) => {
+    return Object.keys(this.state.logMap).map((key) => {
       return (
         <div>
-          <Link key={key} onClick={() => this.setState({ data: this.state.logData[key] })} >
+          <Link key={key} onClick={() => this.setState({ logData: this.state.logMap[key] })} >
             {key}
           </Link>
         </div>
@@ -69,20 +74,15 @@ export default class AppLogs extends Component {
   }
 
   getLogsContainer() {
-    if (this.state.data) {
+    if (this.state.logData.length > 0) {
       return (
-        <div className="_logs default">
-	  {this.state.data}
-	</div>
+        <div className="_logs">
+          {this.renderLogs(this.state.logData)}
+        </div>
       );
     }
     if (this.state.loading) {
       return (<div className="_loading">Please wait. Fetching logs...</div>);
-    }
-    if (!this.state.logData || this.state.logData === 'null') {
-      return (
-        <div className="_logs default">No logs found</div>
-      );
     }
     return (
       <div>
@@ -99,8 +99,8 @@ export default class AppLogs extends Component {
           <div className="_opt left">
             <button className="btn" onClick={e => {
               e.preventDefault();
-              if (this.state.data) {
-                this.setState({ data: null });
+              if (this.state.logData.length > 0) {
+                this.setState({ logData: [] });
               } else {
                 this.context.router.go(-1);
               }

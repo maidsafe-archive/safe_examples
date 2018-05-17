@@ -70,6 +70,8 @@ export const requestShareMdAuth = async (app, mdPermissions) => {
   }
 }
 
+export const initialise = async () => initializeApp(APP_INFO.info, null, { libPath });
+
 const requestAuth = async () => {
   log.info('Generating auth URI...');
   try {

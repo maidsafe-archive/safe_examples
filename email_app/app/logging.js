@@ -13,7 +13,7 @@ if(log.transports) {
   * Date: {y},{m},{d},{h},{i},{s},{ms}
   */
   log.transports.console.format = '{level} {h}:{i}:{s}:{ms} {text}';
-  log.transports.file.file = `./${pkg.name}-nodejs.log`;
+  log.transports.file.file = `./${pkg.name}-client.log`;
   log.transports.file.level = 'info';
   log.transports.file.format = '{level} {y}/{m}/{d} {h}:{i}:{s}:{ms} {text}';
   

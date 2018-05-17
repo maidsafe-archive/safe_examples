@@ -18,10 +18,14 @@ export default class Initializer extends Component {
   }
 
   componentDidMount() {
-    const { setInitialiserTask, authoriseApplication } = this.props;
-    setInitialiserTask(MESSAGES.INITIALISE.AUTHORISE_APP);
-
-    return authoriseApplication();
+    const { setInitialiserTask, authoriseApplication, initialiseApplication } = this.props;
+    if (!this.props.tasks[0]) {
+      setInitialiserTask(MESSAGES.INITIALISE.AUTHORISE_APP);
+    }
+    if (!this.props.app) {
+      initialiseApplication();
+      authoriseApplication();
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
