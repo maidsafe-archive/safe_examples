@@ -11,15 +11,15 @@ require("codemirror/addon/selection/active-line.js");
 function updateVariableValues() {
   return apiVariables.map(variable => {
     try {
-      if(window[variable]) {
+      let varDivId = `${variable}Var`;
+      if(window[variable] && window[variable].constructor !== HTMLDivElement) {
         if(document.getElementById('tempText')) {
           let tempText = document.getElementById('tempText');
           tempText.parentNode.removeChild(tempText);
         }
-
         let varBoxEl = document.getElementById('variables');
-        if(document.getElementById(variable)) {
-          let pEl = document.getElementById(variable);
+        if(document.getElementById(varDivId)) {
+          let pEl = document.getElementById(varDivId);
           let currentTextContent = pEl.textContent;
 
           pEl.textContent = '';
@@ -41,7 +41,7 @@ function updateVariableValues() {
           varBoxEl.appendChild(pEl);
         } else {
           let pEl = document.createElement('p');
-          pEl.setAttribute('id', variable);
+          pEl.setAttribute('id', varDivId);
           pEl.setAttribute('class', 'varValue');
           let spanEl = document.createElement('span');
           spanEl.setAttribute('class', 'varName');
@@ -55,8 +55,10 @@ function updateVariableValues() {
           varBoxEl.appendChild(pEl);
         }
       } else {
-        let targetEl = document.getElementById(variable);
-        targetEl.parentNode.removeChild(targetEl);
+        let targetEl = document.getElementById(varDivId);
+        if (targetEl) {
+          targetEl.parentNode.removeChild(targetEl);
+        }
 
         let varBox = document.getElementById('variables');
 
@@ -90,13 +92,6 @@ function handleSubmit() {
 
   try {
     const res = evalSnippet(editor.getValue());
-    const isFreeSyncFunction = new RegExp('free').test(editor.getValue());
-    if(isFreeSyncFunction) {
-      loader.parentNode.removeChild(loader);
-      res();
-      updateVariableValues();
-      return;
-    }
     return res().then(res => {
       loader.parentNode.removeChild(loader);
 

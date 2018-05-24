@@ -1,124 +1,124 @@
 const apiVariables = require('./api_variables');
 const errCase = (type) => {
       switch(type) {
-        case 'entriesHandle':
-          return 'entriesHandle not yet defined. Use safeMutableData.getEntries or .newEntries to first obtain entriesHandle';
+        case 'entries':
+          return 'entries not yet defined. Use mData.getEntries or .newEntries to first obtain entries';
           break;
 
-        case 'mutationHandle':
-          return 'mutationHandle not yet defined. Use safeMutableData.newMutation to first obtain mutationHandle';
+        case 'mutation':
+          return 'mutation not yet defined. Use mData.newMutation to first obtain mutation';
           break;
 
-        case 'permsHandle':
-          return 'permsHandle not yet defined. Use safeMutableData.getPermissions to first obtain permsHandle';
+        case 'perms':
+          return 'perms not yet defined. Use mData.getPermissions to first obtain perms';
           break;
 
-        case 'nfsHandle':
-          return 'nfsHandle not yet defined. Use safeMutableData.emulateAs to first obtain nfsHandle';
+        case 'nfs':
+          return 'nfs not yet defined. Use mData.emulateAs to first obtain nfs';
           break;
 
-        case 'idWriterHandle':
-          return 'idWriterHandle not yet defined. Use safeImmutableData.create to first obtain idWriterHandle';
+        case 'idWriter':
+          return 'idWriter not yet defined. Use app.immutableData.create to first obtain idWriter interface';
           break;
 
-        case 'idReaderHandle':
-          return 'idReaderHandle not yet defined. Use safeImmutableData.fetch to first obtain idReaderHandle';
+        case 'idReader':
+          return 'idReader not yet defined. Use app.immutableData.fetch to first obtain idReader interface';
           break;
 
-        case 'mdHandle':
-          return 'mdHandle not yet defined. Use one of the first 4 functions from the safeMutableData module to first obtain mdHandle';
+        case 'mData':
+          return 'mData not yet defined. Use one of the first 4 functions from the MutableData section to first obtain mData';
           break;
 
         case 'nonce':
-          return 'nonce not yet defined. Use safeCrypto.generateNonce to first obtain nonce';
+          return 'nonce not yet defined. Use app.crypto.generateNonce to first obtain nonce';
           break;
 
-        case 'cipherOptHandle':
-          return 'cipherOptHandle not yet defined. Use either safeCipherOpt.newPlainText, safeCipherOpt.newSymmetric, or safeCipherOpt.newAsymmetric to first obtain cipherOptHandle';
+        case 'cipherOpt':
+          return 'cipherOpt not yet defined. Open cipherOption section and choose of the options to optain cipherOpt value';
           break;
 
         case 'authUri':
-          return 'authUri not yet defined. Use safeApp.authorise to first obtain authUri';
+          return 'authUri not yet defined. Use safe.authorise to first obtain authUri';
           break;
 
-        case 'appHandle':
-          return 'appHandle not yet defined. Use safeApp.initialise to first obtain appHandle';
+        case 'app':
+          return 'app not yet defined. Use safe.initialiseApp to first obtain app interface';
           break;
 
         case 'encryptedKey':
-          return 'encryptedKey not yet defined. Use safeMutableData.encryptKey to first obtain encryptedKey';
+          return 'encryptedKey not yet defined. Use mData.encryptKey to first obtain encryptedKey buffer';
           break;
 
         case 'encryptedValue':
-          return 'encryptedValue not yet defined. Use safeMutableData.encryptValue to first obtain encryptedValue';
+          return 'encryptedValue not yet defined. Use mData.encryptValue to first obtain encryptedValue buffer';
           break;
 
-	case 'signKeyPairHandle':
-	  return 'signKeyPairHandle not yet defined. Use safeCrypto.generateSignKeyPair to first obtain signKeyPairHandle';
+	case 'signKeyPair':
+	  return 'signKeyPair not yet defined. Use app.crypto.generateSignKeyPair to first obtain signKeyPair';
 	  break;
 
-        case 'pubSignKeyHandle':
-          return 'pubSignKeyHandle not yet defined. Use safeCrypto.getAppPubSignKey to first obtain pubSignKeyHandle';
+        case 'pubSignKey':
+          return 'pubSignKey not yet defined. Use app.crypto.getAppPubSignKey to first obtain pubSignKey';
           break;
 
-	case 'secSignKeyHandle':
-	  return 'secSignKeyHandle not yet defined. Use safeCryptoSignKeyPair.getSecSignKey to first obtain secSignKeyHandle';
+	case 'secSignKey':
+	  return 'secSignKey not yet defined. Use signKeyPair.secSignKey to first obtain secSignKey';
 	  break;
 
         case 'version':
-          return 'version not yet defined. Use safeMutableData.getVersion to first obtain version';
+          return 'version not yet defined. Use mData.getVersion to first obtain version';
           break;
 
-        case 'fileContextHandle':
-          return 'fileContextHandle not yet defined. Use safeNfs.create to first obtain fileContextHandle';
+        case 'fileContext':
+          return 'fileContext not yet defined. Use nfs.create to first obtain fileContext';
           break;
 
-        case 'pubEncKeyHandle':
-          return 'pubEncKeyHandle not yet defined. Use safeCrypto.getAppPubEncKey to first obtain pubEncKeyHandle';
+        case 'pubEncKey':
+          return 'pubEncKey not yet defined. Use app.crypto.getAppPubEncKey to first obtain pubEncKey';
           break;
 
-        case 'secEncKeyHandle':
-          return 'secEncKeyHandle not yet defined. Use safeCryptoKeyPair.getSecEncKey to first obtain secEncKeyHandle';
+        case 'secEncKey':
+          return 'secEncKey not yet defined. Use encKeyPair.getSecEncKey to first obtain secEncKey';
           break;
 
-        case 'encKeyPairHandle':
-          return 'encKeyPairHandle not yet defined. Use safeCrypto.generateEncKeyPair to first obtain encKeyPairHandle';
+        case 'encKeyPair':
+          return 'encKeyPair not yet defined. Use app.crypto.generateEncKeyPair to first obtain encKeyPair';
           break;
 
         case 'rawPubSignKey':
-          return 'rawPubSignKey not yet defined. Use safeCrypto.pubSignKeyFromRaw to first obtain rawPubSignKey';
+          return 'rawPubSignKey not yet defined. Use app.crypto.pubSignKeyFromRaw to first obtain rawPubSignKey';
           break;
 
         case 'rawSecSignKey':
-          return 'rawSecSignKey not yet defined. Use safeCrypto.secSignKeyFromRaw to first obtain rawSecSignKey';
+          return 'rawSecSignKey not yet defined. Use app.crypto.secSignKeyFromRaw to first obtain rawSecSignKey';
           break;
 
         case 'rawPubEncKey':
-          return 'rawPubEncKey not yet defined. Use safeCryptoPubEncKey.getRaw to first obtain rawPubEncKey';
+          return 'rawPubEncKey not yet defined. Use pubEncKey.getRaw to first obtain rawPubEncKey';
           break;
 
         case 'rawSecEncKey':
-          return 'rawSecEncKey not yet defined. Use safeCryptoSecEncKey.getRaw to first obtain rawSecEncKey';
+          return 'rawSecEncKey not yet defined. Use secEncKey.getRaw to first obtain rawSecEncKey';
           break;
 
         case 'encryptedBuffer':
-          return 'encryptedBuffer not yet defined. Use safeCryptoPubEncKey.encryptSealed to first obtain encryptedBuffer';
+          return 'encryptedBuffer not yet defined. Use pubEncKey.encryptSealed to first obtain encryptedBuffer';
           break;
 
         case 'idAddress':
-          return 'idAddress not yet defined. Use safeImmutableData.closeWriter to first obtain idAddress';
+          return 'idAddress not yet defined. Use idWriter.closeWriter to first obtain idAddress';
           break;
 
         case 'serialisedMD':
-          return 'serialisedMD not yet defined. Use safeMutableData.serialise to first obtain serialisedMD';
+          return 'serialisedMD not yet defined. Use mData.serialise to first obtain serialisedMD';
           break;
 
         case 'hashedString':
-          return 'hashedString not yet defined. Use safeCrypto.sha3Hash to first obtain hashedString';
+          return 'hashedString not yet defined. Use app.crypto.sha3Hash to first obtain hashedString';
           break;
 	
 	case 'signedData':
-	  return 'signedData is not yet defined. Use safeCryptoSecSignKey.sign to first obtain signeData';
+	  return 'signedData is not yet defined. Use secSignKey.sign to first obtain signeData';
 	  break;
 
         default:
@@ -158,13 +158,15 @@ const handleIncompleteSetup = () => {
   let p3 = document.createElement('p');
   let p4 = document.createElement('p');
   let p5 = document.createElement('p');
-  p1.textContent = 'Your app token is not yet authorised to perform this operation.';
-  p2.textContent = '- First run safeApp.initialise';
-  p3.textContent = '- Then run safeApp.authorise';
-  p4.textContent = '- Finally, run safeApp.connectAuthorised';
-  p5.textContent = 'Your appHandle will then be authorised to perform this operation!';
+  let p6 = document.createElement('p');
+  p1.textContent = 'Your app interface is not yet authorised to perform this operation.';
+  p2.textContent = '- First run safe.initialiseApp';
+  p3.textContent = '- Then run app.auth.genAuthUri';
+  p4.textContent = '- Then run safe.authorise';
+  p5.textContent = '- Finally, run app.auth.loginFromUri';
+  p6.textContent = 'Your app interface will then be authorised to perform this operation!';
   div.appendChild(p1);
-  let pElArray = [p1, p2, p3, p4, p5];
+  let pElArray = [p1, p2, p3, p4, p5, p6];
   pElArray.map(function(p) {
     div.appendChild(p);
   })
