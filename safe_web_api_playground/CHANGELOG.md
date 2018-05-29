@@ -1,5 +1,8 @@
 # SAFE web API playground Change Log
 
+## 3.0.0
+- Refactors code-snippets for newly exposed web API which is nearly identical to safe_app_nodejs
+
 ## 2.1.0
 
 - embeds text editor to improve user experience(codemirror)

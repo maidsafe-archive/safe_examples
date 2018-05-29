@@ -1,8 +1,8 @@
 module.exports = {
-  safeCryptoSecSignKey: {
+  cryptoSecSignKey: {
     getRaw: async () => {
       try {
-        rawSecSignKey = await window.safeCryptoSecSignKey.getRaw(secSignKeyHandle);
+        rawSecSignKey = await secSignKey.getRaw();
       } catch(err) {
         return err;
       }
@@ -12,18 +12,11 @@ module.exports = {
     sign: async () => {
       const data = 'test information to be signed';
       try {
-        signedData = await window.safeCryptoSecSignKey.sign(secSignKeyHandle, data);
+        signedData = await secSignKey.sign(data);
       } catch(err) {
         return err;
       }
       return `Returns signed data: ${signedData}`;
-    }, 
-
-    free: () => {
-      window.safeCryptoSecSignKey.free(secSignKeyHandle);
-      secSignKeyHandle = null;
-      return;
-    },
-
+    }
   }
 }
