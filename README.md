@@ -1,24 +1,22 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/2fnekwfbm5h2ayk7/branch/master?svg=true)]
 
 # safe_examples
-Examples showcasing various features of the SAFE Network
+Examples showcasing various features of the SAFE Network.
 
 ## email_app (NodeJS - Electron)
-[email_app](email_app), written in `NodeJS`. Example application to exchange messages.
+[email_app](email_app), written in `NodeJS`, is an application to exchange messages.
 
 ## safe_web_api_playground (NodeJS - Electron)
-[safe_web_api_playground](safe_web_api_playground), written in `NodeJS`. Application to help in exploring the web api.
-
+[safe_web_api_playground](safe_web_api_playground), written in `NodeJS`, is an application allowing you to explore the web API.
 
 ## web_hosting_manager (NodeJS - Electron)
-[web_hosting_manager](web_hosting_manager), written in `NodeJS`. Example application to allow hosting and managing web files.
+[web_hosting_manager](web_hosting_manager), written in `NodeJS`, is an application which allows hosting and managing web files.
 
-
-For more details and build-instructions, please check the corresponding folder's README.
+**Note:** For more details and build-instructions, please check the corresponding folder's README.
 
 ## Packaging
 
-To run a complete package of the email/webhosting apps, (assuming each project has their own dependencies installed) you can run:
+To run a complete package of the email/webhosting apps, (assuming each project has their own dependencies installed) you can:
 
 * Run `yarn` in the root examples directory
 * Run `yarn install-all` to install and build `email_app` and `web_hosting_manager`.
