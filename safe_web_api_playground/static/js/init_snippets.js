@@ -1,38 +1,40 @@
-let safeApp = require('./code-snippets/safeApp');
-let safeImmutableData = require('./code-snippets/safeImmutableData');
-let safeMutableData = require('./code-snippets/safeMutableData');
-let safeMutableDataEntries = require('./code-snippets/safeMutableDataEntries');
-let safeMutableDataMutation = require('./code-snippets/safeMutableDataMutation');
-let safeMutableDataPermissions = require('./code-snippets/safeMutableDataPermissions');
-let safeNfs = require('./code-snippets/safeNfs');
-let safeNfsFile = require('./code-snippets/safeNfsFile');
-let safeCipherOpt = require('./code-snippets/safeCipherOpt');
-let safeCrypto = require('./code-snippets/safeCrypto');
-let safeCryptoEncKeyPair = require('./code-snippets/safeCryptoEncKeyPair');
-let safeCryptoPubEncKey = require('./code-snippets/safeCryptoPubEncKey');
-let safeCryptoSecEncKey = require('./code-snippets/safeCryptoSecEncKey');
-let safeCryptoPubSignKey = require('./code-snippets/safeCryptoPubSignKey');
-let safeCryptoSecSignKey = require('./code-snippets/safeCryptoSecSignKey');
-let safeCryptoSignKeyPair = require('./code-snippets/safeCryptoSignKeyPair');
+const app = require('./code-snippets/app');
+const auth = require('./code-snippets/auth');
+const immutableData = require('./code-snippets/immutableData');
+const mutableData = require('./code-snippets/mutableData');
+const mutableDataEntries = require('./code-snippets/mutableDataEntries');
+const mutableDataMutation = require('./code-snippets/mutableDataMutation');
+const mutableDataPermissions = require('./code-snippets/mutableDataPermissions');
+const nfs = require('./code-snippets/nfs');
+const nfsFile = require('./code-snippets/nfsFile');
+const cipherOpt = require('./code-snippets/cipherOpt');
+const crypto = require('./code-snippets/crypto');
+const cryptoEncKeyPair = require('./code-snippets/cryptoEncKeyPair');
+const cryptoPubEncKey = require('./code-snippets/cryptoPubEncKey');
+const cryptoSecEncKey = require('./code-snippets/cryptoSecEncKey');
+const cryptoPubSignKey = require('./code-snippets/cryptoPubSignKey');
+const cryptoSecSignKey = require('./code-snippets/cryptoSecSignKey');
+const cryptoSignKeyPair = require('./code-snippets/cryptoSignKeyPair');
 //let helpers = require('./code-snippets/helpers');
 
 let codeSnippets = [
-  safeApp,
-  safeImmutableData,
-  safeMutableData,
-  safeMutableDataEntries,
-  safeMutableDataMutation,
-  safeMutableDataPermissions,
-  safeNfs,
-  safeNfsFile,
-  safeCipherOpt,
-  safeCrypto,
-  safeCryptoEncKeyPair,
-  safeCryptoPubEncKey,
-  safeCryptoSecEncKey,
-  safeCryptoPubSignKey,
-  safeCryptoSecSignKey,
-  safeCryptoSignKeyPair
+  app,
+  auth,
+  immutableData,
+  mutableData,
+  mutableDataEntries,
+  mutableDataMutation,
+  mutableDataPermissions,
+  nfs,
+  nfsFile,
+  cipherOpt,
+  crypto,
+  cryptoEncKeyPair,
+  cryptoPubEncKey,
+  cryptoSecEncKey,
+  cryptoPubSignKey,
+  cryptoSecSignKey,
+  cryptoSignKeyPair
 ];
 
 function updateCode(string) {
@@ -143,7 +145,7 @@ codeSnippets.map(function(module) {
   Object.keys(module[moduleName]).map(function(key, i) {
     let anchorEl = window.document.createElement('a');
     anchorEl.setAttribute("onclick", "updateCode(window.snippets." + moduleName + "." + key  + ")");
-    if (key  === 'initialise') {
+    if (key  === 'initialiseApp') {
       anchorEl.setAttribute("class", "snippet bgcolor-blue-500");
     } else {
       anchorEl.setAttribute("class", "snippet");
@@ -164,6 +166,6 @@ codeSnippets.map(function(module) {
 });
 
 let el = document.getElementById('code');
-el.value = safeApp.safeApp.initialise;
+el.value = app.app.initialiseApp;
 
 module.exports = {};

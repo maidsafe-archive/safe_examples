@@ -1,18 +1,18 @@
 module.exports = {
-  safeNfs: {
+  nfs: {
     create: async () => {
-      // Where does nfsHandle come from?
-      // Use safeMutableData.emulateAs to generate nfsHandle
+      // Where does nfs come from?
+      // Use mData.emulateAs to generate nfsHandle
 
       // fileContent can either be a string or a file buffer.
       // Choose a file and then use the line of code directly below to retreive file buffer.
       const fileContent = window.fileContent;
       try {
-        fileContextHandle = await window.safeNfs.create(nfsHandle, fileContent)
+        fileContext = await nfs.create(fileContent)
       } catch(err) {
         return err;
       }
-        return `Returns the file handle of a newly created file: ${fileContextHandle}`;
+        return `Returns the file handle of a newly created file: ${fileContext}`;
     },
 
     fetch: async () => {
@@ -20,36 +20,36 @@ module.exports = {
 
       const fileName = 'index.html';
       try {
-        fileContextHandle = await window.safeNfs.fetch(nfsHandle, fileName)
+        fileContext = await nfs.fetch(fileName)
       } catch(err) {
         return err;
       }
-        return `Returns the file handle: ${fileContextHandle}`;
+        return `Returns the file handle: ${fileContext}`;
     },
 
     insert: async () => {
       const fileName = 'index.html';
       try {
-        fileContextHandle = await window.safeNfs.insert(nfsHandle, fileContextHandle, fileName)
+        fileContext = await nfs.insert(fileName)
       } catch(err) {
         return err;
       }
-        return `Returns same file handle: ${fileContextHandle}`;
+        return `Returns same file handle: ${fileContext}`;
     },
 
     update: async () => {
       try {
-        fileContextHandle = await window.safeNfs.update(nfsHandle, fileContextHandle, fileName, version)
+        fileContext = await nfs.update(fileName, version)
       } catch(err) {
         return err;
       }
-        return `Returns same file handle: ${fileContextHandle}`;
+        return `Returns same file handle: ${fileContext}`;
     },
 
 
     delete: async () => {
       try {
-        await window.safeNfs.delete(nfsHandle, fileName, version)
+        await nfs.delete(fileName, version)
       } catch(err) {
         return err;
       }
@@ -69,18 +69,11 @@ module.exports = {
 
       const openMode = OPEN_MODE_READ;
       try {
-        fileContextHandle = await window.safeNfs.open(nfsHandle, fileContextHandle, openMode)
+        fileContext = await nfs.open(fileContext, openMode)
       } catch(err) {
         return err;
       }
-      return `Returns same file context handle: ${fileContextHandle}`;
-    },
-
-    free: () => {
-      window.safeNfs.free(nfsHandle);
-      nfsHandle = null;
-      return;
+      return `Returns same file context handle: ${fileContext}`;
     }
-
   }
 }

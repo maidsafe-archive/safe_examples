@@ -1,9 +1,9 @@
 module.exports = {
-  safeNfsFile: {
+  nfsFile: {
     size: async () => {
       let fileSize = null;
       try {
-        fileSize = await window.safeNfsFile.size(fileContextHandle)
+        fileSize = await fileContext.size(fileContextHandle)
       } catch(err) {
         return err;
       }
@@ -20,7 +20,7 @@ module.exports = {
       const position = FILE_READ_FROM_BEGIN;
       const len = FILE_READ_TO_END;
       try {
-       var data = await window.safeNfsFile.read(fileContextHandle, position, len)
+       var data = await fileContext.read(fileContextHandle, position, len)
       } catch(err) {
         return err;
       }
@@ -30,7 +30,7 @@ module.exports = {
     write: async () => {
       let content = 'file content may be a string';
       try {
-        await window.safeNfsFile.write(fileContextHandle, content)
+        await fileContext.write(fileContextHandle, content)
       } catch(err) {
         return err;
       }
@@ -39,26 +39,20 @@ module.exports = {
 
     close: async () => {
       try {
-        await window.safeNfsFile.close(fileContextHandle)
+        await fileContext.close(fileContextHandle)
       } catch(err) {
         return err;
       }
-        return 'File closed and committed to the network, if not previsouly!';
+        return 'File closed and committed to the network, if not previously!';
     },
 
     metadata: async () => {
       try {
-        var metaData = await window.safeNfsFile.metadata(fileContextHandle)
+        var metaData = await fileContext.metadata(fileContextHandle)
       } catch(err) {
         return err;
       }
         return `Returns file meta data: ${JSON.stringify(metaData)}`;
-    },
-
-    free: () => {
-      window.safeNfsFile.free(fileContextHandle);
-      fileContextHandle = null;
-      return;
     }
   }
 }

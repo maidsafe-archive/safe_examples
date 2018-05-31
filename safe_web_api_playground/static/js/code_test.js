@@ -13,8 +13,8 @@
   //   scope: null
   // };
   //
-  // const appHandle = await window.safeApp.initialise(appInfo)
-  // console.log('Returns app token: ', appHandle);
+  // const app = await window.safe.initialiseApp(appInfo)
+  // console.log('Returns app interface: ', app);
 
 
 /***********************************************************************************/
