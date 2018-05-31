@@ -34,7 +34,7 @@
     "gulp-watch": "^4.3.11",
     "jquery": "^3.2.1",
     "npm-font-open-sans": "^1.1.0",
-    "safe-styles": "https://github.com/shankar2105/design_system.git",
+    "safe_ux_guidelines": "https://github.com/maidsafe/safe_ux_guidelines.git",
     "vinyl-source-stream": "^1.1.0"
   }
 }
