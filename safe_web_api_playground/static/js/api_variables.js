@@ -34,5 +34,6 @@ module.exports = [
   'serialisedMD',
   'hashedString',
   'mdName',
-  'signedData'
+  'signedData',
+  'value'
 ];
