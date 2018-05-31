@@ -155,7 +155,7 @@ module.exports = {
     get: async () => {
      // get entry valuefrom mutable data by key
       try {
-        var value = await mData.get('key1')
+        value = await mData.get('key1')
       } catch(err) {
         return err;
       }

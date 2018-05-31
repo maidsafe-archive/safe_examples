@@ -121,6 +121,10 @@ const errCase = (type) => {
 	  return 'signedData is not yet defined. Use secSignKey.sign to first obtain signeData';
 	  break;
 
+	case 'value':
+	  return 'value is not yet defined. Use mData.get to first obtain value';
+	  break;
+
         default:
           return 'Error not yet recognized. Please inform developer.';
       }
