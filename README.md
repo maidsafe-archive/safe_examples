@@ -12,6 +12,12 @@ Examples showcasing various features of the SAFE Network.
 ## web_hosting_manager (NodeJS - Electron)
 [web_hosting_manager](web_hosting_manager), written in `NodeJS`, is an application which allows hosting and managing web files.
 
+## safe_app_electron_quick_start (NodeJs - Electron)
+[safe_app_electron_quick_start](safe_app_electron_quick_start), it's a boilerplate with a tutorial to create an [Electron](https://electronjs.org) application.
+
+## safe_web_app_quick_start (NodeJs - SAFE Web API)
+[safe_web_app_quick_start](safe_web_app_quick_start), it's a boilerplate with a tutorial to create a SAFE Web application which uses the Web API to interact with the SAFE Authenticator, and to connect with the SAFE Network.
+
 **Note:** For more details and build-instructions, please check the corresponding folder's README.
 
 ## Packaging
