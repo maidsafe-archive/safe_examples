@@ -1,5 +1,7 @@
 import path from 'path';
+import {remote} from 'electron';
 import pkg from './package.json';
+const isRunningUnpacked = !!process.execPath.match(/[\\/]electron/);
 
 const CONSTANTS = {
   ENV: {
@@ -17,6 +19,7 @@ const CONSTANTS = {
       scope: null,
       name: pkg.productName,
       vendor: pkg.author.name,
+      customExecPath: isRunningUnpacked ? [remote.process.execPath, path.join( __dirname, 'main.prod.js')] : [remote.app.getPath('exe')]
     },
     opt: {
       own_container: false,

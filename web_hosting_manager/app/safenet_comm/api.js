@@ -101,7 +101,8 @@ class SafeApi extends Network {
         try {
           const decPubNameBuf = await pubNamesCntr.decrypt(encPubName);
           const decPubName = decPubNameBuf.toString();
-          if (decPubName !== SAFE_CONSTANTS.MD_METADATA_KEY) {
+          if (decPubName !== SAFE_CONSTANTS.MD_METADATA_KEY ||
+            !decPubName.startsWith('safe://') ) {
             publicNames.push({
               name: decPubName
             });
@@ -126,7 +127,7 @@ class SafeApi extends Network {
 
         const decryptPubNamesQ = [];
         for (const encPubName of encPubNames) {
-          decryptPubNamesQ.push(decryptPublicName(pubNamesCntr, encPubName));
+            decryptPubNamesQ.push(decryptPublicName(pubNamesCntr, encPubName));
         }
 
         await Promise.all(decryptPubNamesQ);
@@ -242,10 +243,17 @@ class SafeApi extends Network {
         try {
           const pubNamesCntr = await this.getPublicNamesContainer();
           const servCntrName = await this.getMDataValueForKey(pubNamesCntr, pubName);
+
           const servCntr = await this.getServicesContainer(servCntrName);
-          const services = await servCntr.getEntries();
-          await services.forEach((key, value) => {
+
+			  const entries = await servCntr.getEntries();
+			  const services = await entries.listEntries();
+
+          services.forEach((entry) => {
+			const key = entry.key;
+			const value  = entry.value;
             const service = key.toString();
+
             // Let's filter out the services which are not web services,
             // i.e. those which don't have a `@<service type>` postfix.
             // Also filter out the MD metadata entry and soft-deleted values.
@@ -254,6 +262,7 @@ class SafeApi extends Network {
                 || service === SAFE_CONSTANTS.MD_METADATA_KEY) {
               return;
             }
+
             serviceList.push({
               name: service,
               xorname: value.buf
@@ -381,6 +390,7 @@ class SafeApi extends Network {
       try {
         const pubCntr = await this.getPublicContainer();
         const serviceFolders = await pubCntr.getKeys();
+
         if (serviceFolders.length !== 0) {
           await serviceFolders.forEach((key) => {
             if (!key) {
@@ -454,8 +464,11 @@ class SafeApi extends Network {
         const servFolderName = await this.getMDataValueForKey(pubCntr, containerName);
         const servFolder = await this.getServiceFolderMD(servFolderName);
         const files = [];
-        const filesPath = await servFolder.getEntries();
-        await filesPath.forEach((key, val) => {
+		const entries = await servFolder.getEntries();
+	    const filesPath = await entries.listEntries();
+        await filesPath.forEach((entry) => {
+		  const key = entry.key;
+		  const value  = entry.value;
           const keyStr = key.toString();
           if ((keyStr.indexOf(containerKey) !== 0) || keyStr === SAFE_CONSTANTS.MD_METADATA_KEY) {
             return;
@@ -509,8 +522,11 @@ class SafeApi extends Network {
 
         await this._checkMDAccessible(servFolder);
 
-        const filePaths = await servFolder.getEntries();
-        await filePaths.forEach((key, val) => {
+	        const entries = await servFolder.getEntries();
+	        const filePaths = await entries.listEntries();
+        await filePaths.forEach((entry) => {
+			const key = entry.key;
+			const value  = entry.value;
           if (val.buf.length === 0) {
             return;
           }
@@ -679,7 +695,7 @@ class SafeApi extends Network {
     /* eslint-enable class-methods-use-this */
     return new Promise(async (resolve, reject) => {
       try {
-        const entries = await md.getEntries();
+	        const entries = await md.getEntries();
         const val = await entries.get(key);
         if (ifEmpty && val.buf.length !== 0) {
           return reject(makeError(CONSTANTS.APP_ERR_CODE.ENTRY_VALUE_NOT_EMPTY, 'Entry value is not empty'));
@@ -740,8 +756,11 @@ class SafeApi extends Network {
       try {
         const publicMd = await this.getPublicContainer();
         const entries = await publicMd.getEntries();
-        await entries.forEach((key, val) => {
-          if (val.buf.equals(serviceXorName)) {
+		const entryList = await entries.listEntries();
+        entryList.forEach ((entry) => {
+			const key = entry.key;
+			const value  = entry.value;
+          if (value.buf.equals(serviceXorName)) {
             servicePath = key.toString();
           }
         });

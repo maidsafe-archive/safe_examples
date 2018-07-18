@@ -1,4 +1,4 @@
-import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
+import { initialiseApp, fromAuthUri } from '@maidsafe/safe-node-app';
 
 import makeError from './error';
 import CONSTANTS from '../constants';
@@ -31,7 +31,7 @@ export default class Network {
    */
   async requestAuth() {
     try {
-      const app = await initializeApp(this[_appInfo].info, null, { libPath: this[_libPath] });
+      const app = await initialiseApp(this[_appInfo].info, null, { libPath: this[_libPath] });
       const resp = await app.auth.genAuthUri(this[_appInfo].permissions, this[_appInfo].opts);
       // commented out until system_uri open issue is solved for osx
       // await app.auth.openUri(resp.uri);
@@ -76,7 +76,7 @@ export default class Network {
     }
 
     try {
-      this[_app] = await fromAuthURI(this[_appInfo].info, uri, netStatusCallback,
+      this[_app] = await fromAuthUri(this[_appInfo].info, uri, netStatusCallback,
         { libPath: this[_libPath] });
       await this.app.auth.refreshContainersPermissions();
       netStatusCallback(CONSTANTS.NETWORK_STATE.CONNECTED);
@@ -135,8 +135,12 @@ export default class Network {
       });
 
       const servCntr = await this.getServicesContainer(servCntrName);
-      const services = await servCntr.getEntries();
-      await services.forEach((key, val) => {
+      const entries = await servCntr.getEntries();
+      const services = await entries.listEntries();
+
+      services.forEach((entry) => {
+		const key = entry.key;
+		const value  = entry.value;
         const service = key.toString();
         // Let's filter out the services which are not web services,
         // i.e. those which don't have a `@<service type>` postfix.
@@ -164,7 +168,7 @@ export default class Network {
    */
   async authoriseMock() {
     try {
-      this[_app] = await initializeApp(this[_appInfo].info, null, { libPath: this[_libPath] });
+      this[_app] = await initialiseApp(this[_appInfo].info, null, { libPath: this[_libPath] });
       await this.app.auth.loginForTest(this[_appInfo].permissions);
       return;
     } catch (err) {
