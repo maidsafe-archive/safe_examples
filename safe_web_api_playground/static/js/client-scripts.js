@@ -117,9 +117,10 @@ function handleSubmit() {
         }
       }
 
-    })
+    });
   } catch (e) {
     console.log('Unhandled error: ', e);
+    loader.parentNode.removeChild(loader);
   }
 }
 
