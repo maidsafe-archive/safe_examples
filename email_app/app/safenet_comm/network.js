@@ -30,12 +30,12 @@ const DEVELOPMENT = 'dev';
 const nodeEnv = process.env.NODE_ENV || DEVELOPMENT
 
 let libPath;
-
 if (nodeEnv === DEVELOPMENT) {
   libPath = CONSTANTS.DEV_LIB_PATH;
 } else {
   libPath = CONSTANTS.ASAR_LIB_PATH;
 }
+console.log('LIIIIBPATHHHHH', libPath)
 
 /*
 * A request to share access to a Mutable Data structure becomes necessary when\
