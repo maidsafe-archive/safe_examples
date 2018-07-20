@@ -1,5 +1,5 @@
 import { shell } from 'electron';
-import { initializeApp, fromAuthURI } from '@maidsafe/safe-node-app';
+import { initialiseApp, fromAuthUri } from '@maidsafe/safe-node-app';
 import { getAuthData, saveAuthData, clearAuthData,
   parseUrl, showError } from '../utils/app_utils';
 import pkg from '../../package.json';
@@ -58,7 +58,7 @@ export const requestShareMdAuth = async (app, mdPermissions) => {
 
 const requestAuth = async () => {
   try {
-    const app = await initializeApp(APP_INFO.info, null, { libPath });
+    const app = await initialiseApp(APP_INFO.info, null, { libPath });
     const resp = await app.auth.genAuthUri(APP_INFO.permissions, APP_INFO.opts);
     // commented out until system_uri open issue is solved for osx
     // await app.auth.openUri(resp.uri);
@@ -76,14 +76,14 @@ const requestAuth = async () => {
 */
 export const authApp = async (netStatusCallback) => {
   if (process.env.SAFE_FAKE_AUTH) {
-    const app = await initializeApp(APP_INFO.info, null, { libPath });
+    const app = await initialiseApp(APP_INFO.info, null, { libPath });
     return app.auth.loginForTest(APP_INFO.permissions);
   }
 
   const uri = getAuthData();
   if (uri) {
     try {
-      const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
+      const registeredApp = await fromAuthUri(APP_INFO.info, uri, netStatusCallback, { libPath });
       await registeredApp.auth.refreshContainersPermissions();
       return registeredApp;
     } catch (err) {
@@ -101,7 +101,7 @@ export const authApp = async (netStatusCallback) => {
 */
 export const connect = async (uri, netStatusCallback) => {
   try {
-    const registeredApp = await fromAuthURI(APP_INFO.info, uri, netStatusCallback, { libPath });
+    const registeredApp = await fromAuthUri(APP_INFO.info, uri, netStatusCallback, { libPath });
     // synchronous
     saveAuthData(uri);
     await registeredApp.auth.refreshContainersPermissions();

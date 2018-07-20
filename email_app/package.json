@@ -98,7 +98,7 @@
     "webpack-merge": "^0.14.1"
   },
   "dependencies": {
-    "@maidsafe/safe-node-app": "0.7.0",
+    "@maidsafe/safe-node-app": "git+https://github.com/joshuef/safe_app_nodejs#0585af43b8982d6f728505c43e985a92ca0fb209",
     "axios": "^0.14.0",
     "babel-plugin-transform-class-properties": "^6.23.0",
     "babel-polyfill": "^6.26.0",

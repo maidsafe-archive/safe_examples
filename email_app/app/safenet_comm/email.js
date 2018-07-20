@@ -10,8 +10,11 @@ const fetchPublicIds = async (app) => {
   try {
     const pubNamesMd = await app.auth.getContainer(netFns.APP_INFO.containers.publicNames);
     const entries = await pubNamesMd.getEntries();
-    await entries.forEach((key, value) => {
-      rawEntries.push({key, value});
+    const pubNames = await entries.listEntries();
+
+    await pubNames.forEach((entry => {
+
+      rawEntries.push({entty.key,entry.value});
     });
 
     await Promise.all(rawEntries.map( async (entry) => {
@@ -21,10 +24,12 @@ const fetchPublicIds = async (app) => {
 
       const decKey = await pubNamesMd.decrypt(entry.key);
       const id = decKey.toString();
-      if (id === CONSTANTS.MD_META_KEY) { // Skip the metadata entry
+      if (id === CONSTANTS.MD_META_KEY || !id.startsWith('safe://')  ) {
+          // Skip the metadata or RDF publicName entry
         return Promise.resolve();
       }
       const service = await pubNamesMd.decrypt(entry.value.buf);
+
       publicIds.push({ id, service });
     }));
 
@@ -145,7 +150,11 @@ const decryptEmail = async (app, account, key, value, cb) => {
 export const readInboxEmails = async (app, account, cb) => {
   try {
     const entries = await account.inboxMd.getEntries();
-    await entries.forEach((key, value) => {
+    const inboxList = await entries.listEntries();
+
+    await inboxList.forEach((entry) => {
+      const key = entry.key;
+      const value = entry.value;
       if (key.toString() !== CONSTANTS.MD_KEY_EMAIL_ENC_PUBLIC_KEY) {
         return decryptEmail(app, account, key, value.buf, cb);
       }
@@ -160,7 +169,11 @@ export const readInboxEmails = async (app, account, cb) => {
 export const readArchivedEmails = async (app, account, cb) => {
   try {
     const entries = await account.archiveMd.getEntries();
-    await entries.forEach((key, value) => {
+    const archiveList = await entries.listEntries();
+
+    await archiveList.forEach((entry) => {
+      const key = entry.key;
+      const value = entry.value;
       return decryptEmail(app, account, key, value.buf, cb);
     })
   } catch (err) {
@@ -335,7 +348,7 @@ export const setupAccount = async (app, emailId) => {
 */
 export const connectWithSharedMd = async (app, uri, serviceToRegister) => {
   try {
-    await app.auth.loginFromURI(uri);
+    await app.auth.loginFromUri(uri);
     await app.auth.refreshContainersPermissions();
     return registerEmailService(app, serviceToRegister);
   } catch (err) {
