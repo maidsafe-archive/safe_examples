@@ -12,9 +12,9 @@ const fetchPublicIds = async (app) => {
     const entries = await pubNamesMd.getEntries();
     const pubNames = await entries.listEntries();
 
-    pubNames.forEach((entry => {
+    pubNames.forEach( entry => {
 
-      rawEntries.push({entry.key ,entry.value});
+      rawEntries.push({ key: entry.key , value: entry.value });
     });
 
     await Promise.all(rawEntries.map( async (entry) => {
