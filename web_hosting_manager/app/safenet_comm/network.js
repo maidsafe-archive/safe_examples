@@ -146,12 +146,12 @@ export default class Network {
         // i.e. those which don't have a `@<service type>` postfix.
         // Also filter out the MD metadata entry and soft-deleted values.
         if ((service.indexOf(CONSTANTS.SERVICE_TYPE_POSTFIX_DELIM) !== -1)
-          || (val.buf.length === 0) || service === SAFE_CONSTANTS.MD_METADATA_KEY) {
+          || (value.buf.length === 0) || service === SAFE_CONSTANTS.MD_METADATA_KEY) {
           return;
         }
         mdPermissions.push({
           type_tag: CONSTANTS.TYPE_TAG.WWW,
-          name: val.buf,
+          name: value.buf,
           perms: ['Insert', 'Update', 'Delete'],
         });
       });

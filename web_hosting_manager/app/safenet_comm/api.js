@@ -101,7 +101,8 @@ class SafeApi extends Network {
         try {
           const decPubNameBuf = await pubNamesCntr.decrypt(encPubName);
           const decPubName = decPubNameBuf.toString();
-          if (decPubName !== SAFE_CONSTANTS.MD_METADATA_KEY ||
+
+          if (decPubName !== SAFE_CONSTANTS.MD_METADATA_KEY &&
             !decPubName.startsWith('safe://') ) {
             publicNames.push({
               name: decPubName
@@ -244,6 +245,10 @@ class SafeApi extends Network {
           const pubNamesCntr = await this.getPublicNamesContainer();
           const servCntrName = await this.getMDataValueForKey(pubNamesCntr, pubName);
 
+		  if( !servCntrName.length )
+		  {
+			 resolve();
+		  }
           const servCntr = await this.getServicesContainer(servCntrName);
 
 			  const entries = await servCntr.getEntries();
@@ -473,10 +478,10 @@ class SafeApi extends Network {
           if ((keyStr.indexOf(containerKey) !== 0) || keyStr === SAFE_CONSTANTS.MD_METADATA_KEY) {
             return;
           }
-          if (val.buf.length === 0) {
+          if (value.buf.length === 0) {
             return;
           }
-          files.push({ path: keyStr, version: val.version });
+          files.push({ path: keyStr, version: value.version });
         });
         const nfs = servFolder.emulateAs('NFS');
         await deleteFiles(nfs, files);
@@ -527,7 +532,7 @@ class SafeApi extends Network {
         await filePaths.forEach((entry) => {
 			const key = entry.key;
 			const value  = entry.value;
-          if (val.buf.length === 0) {
+          if (value.buf.length === 0) {
             return;
           }
           const keyStr = key.toString();
@@ -657,6 +662,12 @@ class SafeApi extends Network {
       try {
         const encKey = await md.encryptKey(key);
         const value = await md.get(encKey);
+
+		if( value.buf.length === 0 )
+		{
+			resolve('');
+		}
+
         const result = await md.decrypt(value.buf);
         resolve(result);
       } catch (err) {
@@ -718,7 +729,7 @@ class SafeApi extends Network {
         const entries = await md.getEntries();
         const value = await entries.get(key);
         const mut = await entries.mutate();
-        await mut.remove(key, value.version + 1);
+        await mut.delete(key, value.version + 1);
         await md.applyEntriesMutation(mut);
         resolve(true);
       } catch (err) {

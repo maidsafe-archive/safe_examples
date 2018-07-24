@@ -66,9 +66,10 @@ export default class AppLogs extends Component {
   }
 
   render() {
+	const logPath = this.logPath | '';
     return (
       <div className="app-logs">
-        <h3 className="_title">App logs</h3>
+        <h3 className="_title">{`App Logs: ${logPath}`}</h3>
         <div className="_opts">
           <div className="_opt left">
             <button className="btn" onClick={e => {e.preventDefault(); this.props.history.go(-1);}}>Back</button>
