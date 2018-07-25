@@ -47,7 +47,7 @@ angular.module('tripsPlanner', [])
       });
 
       if (tripsToRemove.length > 0) {
-        await safenetwork.removeItems(tripsToRemove);
+        await safenetwork.deleteItems(tripsToRemove);
         await tripsList.refreshList();
       }
     };

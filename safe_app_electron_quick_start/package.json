@@ -1,6 +1,6 @@
 {
   "name": "safe_app_electron_quick_start",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimal SAFE App application with Electron",
   "main": "main.js",
   "scripts": {
