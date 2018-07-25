@@ -29,9 +29,15 @@ In this tutorial we will be using the SAFE Browser package that is built to work
 $ export NODE_ENV=dev
 ```
 
-If you are using Windows you can set it with the following command instead:
-```bash
+If you are using Windows you can set it with the following commands instead.
+
+Command prompt:
+```
 $ set NODE_ENV=dev
+```
+Powershell:
+```
+$ $env:NODE_ENV = "dev"
 ```
 
 You can now launch the browser (make sure you launch it from the same console where you just set the NODE_ENV variable), please create an account from the Authenticator. You can enter any string when you are requested for the “Invitation token”.

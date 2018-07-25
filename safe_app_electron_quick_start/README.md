@@ -38,6 +38,10 @@ Command prompt
 ```
 $ set NODE_ENV=dev
 ```
+Powershell:
+```
+$ $env:NODE_ENV = "dev"
+```
 
 Powershell
 ```
