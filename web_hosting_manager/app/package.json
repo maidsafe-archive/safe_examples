@@ -15,7 +15,7 @@
   },
   "license": "MIT",
   "dependencies": {
-	"@maidsafe/safe-node-app": "git+https://github.com/joshuef/safe_app_nodejs#0585af43b8982d6f728505c43e985a92ca0fb209",
+	"@maidsafe/safe-node-app": "git+https://github.com/joshuef/safe_app_nodejs#2869418d9c29d85854f82f6d4437940de8ed8e41",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "npm-font-open-sans": "^1.1.0",
