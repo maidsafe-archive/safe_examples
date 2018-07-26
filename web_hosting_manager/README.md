@@ -18,19 +18,23 @@ $ yarn
 ```
 Set `NODE_ENV=dev` to use Mock Vault. By deafult it uses Actual Network Or set `NODE_ENV=prod` to use Actual Network.
 
-## Run
+## Run Dev Mode
 
 ```bash
 $ yarn start
 ```
 
-To open application on development environment run `yarn dev`
+To open application on development environment run `yarn dev`.
+
+Note: Currently not working in osx.
 
 ### Authorising against Mock
 
 To simplify the auth process, as web-hosting can't received a response when running in dev mode.
 
 Run the app, and in the main menu, select `Simulate Mock Response`, and you're good to go.
+
+Alternatively, to run against a mock versio of the browser (after installing in a dev environment), you can trigger 'dev' libs via setting your env to be `NODE_ENV=test`.
 
 ## Packaging
 

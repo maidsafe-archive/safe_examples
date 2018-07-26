@@ -113,6 +113,10 @@ class SafeApi extends Network {
           if (err.code === CONSTANTS.ERROR_CODE.SYMMETRIC_DECIPHER_FAILURE) {
             return resolve(true);
           }
+          if (err.message && err.message.match('IoError: failed to fill whole buffer')) {
+			// one entry is unencrypted... so we ignore it...
+            return resolve(true);
+          }
           reject(err);
         }
       })
