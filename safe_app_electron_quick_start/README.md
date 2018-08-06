@@ -8,7 +8,7 @@ We are going to use the [SAFE App Electron quick start](https://github.com/maids
 
 The boilerplate implements a simple single page application using [Angular.js](https://angularjs.org) for rendering the UI components and the data. The application implements a trip planner, showing the list of trips planned by the user, allowing him/her to add or remove trips from the list. In this tutorial, we will be adding the implementation to store (and retrieve) the list of planned trips in the SAFE Network.
 
-<a name="Pre-requisites"></a>
+<a name="pre-requisites"></a>
 ## Pre-requisites
 
 First you need to make sure you have the following tools installed to be able to work with this tutorial:
@@ -33,13 +33,13 @@ In this tutorial we will be using the SAFE Browser package that is built to work
 $ export NODE_ENV=dev
 ```
 
-If you are using Windows you can set it with the following commands instead.
-
-Command prompt:
+If you are using Windows you can set it with the following commands instead:
+Command prompt
 ```
 $ set NODE_ENV=dev
 ```
-Powershell:
+
+Powershell
 ```
 $ $env:NODE_ENV = "dev"
 ```
@@ -55,7 +55,7 @@ We first clone the repo which contains the boilerplate using `git` onto a local 
 $ git clone https://github.com/maidsafe/safe_examples safe_examples
 ```
 
-As mentioned above in the [pre-requisites](#Pre-requisites) section, it's recommended to use the browser built for mock routing for this tutorial, therefore we need to also make sure to signal our application that it needs to use the SAFE libraries required to connect to the mock routing as well. We do this by setting the `NODE_ENV` environment variable:
+As mentioned above in the [pre-requisites](#pre-requisites) section, it's recommended to use the browser built for mock routing for this tutorial, therefore we need to also make sure to signal our application that it needs to use the SAFE libraries required to connect to the mock routing as well. We do this by setting the `NODE_ENV` environment variable:
 ```bash
 $ export NODE_ENV=dev
 ```
@@ -98,7 +98,7 @@ A SAFE application needs to get an authorisation from the user before being able
 
 We first need to generate a `SAFEApp` instance by calling the `initialiseApp` function of the API, providing information about the application (this information is displayed to the user when requesting the authorisation):
 ```js
-let appInfo = {
+const appInfo = {
   name: 'Hello SAFE Network',
   id: 'net.maidsafe.tutorials.nodejs',
   version: '0.1.0',
@@ -106,7 +106,12 @@ let appInfo = {
   bundle: 'com.github.electron',
   customExecPath
 };
-let safeApp = await safeNodeApp.initializeApp(appInfo);
+
+const opts = {
+  forceUseMock: true
+};
+
+let safeApp = await safeNodeApp.initialiseApp(appInfo, null, opts);
 ```
 
 We are using `await` to call the `initialiseApp` function since it's asynchronous as most of the functions exposed by the `safe-app-nodejs` API. You can also use JavaScript `Promises` if you prefer.
@@ -137,7 +142,7 @@ let safeApp;
 
 async function sendAuthRequest() {
   console.log('Authorising SAFE application...');
-  let appInfo = {
+  const appInfo = {
     // User-facing name of our app. It will be shown
     // in the Authenticator user's interface.
     name: 'Hello SAFE Network',
@@ -148,7 +153,12 @@ async function sendAuthRequest() {
     bundle: 'com.github.electron',
     customExecPath
   };
-  safeApp = await safeNodeApp.initializeApp(appInfo);
+
+  const opts = {
+    forceUseMock: true
+  };
+
+  safeApp = await safeNodeApp.initialiseApp(appInfo, null, opts);
   const authUri = await safeApp.auth.genAuthUri({});
   await safeApp.auth.openUri(authUri);
 }
@@ -159,7 +169,7 @@ As you can see, we declare the `safeApp` variable outside the function since we 
 
 The `sendAuthReq` function is invoked when the application's window is loaded, this is part of the code we inherited with the boilerplate. You can look at the code in `controller.js` if you are interested in it.
 
-We can now launch our application again to verify that now it's able to generate the authorisation request and send it to the Authenticator. Make sure you launch the SAFE Browser and log in using the Authenticator ([see the pre-requisites section](#Pre-requisites)) before running the application:
+We can now launch our application again to verify that now it's able to generate the authorisation request and send it to the Authenticator. Make sure you launch the SAFE Browser and log in using the Authenticator ([see the pre-requisites section](#pre-requisites)) before running the application:
 ```bash
 $ npm start
 ```
@@ -175,7 +185,7 @@ async function uponAuthResponse(resAuthUri) {
 ## Connecting to the SAFE Network
 We can now use the authorisation URI we received from the Authenticator to connect to the SAFE Network. In order to do this we simply call the `loginFromUri` API function:
 ```js
-await safeApp.auth.loginFromURI(resAuthUri);
+await safeApp.auth.loginFromUri(resAuthUri);
 ```
 
 This function will decode the authorisation URI and create a connection with the SAFE Network using the credentials obtained from it.
@@ -218,7 +228,7 @@ let md;
 async function uponAuthResponse(resAuthUri) {
   console.log("Authorisation response received");
 
-  await safeApp.auth.loginFromURI(resAuthUri);
+  await safeApp.auth.loginFromUri(resAuthUri);
   console.log("Application connected to the network");
 
   const typeTag = 15000;
@@ -246,11 +256,13 @@ We now have our MutableData stored on the network with an initial set of key-val
 ```js
 async function getItems() {
   const entries = await md.getEntries();
+  let entriesList = await entries.listEntries();
   let items = [];
-  await entries.forEach((key, value) => {
+  entriesList.forEach((entry) => {
+    const value = entry.value;
     if (value.buf.length == 0) return;
     const parsedValue = JSON.parse(value.buf);
-    items.push({ key: key, value: parsedValue, version: value.version });
+    items.push({ key: entry.key, value: parsedValue, version: value.version });
   });
   return items;
 };
@@ -289,7 +301,7 @@ Let's now run the application and try to add a new trip to the list, the applica
 Note that since we are creating a MutableData at a random location each time the application loads, any new items/trips the user inserts won't be displayed after restarting the application. This can obviously be changed by storing the MutableData at a custom location that can be found each time the application loads. We are leaving this out of the scope of this tutorial for the sake of simplicity.
 
 ## Update and remove entries
-As we saw above, to update or remove entries we just need to create a mutation transaction, with "update" and/or "remove" actions, and apply the mutations to the MutableData. Let's fill up the body of the `updateItem` and `removeItems` functions to respectively perform these mutations on our MutableData:
+As we saw above, to update or remove entries we just need to create a mutation transaction, with "update" and/or "remove" actions, and apply the mutations to the MutableData. Let's fill up the body of the `updateItem` and `deleteItems` functions to respectively perform these mutations on our MutableData:
 ```js
 async function updateItem(key, value, version) {
   const mutations = await safeApp.mutableData.newMutation();
@@ -297,10 +309,10 @@ async function updateItem(key, value, version) {
   await md.applyEntriesMutation(mutations);
 };
 
-async function removeItems(items) {
+async function deleteItems(items) {
   const mutations = await safeApp.mutableData.newMutation();
   items.forEach(async (item) => {
-    await mutations.remove(item.key, item.version + 1);
+    await mutations.delete(item.key, item.version + 1);
   });
   await md.applyEntriesMutation(mutations);
 };
@@ -313,6 +325,6 @@ Also bear in mind that when you remove and entry it is never deleted from the Mu
 if (value.buf.length == 0) return;
 ```
 
-The `removeItems` is invoked when the user selects some of the trips from the list and then clicks on "remove trips already made". As you can see we receive a list of items to be removed and we are able to add a "remove" action for each of them into the mutation transaction before we actually send the mutation request to the network when invoking `applyEntriesMutation`. This is to reduce the network traffic needed to perform several mutations on a single MutableData.
+The `deleteItems` is invoked when the user selects some of the trips from the list and then clicks on "remove trips already made". As you can see we receive a list of items to be removed and we are able to add a "remove" action for each of them into the mutation transaction before we actually send the mutation request to the network when invoking `applyEntriesMutation`. This is to reduce the network traffic needed to perform several mutations on a single MutableData.
 
 Note that the boilerplate code doesn't have the implementation in the UI to be able to update trips, but we jut added the implementation for updating the items on the MutableData entries, so go ahead and try to add the UI components to allow the user to do this ;)

@@ -18,7 +18,7 @@ async function insertItem(key, value) {
 async function updateItem(key, value, version) {
 };
 
-async function removeItems(items) {
+async function deleteItems(items) {
 };
 
 module.exports = {
@@ -27,5 +27,5 @@ module.exports = {
   getItems,
   insertItem,
   updateItem,
-  removeItems
+  deleteItems
 };
