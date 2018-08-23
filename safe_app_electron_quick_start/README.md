@@ -1,4 +1,4 @@
-# SAFE Desktop App Tutorial
+﻿# SAFE Desktop App Tutorial
 
 In this tutorial, we will create an [Electron](https://electronjs.org) application. Electron allows you to create and build cross-platforms desktop applications using JavaScript.
 
@@ -307,3 +307,11 @@ if (value.buf.length == 0) return;
 The `deleteItems` is invoked when the user selects some of the trips from the list and then clicks on "remove trips already made". As you can see we receive a list of items to be removed and we are able to add a "remove" action for each of them into the mutation transaction before we actually send the mutation request to the network when invoking `applyEntriesMutation`. This is to reduce the network traffic needed to perform several mutations on a single MutableData.
 
 Note that the boilerplate code doesn't have the implementation in the UI to be able to update trips, but we jut added the implementation for updating the items on the MutableData entries, so go ahead and try to add the UI components to allow the user to do this ;)
+
+## License
+
+This SAFE Network library is dual-licensed under the Modified BSD ([LICENSE-BSD](LICENSE-BSD) https://opensource.org/licenses/BSD-3-Clause) or the MIT license ([LICENSE-MIT](LICENSE-MIT) https://opensource.org/licenses/MIT) at your option.
+
+## Contribution
+
+Copyrights in the SAFE Network are retained by their contributors. No copyright assignment is required to contribute to this project.

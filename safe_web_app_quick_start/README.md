@@ -1,4 +1,4 @@
-# SAFE Web App Tutorial
+﻿# SAFE Web App Tutorial
 
 In this tutorial we will create a SAFE Web application which uses the Web API to interact with the SAFE Authenticator, and to connect with the SAFE Network.
 
@@ -252,3 +252,11 @@ if (value.buf.length == 0) return;
 ```
 
 Note that the boilerplate code doesn't have the implementation in the UI to be able to update trips, but we jut added the implementation for updating the items on the MutableData entries, so go ahead and try to add the UI components to allow the user to do this ;)
+
+## License
+
+This SAFE Network library is dual-licensed under the Modified BSD ([LICENSE-BSD](LICENSE-BSD) https://opensource.org/licenses/BSD-3-Clause) or the MIT license ([LICENSE-MIT](LICENSE-MIT) https://opensource.org/licenses/MIT) at your option.
+
+## Contribution
+
+Copyrights in the SAFE Network are retained by their contributors. No copyright assignment is required to contribute to this project.
