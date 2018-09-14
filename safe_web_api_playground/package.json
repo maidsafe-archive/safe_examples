@@ -21,7 +21,7 @@
   "dependencies": {
     "babelify": "^7.3.0",
     "body-parser": "^1.17.2",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^4.1.3",
     "browserify": "^14.4.0",
     "codemirror": "^5.33.0",
     "envfile": "^2.1.1",
