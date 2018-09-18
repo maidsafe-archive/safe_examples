@@ -78,7 +78,7 @@ module.exports = {
 
       const permissions = [
         {
-          type_tag: 15001,
+          typeTag: 15001,
           name: mdName,
           perms: ['Insert']
         }
