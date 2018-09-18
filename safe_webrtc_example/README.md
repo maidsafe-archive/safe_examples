@@ -1,7 +1,7 @@
 # SAFE WebRTC Example
 Webrtc secure signalling example application on SAFE Network.
 
-> NOTE: This application is supported only on the latest [SAFE Browser](https://github.com/maidsafe/safe_browser/releases).
+> NOTE: This application is supported only on the latest [SAFE Browser](https://github.com/maidsafe/safe_browser/releases/latest).
 # Install
 
 First, clone the repo via git:
