@@ -7,16 +7,11 @@ Instead of having to upload your site to the network every time you want to test
 
 ###### SETUP
 
-- clone this repository and `cd` into the respective directory
+- Clone this repository and `cd` into the respective directory
 - Run `yarn`
 - Run `yarn gulp` to start server
-- Visit `localhost://p:3003` in your mock SAFE browser to see page
-- Be sure that `File > SAFE Browsing Enabled` is unchecked
-- If you are using our new [Peruse](https://github.com/joshuef/peruse) browser, then you'll be navigating to `http://localhost:3003`.
+- Visit `localhost:3003` in your SAFE browser to see page
 
 To upload this site to the network:
  - Run `npm run gulp` and observe the `build` directory that's created
- - Using [web_hosting_manager](https://github.com/maidsafe/safe_examples/tree/master/web_hosting_manager), simply upload the `build` directory
-
-See docs for more detail of expected return values and other information:
-http://docs.maidsafe.net/beaker-plugin-safe-app/
+ - Using [web_hosting_manager](https://github.com/maidsafe/safe-web-hosting-manager-electron/releases/latest), simply upload the `build` directory
