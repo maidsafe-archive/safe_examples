@@ -12,14 +12,14 @@ module.exports = {
         // You must now run safeMutableData.applyEntriesMutation(mdHandle, mutationHandle) to save changes.
     },
 
-    remove: async () => {
+    delete: async () => {
       // Use safeMutableData.newMutation to obtain mutationHandle
       try {
-        await window.safeMutableDataMutation.remove(mutationHandle, 'key1', value.version + 1)
+        await window.safeMutableDataMutation.delete(mutationHandle, 'key1', value.version + 1)
       } catch(err) {
         return err;
       }
-      return 'Registers a remove operation with mutation handle, later to be applied.' + _;
+      return 'Registers a delete operation with mutation handle, later to be applied.' + _;
 
       	// You must now run safeMutableData.applyEntriesMutation(mdHandle, mutationHandle) to save changes
     },
