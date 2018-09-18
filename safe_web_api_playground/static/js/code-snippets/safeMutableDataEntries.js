@@ -22,20 +22,21 @@ module.exports = {
       return `Value: ${value.buf}`;
     },
 
-    forEach: async () => {
+    listEntries: async () => {
       // Use safeMutableData.getEntries to obtain entriesHandle
 
-      // Look for console log output in your safe browser console, not this console
       try {
-        await window.safeMutableDataEntries.forEach(entriesHandle, (key, value) => {
-
-          console.log(key + ': ' + value.buf);
-
-        })
+        var entriesArray = await window.safeMutableDataEntries.listEntries(entriesHandle);
+        entriesArray.forEach((entry) => {
+          const key = entry.key.toString();
+          const value = entry.value.buf.toString();
+          console.log('Key: ', key);
+          console.log('Value: ', value);
+        });
       } catch(err) {
         return err;
       }
-      return 'Iteration complete';
+      return entriesArray;
     },
 
     insert: async () => {
