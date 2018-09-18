@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hunterlester/safe_dom_api_playground.git"
+    "url": "git+https://github.com/maidsafe/safe_examples.git"
   },
   "author": "Hunter Lester <hunter.lester@maidsafe.net>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hunterlester/safe_dom_api_playground/issues"
+    "url": "https://github.com/maidsafe/safe_examples/issues"
   },
-  "homepage": "https://github.com/hunterlester/safe_dom_api_playground#readme",
+  "homepage": "https://github.com/maidsafe/safe_examples/blob/master/safe_web_api_playground/README.md",
   "dependencies": {
     "babelify": "^7.3.0",
     "body-parser": "^1.17.2",

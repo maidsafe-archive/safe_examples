@@ -169,7 +169,7 @@ module.exports = {
 
     getOwnContainer: async () => {
       try {
-        mData = await app.auth.getOwnContainer(appHandle);
+        mData = await app.auth.getOwnContainer();
       } catch (err) {
         return err;
       }
@@ -178,7 +178,7 @@ module.exports = {
 
     getOwnContainerName: async () => {
       try {
-        var containerName = await app.auth.getOwnContainerName();
+        var containerName = await app.getOwnContainerName();
       } catch(err) {
         return err;
       }
@@ -188,7 +188,7 @@ module.exports = {
     getContainer: async () => {
       const container = '_public';
       mData = await app.auth.getContainer(container);
-      return `Returns handle to Mutable Data behind ${container} container: ${mdHandle}` 
+      return `Returns handle to Mutable Data behind ${container} container: ${mData}` 
     },
 
   }
