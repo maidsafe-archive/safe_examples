@@ -8,11 +8,11 @@ module.exports = {
       // Choose a file and then use the line of code directly below to retreive file buffer.
       const fileContent = window.fileContent;
       try {
-        fileContext = await nfs.create(fileContent)
+        fileContext = await nfs.create(fileContent);
       } catch(err) {
         return err;
       }
-        return `Returns the file handle of a newly created file: ${fileContext}`;
+        return `Returns file context object: ${fileContext}`;
     },
 
     fetch: async () => {
@@ -20,36 +20,39 @@ module.exports = {
 
       const fileName = 'index.html';
       try {
-        fileContext = await nfs.fetch(fileName)
+        fileContext = await nfs.fetch(fileName);
       } catch(err) {
         return err;
       }
-        return `Returns the file handle: ${fileContext}`;
+        return `Returns file context object: ${fileContext}`;
     },
 
     insert: async () => {
       const fileName = 'index.html';
+      const userMetaData = 'Arbitrary meta data';
       try {
-        fileContext = await nfs.insert(fileName)
+        fileContext = await nfs.insert(fileName, fileContext, userMetaData);
       } catch(err) {
         return err;
       }
-        return `Returns same file handle: ${fileContext}`;
+        return `Returns file context object: ${fileContext}`;
     },
 
     update: async () => {
+      const fileName = 'index.html';
+      const userMetaData = 'Updated arbitrary meta data';
       try {
-        fileContext = await nfs.update(fileName, version)
+        fileContext = await nfs.update(fileName, fileContext, version, userMetaData);
       } catch(err) {
         return err;
       }
-        return `Returns same file handle: ${fileContext}`;
+        return `Returns file context object: ${fileContext}`;
     },
 
 
     delete: async () => {
       try {
-        await nfs.delete(fileName, version)
+        await nfs.delete(fileName, version);
       } catch(err) {
         return err;
       }
@@ -69,7 +72,7 @@ module.exports = {
 
       const openMode = OPEN_MODE_READ;
       try {
-        fileContext = await nfs.open(fileContext, openMode)
+        fileContext = await nfs.open(fileContext, openMode);
       } catch(err) {
         return err;
       }
