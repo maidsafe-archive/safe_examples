@@ -19,7 +19,7 @@ module.exports = [
   'pubSignKey',
   'secSignKey',
   'version',
-  'fileContext ',
+  'fileContext',
   'pubEncKey',
   'secEncKey',
   'encKeyPair',

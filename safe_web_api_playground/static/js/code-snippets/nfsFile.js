@@ -1,9 +1,8 @@
 module.exports = {
   nfsFile: {
     size: async () => {
-      let fileSize = null;
       try {
-        fileSize = await fileContext.size(fileContextHandle)
+        var fileSize = await fileContext.size();
       } catch(err) {
         return err;
       }
@@ -20,7 +19,7 @@ module.exports = {
       const position = FILE_READ_FROM_BEGIN;
       const len = FILE_READ_TO_END;
       try {
-       var data = await fileContext.read(fileContextHandle, position, len)
+       var data = await fileContext.read(position, len);
       } catch(err) {
         return err;
       }
@@ -30,7 +29,7 @@ module.exports = {
     write: async () => {
       let content = 'file content may be a string';
       try {
-        await fileContext.write(fileContextHandle, content)
+        await fileContext.write(content);
       } catch(err) {
         return err;
       }
@@ -39,7 +38,7 @@ module.exports = {
 
     close: async () => {
       try {
-        await fileContext.close(fileContextHandle)
+        await fileContext.close();
       } catch(err) {
         return err;
       }
@@ -48,11 +47,11 @@ module.exports = {
 
     metadata: async () => {
       try {
-        var metaData = await fileContext.metadata(fileContextHandle)
+        var metaData = await fileContext.userMetadata;
       } catch(err) {
         return err;
       }
-        return `Returns file meta data: ${JSON.stringify(metaData)}`;
+        return `Returns file meta data: ${metaData.toString()}`;
     }
   }
 }
