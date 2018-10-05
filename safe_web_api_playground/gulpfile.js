@@ -61,11 +61,14 @@ gulp.task('css-deps', function () {
     ])
     .pipe(concat('deps.css'))
     .pipe(gulp.dest('./build/css'));
+  gulp.src([
+      './node_modules/bootstrap/dist/css/bootstrap.css.map'
+    ])
+    .pipe(gulp.dest('./build/css'));
 });
 
 gulp.task('fonts', function () {
   gulp.src([
-      './node_modules/bootstrap/fonts/*.*',
       './static/fonts/**/*.*',
       './node_modules/npm-font-open-sans/fonts/**/*.*'
     ])

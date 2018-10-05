@@ -43,18 +43,18 @@
     <div class="container-fluid">
       <header>
         <div class="row">
-          <div class="col-xs-2 header bgcolor-snow-light">
+          <div class="col-2 header bgcolor-snow-light">
 
           </div>
-          <div class="col-xs-10 header bgcolor-primary-blue" id="rightheader">
-            <img id="safe-logo" class="pull-right" src="images/safenetwork_logo_mono.svg" alt="Safe Network Logo">
+          <div class="col-10 header bgcolor-primary-blue" id="rightheader">
+            <img id="safe-logo" class="float-right" src="images/safenetwork_logo_mono.svg" alt="Safe Network Logo">
           </div>
         </div>
       </header>
 
       <div class="row">
 
-        <div class="col-xs-2">
+        <div class="col-2">
           <div class="row">
             <div id="snippetParent">
 
@@ -62,35 +62,44 @@
           </div>
         </div>
 
-        <div class="col-xs-10 bgcolor-snow-medium" id="rightside">
+        <div class="col-10 bgcolor-snow-medium" id="rightside">
 
           <div class="row">
 
-            <div class="col-xs-10" id="codebox">
+            <div class="col-10" id="codebox">
               <div class="box">
                 <form class="form" id="codeForm">
                   <textarea class="form-control" id="code" ></textarea>
                   <button type="button" class="btn btn-success bgcolor-teal-100 tcolor-primary-white" id="runButton" onclick="handleSubmit()">RUN</button>
-		  <label class="switch pull-right">
-		    <input type="checkbox" onclick="toggleVim()">
-                    <span class="slider round"></span>
-	          </label>
-		  <p class="pull-right">vim&nbsp;</p>
+                  <div class="float-right mt-1">
+		    <label class="switch">
+		      <input id="emacs" type="checkbox" onclick="toggleEmacs()">
+                      <span class="slider"></span>
+	            </label>
+		    <p >Emacs&nbsp;</p>
+                  </div>
+                  <div class="float-right mr-1 mt-1">
+		    <label class="switch ">
+		      <input id="vim" type="checkbox" onclick="toggleVim()">
+                      <span class="slider"></span>
+	            </label>
+		    <p >vim&nbsp;</p>
+                  </div>
                 </form>
               </div>
             </div>
 
-            <div class="col-xs-2 clear-padding">
+            <div class="col-2 clear-padding">
               <div class="box" id="variables">
-                <h4>Saved variables</h4>
+                <h6>Saved variables</h6>
                 <p id="tempText"><i>No variables saved yet.</i></p>
               </div>
-            </div>
-          </div>
-        </div>
+            </div> <!-- closes col-2  -->
+          </div> <!-- closes row -->
+        </div> <!-- closes col-10 -->
 
-      </div>
-    </div>
+      </div> <!-- closes row -->
+    </div> <!-- closes container-fluid -->
 
     <script type="text/javascript" src="js/deps.js"></script>
     <script type="text/javascript" src="js/client-scripts.js"></script>
