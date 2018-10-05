@@ -1,5 +1,9 @@
 # SAFE web API playground Change Log
 
+## 3.1.0
+- Complies with Bootstrap4
+- Adds Emacs bindings toggle
+
 ## 3.0.0
 - Refactors code-snippets for newly exposed web API which is nearly identical to safe_app_nodejs
 

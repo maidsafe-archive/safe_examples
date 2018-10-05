@@ -58,11 +58,6 @@ textarea {
 
 .snippet {
   display: block;
-  font-size: 1.5rem;
-}
-
-.module-title {
-  font-size: 1.5rem;
 }
 
 .module-title:hover {
@@ -71,7 +66,8 @@ textarea {
 }
 
 .moduleContainer {
-  padding-left: 3%;
+  padding-left: 5%;
+  padding-bottom: 5%;
 }
 
 .varName {

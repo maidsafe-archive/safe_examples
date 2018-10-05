@@ -131,7 +131,7 @@ codeSnippets.map(function(module) {
 
   let titleEl = window.document.createElement('p');
   titleEl.setAttribute('data-toggle', 'collapse');
-  titleEl.setAttribute('class', 'module-title text-bold-2');
+  titleEl.setAttribute('class', 'module-title text-normal-1');
   titleEl.setAttribute('data-target', '#'+moduleName);
   titleEl.innerText = moduleName;
 

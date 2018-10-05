@@ -6,6 +6,7 @@ const CodeMirror = require('codemirror/lib/codemirror.js');
 require("codemirror/mode/javascript/javascript.js");
 require("codemirror/addon/edit/matchbrackets.js");
 require("codemirror/keymap/vim.js");
+require("codemirror/keymap/emacs.js");
 require("codemirror/addon/selection/active-line.js");
 
 function updateVariableValues() {
@@ -134,14 +135,31 @@ const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
 });
 
 const toggleVim = () => {
-  if(editor.options.keyMap === 'default') {
+  if(editor.options.keyMap === 'default' || editor.options.keyMap === 'emacs') {
+    const emacs = document.getElementById('emacs');
+    emacs.checked = false;
     editor.setOption('keyMap', 'vim');
   } else {
     editor.setOption('keyMap', 'default');
   }
   editor.focus();
 };
+
+const toggleEmacs = () => {
+  if(editor.options.keyMap === 'default' || editor.options.keyMap === 'vim') {
+    const vim = document.getElementById('vim');
+    vim.checked = false;
+    editor.setOption('keyMap', 'emacs');
+  } else {
+    editor.setOption('keyMap', 'default');
+  }
+  editor.focus();
+};
+
+const inputs = document.getElementsByTagName('input');
+Array.prototype.forEach.call(inputs, (input) => {input.checked = false});
 window.toggleVim = toggleVim;
+window.toggleEmacs = toggleEmacs;
 window.editor = editor;
 window.handleSubmit = handleSubmit;
 
