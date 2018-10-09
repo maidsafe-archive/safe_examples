@@ -7,6 +7,10 @@
     "build": "neutrino build",
     "start": "neutrino start"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maidsafe/safe_examples"
+  },
   "dependencies": {
     "@babel/helper-module-imports": "^7.0.0-beta.44",
     "vue": "^2.5.16"
