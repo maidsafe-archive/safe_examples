@@ -1,32 +1,32 @@
 module.exports = {
   immutableData: {
     fetch: async () => {
-      // idAddress argument is a buffer address to an ImmutableData structure
-      // Use idWriter.closeWriter to obtain idAddress
+      // iDataAddress argument is a buffer address to an ImmutableData structure
+      // Use iDataWriter.closeWriter to obtain idAddress
       try {
-        idReader = await app.immutableData.fetch(idAddress)
+        iDataReader = await app.immutableData.fetch(iDataAddress);
       } catch(err) {
         return err;
       }
-      return `Return ImmutableData reader handle: ${idReader}`;
+      return `Return ImmutableData reader interface: ${iDataReader}`;
     },
 
     create: async () => {
       try {
-        idWriter = await app.immutableData.create()
+        iDataWriter = await app.immutableData.create()
       } catch(err) {
         return err;
       }
-      return `ImmutableData writer interface: ${idWriter}`;
+      return `ImmutableData writer interface: ${iDataWriter}`;
     },
 
     write: async () => {
-      // Where does idWriter come from?
+      // Where does iDataWriter come from?
       // Run safeImmutableData.create first to obtain it.
 
-      // After running this function, you must use idWriter.closeWriter to save data to the network
+      // After running this function, you must use the iDataWriter.closeWriter snippet to save data to the network
       try {
-        await idWriter.write('my immutable data')
+        await iDataWriter.write('my immutable data')
       } catch (err) {
         return err;
       }
@@ -34,13 +34,19 @@ module.exports = {
     },
 
     closeWriter: async () => {
+      const getXorUrl = true; // Experimental feature
+      const mimeType = 'text/plain';
       try {
-        idAddress = await idWriter.close(cipherOpt)
+        iDataAddress = await iDataWriter.close(cipherOpt, getXorUrl, mimeType)
       } catch(err) {
         return err;
       }
-      idWriter = null;
-      return `ImmutableData was stored at address: ${idAddress}`;
+      iDataWriter = null;
+      if ( getXorUrl ) {
+          return `ImmutableData was stored at address: ${iDataAddress.name} and can be fetched via it's XOR-URL: ${iDataAddress.xorUrl}`;
+      } else {
+          return `ImmutableData was stored at address: ${iDataAddress}`;
+      }
     },
 
     read: async () => {
@@ -50,7 +56,7 @@ module.exports = {
         end: null // ends reading at this byte position
       };
       try {
-        var data = await idReader.read(readOptions)
+        var data = await iDataReader.read(readOptions)
       } catch(err) {
         return err;
       }
@@ -59,7 +65,7 @@ module.exports = {
 
     size: async () => {
       try {
-        var size = await idReader.size()
+        var size = await iDataReader.size()
       } catch(err) {
         return err;
       }

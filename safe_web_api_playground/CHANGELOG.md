@@ -1,5 +1,11 @@
 # SAFE web API playground Change Log
 
+## 3.2.0
+- Adds RDF emulation snippets
+- Adds WebId emulation snippets
+- Adds WebInterface snippets
+- Highlights return of XOR-URL value upon committing ImmutableData and MutableData
+
 ## 3.1.0
 - Complies with Bootstrap4
 - Adds Emacs bindings toggle

@@ -2,13 +2,12 @@ module.exports = {
   app: {
     initialiseApp: async () => {
       // Welcome! Get started by running this snippet.
-      // Reference documentation: http://docs.maidsafe.net/safe_app_nodejs/
-
-      /* Helpful tips */
+      
+      /* Helpful tip */
       // When not focused in this editor, simply hit `Enter` at any time to run code.
-
+      
       const appInfo = {
-        id: 'net.maidsafe.api_playground.webclient.10',
+        id: 'net.maidsafe.api_playground.webclient.9',
         name: 'SAFE web API playground',
         vendor: 'MaidSafe Ltd.',
         scope: null
@@ -42,6 +41,16 @@ module.exports = {
       return `Returns app interface.`;
     },
 
+    getOwnContainerName: async () => {
+      try {
+        var containerName = await app.getOwnContainerName();
+      } catch(err) {
+        return err;
+      }
+      return `Returns name of app's root container: ${containerName}`;
+    },
+
+
     authorise: async () => {
       // Sends autorisation request to authenticator
       try {
@@ -63,6 +72,21 @@ module.exports = {
         return err;
       }
       return data.body;
+    },
+
+    fetch: async () => {
+      // Experimental feature
+      // If you have an XOR-URL with a type tag, and therefore represents MutableData,
+      // use this operation to fetch an interface to the underlying data structure.
+      try {
+        var data = await app.fetch(
+          'safe://hyfktcerbwpctjz6ws8468hncw1ddpzrz65z3mapzx9wr413r7gj3w6yt5y:15001',
+        );
+      } catch(err) {
+        return err;
+      }
+      console.log(data);
+      return data;
     },
 
     networkState: async () => {
@@ -94,8 +118,8 @@ module.exports = {
       return 'All handles, except for app, have been freed from memory';
     },
 
-    isMockBuild: async () => {
-      const bool = app.isMockBuild();
+    appIsMock: async () => {
+      const bool = app.appIsMock();
       return `Are the underlying native libraries compiled for mock routing? ${bool}`;
     },
 

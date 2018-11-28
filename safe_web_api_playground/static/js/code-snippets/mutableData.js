@@ -98,7 +98,7 @@ module.exports = {
       const name = 'Mutable data name';
       const description = 'Mutable data description';
       try {
-        mData = await mData.setMetadata(name, description);
+        await mData.setMetadata(name, description);
       } catch (err) {
         return err;
       }
@@ -140,7 +140,8 @@ module.exports = {
       } catch(err) {
         return err;      
       }
-      return `Name: ${nameAndTag.name.buffer}, Tag: ${nameAndTag.type_tag}`;
+      // Returning `xorUrl` property is an experimental feature
+      return `Name: ${nameAndTag.name}, Tag: ${nameAndTag.typeTag}, XOR-URL: ${nameAndTag.xorUrl}`;
     },
 
     getVersion: async () => {
@@ -163,7 +164,11 @@ module.exports = {
     },
 
     put: async () => {
-      await mData.put(perms, entries)
+      try {
+        await mData.put(perms, entries)
+      } catch (err) {
+        return err;
+      }
       return 'Finished creating and committing MutableData to the network';
     },
 
@@ -202,7 +207,7 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns handle to operate on safeMutableDataPermissions: ${perms}`;
+      return `Returns MutableData permissions interface: ${perms}`;
     },
 
     getUserPermissions: async () => {
@@ -212,16 +217,16 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return `Returns handle to operate on safeMutableDataPermissions: ${perms}`;
+      return `Returns MutableData permissions interface: ${perms}`;
     },
 
     delUserPermissions: async () => {
       try {
-        await mData.delUserPermissions(signKey, version + 1)
+        await mData.delUserPermissions(pubSignKey, version + 1)
       } catch(err) {
         return err; 
       }
-      return `Permissions-Set removed for the sign key provided`;
+      return `Permissions-Set removed for the public sign key provided`;
     },
 
     setUserPermissions: async () => {
@@ -254,7 +259,7 @@ module.exports = {
 
     fromSerial: async () => {
       try {
-        mData = await app.mutableData.fromSerial(serializedMD)
+        mData = await app.mutableData.fromSerial(serialisedMD)
       } catch(err) {
         return err;
       }
@@ -264,12 +269,17 @@ module.exports = {
     emulateAs: async () => {
       // Wrap this MutableData into a known abstraction. Currently known: NFS
       // The returned nfsHandle will allow you to use safeNfs functions
+      const emulationOptions = {
+          nfs   : 'NFS',
+          rdf   : 'RDF',
+          webid : 'WebId'
+      };
       try {
-        nfs = await mData.emulateAs('NFS')
+        rdf = await mData.emulateAs(emulationOptions.rdf)
       } catch(err) {
         return err;
       }
-      return `Returns nfsHandle: ${nfs}`;
+      return `Returns emulation interface: ${rdf}`;
     }
   }
 }

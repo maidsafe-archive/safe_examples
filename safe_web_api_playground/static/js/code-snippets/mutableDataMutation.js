@@ -6,9 +6,9 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return 'Registers an insert operation with mutation handle, later to be applied.';
+      return 'Registers an insert operation with mutation interface, later to be applied.';
 
-      // You must now run mData.applyEntriesMutation(mutation) to save changes
+      // You must now run mData.applyEntriesMutation(mutation) to commit changes
     },
 
     delete: async () => {
@@ -18,9 +18,9 @@ module.exports = {
       } catch(err) {
         return err;
       }
-      return 'Registers a delete operation with mutation handle, later to be applied.' + _;
+      return 'Registers a delete operation with mutation interface, later to be applied.' + _;
 
-      // You must now run mData.applyEntriesMutation(mutation) to save changes
+      // You must now run mData.applyEntriesMutation(mutation) to commit changes
     },
 
     update: async () => {
@@ -31,9 +31,9 @@ module.exports = {
         return err;
       }
 
-      	return 'Registers an update operation with mutation handle, later to be applied.' + _;
+      	return 'Registers an update operation with mutation interface, later to be applied.' + _;
 
-      	// You must now run mData.applyEntriesMutation(mutation) to save changes
+        // You must now run mData.applyEntriesMutation(mutation) to commit changes
     }
   }
 }
