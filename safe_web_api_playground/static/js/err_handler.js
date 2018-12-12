@@ -204,7 +204,7 @@ const handleExperimentalApi = () => {
   p1.textContent = 'You are attempting to run an experimental feature.';
   p2.textContent = '- In upper right-hand corner of browser, click on icon with 3 vertical dots.';
   p3.textContent = '- Look for "Toggle Experiments" and turn it on.';
-  p4.textContent = '- All tabs with refresh.';
+  p4.textContent = '- All tabs will refresh.';
   p5.textContent = '- You should then see flask icon in address bar, to indicate experimental features toggled on.';
   div.appendChild(p1);
   let pElArray = [p1, p2, p3, p4, p5];
