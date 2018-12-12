@@ -3,7 +3,7 @@ module.exports = {
     len: async () => {
       let length = null;
       try {
-        length = await perms.len(permsHandle)
+        length = await perms.len()
       } catch(err) {
         return err;
       }

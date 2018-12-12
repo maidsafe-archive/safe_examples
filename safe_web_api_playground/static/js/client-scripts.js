@@ -102,6 +102,8 @@ function handleSubmit() {
       	return errHandler.handleReferenceError(res);	
       } else if(/Setup Incomplete/.test(res)) {
         return errHandler.handleIncompleteSetup();
+      } else if (/experimental/.test(res)) {
+        return errHandler.handleExperimentalApi();
       } else {
         let div = document.createElement('div');
         div.setAttribute("class", "box output");

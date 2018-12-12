@@ -21,7 +21,7 @@ module.exports = {
 
     listEntries: async () => {
       try {
-        var entriesArray = await entries.listEntries(entriesHandle);
+        var entriesArray = await entries.listEntries();
         entriesArray.forEach((entry) => {
           const key = entry.key.toString();
           const value = entry.value.buf.toString();
@@ -45,11 +45,11 @@ module.exports = {
 
     mutate: async () => {
       try {
-        mutationHandle = await entries.mutate()
+        mutation = await entries.mutate()
       } catch(err) {
         return err;
       }
-      return `Returns mutation handle: ${mutationHandle}`;
+      return `Returns mutation interface: ${mutation}`;
     }
   }
 }

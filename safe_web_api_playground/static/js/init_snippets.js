@@ -5,8 +5,6 @@ const mutableData = require('./code-snippets/mutableData');
 const mutableDataEntries = require('./code-snippets/mutableDataEntries');
 const mutableDataMutation = require('./code-snippets/mutableDataMutation');
 const mutableDataPermissions = require('./code-snippets/mutableDataPermissions');
-const nfs = require('./code-snippets/nfs');
-const nfsFile = require('./code-snippets/nfsFile');
 const cipherOpt = require('./code-snippets/cipherOpt');
 const crypto = require('./code-snippets/crypto');
 const cryptoEncKeyPair = require('./code-snippets/cryptoEncKeyPair');
@@ -15,6 +13,11 @@ const cryptoSecEncKey = require('./code-snippets/cryptoSecEncKey');
 const cryptoPubSignKey = require('./code-snippets/cryptoPubSignKey');
 const cryptoSecSignKey = require('./code-snippets/cryptoSecSignKey');
 const cryptoSignKeyPair = require('./code-snippets/cryptoSignKeyPair');
+const nfs = require('./code-snippets/nfs');
+const nfsFile = require('./code-snippets/nfsFile');
+const rdf = require('./code-snippets/rdf');
+const web = require('./code-snippets/web');
+const webid = require('./code-snippets/webid');
 //let helpers = require('./code-snippets/helpers');
 
 let codeSnippets = [
@@ -25,8 +28,6 @@ let codeSnippets = [
   mutableDataEntries,
   mutableDataMutation,
   mutableDataPermissions,
-  nfs,
-  nfsFile,
   cipherOpt,
   crypto,
   cryptoEncKeyPair,
@@ -34,7 +35,12 @@ let codeSnippets = [
   cryptoSecEncKey,
   cryptoPubSignKey,
   cryptoSecSignKey,
-  cryptoSignKeyPair
+  cryptoSignKeyPair,
+  nfs,
+  nfsFile,
+  rdf,
+  web,
+  webid
 ];
 
 function updateCode(string) {
@@ -150,7 +156,7 @@ codeSnippets.map(function(module) {
     } else {
       anchorEl.setAttribute("class", "snippet");
     }
-    anchorEl.setAttribute("id", i);
+    anchorEl.setAttribute("id", `${key}${i}`);
     anchorEl.addEventListener("click", (event) => {
       event.target.setAttribute("class", "snippet bgcolor-blue-500");
       const snippetArray = document.getElementsByClassName('snippet');

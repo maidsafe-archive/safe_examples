@@ -17,12 +17,20 @@ const errCase = (type) => {
           return 'nfs not yet defined. Use mData.emulateAs to first obtain nfs';
           break;
 
-        case 'idWriter':
-          return 'idWriter not yet defined. Use app.immutableData.create to first obtain idWriter interface';
+        case 'rdf':
+          return 'rdf not yet defined. Use mData.emulateAs to first obtain rdf';
           break;
 
-        case 'idReader':
-          return 'idReader not yet defined. Use app.immutableData.fetch to first obtain idReader interface';
+        case 'webid':
+          return 'webid not yet defined. Use mData.emulateAs to first obtain webid';
+          break;
+
+        case 'iDataWriter':
+          return 'iDataWriter not yet defined. Use app.immutableData.create to first obtain iDataWriter interface';
+          break;
+
+        case 'iDataReader':
+          return 'iDataReader not yet defined. Use app.immutableData.fetch to first obtain iDataReader interface';
           break;
 
         case 'mData':
@@ -105,8 +113,8 @@ const errCase = (type) => {
           return 'encryptedBuffer not yet defined. Use pubEncKey.encryptSealed to first obtain encryptedBuffer';
           break;
 
-        case 'idAddress':
-          return 'idAddress not yet defined. Use idWriter.closeWriter to first obtain idAddress';
+        case 'iDataAddress':
+          return 'iDataAddress not yet defined. Use iDataWriter.closeWriter to first obtain iDataAddress';
           break;
 
         case 'serialisedMD':
@@ -184,7 +192,37 @@ const handleIncompleteSetup = () => {
   }
 };
 
+const handleExperimentalApi = () => {
+  let div = document.createElement('div');
+  div.setAttribute("class", "red-box output");
+  let p1 = document.createElement('p');
+  let p2 = document.createElement('p');
+  let p3 = document.createElement('p');
+  let p4 = document.createElement('p');
+  let p5 = document.createElement('p');
+  let p6 = document.createElement('p');
+  p1.textContent = 'You are attempting to run an experimental feature.';
+  p2.textContent = '- In upper right-hand corner of browser, click on icon with 3 vertical dots.';
+  p3.textContent = '- Look for "Toggle Experiments" and turn it on.';
+  p4.textContent = '- All tabs will refresh.';
+  p5.textContent = '- You should then see flask icon in address bar, to indicate experimental features toggled on.';
+  div.appendChild(p1);
+  let pElArray = [p1, p2, p3, p4, p5];
+  pElArray.map(function(p) {
+    div.appendChild(p);
+  })
+  
+  let parentEl = document.getElementById('codebox');
+  if(parentEl.children.length == 1) {
+    parentEl.appendChild(div);
+  } else {
+    let parentChildren = parentEl.children;
+    parentEl.insertBefore(div, parentChildren[1]);
+  }
+};
+
 module.exports = {
   handleReferenceError,
-  handleIncompleteSetup
+  handleIncompleteSetup,
+  handleExperimentalApi
 };

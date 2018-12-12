@@ -173,22 +173,13 @@ module.exports = {
       } catch (err) {
         return err;
       }
-      return `Returns interface for Mutable Data structure behind app's root container: ${mData}`
-    },
-
-    getOwnContainerName: async () => {
-      try {
-        var containerName = await app.getOwnContainerName();
-      } catch(err) {
-        return err;
-      }
-      return `Returns name of app's root container: ${containerName}`;
+      return `Returns interface for Mutable Data structure behind app's root container: ${mData}`;
     },
 
     getContainer: async () => {
       const container = '_public';
       mData = await app.auth.getContainer(container);
-      return `Returns handle to Mutable Data behind ${container} container: ${mData}` 
+      return `Returns interface to Mutable Data behind ${container} container: ${mData}`;
     },
 
   }
