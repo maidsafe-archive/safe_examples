@@ -26,7 +26,7 @@ angular.module('tripsPlanner', [])
     };
 
     tripsList.addTrip = async () => {
-      const randomKey = Math.floor((Math.random() * 10000) + 1);
+      const randomKey = Math.floor((Math.random() * 10000) + 1).toString();
       await safenetwork.insertItem(randomKey, {text: tripsList.tripText, made: false});
       tripsList.tripText = '';
       await tripsList.refreshList();
