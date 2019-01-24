@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/2fnekwfbm5h2ayk7/branch/master?svg=true)]
+![Build status](https://ci.appveyor.com/api/projects/status/2fnekwfbm5h2ayk7/branch/master?svg=true)
 
 # safe_examples
 Examples showcasing various features of the SAFE Network.
@@ -10,7 +10,7 @@ Examples showcasing various features of the SAFE Network.
 [safe_web_api_playground](safe_web_api_playground), written in `NodeJS`, is an application allowing you to explore the web API.
 
 ## web_hosting_manager (NodeJS - Electron)
-[web_hosting_manager](web_hosting_manager), written in `NodeJS`, is an application which allows hosting and managing web files.
+[web_hosting_manager](https://github.com/maidsafe/safe-web-hosting-manager-electron), written in `NodeJS`, is an application which allows hosting and managing web files.
 
 ## safe_app_electron_quick_start (NodeJs - Electron)
 [safe_app_electron_quick_start](safe_app_electron_quick_start), it's a boilerplate with a tutorial to create an [Electron](https://electronjs.org) application.
