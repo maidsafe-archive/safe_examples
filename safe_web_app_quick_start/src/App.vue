@@ -10,7 +10,7 @@
         this.trips = await safenetwork.getItems();
       },
       addTrip: async function() {
-        const randomKey = Math.floor((Math.random() * 10000) + 1);
+        const randomKey = Math.floor((Math.random() * 10000) + 1).toString();
         await safenetwork.insertItem(randomKey, {text: this.tripText, made: false});
         this.tripText = '';
         await this.refreshList();
