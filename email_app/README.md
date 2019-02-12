@@ -1,3 +1,16 @@
+# **THIS MAIL TUTORIAL APPLICATION HAS BEEN DEPRECATED**
+
+## The email example app is no longer supported.
+The last known working version of this [v0.4.3](https://github.com/maidsafe/safe_examples/releases/tag/0.16.0) is configured to work with previous browser version [Peruse v0.7.0](https://github.com/maidsafe/safe_browser/releases/tag/peruse-browser-0.7.0).
+This will no longer be maintained or updated to work with more recent versions of the SAFE Browser
+
+## The Web Hosting Manager has been moved to its own repository. The latest release can be found [here](https://github.com/maidsafe/safe-web-hosting-manager-electron/releases/latest)
+
+
+
+
+
+
 # Safe Mail Tutorial Application
 
 The tutorial app show cases how to use the low level API from `safe_app_nodejs`
