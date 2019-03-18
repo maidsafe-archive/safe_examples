@@ -5,10 +5,8 @@ os:
 - osx
 - linux
 
-
 env:
 - NODE_ENV=prod
-
 
 node_js:
 - '8'
@@ -26,30 +24,3 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-before_deploy:
-- export TOKEN="$GITHUB_AUTH_TOKEN" OWNER="MaidSafe" REPO="release_config"
-- export FILE="https://api.github.com/repos/$OWNER/$REPO/contents/safe_authenticator/log.toml"
-- curl -O "$FILE" -H "Authorization:token $TOKEN" -H "Accept:application/vnd.github.v3.raw"
-- yarn install-all
-- yarn package-all
-- export EMAIL_APP="$(ls email_app/out/*.zip)";
-- export WEB_HOSTING_MANAGER="$(ls web_hosting_manager/release/*.zip)";
-- export SHA_256_SUM_EMAIL_APP="$(ls email_app/out/*.txt)";
-- export SHA_256_SUM_WHM="$(ls web_hosting_manager/release/*.txt)";
-- ls email_app/out
-- ls web_hosting_manager/release
-- echo "${EMAIL_APP}, ${WEB_HOSTING_MANAGER}, ${SHA_256_SUM_EMAIL_APP}, ${SHA_256_SUM_WHM} being deployed."
-deploy:
-  provider: releases
-  skip_cleanup: true
-  api_key: $GITHUB_AUTH_TOKEN
-  file: 
-    - "${EMAIL_APP}"
-    - "${WEB_HOSTING_MANAGER}"
-    - "${SHA_256_SUM_EMAIL_APP}"
-    - "${SHA_256_SUM_WHM}"
-  draft: true
-  prerelease: true
-  tag_name: $TRAVIS_TAG
-  on:
-    tags: true
