@@ -1,0 +1,65 @@
+// Colors
+$text-color-prefix: "tcolor" !default;
+$bg-color-prefix: "bgcolor" !default;
+
+// color variable prefixed with $color-
+$colors: (
+  primary-white: #ffffff,
+  primary-blue: #5593d7,
+
+  secondary-red: #f20808,
+  secondary-green: #9ed167,
+  secondary-orange: #fc9526,
+  secondary-yellow: #fddf4c,
+
+  smoke-dark: #555555,
+  smoke-medium: #8b8b8b,
+  smoke-light: #c2c1c1,
+
+  snow-dark: #c2c1c1,
+  snow-medium: #e4e4e4,
+  snow-light: #fafafa,
+
+  red-100: #a30000,
+  red-200: #c80202,
+  red-300: #f20808,
+  red-400: #fd5454,
+  red-500: #ffbbbb,
+
+  purple-100: #450085,
+  purple-200: #6904c6,
+  purple-300: #8c15f9,
+  purple-400: #9f40f7,
+  purple-500: #e3c6fc,
+
+  blue-100: #2b588a,
+  blue-200: #5593d7,
+  blue-300: #b5d1ef,
+  blue-400: #cbdcee,
+  blue-500: #dce5ee,
+
+  teal-100: #007f6f,
+  teal-200: #089f8c,
+  teal-300: #0fc3ac,
+  teal-400: #45ead5,
+  teal-500: #b2fdf3,
+
+  green-100: #4b850c,
+  green-200: #7ab639,
+  green-300: #9ed167,
+  green-400: #b6e97f,
+  green-500: #d3f7ad,
+
+  orange-100: #f09500,
+  orange-200: #fcb136,
+  orange-300: #fbc66f,
+  orange-400: #ffd898,
+  orange-500: #fee9c6,
+
+  grey-100: #555555,
+  grey-200: #8e8e8e,
+  grey-300: #a0a0a0,
+  grey-400: #c2c1c1,
+  grey-500: #fafafa
+) !default;
+

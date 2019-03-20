@@ -11,9 +11,6 @@ var envfile = require('envfile'),
   babelify = require('babelify');
 
 gulp.task('safe-styles', function(done) {
-  gulp.src('./node_modules/npm-font-open-sans/open-sans.scss')
-    .pipe(gulp.dest('./static/scss'));
-
   gulp.src('./static/scss/custom/main.scss')
     .pipe(gulp.dest('./static/scss'));
     done();

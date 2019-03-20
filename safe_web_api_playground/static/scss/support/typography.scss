@@ -1,0 +1,46 @@
+// Typography
+$typo-prefix: "text" !default;
+
+// Font size
+$font-size-mobile: (
+  h0: 36px,
+  h1: 24px,
+  h2: 18px,
+  h3: 16px
+) !default;
+
+$font-size: (
+  h0: 48px,
+  h1: 36px,
+  h2: 30px,
+  h3: 24px,
+  h4: 18px,
+  h5: 16px,
+  h6: 14px
+) !default;
+
+// Font weight
+$font-weight: (
+  black: 800,
+  bold: 600,
+  normal: 400,
+  light: 300
+) !default;
+
+// Line height
+$line-height-mobile: (
+  h0: 40px,
+  h1: 27px,
+  h2: 20px,
+  h3: 18px,
+) !default;
+
+$line-height: (
+  h0: 54px,
+  h1: 40px,
+  h2: 33px,
+  h3: 27px,
+  h4: 20px,
+  h5: 18px,
+  h6: 16px
+) !default;

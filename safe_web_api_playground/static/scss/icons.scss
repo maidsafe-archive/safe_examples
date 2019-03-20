@@ -1,0 +1,52 @@
+
+.#{$icon-prefix} {
+  display: inline-block;
+}
+.#{$icon-prefix}:after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+// Icon sizes
+@each $size in $icon-sizes {
+  .#{$icon-prefix}-#{$size} {
+    width: #{$size}px;
+    height: #{$size}px;
+  }
+  .#{$icon-prefix}-#{$size}:after {
+    background-size: #{$size}px;
+  }
+}
+
+@mixin traverseIconList($prefix, $url, $list) {
+  @each $name, $value in $list {
+    @if nth($value, 1) {
+      .#{$prefix}-#{$name}:after {
+        background-image: url("#{$url}#{$name}#{$icons-ext}");
+      }
+    }
+    @if nth($value, 2) {
+      .#{$prefix}-#{$name}:hover:after {
+        background-image: url("#{$url}#{$name}_hover#{$icons-ext}");
+      }
+    }
+    @if nth($value, 3) {
+      .#{$prefix}-#{$name}:active:after {
+        background-image: url("#{$url}#{$name}_active#{$icons-ext}");
+      }
+    }
+  }
+}
+
+// Icons list
+@include traverseIconList($icon-prefix, $icons-url, $icon-list);
+
+// light icons
+@include traverseIconList($light-icon-prefix, $light-icons-url, $icon-list);
+
+// custom icons
+@include traverseIconList($custom-icon-prefix, $custom-icons-url, $custom-icon-list);
