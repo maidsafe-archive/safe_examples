@@ -1,88 +1,82 @@
-var envfile = require('envfile'),
+const envfile = require('envfile'),
   fs = require('fs'),
   gulp = require('gulp'),
   sass = require('gulp-sass'),
   concat = require('gulp-concat'),
   nodemon = require('gulp-nodemon'),
-  watch = require('gulp-watch'),
   image = require('gulp-image'),
   browserify = require('browserify'),
   source = require('vinyl-source-stream'),
   babelify = require('babelify');
 
-gulp.task('safe-styles', function() {
-  gulp.src([
-    './node_modules/safe_ux_guidelines/scss/**/*.scss',
-    './node_modules/npm-font-open-sans/open-sans.scss',
-    '!./node_modules/safe_ux_guidelines/scss/main.scss'
-  ])
+function getStyleDeps () {
+  return gulp.src('./static/scss/custom/main.scss')
     .pipe(gulp.dest('./static/scss'));
+}
 
-  gulp.src('./static/scss/custom/main.scss')
-    .pipe(gulp.dest('./static/scss'));
-});
-
-gulp.task('image', function () {
+function images (done) {
   gulp.src('./static/images/*')
     .pipe(image())
     .pipe(gulp.dest('./build/images'));
 
   gulp.src('./favicon.ico')
     .pipe(gulp.dest('./build'));
-});
+  done();
+}
 
-gulp.task('js-deps', function () {
-  gulp.src([
+function jsDeps () {
+  return gulp.src([
       './node_modules/jquery/dist/jquery.min.js',
       './node_modules/bootstrap/dist/js/bootstrap.min.js'
     ])
     .pipe(concat('deps.js'))
     .pipe(gulp.dest('./build/js'));
-});
+}
 
-gulp.task('html', function () {
-  gulp.src(
+function html () {
+  return gulp.src(
     './index.html'
     )
     .pipe(gulp.dest('./build'));
-});
+}
 
-gulp.task('scss', function () {
-  gulp.src([
+function scss () {
+  return gulp.src([
       './static/scss/main.scss',
     ])
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('./build/css'));
-});
+}
 
-gulp.task('css-deps', function () {
+function cssDeps () {
   gulp.src([
       './node_modules/bootstrap/dist/css/bootstrap.css'
     ])
     .pipe(concat('deps.css'))
     .pipe(gulp.dest('./build/css'));
-  gulp.src([
+
+  return gulp.src([
       './node_modules/bootstrap/dist/css/bootstrap.css.map'
     ])
     .pipe(gulp.dest('./build/css'));
-});
+}
 
-gulp.task('fonts', function () {
-  gulp.src([
+function fonts () {
+  return gulp.src([
       './static/fonts/**/*.*',
       './node_modules/npm-font-open-sans/fonts/**/*.*'
     ])
     .pipe(gulp.dest('./build/fonts'));
-});
+}
 
-gulp.task('codemirror', function () {
-  gulp.src([
+function codemirror () {
+  return gulp.src([
       './node_modules/codemirror/lib/codemirror.css'
     ])
     .pipe(gulp.dest('./build/css'));
-});
+}
 
-gulp.task('js', function () {
+function bundleJS () {
   var sourceDirectory = __dirname + '/static/js',
     destinationDirectory = __dirname + '/build/js',
     outputFile = 'client-scripts.js',
@@ -94,11 +88,10 @@ gulp.task('js', function () {
         console.log(err);
       })
       .pipe(source('client-scripts.js'))
-      .pipe(gulp.dest(destinationDirectory))
+      .pipe(gulp.dest(destinationDirectory));
+}
 
-});
-
-gulp.task('serve', function () {
+function serve (done) {
   var env = envfile.parseFileSync('.env');
   nodemon({
     script: './index.js',
@@ -106,23 +99,20 @@ gulp.task('serve', function () {
     ignore: ['build/**/*.*', 'static/**/*.*', 'node_modules'],
     tasks: [],
     env: env
-  }).on('restart', function () {
+  }).on('restart', function (event) {
     console.log('server restarted....');
   });
-});
+  done();
+}
 
-gulp.task('watch', function () {
-  watch(['./static/js/*.js', './static/js/**/*.js'], function () {
-    gulp.start('js');
-  });
+function watch (done) {
+  gulp.watch (['./static/js/*.js', './static/js/**/*.js'], bundleJS);
+  
+  gulp.watch('./static/scss/custom/*.scss', scss);
+  
+  gulp.watch('./index.html', html);
+  done();
+}
 
-  watch('./static/scss/**/*.scss', function () {
-    gulp.start('scss');
-  });
-
-  watch('./index.html', function () {
-    gulp.start('html');
-  });
-});
-
-gulp.task('default', ['codemirror', 'js-deps', 'html', 'scss', 'css-deps', 'js', 'watch', 'serve', 'fonts', 'image']);
+exports.getStyleDeps = getStyleDeps;
+exports.default = gulp.series(watch, codemirror, jsDeps, html, scss, cssDeps, bundleJS, serve, fonts, images);

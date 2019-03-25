@@ -1,0 +1,83 @@
+// Black 1
+.#{$typo-prefix}-black-1 {
+  font-size: map-get($font-size, h0);
+  font-weight: map-get($font-weight, black);
+  line-height: map-get($line-height, h0);
+
+  // Mobile
+  @media screen and (max-width: map-get($grid-breakpoints, 'md')) {
+    font-size: map-get($font-size-mobile, h0);
+    font-weight: map-get($font-weight, black);
+    line-height: map-get($line-height-mobile, h0);
+  }
+}
+
+// Black 2
+.#{$typo-prefix}-black-2 {
+  font-size: map-get($font-size, h1);
+  font-weight: map-get($font-weight, black);
+  line-height: map-get($line-height, h1);
+
+  // Mobile
+  @media screen and (max-width: map-get($grid-breakpoints, 'md')) {
+    font-size: map-get($font-size-mobile, h1);
+    font-weight: map-get($font-weight, black);
+    line-height: map-get($line-height-mobile, h1);
+  }
+}
+
+// Bold 1
+.#{$typo-prefix}-bold-1 {
+  font-size: map-get($font-size, h2);
+  font-weight: map-get($font-weight, bold);
+  line-height: map-get($line-height, h2);
+
+  // Mobile
+  @media screen and (max-width: map-get($grid-breakpoints, 'md')) {
+    font-size: map-get($font-size-mobile, h1);
+    font-weight: map-get($font-weight, bold);
+    line-height: map-get($line-height-mobile, h1);
+  }
+}
+
+// Bold 2
+.#{$typo-prefix}-bold-2 {
+  font-size: map-get($font-size, h3);
+  font-weight: map-get($font-weight, bold);
+  line-height: map-get($line-height, h3);
+
+  // Mobile
+  @media screen and (max-width: map-get($grid-breakpoints, 'md')) {
+    font-size: map-get($font-size-mobile, h2);
+    font-weight: map-get($font-weight, bold);
+    line-height: map-get($line-height-mobile, h2);
+  }
+}
+
+// Normal 1
+.#{$typo-prefix}-normal-1 {
+  font-size: map-get($font-size, h4);
+  font-weight: map-get($font-weight, normal);
+  line-height: map-get($line-height, h4);
+
+  // Mobile
+  @media screen and (max-width: map-get($grid-breakpoints, 'md')) {
+    font-size: map-get($font-size-mobile, h3);
+    font-weight: map-get($font-weight, normal);
+    line-height: map-get($line-height-mobile, h3);
+  }
+}
+
+// Normal 2
+.#{$typo-prefix}-normal-2 {
+  font-size: map-get($font-size, h5);
+  font-weight: map-get($font-weight, normal);
+  line-height: map-get($line-height, h5);
+}
+
+// Normal 3
+.#{$typo-prefix}-normal-3 {
+  font-size: map-get($font-size, h6);
+  font-weight: map-get($font-weight, normal);
+  line-height: map-get($line-height, h6);
+}

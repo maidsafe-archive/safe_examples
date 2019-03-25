@@ -1,0 +1,60 @@
+// variables related to SVG Icons
+$icon-prefix: "icon" !default;
+$light-icon-prefix: "light-icon" !default;
+$custom-icon-prefix: "custom-icon" !default;
+
+$icons-url: "../assets/icons/" !default;
+$light-icons-url: "#{$icons-url}light/" !default;
+$custom-icons-url: "#{$icons-url}custom/" !default;
+
+$icons-ext: ".svg" !default;
+
+// icon sizes
+$icon-sizes: 36 24 20 18 16 14 !default;
+
+// Icon urls
+// name: (Normal, Hover, Active)
+$icon-list: (
+  add: (true, false, false),
+  archive: (true, false, false),
+  attachment: (true, false, false),
+  bell: (true, false, false),
+  checked: (true, false, false),
+  checklist: (true, false, false),
+  cloud: (true, false, false),
+  controls: (true, false, false),
+  cross: (true, false, false),
+  download: (true, false, false),
+  filter: (true, false, false),
+  flag: (true, false, false),
+  garbage: (true, false, false),
+  hamburger: (true, false, false),
+  heart: (true, false, false),
+  hide: (true, false, false),
+  home: (true, false, false),
+  horizontal-dots: (true, false, false),
+  hourglass: (true, false, false),
+  key: (true, false, false),
+  login: (true, false, false),
+  logout: (true, false, false),
+  minus: (true, false, false),
+  pencil: (true, false, false),
+  pin: (true, false, false),
+  power: (true, false, false),
+  save: (true, false, false),
+  send: (true, false, false),
+  star: (true, false, false),
+  stop-watch: (true, false, false),
+  target: (true, false, false),
+  unlock: (true, false, false),
+  upload: (true, false, false),
+  vertical-dots: (true, false, false),
+  warning: (true, false, false),
+  zoom-in: (true, false, false),
+  zoom-out: (true, false, false),
+) !default;
+
+$custom-icon-list: (
+  maidsafe_mark: (true, true, true),
+  safe_mark: (true, true, true)
+) !default;

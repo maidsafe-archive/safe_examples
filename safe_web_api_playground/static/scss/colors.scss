@@ -1,0 +1,11 @@
+@each $name, $color in $colors {
+  // text colors
+  .#{$text-color-prefix}-#{$name} {
+    color: $color;
+  }
+
+  // background colors
+  .#{$bg-color-prefix}-#{$name} {
+    background-color: $color;
+  }
+}

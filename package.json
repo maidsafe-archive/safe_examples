@@ -2,5 +2,8 @@
   "name": "safe_examples",
   "version": "0.1.0",
   "description": "SAFE Network example applications",
-  "repository": "git@github.com:maidsafe/safe_examples.git"
+  "repository": "git@github.com:maidsafe/safe_examples.git",
+  "scripts": {
+    "test": "echo \"No tests specified\""
+  }
 }
