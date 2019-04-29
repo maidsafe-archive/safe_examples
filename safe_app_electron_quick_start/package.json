@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "postinstall": "npm rebuild --runtime=electron --target=2.0.18 --disturl=https://atom.io/download/atom-shell --build-from-source"
+    "postinstall": "npm rebuild --runtime=electron --target=4.1.5 --disturl=https://atom.io/download/atom-shell --build-from-source"
   },
   "repository": "https://github.com/maidsafe/safe_examples/safe_app_electron_quick_start",
   "keywords": [
@@ -26,7 +26,7 @@
   },
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^2.0.18"
+    "electron": "^4.1.5"
   },
   "dependencies": {
     "angular": "^1.7.8"
