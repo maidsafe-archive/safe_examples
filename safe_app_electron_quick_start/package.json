@@ -4,8 +4,8 @@
   "description": "A minimal SAFE App application with Electron",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "postinstall": "npm rebuild --runtime=electron --target=4.1.5 --disturl=https://atom.io/download/atom-shell --build-from-source"
+    "start": "electron --no-sandbox .",
+    "postinstall": "npm rebuild --runtime=electron --target=5.0.0 --disturl=https://atom.io/download/atom-shell --build-from-source"
   },
   "repository": "https://github.com/maidsafe/safe_examples/safe_app_electron_quick_start",
   "keywords": [
@@ -26,7 +26,7 @@
   },
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^4.1.5"
+    "electron": "^5.0.0"
   },
   "dependencies": {
     "angular": "^1.7.8"
