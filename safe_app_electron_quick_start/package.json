@@ -1,6 +1,6 @@
 {
   "name": "safe_app_electron_quick_start",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A minimal SAFE App application with Electron",
   "main": "main.js",
   "scripts": {
@@ -29,6 +29,7 @@
     "electron": "^5.0.0"
   },
   "dependencies": {
+    "@maidsafe/safe-node-app": "git+https://github.com/joshuef/safe_app_nodejs.git#NAPI",
     "angular": "^1.7.8"
   }
 }

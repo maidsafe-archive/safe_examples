@@ -46,7 +46,7 @@ if (!gotTheLock) {
   app.quit()
 } else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
-    const resAuthUri = commandLine[2];
+    const resAuthUri = commandLine[3];
     if (resAuthUri) {
       mainWindow.webContents.send('system-uri-response', resAuthUri);
     }
