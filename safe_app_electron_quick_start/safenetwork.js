@@ -1,6 +1,6 @@
 const app = require('electron').remote.app;
 
-const customExecPath = [process.execPath, app.getAppPath()];
+const customExecPath = [process.execPath, "--no-sandbox", app.getAppPath()];
 
 async function sendAuthRequest() {
 }
