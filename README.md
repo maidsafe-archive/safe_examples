@@ -3,6 +3,8 @@
 # safe_examples
 Examples showcasing various features of the SAFE Network.
 
+**Note this repository and the examples contained within are no longer maintained. For the latest on the SAFE Network project please see [safenetwork.tech](https://safenetwork.tech/) or our community forum [safenetforum.org](https://safenetforum.org/)**
+
 ## safe_web_api_playground (NodeJS - Electron)
 [safe_web_api_playground](safe_web_api_playground), written in `NodeJS`, is an application allowing you to explore the web API.
 
